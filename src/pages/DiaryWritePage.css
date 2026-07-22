@@ -1,0 +1,150 @@
+.diary-write {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+}
+
+.diary-write__toolbar button {
+  padding: 8px 14px;
+  border: 1px solid #e0d5c0;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.diary-write__toolbar button:hover {
+  background-color: #f7efe0;
+}
+
+.diary-write__dateline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 4px;
+  border-bottom: 2px solid #e0d5c0;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.diary-write__date {
+  position: relative;
+}
+
+.diary-write__date-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-family: var(--diary-font);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+}
+
+.diary-write__date-btn:active {
+  background-color: #f7efe0;
+}
+
+.diary-write__mood-selected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.diary-write__mood-selected:active {
+  background-color: #f7efe0;
+}
+
+.diary-write__mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e0d5c0;
+  border-radius: 8px;
+  background-color: #fffdf7;
+}
+
+.diary-write__mood-grid label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border: 1px solid #e0d5c0;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.diary-write__mood-grid label.selected {
+  background-color: #fff3cd;
+  border-color: #ffb84d;
+}
+
+.diary-write__mood-grid input {
+  display: none;
+}
+
+.diary-write__mood-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.diary-write__mood-label {
+  font-size: 0.7rem;
+  color: #777;
+  text-align: center;
+}
+
+.diary-write__mood-grid label.selected .diary-write__mood-label {
+  color: #b07a10;
+  font-weight: 600;
+}
+
+/* 그림은 고정 높이, 남는 세로 공간은 전부 글쓰기 */
+.diary-write__content {
+  flex: 1;
+  min-height: 160px;
+  padding: 10px 12px;
+  border: 1px solid #e0d5c0;
+  border-radius: 8px;
+  font-family: var(--diary-font);
+  font-size: 1.25rem;
+  background-color: #fff;
+  resize: none;
+  line-height: 1.6;
+}
+
+.diary-write__submit {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ffb84d;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.diary-write__submit:hover {
+  background-color: #ffa726;
+}

@@ -1,0 +1,30 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* 일기 글씨체. FontPicker에서 사용자가 바꿀 수 있음 */
+  --diary-font: 'Gaegu', cursive;
+}
+
+html {
+  /* 모바일 웹뷰에서 탭 하이라이트 제거 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background-color: #f0ece1;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  /* 모바일 웹뷰 기준. PC 브라우저에서 열어도 모바일 폭으로 보이도록 고정 */
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background-color: #fffdf7;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.06);
+}

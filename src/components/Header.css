@@ -1,0 +1,25 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  border-bottom: 2px solid #f0e6d6;
+  background-color: #fffdf7;
+}
+
+.header__logo {
+  margin: 0;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.header__actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}

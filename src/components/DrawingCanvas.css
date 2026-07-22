@@ -1,0 +1,108 @@
+.drawing {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+  height: 360px;
+}
+
+.drawing__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.drawing__colors {
+  display: flex;
+  gap: 6px;
+}
+
+.drawing__color {
+  width: 22px;
+  height: 22px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+}
+
+.drawing__color.selected {
+  border-color: #b07a10;
+  transform: scale(1.15);
+}
+
+/* 무지개 원: 누르면 전체 색상 선택기가 열림 */
+.drawing__color--custom {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(
+    #e74c3c,
+    #f1c40f,
+    #2ecc71,
+    #3498db,
+    #9b59b6,
+    #e74c3c
+  );
+  cursor: pointer;
+}
+
+.drawing__color--custom input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drawing__color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+
+.drawing__tools {
+  display: flex;
+  gap: 4px;
+}
+
+.drawing__tools button {
+  padding: 4px 8px;
+  border: 1px solid #e0d5c0;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.drawing__tools button.selected {
+  background-color: #ffd966;
+  border-color: #ffb84d;
+  font-weight: 600;
+}
+
+.drawing__canvas {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 1px solid #e0d5c0;
+  border-radius: 8px;
+  background-color: #fff;
+  /* 스크롤 대신 그리기 제스처를 받도록 함 */
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* 지우개 모드: 지우개 크기(20px)의 원형 커서로 지워지는 영역을 표시 */
+.drawing__canvas--eraser {
+  cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='11' cy='11' r='9.5' fill='rgba(255,255,255,0.85)' stroke='%23888' stroke-width='1.5' stroke-dasharray='3 2'/%3E%3C/svg%3E")
+      11 11,
+    cell;
+}

@@ -1,0 +1,19 @@
+.diary-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  align-content: start;
+  padding: 16px;
+  /* 하단 플러스 버튼에 가려지지 않도록 여백 확보 */
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+.diary-list--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: #999;
+  gap: 4px;
+}
