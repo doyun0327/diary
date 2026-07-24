@@ -21,41 +21,70 @@
   max-height: 92dvh;
   display: flex;
   flex-direction: column;
-  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
-  border-radius: 20px 20px 0 0;
-  background: var(--color-bg-muted);
-  box-shadow: 0 -10px 40px rgba(80, 60, 20, 0.2);
+  padding: 12px 18px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: #fffcf8;
+  box-shadow: 0 -20px 50px rgba(28, 24, 20, 0.18);
 }
 
 .diary-book__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 10px;
 }
 
-.diary-book__head button {
-  min-width: 56px;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-surface);
-  font-family: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
+.diary-book__title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
-.diary-book__head button:disabled {
-  opacity: 0.55;
+.diary-book__icon-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.diary-book__icon-btn:hover {
+  background: var(--color-bg-muted);
+}
+
+.diary-book__icon-btn:disabled {
+  opacity: 0.45;
   cursor: wait;
 }
 
-.diary-book__head span {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--color-text);
+.diary-book__icon-btn--back {
+  justify-content: flex-start;
+  margin-left: -6px;
+}
+
+.diary-book__icon-btn--back svg {
+  display: block;
+  margin-left: -2px;
+}
+
+.diary-book__icon-btn--end {
+  justify-content: flex-end;
+  margin-right: -6px;
+  padding-right: 2px;
 }
 
 .diary-book__status,
@@ -154,8 +183,7 @@
 }
 
 .diary-book__hint {
-  margin: 10px 0 0;
-  text-align: center;
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
+  margin: 0;
+  min-height: 0;
+  font-size: 0;
 }

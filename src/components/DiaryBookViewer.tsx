@@ -88,12 +88,56 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
       <div className="diary-book__backdrop" onClick={onClose} />
       <div className="diary-book__panel">
         <header className="diary-book__head">
-          <button type="button" onClick={onClose}>
-            닫기
+          <button
+            type="button"
+            className="diary-book__icon-btn diary-book__icon-btn--back"
+            onClick={onClose}
+            aria-label="닫기"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </button>
-          <span>{subtitle}</span>
-          <button type="button" onClick={handleDownload} disabled={busy || downloading || !pages}>
-            {downloading ? '저장 중…' : 'PDF'}
+          <span className="diary-book__title">{subtitle || '일기장'}</span>
+          <button
+            type="button"
+            className="diary-book__icon-btn diary-book__icon-btn--end"
+            onClick={handleDownload}
+            disabled={busy || downloading || !pages}
+            aria-label="PDF 저장"
+            title="PDF 저장"
+          >
+            {downloading ? (
+              '…'
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            )}
           </button>
         </header>
 
@@ -145,7 +189,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
           </div>
         )}
 
-        <p className="diary-book__hint">좌우로 밀거나 화살표로 넘겨 보세요</p>
+        <p className="diary-book__hint"></p>
       </div>
     </div>
   );
