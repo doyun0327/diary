@@ -3,9 +3,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   align-content: start;
-  padding: 16px;
-  /* 하단 플러스 버튼에 가려지지 않도록 여백 확보 */
+  padding: 16px 16px;
   padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgba(196, 122, 58, 0.05), transparent 55%);
 }
 
 .diary-list--empty {
@@ -14,6 +15,10 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: #999;
-  gap: 4px;
+  color: var(--text-muted);
+  gap: 6px;
+  text-align: center;
+  padding: 0 28px;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }

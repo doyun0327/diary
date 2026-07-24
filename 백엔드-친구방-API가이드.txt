@@ -1,0 +1,242 @@
+==========================================================
+그림 일기 - 친구 방 API 가이드 (Spring Boot)
+작성일: 2026-07-24
+==========================================================
+
+[ 목표 ]
+- 친구끼리 방을 만들고(6자리 초대코드), 일기를 공유하고 댓글을 달 수 있다.
+- 프론트엔드: React (Vite 프록시 /api → http://localhost:8080)
+- 로그인(OAuth) 없이 MVP: 클라이언트 ID + 닉네임 헤더로 신원 구분
+
+
+----------------------------------------------------------
+1. 공통 요청 헤더
+----------------------------------------------------------
+
+모든 /api/rooms/** 요청에 포함:
+
+  X-Client-Id:  <UUID>     // 기기/브라우저마다 고정 (프론트가 localStorage에 보관)
+  X-Nickname:   <문자열>   // 표시용 닉네임 (UTF-8을 URI 인코딩한 값, 예: %EC%9D%B5%EB%AA%85)
+                           // 서버에서 URLDecoder.decode(value, UTF_8) 로 복원
+
+서버는 X-Client-Id 로 멤버/작성자를 식별한다.
+닉네임이 비어 있으면 "익명" 등으로 저장해도 된다.
+(브라우저 fetch 헤더에 한글을 직접 넣을 수 없어 프론트가 encodeURIComponent 함)
+
+CORS (직접 8080 호출 시):
+  allowedHeaders 에 X-Client-Id, X-Nickname 포함.
+
+
+----------------------------------------------------------
+2. 엔티티 스케치
+----------------------------------------------------------
+
+Room
+  id, name, inviteCode(6자리 숫자 문자열), createdAt, createdByClientId
+
+RoomMember
+  roomId, clientId, nickname, joinedAt
+  (roomId+clientId 유니크)
+
+RoomPost  (방에 공유된 일기 스냅샷)
+  id, roomId, diaryId, authorClientId, authorNickname,
+  title, date(YYYY-MM-DD), content, mood, imageUrl(nullable), createdAt
+
+RoomComment
+  id, postId, authorClientId, authorNickname, text, createdAt
+
+초대코드:
+  - 000000~999999 중 랜덤 6자리 (앞에 0 패딩)
+  - 생성 시 중복이면 재시도
+
+
+----------------------------------------------------------
+3. API
+----------------------------------------------------------
+
+(1) 방 만들기
+POST /api/rooms
+Body: { "name": "우리반 일기방" }
+  ※ inviteCode 는 요청에 넣지 않는다. 서버가 숫자 6자리를 자동 생성한다.
+Response 200:
+{
+  "id": "uuid",
+  "name": "우리반 일기방",
+  "inviteCode": "482913",
+  "createdAt": "2026-07-24T10:00:00",
+  "memberCount": 1
+}
+- 생성자를 RoomMember 에 자동 추가
+- inviteCode: 000000~999999 랜덤, 앞에 0 패딩, 중복 시 재시도
+
+
+(2) 초대코드로 입장
+POST /api/rooms/join
+Body: { "inviteCode": "482913" }
+Response 200: RoomSummary (위와 동일)
+- 이미 멤버면 그대로 방 정보 반환
+- 코드 없으면 404
+
+
+(3) 내 방 목록
+GET /api/rooms
+Response 200: RoomSummary[]
+- X-Client-Id 가 멤버인 방만
+
+
+(4) 방 상세 (+ 멤버)
+GET /api/rooms/{roomId}
+Response 200:
+{
+  "id": "...",
+  "name": "...",
+  "inviteCode": "482913",
+  "createdAt": "...",
+  "memberCount": 3,
+  "members": [
+    { "clientId": "...", "nickname": "민지", "joinedAt": "..." }
+  ]
+}
+- 멤버가 아니면 403
+
+
+(5) 일기 공유 (포스트 생성)
+POST /api/rooms/{roomId}/posts
+Body:
+{
+  "diaryId": "local-uuid",
+  "title": "비 오는 날",
+  "date": "2026-07-24",
+  "content": "오늘은 ...",
+  "mood": "happy",
+  "imageUrl": "data:image/png;base64,..."   // optional, 없으면 생략
+}
+Response 200: RoomPost
+{
+  "id": "uuid",
+  "roomId": "...",
+  "diaryId": "...",
+  "authorClientId": "...",
+  "authorNickname": "민지",
+  "title": "...",
+  "date": "2026-07-24",
+  "content": "...",
+  "mood": "happy",
+  "imageUrl": "...",
+  "createdAt": "..."
+}
+
+주의:
+- imageUrl 이 data URL 이면 본문이 클 수 있음 → DB는 TEXT/MEDIUMTEXT 또는
+  별도 파일 저장 후 URL만 넣는 방식 권장.
+- MVP는 data URL 허용. 용량 초과 시 413 + message.
+
+
+(6) 공유 일기 목록
+GET /api/rooms/{roomId}/posts
+Response 200: RoomPost[]  (최신순 권장)
+
+
+(7) 공유 일기 상세
+GET /api/rooms/{roomId}/posts/{postId}
+Response 200: RoomPost
+
+
+(8) 공유 일기 삭제 (작성자만)
+DELETE /api/rooms/{roomId}/posts/{postId}
+Response 204
+- authorClientId != X-Client-Id 이면 403
+
+
+(9) 댓글 목록
+GET /api/rooms/{roomId}/posts/{postId}/comments
+Response 200:
+[
+  {
+    "id": "uuid",
+    "postId": "...",
+    "authorClientId": "...",
+    "authorNickname": "수아",
+    "text": "그림 예쁘다!",
+    "createdAt": "..."
+  }
+]
+
+
+(10) 댓글 작성
+POST /api/rooms/{roomId}/posts/{postId}/comments
+Body: { "text": "응원해요" }
+Response 200: RoomComment
+- text 공백이면 400
+
+
+----------------------------------------------------------
+4. 컨트롤러 스케치 (참고)
+----------------------------------------------------------
+
+@RestController
+@RequestMapping("/api/rooms")
+public class RoomController {
+
+    @PostMapping
+    public RoomSummary create(@RequestHeader("X-Client-Id") String clientId,
+                              @RequestHeader(value="X-Nickname", defaultValue="익명") String nickname,
+                              @RequestBody CreateRoomRequest req) { ... }
+
+    @PostMapping("/join")
+    public RoomSummary join(...) { ... }
+
+    @GetMapping
+    public List<RoomSummary> myRooms(...) { ... }
+
+    @GetMapping("/{roomId}")
+    public RoomDetail detail(...) { ... }
+
+    @PostMapping("/{roomId}/posts")
+    public RoomPost createPost(...) { ... }
+
+    @GetMapping("/{roomId}/posts")
+    public List<RoomPost> posts(...) { ... }
+
+    @GetMapping("/{roomId}/posts/{postId}")
+    public RoomPost post(...) { ... }
+
+    @DeleteMapping("/{roomId}/posts/{postId}")
+    public ResponseEntity<Void> deletePost(...) { ... }
+
+    @GetMapping("/{roomId}/posts/{postId}/comments")
+    public List<RoomComment> comments(...) { ... }
+
+    @PostMapping("/{roomId}/posts/{postId}/comments")
+    public RoomComment createComment(...) { ... }
+}
+
+
+----------------------------------------------------------
+5. 프론트 연동 포인트
+----------------------------------------------------------
+
+- vite.config.ts 이미 /api → localhost:8080 프록시
+- src/api/roomsApi.ts 가 위 경로를 호출
+- 햄버거 메뉴 → 친구 방
+- 일기 상세 → 「방에 공유」
+
+
+----------------------------------------------------------
+6. 에러 응답 (권장)
+----------------------------------------------------------
+
+{
+  "message": "초대코드를 찾을 수 없어요"
+}
+
+HTTP:
+  400 잘못된 요청
+  403 권한 없음
+  404 없음
+  413 본문(이미지) 너무 큼
+
+
+==========================================================
+끝
+==========================================================

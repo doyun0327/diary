@@ -1,15 +1,21 @@
 .diary-card {
-  border: 1px solid #eee3cf;
-  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--bg-paper);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
 .diary-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: #e0d6c8;
+  box-shadow: 0 12px 28px rgba(40, 32, 20, 0.08);
+}
+
+.diary-card:active {
+  transform: scale(0.99);
 }
 
 .diary-card__image {
@@ -17,7 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #faf6ec;
+  background-color: var(--bg-muted);
 }
 
 .diary-card__image img {
@@ -27,23 +33,28 @@
 }
 
 .diary-card__placeholder {
-  font-size: 2.5rem;
-  opacity: 0.5;
+  font-size: 2rem;
+  opacity: 0.4;
 }
 
 .diary-card__body {
-  padding: 12px 16px;
+  padding: 12px 14px 14px;
 }
 
 .diary-card__body h3 {
   margin: 0 0 4px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .diary-card__meta {
   margin: 0;
-  font-size: 0.85rem;
-  color: #999;
+  font-size: 0.78rem;
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

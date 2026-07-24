@@ -19,10 +19,10 @@ function DiaryCard({ entry, onClick }: DiaryCardProps) {
       </div>
       <div className="diary-card__body">
         <h3>
-          {MOOD_MAP[entry.mood].emoji} {entry.date}
+          {MOOD_MAP[entry.mood].emoji} {entry.title || entry.date}
         </h3>
         <p className="diary-card__meta">
-          {entry.content ? entry.content : MOOD_MAP[entry.mood].label}
+          {entry.content || entry.date}
         </p>
       </div>
     </article>

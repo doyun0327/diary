@@ -12,7 +12,7 @@ function DiaryListPage({ entries, onSelect }: DiaryListPageProps) {
     return (
       <div className="diary-list diary-list--empty">
         <p>아직 작성한 일기가 없어요.</p>
-        <p>첫 번째 그림 일기를 남겨 보세요!</p>
+        <p>첫 번째 diary를 남겨 보세요!</p>
       </div>
     );
   }

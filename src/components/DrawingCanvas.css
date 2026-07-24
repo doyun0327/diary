@@ -1,108 +1,427 @@
 .drawing {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawing__canvas-wrap {
+  position: relative;
+  height: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow:
+    0 2px 8px rgba(80, 60, 20, 0.08),
+    inset 0 0 0 1px rgba(200, 180, 140, 0.35);
+}
+
+.drawing__photo-layers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.drawing__photo {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+  border: 2px solid rgba(232, 168, 56, 0.25);
+  border-radius: 4px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.drawing__photo.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 12px rgba(232, 168, 56, 0.25);
+  cursor: grab;
+}
+
+.drawing__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.drawing__photo-confirm {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+
+.drawing__photo-handle {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-surface);
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 3;
+}
+
+.drawing__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.drawing__canvas--eraser {
+  cursor: cell;
+}
+
+.drawing__canvas--sticker {
+  cursor: pointer;
+}
+
+/* 캔버스 위 떠 있는 도구 dock */
+.drawing__dock {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 0 0 auto;
-  height: 360px;
+  pointer-events: none;
+  z-index: 5;
 }
 
-.drawing__toolbar {
+.drawing__dock-bar,
+.drawing__colors {
+  pointer-events: auto;
+}
+
+.drawing__dock-bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.drawing__dock-btn {
+  flex: 1;
+  padding: 7px 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.drawing__dock-btn.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.drawing__dock-btn--muted {
+  color: var(--color-text-muted);
 }
 
 .drawing__colors {
   display: flex;
   gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.drawing__colors::-webkit-scrollbar {
+  display: none;
 }
 
 .drawing__color {
+  flex: 0 0 auto;
   width: 22px;
   height: 22px;
-  border: 2px solid transparent;
+  border: 2px solid #fff;
   border-radius: 50%;
-  cursor: pointer;
   padding: 0;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 
 .drawing__color.selected {
-  border-color: #b07a10;
-  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 
-/* 무지개 원: 누르면 전체 색상 선택기가 열림 */
 .drawing__color--custom {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: conic-gradient(
-    #e74c3c,
-    #f1c40f,
-    #2ecc71,
-    #3498db,
-    #9b59b6,
-    #e74c3c
-  );
-  cursor: pointer;
+  background: conic-gradient(#e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
 }
 
 .drawing__color--custom input {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   opacity: 0;
   cursor: pointer;
 }
 
 .drawing__color-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid #fff;
   pointer-events: none;
 }
 
-.drawing__tools {
-  display: flex;
-  gap: 4px;
+
+.drawing__file-input {
+  display: none;
 }
 
-.drawing__tools button {
-  padding: 4px 8px;
-  border: 1px solid #e0d5c0;
-  border-radius: 6px;
-  background-color: #fff;
-  font-size: 0.75rem;
+.drawing__sticker-panel {
+  padding: 10px 12px 12px;
+  border-radius: 14px;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-soft);
+}
+
+.drawing__sticker-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.drawing__sticker-panel-head button {
+  border: none;
+  background: none;
+  font-size: 0.78rem;
+  color: var(--color-accent-text);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 2px 4px;
+}
+
+.drawing__sticker-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.drawing__sticker-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.drawing__sticker-tab {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.drawing__sticker-tab.active {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+}
+
+.drawing__stickers {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  max-height: 148px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.drawing__stickers button {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.drawing__stickers button.selected {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+.drawing__sticker-hint,
+.drawing__photo-hint {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-accent-text);
+  text-align: center;
+  pointer-events: none;
+}
+
+.drawing__photo-hint {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  z-index: 4;
+}
+
+.drawing__eraser-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+}
+
+.drawing__eraser-sizes {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.drawing__eraser-size {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 4px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.drawing__eraser-size.active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
+.drawing__eraser-preview {
+  display: block;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.drawing__eraser-size.active .drawing__eraser-preview {
+  background: var(--color-accent-text);
+}
+
+.drawing__clear-all {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--color-danger-border);
+  border-radius: 999px;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 0.72rem;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.drawing__tools button.selected {
-  background-color: #ffd966;
-  border-color: #ffb84d;
-  font-weight: 600;
+.drawing__font-panel {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-soft);
 }
 
-.drawing__canvas {
-  flex: 1;
-  min-height: 0;
+.drawing__fonts {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.drawing__font-group + .drawing__font-group {
+  margin-top: 8px;
+}
+
+.drawing__font-category {
+  margin: 0 4px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-accent-text);
+}
+
+.drawing__font-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   width: 100%;
-  border: 1px solid #e0d5c0;
-  border-radius: 8px;
-  background-color: #fff;
-  /* 스크롤 대신 그리기 제스처를 받도록 함 */
-  touch-action: none;
-  cursor: crosshair;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-surface);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text);
+  margin-bottom: 4px;
 }
 
-/* 지우개 모드: 지우개 크기(20px)의 원형 커서로 지워지는 영역을 표시 */
-.drawing__canvas--eraser {
-  cursor: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='11' cy='11' r='9.5' fill='rgba(255,255,255,0.85)' stroke='%23888' stroke-width='1.5' stroke-dasharray='3 2'/%3E%3C/svg%3E")
-      11 11,
-    cell;
+.drawing__font-item.selected {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
 }
+
+.drawing__font-sample {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+

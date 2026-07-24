@@ -9,12 +9,12 @@
   top: calc(100% + 6px);
   left: 0;
   z-index: 21;
-  width: 300px;
+  width: min(300px, calc(100vw - 48px));
   padding: 12px;
-  border: 1px solid #e0d5c0;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background-color: #fffdf7;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-soft);
 }
 
 .calendar__header {
@@ -31,16 +31,16 @@
 .calendar__header button {
   width: 32px;
   height: 32px;
-  border: 1px solid #e0d5c0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--color-surface);
   font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .calendar__header button:active {
-  background-color: #f7efe0;
+  background-color: var(--color-bg-muted);
 }
 
 .calendar__weekdays {
@@ -53,16 +53,16 @@
   text-align: center;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #999;
+  color: var(--color-text-muted);
   padding: 4px 0;
 }
 
 .calendar__weekdays span:first-child {
-  color: #e17055;
+  color: var(--color-danger);
 }
 
 .calendar__weekdays span:last-child {
-  color: #0984e3;
+  color: var(--color-accent-text);
 }
 
 .calendar__days {
@@ -78,21 +78,21 @@
   background: none;
   font-size: 0.9rem;
   font-family: inherit;
-  color: #333;
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .calendar__day:hover {
-  background-color: #f7efe0;
+  background-color: var(--color-bg-muted);
 }
 
 .calendar__day.today {
-  border: 1px solid #ffb84d;
+  border: 1px solid var(--color-accent);
   font-weight: 700;
 }
 
 .calendar__day.selected {
-  background-color: #ffb84d;
+  background-color: var(--color-accent);
   color: #fff;
   font-weight: 700;
 }
@@ -101,14 +101,14 @@
   width: 100%;
   margin-top: 8px;
   padding: 8px;
-  border: 1px solid #e0d5c0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--color-surface);
   font-size: 0.85rem;
   font-family: inherit;
   cursor: pointer;
 }
 
 .calendar__today-btn:active {
-  background-color: #f7efe0;
+  background-color: var(--color-bg-muted);
 }

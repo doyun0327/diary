@@ -5,26 +5,66 @@
 :root {
   /* 일기 글씨체. FontPicker에서 사용자가 바꿀 수 있음 */
   --diary-font: 'Gaegu', cursive;
+
+  /* 단정한 페이퍼 톤 */
+  --color-bg: #faf8f4;
+  --color-bg-outer: #e8e2d8;
+  --color-bg-muted: #f3eee6;
+  --color-bg-soft: #f7f3ec;
+  --color-bg-input: #ffffff;
+  --color-surface: #ffffff;
+  --color-border: #e5ddd0;
+  --color-border-soft: #efe8dc;
+  --color-text: #2c2a26;
+  --color-text-muted: #8b857a;
+  --color-accent: #c47a3a;
+  --color-accent-hover: #a8652e;
+  --color-accent-soft: #f6ebe0;
+  --color-accent-text: #8a5424;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(28, 24, 20, 0.36);
+  --shadow-soft: 0 12px 40px rgba(40, 32, 20, 0.1);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  /* 짧은 별칭 (기존 화면 CSS 호환) */
+  --bg-app: var(--color-bg);
+  --bg-paper: var(--color-surface);
+  --bg-muted: var(--color-bg-muted);
+  --bg-soft: var(--color-bg-soft);
+  --border: var(--color-border);
+  --border-soft: var(--color-border-soft);
+  --text: var(--color-text);
+  --text-muted: var(--color-text-muted);
+  --text-faint: var(--color-text-muted);
+  --accent: var(--color-accent);
+  --accent-text: var(--color-accent-text);
+  --accent-soft: var(--color-accent-soft);
+  --danger: var(--color-danger);
+  --shadow: rgba(40, 32, 20, 0.08);
 }
 
 html {
-  /* 모바일 웹뷰에서 탭 하이라이트 제거 */
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background-color: #f0ece1;
-  color: #333;
+  background-color: var(--color-bg-outer);
+  color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
-  /* 모바일 웹뷰 기준. PC 브라우저에서 열어도 모바일 폭으로 보이도록 고정 */
+  position: relative;
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background-color: #fffdf7;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.06);
+  background-color: var(--color-bg);
+  box-shadow: 0 0 40px rgba(40, 32, 20, 0.08);
+  overflow-x: clip;
 }

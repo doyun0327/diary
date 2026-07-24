@@ -1,26 +1,26 @@
 .write-fab {
   position: fixed;
+  z-index: 10;
   bottom: calc(24px + env(safe-area-inset-bottom));
   left: 50%;
-  transform: translateX(-50%);
   width: 56px;
   height: 56px;
+  margin-left: -28px;
   border: none;
   border-radius: 50%;
-  background-color: #ffb84d;
+  background-color: var(--color-text);
   color: #fff;
-  font-size: 2rem;
+  font-size: 1.85rem;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(230, 168, 23, 0.45);
+  box-shadow: 0 12px 28px rgba(44, 42, 38, 0.22);
   transition: background-color 0.15s, transform 0.15s;
-  z-index: 10;
 }
 
 .write-fab:active {
-  transform: translateX(-50%) scale(0.94);
+  transform: scale(0.94);
 }
 
 .write-fab:hover {
-  background-color: #ffa726;
+  background-color: #1a1815;
 }

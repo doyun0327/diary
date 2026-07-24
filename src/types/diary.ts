@@ -3,6 +3,8 @@ export interface DiaryEntry {
   id: string;
   /** 일기 날짜 (YYYY-MM-DD) */
   date: string;
+  /** 제목 */
+  title: string;
   /** 일기 본문 */
   content: string;
   /** 그림 이미지 (data URL 또는 이미지 경로) */
