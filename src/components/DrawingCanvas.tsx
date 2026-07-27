@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
-import { DEFAULT_FONT_ID, FONTS, FONT_CATEGORY_LABELS, findFont } from '../utils/fonts';
+import { DEFAULT_FONT_ID, FONTS, FONT_CATEGORY_LABELS, findFont, setPreferredFontId } from '../utils/fonts';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
 import './DrawingCanvas.css';
 
@@ -13,6 +13,9 @@ export interface DrawingCanvasHandle {
 
 interface DrawingCanvasProps {
   ref?: Ref<DrawingCanvasHandle>;
+  /** 이 일기에 쓸 글씨체 (엔트리별) */
+  fontId?: string;
+  onFontIdChange?: (fontId: string) => void;
 }
 
 interface PhotoLayer {
@@ -39,7 +42,6 @@ const COLORS = [
   '#8d6e63',
 ];
 
-const FONT_STORAGE_KEY = 'picture-diary-font';
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
 const PEN_WIDTH = 3;
 const ERASER_SIZES = [
@@ -50,7 +52,11 @@ const ERASER_SIZES = [
 const STICKER_SIZE = 36;
 const MIN_PHOTO_SIZE = 40;
 
-function DrawingCanvas({ ref }: DrawingCanvasProps) {
+function DrawingCanvas({
+  ref,
+  fontId: fontIdProp,
+  onFontIdChange,
+}: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,21 +85,19 @@ function DrawingCanvas({ ref }: DrawingCanvasProps) {
   );
   const [eraserSizeId, setEraserSizeId] =
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
-  const [fontId, setFontId] = useState(
-    () => localStorage.getItem(FONT_STORAGE_KEY) ?? DEFAULT_FONT_ID,
-  );
+  const [internalFontId, setInternalFontId] = useState(DEFAULT_FONT_ID);
+  const fontId = fontIdProp ?? internalFontId;
   const [photoLayers, setPhotoLayers] = useState<PhotoLayer[]>([]);
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
 
   const eraserWidth =
     ERASER_SIZES.find((s) => s.id === eraserSizeId)?.width ?? 24;
 
-  useEffect(() => {
-    const font = findFont(fontId);
-    document.documentElement.style.setProperty('--diary-font', font.family);
-    localStorage.setItem(FONT_STORAGE_KEY, fontId);
-  }, [fontId]);
-
+  const selectFont = (id: string) => {
+    onFontIdChange?.(id);
+    if (fontIdProp === undefined) setInternalFontId(id);
+    setPreferredFontId(id);
+  };
   const fillWhite = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -341,7 +345,7 @@ function DrawingCanvas({ ref }: DrawingCanvasProps) {
   };
 
   const pickFont = (id: string) => {
-    setFontId(id);
+    selectFont(id);
     setFontOpen(false);
   };
 

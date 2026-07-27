@@ -80,6 +80,31 @@ export const FONTS: FontOption[] = [
 
 export const DEFAULT_FONT_ID = 'gaegu';
 
-export function findFont(id: string): FontOption {
+/** 새 일기 기본 글씨체 (헤더/작성 도구에서 고른 마지막 값) */
+export const FONT_PREFERENCE_KEY = 'picture-diary-font';
+
+export function findFont(id: string | undefined | null): FontOption {
+  if (!id) return FONTS.find((f) => f.id === DEFAULT_FONT_ID) ?? FONTS[0];
   return FONTS.find((f) => f.id === id) ?? FONTS[0];
+}
+
+export function getPreferredFontId(): string {
+  try {
+    return localStorage.getItem(FONT_PREFERENCE_KEY) ?? DEFAULT_FONT_ID;
+  } catch {
+    return DEFAULT_FONT_ID;
+  }
+}
+
+export function setPreferredFontId(id: string) {
+  try {
+    localStorage.setItem(FONT_PREFERENCE_KEY, id);
+  } catch {
+    // ignore
+  }
+}
+
+/** 일기 엔트리에 저장된 글씨체 (구버전 일기는 기본값) */
+export function fontFamilyForEntry(fontId?: string): string {
+  return findFont(fontId).family;
 }

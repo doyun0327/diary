@@ -1,5 +1,6 @@
 import { domToBlob } from 'modern-screenshot';
 import { downloadBlob } from './diaryBook';
+import { findFont } from './fonts';
 
 const CAPTURE_STYLE_PROPS = [
   'display',
@@ -62,7 +63,14 @@ const CAPTURE_STYLE_PROPS = [
 const EMOJI_FONT =
   '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
 
-function getDiaryFontFamily(): string {
+function getDiaryFontFamily(from?: HTMLElement, fontId?: string): string {
+  if (fontId) {
+    return findFont(fontId).family;
+  }
+  if (from) {
+    const fromEl = getComputedStyle(from).getPropertyValue('--diary-font').trim();
+    if (fromEl) return fromEl;
+  }
   const raw = getComputedStyle(document.documentElement)
     .getPropertyValue('--diary-font')
     .trim();
@@ -183,8 +191,9 @@ function applyCaptureStyles(source: Element, cloned: Element, diaryFont: string)
 export async function downloadDiaryPaperPng(
   element: HTMLElement,
   date: string,
+  fontId?: string,
 ): Promise<void> {
-  const diaryFont = getDiaryFontFamily();
+  const diaryFont = getDiaryFontFamily(element, fontId);
   const fontName = primaryFontName(diaryFont);
 
   await waitForImages(element);

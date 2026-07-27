@@ -11,6 +11,8 @@ export interface DiaryEntry {
   imageUrl?: string;
   /** 그날의 기분 */
   mood: Mood;
+  /** 이 일기에 쓴 글씨체 id (fonts.ts). 없으면 기본 폰트 */
+  fontId?: string;
   createdAt: string;
   updatedAt: string;
 }

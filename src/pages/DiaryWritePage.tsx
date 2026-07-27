@@ -10,6 +10,7 @@ import { HairStyleIcon } from '../components/CharacterIcons';
 import { generateDiaryImage } from '../api/aiImage';
 import type { AiProgress } from '../api/aiImage';
 import { formatDate, today } from '../utils/date';
+import { findFont, getPreferredFontId } from '../utils/fonts';
 import './DiaryWritePage.css';
 interface DiaryWritePageProps {
   character: CharacterProfile;
@@ -32,6 +33,9 @@ function DiaryWritePage({
   const [title, setTitle] = useState(initialEntry?.title ?? '');
   const [content, setContent] = useState(initialEntry?.content ?? '');
   const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? 'happy');
+  const [fontId, setFontId] = useState(
+    () => initialEntry?.fontId ?? getPreferredFontId(),
+  );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiStep, setAiStep] = useState<AiProgress | null>(null);
@@ -88,6 +92,7 @@ function DiaryWritePage({
       title: title.trim(),
       content: content.trim(),
       mood,
+      fontId,
       imageUrl,
     });
   };
@@ -115,7 +120,10 @@ function DiaryWritePage({
         </button>
       </nav>
 
-      <div className="diary-write__paper">
+      <div
+        className="diary-write__paper"
+        style={{ ['--diary-font' as string]: findFont(fontId).family }}
+      >
         <div className="diary-write__meta">
           <button
             type="button"
@@ -165,7 +173,11 @@ function DiaryWritePage({
           </div>
 
           <div className="diary-write__canvas-wrap">
-            <DrawingCanvas ref={canvasRef} />
+            <DrawingCanvas
+              ref={canvasRef}
+              fontId={fontId}
+              onFontIdChange={setFontId}
+            />
             {aiLoading && (
               <div className="diary-write__ai-loading">
                 <span className="diary-write__ai-spinner" />

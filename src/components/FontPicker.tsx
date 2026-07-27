@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
-import { DEFAULT_FONT_ID, FONTS, FONT_CATEGORY_LABELS, findFont } from '../utils/fonts';
+import {
+  FONTS,
+  FONT_CATEGORY_LABELS,
+  findFont,
+  getPreferredFontId,
+  setPreferredFontId,
+} from '../utils/fonts';
 import './FontPicker.css';
-
-const STORAGE_KEY = 'picture-diary-font';
 
 const CATEGORIES = ['cute', 'neat'] as const;
 
-/** 앱 시작 시 저장된 글씨체 적용 */
+/** 앱 시작 시 — 새 일기용 기본 글씨체만 루트에 적용 */
 export function applyStoredFont() {
-  const id = localStorage.getItem(STORAGE_KEY) ?? DEFAULT_FONT_ID;
-  const font = findFont(id);
+  const font = findFont(getPreferredFontId());
   document.documentElement.style.setProperty('--diary-font', font.family);
 }
 
@@ -17,15 +20,14 @@ interface FontPickerProps {
   onClose: () => void;
 }
 
+/** 헤더 글씨체 = 앞으로 쓸 새 일기의 기본값 (이미 저장한 일기에는 영향 없음) */
 function FontPicker({ onClose }: FontPickerProps) {
-  const [fontId, setFontId] = useState(
-    () => localStorage.getItem(STORAGE_KEY) ?? DEFAULT_FONT_ID,
-  );
+  const [fontId, setFontId] = useState(() => getPreferredFontId());
 
   useEffect(() => {
     const font = findFont(fontId);
     document.documentElement.style.setProperty('--diary-font', font.family);
-    localStorage.setItem(STORAGE_KEY, fontId);
+    setPreferredFontId(fontId);
   }, [fontId]);
 
   const selectFont = (id: string) => {

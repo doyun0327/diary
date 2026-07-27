@@ -3,6 +3,7 @@ import type { DiaryEntry } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
+import { findFont } from '../utils/fonts';
 import { shareDiaryTo, type ShareTarget } from '../utils/shareStory';
 import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
@@ -135,7 +136,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     setDownloadingPng(true);
     setShareMsg(null);
     try {
-      await downloadDiaryPaperPng(paperRef.current, entry.date);
+      await downloadDiaryPaperPng(paperRef.current, entry.date, entry.fontId);
       setShareMsg('PNG로 저장했어요');
     } catch (err) {
       setShareMsg(err instanceof Error ? err.message : 'PNG 저장에 실패했어요');
@@ -359,7 +360,11 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
         </div>
       </div>
 
-      <div className="diary-detail__paper" ref={paperRef}>
+      <div
+        className="diary-detail__paper"
+        ref={paperRef}
+        style={{ ['--diary-font' as string]: findFont(entry.fontId).family }}
+      >
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>
           <span className="diary-detail__mood">

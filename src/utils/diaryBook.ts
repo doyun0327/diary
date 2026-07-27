@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import type { DiaryEntry } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
 import { formatDate } from './date';
+import { fontFamilyForEntry } from './fonts';
 
 /** 책 페이지 비율 (세로) */
 export const BOOK_W = 900;
@@ -16,11 +17,8 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-function getDiaryFont(): string {
-  const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue('--diary-font')
-    .trim();
-  return raw || '"Gaegu", "Apple SD Gothic Neo", sans-serif';
+function getDiaryFont(fontId?: string): string {
+  return fontFamilyForEntry(fontId);
 }
 
 function wrapText(
