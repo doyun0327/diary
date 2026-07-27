@@ -119,14 +119,21 @@
 
 .diary-write__section-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-end;
+  justify-content: flex-end;
   gap: 8px;
   margin-bottom: 8px;
 }
 
 .diary-write__section-head h2 {
   margin: 0;
+}
+
+.diary-write__ai-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
 
 .diary-write__ai-actions {
@@ -136,10 +143,49 @@
   gap: 10px;
 }
 
+.diary-write__ai-hint {
+  margin: 0;
+  max-width: 220px;
+  text-align: right;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+.diary-write__ai-draw {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  border: 1px solid rgba(196, 122, 58, 0.22);
+}
+
+.diary-write__ai-char {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(196, 122, 58, 0.28);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.diary-write__ai-char svg {
+  width: 22px;
+  height: 22px;
+}
+
 .diary-write__tip-btn {
   border: none;
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   font-weight: 700;
   font-family: inherit;
@@ -187,11 +233,11 @@
   border: none;
   background: none;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
   color: var(--color-accent-text);
   cursor: pointer;
-  padding: 4px 0;
+  padding: 2px 0;
   white-space: nowrap;
 }
 
@@ -237,33 +283,6 @@
 
 .diary-write__canvas-wrap {
   position: relative;
-}
-
-.diary-write__character {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border-soft);
-  border-radius: 12px;
-  background: var(--color-bg-input);
-  text-align: left;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.diary-write__character-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--color-text-muted);
-}
-
-.diary-write__character-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text);
 }
 
 .diary-write__ai-loading {

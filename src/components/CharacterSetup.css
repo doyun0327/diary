@@ -51,8 +51,9 @@
 }
 
 .character-setup__desc {
-  margin: 0 0 16px;
-  font-size: 0.8rem;
+  margin: 0 0 14px;
+  font-size: 0.82rem;
+  line-height: 1.4;
   color: var(--color-text-muted);
 }
 

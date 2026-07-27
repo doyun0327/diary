@@ -134,29 +134,6 @@
   outline: none;
 }
 
-.rooms__cta {
-  display: block;
-  width: 100%;
-  margin-bottom: 18px;
-  padding: 15px 16px;
-  border: none;
-  border-radius: var(--radius-lg);
-  background: var(--color-text);
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(44, 42, 38, 0.16);
-  transition: transform 0.12s, background 0.15s;
-}
-
-.rooms__cta:active {
-  transform: scale(0.985);
-  background: #1a1815;
-}
-
 .rooms__empty {
   display: flex;
   flex-direction: column;

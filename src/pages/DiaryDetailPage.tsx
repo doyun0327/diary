@@ -312,22 +312,26 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
         </div>
       </div>
 
-      <div className="diary-detail__dateline">
-        <span>{formatDate(entry.date)}</span>
-        <span className="diary-detail__mood">
-          기분 {MOOD_MAP[entry.mood].emoji}
-        </span>
-      </div>
-
-      {entry.title && <h2 className="diary-detail__title">{entry.title}</h2>}
-
-      {entry.imageUrl && (
-        <div className="diary-detail__image">
-          <img src={entry.imageUrl} alt={entry.title || `${entry.date} 그림`} />
+      <div className="diary-detail__paper">
+        <div className="diary-detail__dateline">
+          <span>{formatDate(entry.date)}</span>
+          <span className="diary-detail__mood">
+            {MOOD_MAP[entry.mood].emoji}
+          </span>
         </div>
-      )}
 
-      <p className="diary-detail__content">{entry.content}</p>
+        {entry.title && <h2 className="diary-detail__title">{entry.title}</h2>}
+
+        {entry.imageUrl && (
+          <div className="diary-detail__image">
+            <img src={entry.imageUrl} alt={entry.title || `${entry.date} 그림`} />
+          </div>
+        )}
+
+        <section className="diary-detail__section">
+          <p className="diary-detail__content">{entry.content || ' '}</p>
+        </section>
+      </div>
 
       {shareMsg && <p className="diary-detail__share-msg">{shareMsg}</p>}
       {previewUrl && (

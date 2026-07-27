@@ -135,11 +135,7 @@ function RoomsHubPage({
     <div className="rooms">
       <div className="rooms__toolbar">
         <button type="button" onClick={onBack}>
-          ← 돌아가기
-        </button>
-        <h2>내 방</h2>
-        <button type="button" className="rooms__link" onClick={() => void refresh()} disabled={loading}>
-          새로고침
+          ← 
         </button>
       </div>
 
@@ -159,10 +155,6 @@ function RoomsHubPage({
           저장
         </button>
       </div>
-
-      <button type="button" className="rooms__cta" onClick={() => openSheet('create')}>
-        방 만들기 · 입장
-      </button>
 
       {!sheetOpen && error && <p className="rooms__error">{error}</p>}
 

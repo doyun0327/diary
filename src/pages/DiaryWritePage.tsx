@@ -3,15 +3,14 @@ import type { FormEvent } from 'react';
 import type { DiaryEntry, Mood } from '../types/diary';
 import { MOODS } from '../types/diary';
 import type { CharacterProfile } from '../types/character';
-import { summarizeCharacterKo } from '../types/character';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
+import { HairStyleIcon } from '../components/CharacterIcons';
 import { generateDiaryImage } from '../api/aiImage';
 import type { AiProgress } from '../api/aiImage';
 import { formatDate, today } from '../utils/date';
 import './DiaryWritePage.css';
-
 interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
@@ -151,13 +150,8 @@ function DiaryWritePage({
           </div>
         </div>
 
-        <button type="button" className="diary-write__character" onClick={onOpenCharacter}>
-          <span className="diary-write__character-label">내 캐릭터</span>
-          <span className="diary-write__character-value">{summarizeCharacterKo(character)}</span>
-        </button>
 
         <section className="diary-write__section">
-          <h2>그림</h2>
 
           <div className="diary-write__title-row">
             <input
@@ -185,31 +179,43 @@ function DiaryWritePage({
 
         <section className="diary-write__section diary-write__section--grow">
           <div className="diary-write__section-head">
-            <h2>일기</h2>
-            <div className="diary-write__ai-actions">
-              <button
-                type="button"
-                className="diary-write__tip-btn"
-                onClick={() => setTipOpen((open) => !open)}
-                aria-expanded={tipOpen}
-              >
-                팁
-              </button>
-              <button
-                type="button"
-                className="diary-write__ai-link"
-                onClick={handleAiDraw}
-                disabled={aiLoading || !content.trim()}
-              >
-                {aiLabel}
-              </button>
+            <div className="diary-write__ai-block">
+              <div className="diary-write__ai-actions">
+                <button
+                  type="button"
+                  className="diary-write__tip-btn"
+                  onClick={() => setTipOpen((open) => !open)}
+                  aria-expanded={tipOpen}
+                >
+                  팁
+                </button>
+                <div className="diary-write__ai-draw">
+                  <button
+                    type="button"
+                    className="diary-write__ai-char"
+                    onClick={onOpenCharacter}
+                    aria-label="AI 그림에 쓸 캐릭터 설정"
+                    title="이 캐릭터가 그림 속 주인공이 돼요"
+                  >
+                  <HairStyleIcon style={character.hairStyle} />
+                  </button>
+                  <button
+                    type="button"
+                    className="diary-write__ai-link"
+                    onClick={handleAiDraw}
+                    disabled={aiLoading || !content.trim()}
+                  >
+                    {aiLabel}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           {tipOpen && (
             <div className="diary-write__tip">
               <p className="diary-write__ai-note">
-                AI는 일기 앞부분의 장면을 중심으로 그려요. 캐릭터는 모습만 맞춰요.
+                설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 앞부분의 장면을 중심으로 그려요.
               </p>
               <p>
                 <strong>눈에 보이는 행동·장소</strong>를 적어 주세요.
@@ -226,12 +232,12 @@ function DiaryWritePage({
             className="diary-write__content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="예) 오늘은 피자 파티를 했어요. 친구들이랑 웃으면서 먹었어요"
+            placeholder="예) 오늘 수영을 했다. 오늘 운동을 했다."
           />
-          {aiScene && (
+          {/* {aiScene && (
             <p className="diary-write__ai-scene">AI가 이해한 장면: {aiScene}</p>
           )}
-          {aiError && <p className="diary-write__ai-error">{aiError}</p>}
+          {aiError && <p className="diary-write__ai-error">{aiError}</p>} */}
         </section>
       </div>
     </form>

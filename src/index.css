@@ -67,4 +67,5 @@ body {
   background-color: var(--color-bg);
   box-shadow: 0 0 40px rgba(40, 32, 20, 0.08);
   overflow-x: clip;
+  isolation: isolate;
 }
