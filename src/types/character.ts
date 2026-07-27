@@ -87,7 +87,7 @@ const OUTFIT_FALLBACK: Record<string, CharacterProfile['outfit']> = {
 
 /** 이전 저장 형식도 새 필드로 보정 */
 export function normalizeCharacter(
-  raw: Partial<CharacterProfile> & Record<string, unknown>,
+  raw: Partial<CharacterProfile> | (Partial<CharacterProfile> & Record<string, unknown>),
 ): CharacterProfile {
   const gender =
     raw.gender === 'boy' || raw.gender === 'girl' ? raw.gender : DEFAULT_CHARACTER.gender;

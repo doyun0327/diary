@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
 import './DiaryCard.css';
@@ -8,11 +9,13 @@ interface DiaryCardProps {
 }
 
 function DiaryCard({ entry, onClick }: DiaryCardProps) {
+  const { t } = useTranslation();
+
   return (
     <article className="diary-card" onClick={onClick}>
       <div className="diary-card__image">
         {entry.imageUrl ? (
-          <img src={entry.imageUrl} alt={`${entry.date} 그림`} />
+          <img src={entry.imageUrl} alt={t('diary.card.imageAlt', { date: entry.date })} />
         ) : (
           <span className="diary-card__placeholder">🖼️</span>
         )}

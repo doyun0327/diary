@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, Mood } from '../types/diary';
 import { MOODS } from '../types/diary';
 import type { CharacterProfile } from '../types/character';
@@ -28,6 +29,7 @@ function DiaryWritePage({
   onCancel,
   onOpenCharacter,
 }: DiaryWritePageProps) {
+  const { t } = useTranslation();
   const isEdit = Boolean(initialEntry);
   const [date, setDate] = useState(initialEntry?.date ?? today());
   const [title, setTitle] = useState(initialEntry?.title ?? '');
@@ -39,8 +41,8 @@ function DiaryWritePage({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiStep, setAiStep] = useState<AiProgress | null>(null);
-  const [aiError, setAiError] = useState<string | null>(null);
-  const [aiScene, setAiScene] = useState<string | null>(null);
+  const [, setAiError] = useState<string | null>(null);
+  const [, setAiScene] = useState<string | null>(null);
   const [tipOpen, setTipOpen] = useState(false);
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const imageLoadedRef = useRef(false);
@@ -53,12 +55,12 @@ function DiaryWritePage({
 
   const handleAiDraw = async () => {
     if (!content.trim()) {
-      setAiError('일기 내용을 먼저 적어 주세요');
+      setAiError(t('write.err.aiNeedContent'));
       return;
     }
 
     if (canvasRef.current?.hasContent()) {
-      const ok = confirm('그림판 내용을 AI 그림으로 바꿀까요?');
+      const ok = confirm(t('write.confirm.replaceWithAi'));
       if (!ok) return;
     }
 
@@ -76,7 +78,7 @@ function DiaryWritePage({
       await canvasRef.current?.loadImage(imageUrl);
       if (scene) setAiScene(scene);
     } catch (err) {
-      setAiError(err instanceof Error ? err.message : '그림 생성에 실패했습니다');
+      setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     } finally {
       setAiLoading(false);
       setAiStep(null);
@@ -99,24 +101,24 @@ function DiaryWritePage({
 
   const aiLabel =
     aiStep === 'scene'
-      ? '장면 만드는 중…'
+      ? t('write.ai.sceneStep')
       : aiStep === 'image'
-        ? '그리는 중…'
-        : '✨ AI 그림';
+        ? t('write.ai.drawStep')
+        : t('write.ai.button');
 
   return (
     <form className="diary-write" onSubmit={handleSubmit}>
       <nav className="diary-write__nav">
         <button type="button" className="diary-write__nav-btn" onClick={onCancel}>
-          취소
+          {t('write.cancel')}
         </button>
-        <span className="diary-write__nav-title">{isEdit ? '일기 수정' : '오늘의 일기'}</span>
+        <span className="diary-write__nav-title">{isEdit ? t('write.title.edit') : t('write.title.new')}</span>
         <button
           type="submit"
           className="diary-write__nav-btn diary-write__nav-btn--save"
           disabled={aiLoading}
         >
-          {isEdit ? '수정 완료' : '저장'}
+          {isEdit ? t('write.saveEdit') : t('write.save')}
         </button>
       </nav>
 
@@ -149,7 +151,7 @@ function DiaryWritePage({
                 key={m.value}
                 type="button"
                 className={mood === m.value ? 'selected' : ''}
-                title={m.label}
+                title={t(`mood.${m.value}`)}
                 onClick={() => setMood(m.value)}
               >
                 {m.emoji}
@@ -167,7 +169,7 @@ function DiaryWritePage({
               className="diary-write__title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="제목을 적어 주세요"
+              placeholder={t('write.titlePlaceholder')}
               maxLength={40}
             />
           </div>
@@ -182,7 +184,7 @@ function DiaryWritePage({
               <div className="diary-write__ai-loading">
                 <span className="diary-write__ai-spinner" />
                 <span>
-                  {aiStep === 'scene' ? '장면을 생각하고 있어요…' : '그림을 그리고 있어요…'}
+                  {aiStep === 'scene' ? t('write.ai.statusScene') : t('write.ai.statusDraw')}
                 </span>
               </div>
             )}
@@ -199,15 +201,15 @@ function DiaryWritePage({
                   onClick={() => setTipOpen((open) => !open)}
                   aria-expanded={tipOpen}
                 >
-                  팁
+                  {t('write.ai.tip')}
                 </button>
                 <div className="diary-write__ai-draw">
                   <button
                     type="button"
                     className="diary-write__ai-char"
                     onClick={onOpenCharacter}
-                    aria-label="AI 그림에 쓸 캐릭터 설정"
-                    title="이 캐릭터가 그림 속 주인공이 돼요"
+                    aria-label={t('write.ai.characterAria')}
+                    title={t('write.ai.characterTitle')}
                   >
                   <HairStyleIcon style={character.hairStyle} />
                   </button>
@@ -227,15 +229,15 @@ function DiaryWritePage({
           {tipOpen && (
             <div className="diary-write__tip">
               <p className="diary-write__ai-note">
-                설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 앞부분의 장면을 중심으로 그려요.
+                {t('write.ai.tipBody')}
               </p>
               <p>
-                <strong>눈에 보이는 행동·장소</strong>를 적어 주세요.
+                <strong>{t('write.ai.tipVisible')}</strong>{t('write.ai.tipAsk')}
               </p>
               <ul>
-                <li>좋은 예: 오늘은 피자 파티를 했어요</li>
-                <li>좋은 예: 공원에서 강아지랑 뛰어놀았어요</li>
-                <li>아쉬운 예: 오늘 기분이 좋았어요</li>
+                <li>{t('write.ai.exGood1')}</li>
+                <li>{t('write.ai.exGood2')}</li>
+                <li>{t('write.ai.exBad')}</li>
               </ul>
             </div>
           )}
@@ -244,10 +246,10 @@ function DiaryWritePage({
             className="diary-write__content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="예) 오늘 수영을 했다. 오늘 운동을 했다."
+            placeholder={t('write.contentPlaceholder')}
           />
           {/* {aiScene && (
-            <p className="diary-write__ai-scene">AI가 이해한 장면: {aiScene}</p>
+            <p className="diary-write__ai-scene">{t('write.ai.sceneUnderstood', { scene: aiScene })}</p>
           )}
           {aiError && <p className="diary-write__ai-error">{aiError}</p>} */}
         </section>

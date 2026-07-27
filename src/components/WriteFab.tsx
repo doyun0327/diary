@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import './WriteFab.css';
 
 interface WriteFabProps {
@@ -5,8 +6,10 @@ interface WriteFabProps {
 }
 
 function WriteFab({ onClick }: WriteFabProps) {
+  const { t } = useTranslation();
+
   return (
-    <button type="button" className="write-fab" aria-label="일기 쓰기" onClick={onClick}>
+    <button type="button" className="write-fab" aria-label={t('diary.writeFabAria')} onClick={onClick}>
       +
     </button>
   );

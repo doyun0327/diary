@@ -1,0 +1,395 @@
+{
+  "common": {
+    "close": "닫기",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "loading": "불러오는 중…",
+    "anonymous": "익명",
+    "back": "뒤로가기",
+    "processing": "처리 중…",
+    "requestFailed": "요청 실패 ({{status}})",
+    "serverUnreachable": "서버에 연결하지 못했어요. Spring(8080)이 켜져 있는지 확인해 주세요.",
+    "weekday": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    },
+    "dateFull": "{{y}}년 {{m}}월 {{d}}일 {{weekday}}요일",
+    "yearMonth": "{{y}}년 {{m}}월"
+  },
+  "header": {
+    "menu": "메뉴",
+    "tagline": "나의 하루를 남기다",
+    "footer": "천천히, 하루씩",
+    "account": "계정",
+    "accountHintEmpty": "프로필 사진 · 이름",
+    "rooms": "친구 방",
+    "roomsHint": "내 방 목록",
+    "character": "캐릭터",
+    "characterHint": "AI 그림 속 나",
+    "export": "내보내기",
+    "exportHint": "기간 PDF · 일기장"
+  },
+  "account": {
+    "title": "계정",
+    "aria": "계정",
+    "photoLabel": "프로필 사진",
+    "changePhotoAria": "프로필 사진 변경",
+    "pickPhoto": "사진 선택",
+    "removePhoto": "삭제",
+    "nameLabel": "이름",
+    "nameHint": "친구 방에서 보일 이름이에요",
+    "namePlaceholder": "이름을 입력해 주세요",
+    "save": "저장",
+    "ok": {
+      "nameSaved": "이름을 저장했어요",
+      "photoSaved": "프로필 사진을 저장했어요",
+      "photoRemoved": "프로필 사진을 삭제했어요"
+    },
+    "err": {
+      "nameRequired": "이름을 입력해 주세요",
+      "imageOnly": "이미지 파일만 올릴 수 있어요",
+      "photoSave": "사진을 저장하지 못했어요",
+      "photoRead": "사진을 읽지 못했어요",
+      "photoProcess": "사진을 처리하지 못했어요",
+      "photoLoad": "사진을 불러오지 못했어요"
+    }
+  },
+  "language": {
+    "label": "언어",
+    "hint": "앱 표시 언어",
+    "ko": "한국어",
+    "en": "English"
+  },
+  "rooms": {
+    "title": "친구 방",
+    "joinWithCode": "코드로 입장",
+    "create": "방 만들기",
+    "empty": "아직 참여한 방이 없어요",
+    "memberCount": "멤버 {{n}}",
+    "roomFallback": "방",
+    "copyInvite": "초대코드",
+    "copied": "복사됨",
+    "copyInviteTitle": "초대코드 복사",
+    "copyInviteAria": "초대코드 복사하기",
+    "createSheetAria": "방 만들기",
+    "createHint": "방 이름만 정하면 초대코드 6자리가 자동으로 만들어져요.",
+    "asChipCreate": "{{name}}로 만들기",
+    "roomNamePlaceholder": "방 이름",
+    "creating": "만드는 중…",
+    "joinSheetAria": "코드로 입장",
+    "joinHint": "친구가 알려 준 초대코드 6자리를 입력하세요.",
+    "asChipJoin": "{{name}}로 입장",
+    "invitePlaceholder": "예: 482913",
+    "joining": "입장 중…",
+    "joinSubmit": "입장하기",
+    "noNickname": "닉네임 없음",
+    "backToList": "← 목록",
+    "refresh": "새로고침",
+    "sharedDiaries": "공유된 일기",
+    "sharedEmpty": "아직 공유된 일기가 없어요. 내 일기에서 「방에 공유」를 눌러 보세요.",
+    "backToRoom": "← 방으로",
+    "sharedDiary": "공유 일기",
+    "comments": "댓글 {{n}}",
+    "commentPlaceholder": "댓글을 남겨 보세요",
+    "commentSubmit": "등록",
+    "alert": {
+      "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
+    },
+    "confirm": {
+      "deletePost": "이 공유 일기를 방에서 삭제할까요?"
+    },
+    "err": {
+      "needNickname": "햄버거 메뉴 → 계정에서 이름을 먼저 정해 주세요",
+      "list": "방 목록을 불러오지 못했어요",
+      "nameRequired": "방 이름을 입력해 주세요",
+      "create": "방을 만들지 못했어요",
+      "codeRequired": "초대코드 6자리를 입력해 주세요",
+      "join": "방에 들어가지 못했어요",
+      "copy": "초대코드를 복사하지 못했어요",
+      "load": "방을 불러오지 못했어요",
+      "loadPost": "글을 불러오지 못했어요",
+      "comment": "댓글을 남기지 못했어요",
+      "delete": "삭제에 실패했어요"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "아직 작성한 일기가 없어요.",
+      "line2": "첫 번째 diary를 남겨 보세요!"
+    },
+    "writeFabAria": "일기 쓰기",
+    "card": {
+      "imageAlt": "{{date}} 그림"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "오늘의 일기",
+      "edit": "일기 수정"
+    },
+    "save": "저장",
+    "saveEdit": "수정 완료",
+    "cancel": "취소",
+    "titlePlaceholder": "제목을 적어 주세요",
+    "contentPlaceholder": "예) 오늘 수영을 했다. 오늘 운동을 했다.",
+    "ai": {
+      "button": "✨ AI 그림",
+      "sceneStep": "장면 만드는 중…",
+      "drawStep": "그리는 중…",
+      "statusScene": "장면을 생각하고 있어요…",
+      "statusDraw": "그림을 그리고 있어요…",
+      "tip": "팁",
+      "tipBody": "설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 앞부분의 장면을 중심으로 그려요.",
+      "tipVisible": "눈에 보이는 행동·장소",
+      "tipAsk": "를 적어 주세요.",
+      "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
+      "exGood2": "좋은 예: 공원에서 강아지랑 뛰어놀았어요",
+      "exBad": "아쉬운 예: 오늘 기분이 좋았어요",
+      "sceneUnderstood": "AI가 이해한 장면: {{scene}}",
+      "characterAria": "AI 그림에 쓸 캐릭터 설정",
+      "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요"
+    },
+    "confirm": {
+      "replaceWithAi": "그림판 내용을 AI 그림으로 바꿀까요?"
+    },
+    "err": {
+      "needContent": "일기 내용을 먼저 적어 주세요",
+      "aiFailed": "그림 생성에 실패했습니다",
+      "aiNeedContent": "그림을 만들려면 일기 내용을 먼저 적어 주세요",
+      "aiHttp": "그림 생성 실패: HTTP {{status}}",
+      "aiNoImage": "백엔드 응답에 이미지가 없습니다",
+      "aiUrl": "이미지 URL을 불러오지 못했습니다",
+      "aiConvert": "이미지 변환에 실패했습니다"
+    }
+  },
+  "detail": {
+    "backAria": "뒤로가기",
+    "bookAria": "일기장으로 보기",
+    "bookTitle": "일기장 · PDF",
+    "pngAria": "PNG 다운로드",
+    "pngTitle": "PNG로 저장",
+    "shareAria": "공유하기",
+    "moreAria": "더보기",
+    "menuCloseAria": "메뉴 닫기",
+    "edit": "수정",
+    "delete": "삭제",
+    "imageAlt": "{{date}} 그림",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "공유용 일기 카드",
+    "confirm": {
+      "delete": "이 일기를 삭제할까요?"
+    },
+    "ok": {
+      "png": "PNG로 저장했어요"
+    },
+    "err": {
+      "png": "PNG 저장에 실패했어요",
+      "pngBlob": "PNG를 만들지 못했어요",
+      "share": "공유에 실패했어요",
+      "roomsList": "방 목록을 불러오지 못했어요"
+    }
+  },
+  "share": {
+    "title": "공유하기",
+    "toRoomAria": "방에 공유",
+    "backToMenuAria": "공유 메뉴로",
+    "instagram": "인스타그램",
+    "instagramDesc": "스토리용 카드로 공유",
+    "kakao": "카카오톡",
+    "kakaoIcon": "카톡",
+    "kakaoDesc": "채팅방에 사진으로 공유",
+    "rooms": "친구 방",
+    "roomsIcon": "방",
+    "roomsDesc": "참여 중인 방에 올리기",
+    "roomsHint": "여러 방을 골라 한 번에 공유할 수 있어요",
+    "roomsLoading": "방 목록 불러오는 중…",
+    "roomsEmpty": "참여 중인 방이 없어요. 메뉴 → 친구 방에서 방을 만들거나 입장해 주세요.",
+    "submit": "공유",
+    "sharing": "공유 중…",
+    "pcHint": "PC 웹에서는 앱으로 바로 공유가 안 돼요. 이미지가 다운로드됐으니, 폰에서 열거나 앱에 올려 주세요.",
+    "ok": {
+      "oneRoom": "「{{name}}」방에 공유했어요",
+      "manyRooms": "{{n}}개 방에 공유했어요",
+      "partial": "{{n}}개 방에 공유했어요. 실패: {{fails}}"
+    },
+    "pick": {
+      "instagram": "공유 목록에서 인스타그램을 골라 주세요!",
+      "kakao": "공유 목록에서 카카오톡을 골라 주세요!"
+    },
+    "saved": {
+      "instagram": "이미지가 저장됐어요. 인스타 스토리에 올려 주세요!",
+      "kakao": "이미지가 저장됐어요. 카카오톡 채팅방에 사진을 보내 주세요!"
+    },
+    "native": {
+      "instagram": "내 diary를 인스타 스토리에 공유해요",
+      "kakao": "내 diary를 카카오톡으로 공유해요"
+    },
+    "err": {
+      "roomShare": "방에 공유하지 못했어요",
+      "build": "공유 이미지를 만들 수 없어요",
+      "convert": "공유 이미지 변환에 실패했어요",
+      "imageLoad": "그림을 불러오지 못했어요"
+    }
+  },
+  "character": {
+    "dialogAria": "내 캐릭터 설정",
+    "title": "내 캐릭터",
+    "done": "완료",
+    "desc": "이 모습이 AI 그림 속 주인공이 돼요",
+    "who": "누구인가요?",
+    "hairLabel": "머리",
+    "outfitLabel": "옷",
+    "gender": {
+      "boy": "남자아이",
+      "girl": "여자아이"
+    },
+    "hair": {
+      "short": "짧은 머리",
+      "medium": "단발",
+      "curly": "뽀글머리"
+    },
+    "outfit": {
+      "short-sleeve": "반팔",
+      "dress": "원피스",
+      "hoodie": "후드티",
+      "school-uniform": "교복"
+    }
+  },
+  "export": {
+    "title": "내보내기",
+    "aria": "내보내기",
+    "period": "기간",
+    "presetsAria": "기간 프리셋",
+    "thisMonth": "이번 달",
+    "lastMonth": "지난달",
+    "custom": "직접 선택",
+    "start": "시작",
+    "end": "끝",
+    "count": "{{n}}건의 일기",
+    "empty": "이 기간에 작성한 일기가 없어요",
+    "pdf": "PDF 저장",
+    "saving": "저장 중…",
+    "openBook": "일기장으로 보기",
+    "err": {
+      "pdf": "PDF 저장에 실패했어요"
+    }
+  },
+  "book": {
+    "dialogAria": "일기장 보기",
+    "title": "일기장",
+    "pdfAria": "PDF 저장",
+    "pdfTitle": "PDF 저장",
+    "building": "일기장을 만드는 중…",
+    "prevPage": "이전 페이지",
+    "nextPage": "다음 페이지",
+    "coverLabel": "표지",
+    "cover": {
+      "total": "총 {{n}}편",
+      "hint": "옆으로 넘겨 읽어 보세요"
+    },
+    "err": {
+      "build": "일기장을 만들지 못했어요",
+      "empty": "다운로드할 일기가 없어요",
+      "page": "일기장 페이지를 만들 수 없어요",
+      "image": "그림을 불러오지 못했어요"
+    }
+  },
+  "canvas": {
+    "pen": "펜",
+    "photo": "사진",
+    "font": "글씨체",
+    "sticker": "스티커",
+    "eraser": "지우개",
+    "clearAll": "전체 지우기",
+    "photoHint": "드래그로 이동 · 모서리로 크기 조절 · ✓ 로 붙이기",
+    "stickerSelected": "{{emoji}} 선택됨 · 그림판을 눌러 붙이세요",
+    "colorAria": "색상 {{c}}",
+    "pickColorTitle": "색 고르기",
+    "eraserSizeAria": "지우개 크기",
+    "eraserSize": {
+      "s": "작게",
+      "m": "보통",
+      "l": "크게"
+    },
+    "fontPickerTitle": "글씨체 고르기",
+    "stickerSheetTitle": "스티커",
+    "stickerCatsAria": "스티커 카테고리",
+    "sample": "오늘의 diary",
+    "confirm": {
+      "clear": "그림을 모두 지울까요?"
+    },
+    "alert": {
+      "imageOnly": "이미지 파일만 넣을 수 있어요"
+    },
+    "err": {
+      "noCanvas": "캔버스가 없습니다",
+      "noContext": "캔버스 컨텍스트를 열 수 없습니다",
+      "imageLoad": "이미지를 불러오지 못했습니다"
+    }
+  },
+  "font": {
+    "dialogAria": "글씨체 선택",
+    "title": "글씨체",
+    "sample": "오늘의 diary",
+    "cat": {
+      "cute": "귀여운 글씨체",
+      "neat": "정직한 글씨체"
+    },
+    "gaegu": "개구",
+    "dongle": "동글",
+    "hiMelody": "히멜로디",
+    "singleDay": "싱글데이",
+    "cuteFont": "큐트폰트",
+    "jua": "주아",
+    "gamjaFlower": "감자꽃",
+    "poorStory": "푸어스토리",
+    "nanumPen": "나눔손글씨 펜",
+    "nanumBrush": "나눔손글씨 붓",
+    "eastSeaDokdo": "동해독도",
+    "yeonSung": "연성",
+    "notoSans": "노토 산스",
+    "nanumGothic": "나눔고딕",
+    "gowunDodum": "고운돋움",
+    "gowunBatang": "고운바탕",
+    "nanumMyeongjo": "나눔명조",
+    "songMyung": "송명",
+    "doHyeon": "도현",
+    "ibmPlex": "IBM 플렉스"
+  },
+  "calendar": {
+    "dialogAria": "날짜 선택",
+    "prevMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "goToday": "오늘로 이동"
+  },
+  "mood": {
+    "happy": "행복해요",
+    "excited": "신나요",
+    "love": "사랑스러워요",
+    "proud": "뿌듯해요",
+    "calm": "평온해요",
+    "sleepy": "졸려요",
+    "soso": "그저 그래요",
+    "surprised": "놀랐어요",
+    "sad": "슬퍼요",
+    "angry": "화나요",
+    "anxious": "불안해요",
+    "sick": "아파요"
+  },
+  "stickers": {
+    "face": "표정",
+    "animal": "동물",
+    "fruit": "과일",
+    "building": "건물",
+    "weather": "날씨",
+    "sport": "운동",
+    "clothes": "의류",
+    "shape": "도형"
+  }
+}

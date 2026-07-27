@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Header from './components/Header';
 import WriteFab from './components/WriteFab';
 import CharacterSetup from './components/CharacterSetup';
+import AccountSheet from './components/AccountSheet';
 import ExportSheet from './components/ExportSheet';
 import { applyStoredFont } from './components/FontPicker';
 import DiaryBookViewer from './components/DiaryBookViewer';
@@ -22,11 +24,12 @@ export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
 function App() {
   const { entries, addEntry, updateEntry, removeEntry } = useDiary();
   const { character, setCharacter } = useCharacter();
-  const { clientId, nickname, setNickname } = useClientProfile();
+  const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } = useClientProfile();
   const [page, setPage] = useState<Page>('home');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [characterOpen, setCharacterOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [bookEntries, setBookEntries] = useState<DiaryEntry[] | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
@@ -89,6 +92,9 @@ function App() {
   return (
     <div className="app">
       <Header
+        nickname={nickname}
+        avatarUrl={avatarUrl}
+        onOpenAccount={() => setAccountOpen(true)}
         onOpenCharacter={() => setCharacterOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
@@ -116,7 +122,7 @@ function App() {
         {page === 'rooms' && (
           <RoomsHubPage
             nickname={nickname}
-            onNicknameChange={setNickname}
+            avatarUrl={avatarUrl}
             onBack={() => setPage('home')}
             onOpenRoom={(roomId) => {
               setActiveRoomId(roomId);
@@ -128,6 +134,8 @@ function App() {
         {page === 'room' && activeRoomId && (
           <RoomPage
             roomId={activeRoomId}
+            clientId={clientId}
+            myAvatarUrl={avatarUrl}
             onBack={() => {
               setActivePostId(null);
               setPage('rooms');
@@ -151,6 +159,17 @@ function App() {
         )}
       </main>
       {page === 'home' && <WriteFab onClick={handleNewWrite} />}
+      {accountOpen &&
+        createPortal(
+          <AccountSheet
+            nickname={nickname}
+            avatarUrl={avatarUrl}
+            onNicknameChange={setNickname}
+            onAvatarChange={setAvatarUrl}
+            onClose={() => setAccountOpen(false)}
+          />,
+          document.getElementById('root') ?? document.body,
+        )}
       {characterOpen && (
         <CharacterSetup
           character={character}

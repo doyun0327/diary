@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 const CLIENT_ID_KEY = 'picture-diary-client-id';
 const NICKNAME_KEY = 'picture-diary-nickname';
+const AVATAR_KEY = 'picture-diary-avatar';
 
 function loadClientId(): string {
   try {
@@ -27,10 +28,19 @@ function loadNickname(): string {
   }
 }
 
-/** 친구 방용 닉네임 + 기기 ID */
+function loadAvatarUrl(): string | null {
+  try {
+    return localStorage.getItem(AVATAR_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** 친구 방용 닉네임 · 프로필 사진 · 기기 ID */
 export function useClientProfile() {
   const [clientId] = useState(loadClientId);
   const [nickname, setNicknameState] = useState(loadNickname);
+  const [avatarUrl, setAvatarUrlState] = useState<string | null>(loadAvatarUrl);
 
   const setNickname = useCallback((next: string) => {
     const trimmed = next.trim().slice(0, 20);
@@ -42,7 +52,17 @@ export function useClientProfile() {
     }
   }, []);
 
-  return { clientId, nickname, setNickname };
+  const setAvatarUrl = useCallback((next: string | null) => {
+    setAvatarUrlState(next);
+    try {
+      if (next) localStorage.setItem(AVATAR_KEY, next);
+      else localStorage.removeItem(AVATAR_KEY);
+    } catch {
+      // quota 등 — 상태는 유지하되 저장 실패는 조용히
+    }
+  }, []);
+
+  return { clientId, nickname, setNickname, avatarUrl, setAvatarUrl };
 }
 
 export function getClientHeaders(): HeadersInit {

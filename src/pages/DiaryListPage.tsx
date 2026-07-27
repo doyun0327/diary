@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import DiaryCard from '../components/DiaryCard';
 import './DiaryListPage.css';
@@ -8,11 +9,13 @@ interface DiaryListPageProps {
 }
 
 function DiaryListPage({ entries, onSelect }: DiaryListPageProps) {
+  const { t } = useTranslation();
+
   if (entries.length === 0) {
     return (
       <div className="diary-list diary-list--empty">
-        <p>아직 작성한 일기가 없어요.</p>
-        <p>첫 번째 diary를 남겨 보세요!</p>
+        <p>{t('diary.empty.line1')}</p>
+        <p>{t('diary.empty.line2')}</p>
       </div>
     );
   }

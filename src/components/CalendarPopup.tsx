@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { formatYearMonth } from '../utils/date';
 import './CalendarPopup.css';
 
 interface CalendarPopupProps {
@@ -8,13 +10,12 @@ interface CalendarPopupProps {
   onClose: () => void;
 }
 
-const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
-
 function toDateString(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 function CalendarPopup({ value, onSelect, onClose }: CalendarPopupProps) {
+  const { t } = useTranslation();
   const selected = new Date(`${value}T00:00:00`);
   const [viewYear, setViewYear] = useState(selected.getFullYear());
   const [viewMonth, setViewMonth] = useState(selected.getMonth());
@@ -42,25 +43,27 @@ function CalendarPopup({ value, onSelect, onClose }: CalendarPopupProps) {
     onSelect(todayStr);
   };
 
+  const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6].map((i) => t(`common.weekday.${i}`));
+
   return (
     <>
       <div className="calendar__backdrop" onClick={onClose} />
-      <div className="calendar" role="dialog" aria-label="날짜 선택">
+      <div className="calendar" role="dialog" aria-label={t('calendar.dialogAria')}>
         <div className="calendar__header">
-          <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">
+          <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
             ‹
           </button>
           <strong>
-            {viewYear}년 {viewMonth + 1}월
+            {formatYearMonth(toDateString(viewYear, viewMonth, 1))}
           </strong>
-          <button type="button" onClick={() => moveMonth(1)} aria-label="다음 달">
+          <button type="button" onClick={() => moveMonth(1)} aria-label={t('calendar.nextMonth')}>
             ›
           </button>
         </div>
 
         <div className="calendar__weekdays">
-          {WEEKDAYS.map((w) => (
-            <span key={w}>{w}</span>
+          {WEEKDAYS.map((w, i) => (
+            <span key={i}>{w}</span>
           ))}
         </div>
 
@@ -91,7 +94,7 @@ function CalendarPopup({ value, onSelect, onClose }: CalendarPopupProps) {
         </div>
 
         <button type="button" className="calendar__today-btn" onClick={goToday}>
-          오늘로 이동
+          {t('calendar.goToday')}
         </button>
       </div>
     </>

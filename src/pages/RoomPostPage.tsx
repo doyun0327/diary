@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import { MOOD_MAP } from '../types/diary';
 import { formatDate } from '../utils/date';
@@ -13,6 +14,7 @@ interface RoomPostPageProps {
 }
 
 function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
+  const { t } = useTranslation();
   const [post, setPost] = useState<RoomPost | null>(null);
   const [comments, setComments] = useState<RoomComment[]>([]);
   const [text, setText] = useState('');
@@ -31,11 +33,11 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       setPost(detail);
       setComments(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '글을 불러오지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.loadPost'));
     } finally {
       setLoading(false);
     }
-  }, [roomId, postId]);
+  }, [roomId, postId, t]);
 
   useEffect(() => {
     void refresh();
@@ -51,7 +53,7 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       setComments((prev) => [...prev, created]);
       setText('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '댓글을 남기지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.comment'));
     } finally {
       setBusy(false);
     }
@@ -59,13 +61,13 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
 
   const handleDelete = async () => {
     if (!post || post.authorClientId !== clientId) return;
-    if (!confirm('이 공유 일기를 방에서 삭제할까요?')) return;
+    if (!confirm(t('rooms.confirm.deletePost'))) return;
     setBusy(true);
     try {
       await roomsApi.deleteRoomPost(roomId, postId);
       onBack();
     } catch (err) {
-      setError(err instanceof Error ? err.message : '삭제에 실패했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.delete'));
       setBusy(false);
     }
   };
@@ -74,12 +76,12 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
     <div className="rooms">
       <div className="rooms__toolbar">
         <button type="button" onClick={onBack}>
-          ← 방으로
+          {t('rooms.backToRoom')}
         </button>
-        <h2>공유 일기</h2>
+        <h2>{t('rooms.sharedDiary')}</h2>
         {post?.authorClientId === clientId ? (
           <button type="button" className="rooms__danger" disabled={busy} onClick={() => void handleDelete()}>
-            삭제
+            {t('common.delete')}
           </button>
         ) : (
           <span />
@@ -87,7 +89,7 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
-      {loading && <p className="rooms__muted">불러오는 중…</p>}
+      {loading && <p className="rooms__muted">{t('common.loading')}</p>}
 
       {post && (
         <article className="rooms__post">
@@ -105,7 +107,7 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       )}
 
       <section className="rooms__comments">
-        <h3>댓글 {comments.length}</h3>
+        <h3>{t('rooms.comments', { n: comments.length })}</h3>
         <ul className="rooms__comment-list">
           {comments.map((c) => (
             <li key={c.id}>
@@ -119,14 +121,14 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
             type="text"
             value={text}
             maxLength={200}
-            placeholder="댓글을 남겨 보세요"
+            placeholder={t('rooms.commentPlaceholder')}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') void handleComment();
             }}
           />
           <button type="button" className="rooms__btn primary" disabled={busy || !text.trim()} onClick={() => void handleComment()}>
-            등록
+            {t('rooms.commentSubmit')}
           </button>
         </div>
       </section>

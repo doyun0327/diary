@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import {
   buildBookPages,
@@ -13,6 +14,7 @@ interface DiaryBookViewerProps {
 }
 
 function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
+  const { t } = useTranslation();
   const [pages, setPages] = useState<BookPage[] | null>(null);
   const [index, setIndex] = useState(0);
   const [flip, setFlip] = useState<'none' | 'next' | 'prev'>('none');
@@ -34,7 +36,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : '일기장을 만들지 못했어요');
+          setError(err instanceof Error ? err.message : t('book.err.build'));
         }
       })
       .finally(() => {
@@ -43,7 +45,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
     return () => {
       cancelled = true;
     };
-  }, [entries]);
+  }, [entries, t]);
 
   const total = pages?.length ?? 0;
   const canPrev = index > 0;
@@ -72,7 +74,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
           : 'diary.pdf';
       await downloadDiaryBookPdf(entries, name);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'PDF 저장에 실패했어요');
+      setError(err instanceof Error ? err.message : t('book.err.build'));
     } finally {
       setDownloading(false);
     }
@@ -84,7 +86,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
   }, [index, pages]);
 
   return (
-    <div className="diary-book" role="dialog" aria-label="일기장 보기">
+    <div className="diary-book" role="dialog" aria-label={t('book.dialogAria')}>
       <div className="diary-book__backdrop" onClick={onClose} />
       <div className="diary-book__panel">
         <header className="diary-book__head">
@@ -92,7 +94,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
             type="button"
             className="diary-book__icon-btn diary-book__icon-btn--back"
             onClick={onClose}
-            aria-label="닫기"
+            aria-label={t('common.close')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -109,14 +111,14 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
-          <span className="diary-book__title">{subtitle || '일기장'}</span>
+          <span className="diary-book__title">{subtitle || t('book.title')}</span>
           <button
             type="button"
             className="diary-book__icon-btn diary-book__icon-btn--end"
             onClick={handleDownload}
             disabled={busy || downloading || !pages}
-            aria-label="PDF 저장"
-            title="PDF 저장"
+            aria-label={t('book.pdfAria')}
+            title={t('book.pdfTitle')}
           >
             {downloading ? (
               '…'
@@ -141,7 +143,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
           </button>
         </header>
 
-        {busy && <p className="diary-book__status">일기장을 만드는 중…</p>}
+        {busy && <p className="diary-book__status">{t('book.building')}</p>}
         {error && <p className="diary-book__error">{error}</p>}
 
         {pages && !busy && (
@@ -163,7 +165,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
               className="diary-book__nav diary-book__nav--prev"
               onClick={() => go('prev')}
               disabled={!canPrev || flip !== 'none'}
-              aria-label="이전 페이지"
+              aria-label={t('book.prevPage')}
             >
               ‹
             </button>
@@ -182,7 +184,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
               className="diary-book__nav diary-book__nav--next"
               onClick={() => go('next')}
               disabled={!canNext || flip !== 'none'}
-              aria-label="다음 페이지"
+              aria-label={t('book.nextPage')}
             >
               ›
             </button>

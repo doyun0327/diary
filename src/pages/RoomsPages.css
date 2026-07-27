@@ -48,10 +48,6 @@
   color: var(--color-text-muted);
 }
 
-.rooms__invite .rooms__hint {
-  margin: 8px 0 0;
-}
-
 .rooms__btn {
   flex-shrink: 0;
   padding: 11px 16px;
@@ -93,45 +89,38 @@
   cursor: default;
 }
 
-.rooms__nick-bar {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 14px;
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid var(--color-border-soft);
-  backdrop-filter: blur(8px);
-}
-
-.rooms__nick-bar label {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.7rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.rooms__as-who {
+  margin: 0 0 16px;
+  padding: 0 2px;
+  font-size: 0.86rem;
+  line-height: 1.45;
   color: var(--color-text-muted);
 }
 
-.rooms__nick-bar input {
-  padding: 0;
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
+.rooms__as-who strong {
+  font-weight: 700;
   color: var(--color-text);
-  text-transform: none;
-  letter-spacing: 0;
 }
 
-.rooms__nick-bar input:focus {
-  outline: none;
+.rooms__as-chip {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.rooms__actions {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.rooms__actions .rooms__btn {
+  flex: 1;
 }
 
 .rooms__empty {
@@ -209,35 +198,6 @@
   font-weight: 600;
   color: var(--color-text-muted);
   cursor: pointer;
-}
-
-.rooms-sheet__tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin-bottom: 16px;
-  padding: 4px;
-  border-radius: 14px;
-  background: var(--color-bg-muted);
-}
-
-.rooms-sheet__tabs button {
-  padding: 11px;
-  border: none;
-  border-radius: 11px;
-  background: transparent;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 650;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-}
-
-.rooms-sheet__tabs button.is-active {
-  background: var(--color-surface);
-  color: var(--color-text);
-  box-shadow: 0 2px 8px rgba(40, 32, 20, 0.08);
 }
 
 .rooms-sheet__body {
@@ -328,9 +288,16 @@
 }
 
 .rooms__room-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.8rem;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.rooms__meta-sep {
+  opacity: 0.45;
 }
 
 .rooms__card {
@@ -342,37 +309,56 @@
 }
 
 .rooms__card h3 {
-  margin: 0 0 12px;
-  font-size: 0.78rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--color-text);
+}
+
+.rooms__card-head-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--color-text-muted);
 }
 
-.rooms__invite {
+.rooms__card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.rooms__label {
-  margin: 0 0 6px;
-  font-size: 0.72rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.rooms__code {
+/* 초대코드 — 숫자는 숨기고 라벨만 (탭하면 복사) */
+.rooms__invite-quiet {
   margin: 0;
-  font-size: 1.75rem;
-  font-weight: 750;
-  letter-spacing: 0.18em;
-  color: var(--color-text);
-  font-variant-numeric: tabular-nums;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #d2cbc0;
+  cursor: pointer;
+}
+
+.rooms__invite-quiet:hover,
+.rooms__invite-quiet:focus-visible {
+  color: #b0a89c;
+  outline: none;
+}
+
+.rooms__card-head .rooms__invite-quiet {
+  font-size: 0.7rem;
+  color: #d8d2c8;
 }
 
 .rooms__members {
@@ -381,13 +367,42 @@
   gap: 8px;
 }
 
-.rooms__members li {
-  padding: 7px 12px;
+.rooms__member {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
   border-radius: 999px;
   background: var(--color-bg-muted);
   color: var(--color-text);
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+.rooms__member-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e8dfd2;
+  color: #8a7355;
+  font-size: 0.75rem;
+  font-weight: 750;
+  flex-shrink: 0;
+}
+
+.rooms__member-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rooms__member-name {
+  line-height: 1.2;
 }
 
 .rooms__feed-item {

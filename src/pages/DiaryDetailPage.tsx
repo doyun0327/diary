@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
 import type { RoomSummary } from '../types/room';
@@ -20,6 +21,7 @@ interface DiaryDetailPageProps {
 type ShareStep = 'menu' | 'rooms';
 
 function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPageProps) {
+  const { t } = useTranslation();
   const [shareOpen, setShareOpen] = useState(false);
   const [shareStep, setShareStep] = useState<ShareStep>('menu');
   const [moreOpen, setMoreOpen] = useState(false);
@@ -41,7 +43,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
 
   const handleDelete = () => {
     setMoreOpen(false);
-    if (confirm('이 일기를 삭제할까요?')) {
+    if (confirm(t('detail.confirm.delete'))) {
       onDelete(entry.id);
       onBack();
     }
@@ -69,7 +71,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       const list = await roomsApi.listRooms();
       setRooms(list);
     } catch (err) {
-      setShareMsg(err instanceof Error ? err.message : '방 목록을 불러오지 못했어요');
+      setShareMsg(err instanceof Error ? err.message : t('detail.err.roomsList'));
       setRooms([]);
     } finally {
       setRoomsLoading(false);
@@ -116,15 +118,15 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       if (okNames.length > 0 && failNames.length === 0) {
         setShareMsg(
           okNames.length === 1
-            ? `「${okNames[0]}」방에 공유했어요`
-            : `${okNames.length}개 방에 공유했어요`,
+            ? t('share.ok.oneRoom', { name: okNames[0] })
+            : t('share.ok.manyRooms', { n: okNames.length }),
         );
       } else if (okNames.length > 0) {
         setShareMsg(
-          `${okNames.length}개 방에 공유했어요. 실패: ${failNames.join(', ')}`,
+          t('share.ok.partial', { n: okNames.length, fails: failNames.join(', ') }),
         );
       } else {
-        setShareMsg('방에 공유하지 못했어요');
+        setShareMsg(t('share.err.roomShare'));
       }
     } finally {
       setSharing(false);
@@ -137,9 +139,9 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     setShareMsg(null);
     try {
       await downloadDiaryPaperPng(paperRef.current, entry.date, entry.fontId);
-      setShareMsg('PNG로 저장했어요');
+      setShareMsg(t('detail.ok.png'));
     } catch (err) {
-      setShareMsg(err instanceof Error ? err.message : 'PNG 저장에 실패했어요');
+      setShareMsg(err instanceof Error ? err.message : t('detail.err.png'));
     } finally {
       setDownloadingPng(false);
     }
@@ -160,27 +162,25 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       if (result === 'shared') {
         setShareMsg(
           target === 'instagram'
-            ? '공유 목록에서 인스타그램을 골라 주세요!'
-            : '공유 목록에서 카카오톡을 골라 주세요!',
+            ? t('share.pick.instagram')
+            : t('share.pick.kakao'),
         );
       } else if (isMobileShare) {
         setShareMsg(
           target === 'instagram'
-            ? '이미지가 저장됐어요. 인스타 스토리에 올려 주세요!'
-            : '이미지가 저장됐어요. 카카오톡 채팅방에 사진을 보내 주세요!',
+            ? t('share.saved.instagram')
+            : t('share.saved.kakao'),
         );
         if (url) setPreviewUrl(url);
       } else {
-        setShareMsg(
-          'PC 웹에서는 앱으로 바로 공유가 안 돼요. 이미지가 다운로드됐으니, 폰에서 열거나 앱에 올려 주세요.',
-        );
+        setShareMsg(t('share.pcHint'));
         if (url) setPreviewUrl(url);
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
         closeShare({ force: true });
       } else {
-        setShareMsg(err instanceof Error ? err.message : '공유에 실패했어요');
+        setShareMsg(err instanceof Error ? err.message : t('detail.err.share'));
       }
     } finally {
       setSharing(false);
@@ -194,7 +194,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
           type="button"
           className="diary-detail__back"
           onClick={onBack}
-          aria-label="뒤로가기"
+          aria-label={t('detail.backAria')}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -217,8 +217,8 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
             type="button"
             className="diary-detail__icon-btn"
             onClick={() => setBookOpen(true)}
-            aria-label="일기장으로 보기"
-            title="일기장 · PDF"
+            aria-label={t('detail.bookAria')}
+            title={t('detail.bookTitle')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -243,8 +243,8 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
             className="diary-detail__icon-btn"
             onClick={() => void handleDownloadPng()}
             disabled={downloadingPng}
-            aria-label="PNG 다운로드"
-            title="PNG로 저장"
+            aria-label={t('detail.pngAria')}
+            title={t('detail.pngTitle')}
           >
             {downloadingPng ? (
               '…'
@@ -273,8 +273,8 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
             className="diary-detail__icon-btn"
             onClick={openShare}
             disabled={sharing}
-            aria-label="공유하기"
-            title="공유하기"
+            aria-label={t('detail.shareAria')}
+            title={t('detail.shareAria')}
           >
             {sharing ? (
               '…'
@@ -305,9 +305,9 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
               type="button"
               className="diary-detail__icon-btn"
               onClick={() => setMoreOpen((v) => !v)}
-              aria-label="더보기"
+              aria-label={t('detail.moreAria')}
               aria-expanded={moreOpen}
-              title="더보기"
+              title={t('detail.moreAria')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -331,7 +331,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                 <button
                   type="button"
                   className="diary-detail__more-backdrop"
-                  aria-label="메뉴 닫기"
+                  aria-label={t('detail.menuCloseAria')}
                   onClick={() => setMoreOpen(false)}
                 />
                 <div className="diary-detail__more-menu" role="menu">
@@ -343,7 +343,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                       onEdit();
                     }}
                   >
-                    수정
+                    {t('detail.edit')}
                   </button>
                   <button
                     type="button"
@@ -351,7 +351,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                     className="danger"
                     onClick={handleDelete}
                   >
-                    삭제
+                    {t('detail.delete')}
                   </button>
                 </div>
               </>
@@ -376,7 +376,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
 
         {entry.imageUrl && (
           <div className="diary-detail__image">
-            <img src={entry.imageUrl} alt={entry.title || `${entry.date} 그림`} />
+            <img src={entry.imageUrl} alt={entry.title ? t('detail.imageAltTitle', { title: entry.title }) : t('detail.imageAlt', { date: entry.date })} />
           </div>
         )}
 
@@ -388,21 +388,21 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       {shareMsg && <p className="diary-detail__share-msg">{shareMsg}</p>}
       {previewUrl && (
         <div className="diary-detail__share-preview">
-          <img src={previewUrl} alt="공유용 일기 카드" />
+          <img src={previewUrl} alt={t('detail.sharePreviewAlt')} />
         </div>
       )}
 
       {shareOpen && (
         <>
-          <div className="diary-detail__picker-backdrop" onClick={closeShare} />
+          <div className="diary-detail__picker-backdrop" onClick={() => closeShare()} />
           <div
             className="diary-detail__picker"
             role="dialog"
-            aria-label={shareStep === 'menu' ? '공유하기' : '방에 공유'}
+            aria-label={shareStep === 'menu' ? t('share.title') : t('share.toRoomAria')}
           >
             {shareStep === 'menu' ? (
               <>
-                <h3>공유하기</h3>
+                <h3>{t('share.title')}</h3>
                 <button
                   type="button"
                   className="diary-detail__picker-item"
@@ -411,8 +411,8 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                 >
                   <span className="diary-detail__picker-icon">IG</span>
                   <span>
-                    <strong>인스타그램</strong>
-                    <small>스토리용 카드로 공유</small>
+                    <strong>{t('share.instagram')}</strong>
+                    <small>{t('share.instagramDesc')}</small>
                   </span>
                 </button>
                 <button
@@ -421,10 +421,10 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                   disabled={sharing}
                   onClick={() => void handlePick('kakao')}
                 >
-                  <span className="diary-detail__picker-icon">카톡</span>
+                  <span className="diary-detail__picker-icon">{t('share.kakaoIcon')}</span>
                   <span>
-                    <strong>카카오톡</strong>
-                    <small>채팅방에 사진으로 공유</small>
+                    <strong>{t('share.kakao')}</strong>
+                    <small>{t('share.kakaoDesc')}</small>
                   </span>
                 </button>
                 <button
@@ -433,19 +433,19 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                   disabled={sharing}
                   onClick={() => void openRoomStep()}
                 >
-                  <span className="diary-detail__picker-icon">방</span>
+                  <span className="diary-detail__picker-icon">{t('share.roomsIcon')}</span>
                   <span>
-                    <strong>친구 방</strong>
-                    <small>참여 중인 방에 올리기</small>
+                    <strong>{t('share.rooms')}</strong>
+                    <small>{t('share.roomsDesc')}</small>
                   </span>
                 </button>
                 <button
                   type="button"
                   className="diary-detail__picker-cancel"
                   disabled={sharing}
-                  onClick={closeShare}
+                  onClick={() => closeShare()}
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </>
             ) : (
@@ -456,7 +456,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                     className="diary-detail__picker-back"
                     disabled={sharing}
                     onClick={() => setShareStep('menu')}
-                    aria-label="공유 메뉴로"
+                    aria-label={t('share.backToMenuAria')}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -473,14 +473,14 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                       <path d="M15 18l-6-6 6-6" />
                     </svg>
                   </button>
-                  <h3>친구 방</h3>
+                  <h3>{t('share.rooms')}</h3>
                   <span className="diary-detail__picker-head-spacer" />
                 </div>
-                <p className="diary-detail__room-hint">여러 방을 골라 한 번에 공유할 수 있어요</p>
-                {roomsLoading && <p className="diary-detail__room-empty">방 목록 불러오는 중…</p>}
+                <p className="diary-detail__room-hint">{t('share.roomsHint')}</p>
+                {roomsLoading && <p className="diary-detail__room-empty">{t('share.roomsLoading')}</p>}
                 {!roomsLoading && rooms.length === 0 && (
                   <p className="diary-detail__room-empty">
-                    참여 중인 방이 없어요. 메뉴 → 친구 방에서 방을 만들거나 입장해 주세요.
+                    {t('share.roomsEmpty')}
                   </p>
                 )}
                 {rooms.map((room) => {
@@ -495,7 +495,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                       onClick={() => toggleRoom(room.id)}
                     >
                       <span className="diary-detail__picker-icon" aria-hidden>
-                        {room.name.trim().charAt(0) || '방'}
+                        {room.name.trim().charAt(0) || t('rooms.roomFallback')}
                       </span>
                       <span className="diary-detail__room-option-text">
                         <strong>{room.name}</strong>
@@ -510,15 +510,15 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                   disabled={sharing || selectedRoomIds.length === 0}
                   onClick={() => void shareToSelectedRooms()}
                 >
-                  {sharing ? '공유 중…' : '공유'}
+                  {sharing ? t('share.sharing') : t('share.submit')}
                 </button>
                 <button
                   type="button"
                   className="diary-detail__picker-cancel"
                   disabled={sharing}
-                  onClick={closeShare}
+                  onClick={() => closeShare()}
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </>
             )}

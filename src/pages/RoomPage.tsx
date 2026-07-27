@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
 import { MOOD_MAP } from '../types/diary';
 import { formatDate } from '../utils/date';
@@ -7,11 +8,14 @@ import './RoomsPages.css';
 
 interface RoomPageProps {
   roomId: string;
+  clientId: string;
+  myAvatarUrl: string | null;
   onBack: () => void;
   onOpenPost: (postId: string) => void;
 }
 
-function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
+function RoomPage({ roomId, clientId, myAvatarUrl, onBack, onOpenPost }: RoomPageProps) {
+  const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,11 +33,11 @@ function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
       setRoom(detail);
       setPosts(feed);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '방을 불러오지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.load'));
     } finally {
       setLoading(false);
     }
-  }, [roomId]);
+  }, [roomId, t]);
 
   useEffect(() => {
     void refresh();
@@ -46,7 +50,7 @@ function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      setError('초대코드를 복사하지 못했어요');
+      setError(t('rooms.err.copy'));
     }
   };
 
@@ -54,43 +58,59 @@ function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
     <div className="rooms">
       <div className="rooms__toolbar">
         <button type="button" onClick={onBack}>
-          ← 목록
+          {t('rooms.backToList')}
         </button>
-        <h2>{room?.name ?? '친구 방'}</h2>
+        <h2>{room?.name ?? t('rooms.title')}</h2>
         <button type="button" className="rooms__link" onClick={() => void refresh()} disabled={loading}>
-          새로고침
+          {t('rooms.refresh')}
         </button>
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
-      {loading && !room && <p className="rooms__muted">불러오는 중…</p>}
+      {loading && !room && <p className="rooms__muted">{t('common.loading')}</p>}
 
       {room && (
         <>
-          <section className="rooms__card rooms__invite">
-            <div>
-              <p className="rooms__label">초대코드 (자동 발급)</p>
-              <p className="rooms__code">{room.inviteCode}</p>
-              <p className="rooms__hint">친구에게 이 코드를 알려 주세요</p>
-            </div>
-            <button type="button" className="rooms__btn" onClick={() => void copyCode()}>
-              {copied ? '복사됨' : '복사'}
-            </button>
-          </section>
-
           <section className="rooms__card">
-            <h3>멤버 ({room.members.length})</h3>
+            <div className="rooms__card-head">
+              <h3>
+                {room.name}
+              </h3>
+              <button
+                type="button"
+                className="rooms__invite-quiet"
+                onClick={() => void copyCode()}
+                title={t('rooms.copyInviteTitle')}
+                aria-label={t('rooms.copyInviteAria')}
+              >
+                {copied ? t('rooms.copied') : t('rooms.copyInvite')}
+              </button>
+            </div>
             <ul className="rooms__members">
-              {room.members.map((m) => (
-                <li key={m.clientId}>{m.nickname || '익명'}</li>
-              ))}
+              {room.members.map((m) => {
+                const name = m.nickname || t('common.anonymous');
+                const photo =
+                  (m.clientId === clientId ? myAvatarUrl : null) || m.avatarUrl || null;
+                return (
+                  <li key={m.clientId} className="rooms__member">
+                    <span className="rooms__member-avatar" aria-hidden>
+                      {photo ? (
+                        <img src={photo} alt="" />
+                      ) : (
+                        <span>{name.slice(0, 1)}</span>
+                      )}
+                    </span>
+                    <span className="rooms__member-name">{name}</span>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
           <section className="rooms__list-wrap">
-            <h3>공유된 일기</h3>
+            <h3>{t('rooms.sharedDiaries')}</h3>
             {posts.length === 0 && (
-              <p className="rooms__muted">아직 공유된 일기가 없어요. 내 일기에서 「방에 공유」를 눌러 보세요.</p>
+              <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
             )}
             <ul className="rooms__feed">
               {posts.map((post) => (

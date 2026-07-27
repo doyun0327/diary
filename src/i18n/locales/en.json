@@ -1,0 +1,395 @@
+{
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading…",
+    "anonymous": "Anonymous",
+    "back": "Go back",
+    "processing": "Processing…",
+    "requestFailed": "Request failed ({{status}})",
+    "serverUnreachable": "Couldn't connect to the server. Check that Spring (8080) is running.",
+    "weekday": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "dateFull": "{{weekday}}, {{y}}-{{m}}-{{d}}",
+    "yearMonth": "{{y}}/{{m}}"
+  },
+  "header": {
+    "menu": "Menu",
+    "tagline": "Capture my day",
+    "footer": "Slowly, day by day",
+    "account": "Account",
+    "accountHintEmpty": "Profile photo · name",
+    "rooms": "Friend rooms",
+    "roomsHint": "My rooms",
+    "character": "Character",
+    "characterHint": "Me in AI drawings",
+    "export": "Export",
+    "exportHint": "Period PDF · diary book"
+  },
+  "account": {
+    "title": "Account",
+    "aria": "Account",
+    "photoLabel": "Profile photo",
+    "changePhotoAria": "Change profile photo",
+    "pickPhoto": "Choose photo",
+    "removePhoto": "Remove",
+    "nameLabel": "Name",
+    "nameHint": "Name shown in friend rooms",
+    "namePlaceholder": "Enter your name",
+    "save": "Save",
+    "ok": {
+      "nameSaved": "Name saved",
+      "photoSaved": "Profile photo saved",
+      "photoRemoved": "Profile photo removed"
+    },
+    "err": {
+      "nameRequired": "Please enter a name",
+      "imageOnly": "Only image files allowed",
+      "photoSave": "Couldn't save photo",
+      "photoRead": "Couldn't read photo",
+      "photoProcess": "Couldn't process photo",
+      "photoLoad": "Couldn't load photo"
+    }
+  },
+  "language": {
+    "label": "Language",
+    "hint": "App display language",
+    "ko": "Korean",
+    "en": "English"
+  },
+  "rooms": {
+    "title": "Friend rooms",
+    "joinWithCode": "Join with code",
+    "create": "Create room",
+    "empty": "You're not in any rooms yet",
+    "memberCount": "{{n}} members",
+    "roomFallback": "Room",
+    "copyInvite": "Invite code",
+    "copied": "Copied",
+    "copyInviteTitle": "Copy invite code",
+    "copyInviteAria": "Copy invite code",
+    "createSheetAria": "Create room",
+    "createHint": "Set a room name; a 6-digit invite code is created automatically.",
+    "asChipCreate": "Create as {{name}}",
+    "roomNamePlaceholder": "Room name",
+    "creating": "Creating…",
+    "joinSheetAria": "Join with code",
+    "joinHint": "Enter the 6-digit code from a friend.",
+    "asChipJoin": "Join as {{name}}",
+    "invitePlaceholder": "e.g. 482913",
+    "joining": "Joining…",
+    "joinSubmit": "Join",
+    "noNickname": "No nickname",
+    "backToList": "← List",
+    "refresh": "Refresh",
+    "sharedDiaries": "Shared diaries",
+    "sharedEmpty": "No shared diaries yet. Try “Share to room” on your diary.",
+    "backToRoom": "← To room",
+    "sharedDiary": "Shared diary",
+    "comments": "Comments ({{n}})",
+    "commentPlaceholder": "Write a comment",
+    "commentSubmit": "Post",
+    "alert": {
+      "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
+    },
+    "confirm": {
+      "deletePost": "Remove this shared diary from the room?"
+    },
+    "err": {
+      "needNickname": "Set your name in Menu → Account first",
+      "list": "Couldn't load rooms",
+      "nameRequired": "Please enter a room name",
+      "create": "Couldn't create room",
+      "codeRequired": "Enter a 6-digit invite code",
+      "join": "Couldn't join room",
+      "copy": "Couldn't copy invite code",
+      "load": "Couldn't load room",
+      "loadPost": "Couldn't load post",
+      "comment": "Couldn't post comment",
+      "delete": "Delete failed"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "No diaries yet.",
+      "line2": "Write your first diary!"
+    },
+    "writeFabAria": "Write diary",
+    "card": {
+      "imageAlt": "Drawing for {{date}}"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "Today's diary",
+      "edit": "Edit diary"
+    },
+    "save": "Save",
+    "saveEdit": "Done editing",
+    "cancel": "Cancel",
+    "titlePlaceholder": "Enter a title",
+    "contentPlaceholder": "e.g. I went swimming today. I worked out today.",
+    "ai": {
+      "button": "✨ AI drawing",
+      "sceneStep": "Creating scene…",
+      "drawStep": "Drawing…",
+      "statusScene": "Thinking of a scene…",
+      "statusDraw": "Drawing the picture…",
+      "tip": "Tip",
+      "tipBody": "Your character is the lead; AI draws from the diary's opening scene.",
+      "tipVisible": "Visible actions & places",
+      "tipAsk": " — please write them.",
+      "exGood1": "Good: We had a pizza party today",
+      "exGood2": "Good: I played with a dog in the park",
+      "exBad": "Weak: I felt good today",
+      "sceneUnderstood": "Scene AI understood: {{scene}}",
+      "characterAria": "Character for AI drawing",
+      "characterTitle": "This character becomes the protagonist"
+    },
+    "confirm": {
+      "replaceWithAi": "Replace the canvas with the AI drawing?"
+    },
+    "err": {
+      "needContent": "Write the diary first",
+      "aiFailed": "Failed to generate drawing",
+      "aiNeedContent": "Write diary content before generating",
+      "aiHttp": "Drawing failed: HTTP {{status}}",
+      "aiNoImage": "No image in backend response",
+      "aiUrl": "Couldn't load image URL",
+      "aiConvert": "Image conversion failed"
+    }
+  },
+  "detail": {
+    "backAria": "Go back",
+    "bookAria": "View as diary book",
+    "bookTitle": "Diary book · PDF",
+    "pngAria": "Download PNG",
+    "pngTitle": "Save as PNG",
+    "shareAria": "Share",
+    "moreAria": "More",
+    "menuCloseAria": "Close menu",
+    "edit": "Edit",
+    "delete": "Delete",
+    "imageAlt": "Drawing for {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "Diary share card",
+    "confirm": {
+      "delete": "Delete this diary?"
+    },
+    "ok": {
+      "png": "Saved as PNG"
+    },
+    "err": {
+      "png": "PNG save failed",
+      "pngBlob": "Couldn't create PNG",
+      "share": "Share failed",
+      "roomsList": "Couldn't load rooms"
+    }
+  },
+  "share": {
+    "title": "Share",
+    "toRoomAria": "Share to room",
+    "backToMenuAria": "Back to share menu",
+    "instagram": "Instagram",
+    "instagramDesc": "Share as a story card",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "Share photo in chat",
+    "rooms": "Friend rooms",
+    "roomsIcon": "Room",
+    "roomsDesc": "Post to rooms you're in",
+    "roomsHint": "Pick several rooms to share at once",
+    "roomsLoading": "Loading rooms…",
+    "roomsEmpty": "No rooms yet. Create or join under Menu → Friend rooms.",
+    "submit": "Share",
+    "sharing": "Sharing…",
+    "pcHint": "Desktop web can't share to apps directly. Image downloaded—open on phone or upload in the app.",
+    "ok": {
+      "oneRoom": "Shared to “{{name}}”",
+      "manyRooms": "Shared to {{n}} rooms",
+      "partial": "Shared to {{n}} rooms. Failed: {{fails}}"
+    },
+    "pick": {
+      "instagram": "Choose Instagram in the share sheet!",
+      "kakao": "Choose KakaoTalk in the share sheet!"
+    },
+    "saved": {
+      "instagram": "Image saved. Upload it to Instagram Stories!",
+      "kakao": "Image saved. Send it in KakaoTalk!"
+    },
+    "native": {
+      "instagram": "Sharing my diary to Instagram Stories",
+      "kakao": "Sharing my diary via KakaoTalk"
+    },
+    "err": {
+      "roomShare": "Couldn't share to room",
+      "build": "Can't create share image",
+      "convert": "Share image conversion failed",
+      "imageLoad": "Couldn't load drawing"
+    }
+  },
+  "character": {
+    "dialogAria": "My character settings",
+    "title": "My character",
+    "done": "Done",
+    "desc": "This look is the AI-drawing protagonist",
+    "who": "Who are you?",
+    "hairLabel": "Hair",
+    "outfitLabel": "Outfit",
+    "gender": {
+      "boy": "Boy",
+      "girl": "Girl"
+    },
+    "hair": {
+      "short": "Short hair",
+      "medium": "Bob",
+      "curly": "Curly hair"
+    },
+    "outfit": {
+      "short-sleeve": "Short sleeves",
+      "dress": "Dress",
+      "hoodie": "Hoodie",
+      "school-uniform": "School uniform"
+    }
+  },
+  "export": {
+    "title": "Export",
+    "aria": "Export",
+    "period": "Period",
+    "presetsAria": "Period presets",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "custom": "Custom",
+    "start": "Start",
+    "end": "End",
+    "count": "{{n}} diaries",
+    "empty": "No diaries in this period",
+    "pdf": "Save PDF",
+    "saving": "Saving…",
+    "openBook": "View as diary book",
+    "err": {
+      "pdf": "PDF save failed"
+    }
+  },
+  "book": {
+    "dialogAria": "Diary book view",
+    "title": "Diary book",
+    "pdfAria": "Save PDF",
+    "pdfTitle": "Save PDF",
+    "building": "Building diary book…",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "coverLabel": "Cover",
+    "cover": {
+      "total": "{{n}} entries total",
+      "hint": "Swipe sideways to read"
+    },
+    "err": {
+      "build": "Couldn't build diary book",
+      "empty": "No diaries to download",
+      "page": "Can't create book page",
+      "image": "Couldn't load drawing"
+    }
+  },
+  "canvas": {
+    "pen": "Pen",
+    "photo": "Photo",
+    "font": "Font",
+    "sticker": "Stickers",
+    "eraser": "Eraser",
+    "clearAll": "Clear all",
+    "photoHint": "Drag to move · corners to resize · ✓ to place",
+    "stickerSelected": "{{emoji}} selected · tap canvas to place",
+    "colorAria": "Color {{c}}",
+    "pickColorTitle": "Pick color",
+    "eraserSizeAria": "Eraser size",
+    "eraserSize": {
+      "s": "Small",
+      "m": "Medium",
+      "l": "Large"
+    },
+    "fontPickerTitle": "Choose font",
+    "stickerSheetTitle": "Stickers",
+    "stickerCatsAria": "Sticker categories",
+    "sample": "Today's diary",
+    "confirm": {
+      "clear": "Clear the whole drawing?"
+    },
+    "alert": {
+      "imageOnly": "Only image files allowed"
+    },
+    "err": {
+      "noCanvas": "No canvas",
+      "noContext": "Can't open canvas context",
+      "imageLoad": "Failed to load image"
+    }
+  },
+  "font": {
+    "dialogAria": "Choose font",
+    "title": "Font",
+    "sample": "Today's diary",
+    "cat": {
+      "cute": "Cute fonts",
+      "neat": "Neat fonts"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "Pick a date",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "goToday": "Go to today"
+  },
+  "mood": {
+    "happy": "Happy",
+    "excited": "Excited",
+    "love": "Lovey",
+    "proud": "Proud",
+    "calm": "Calm",
+    "sleepy": "Sleepy",
+    "soso": "So-so",
+    "surprised": "Surprised",
+    "sad": "Sad",
+    "angry": "Angry",
+    "anxious": "Anxious",
+    "sick": "Sick"
+  },
+  "stickers": {
+    "face": "Faces",
+    "animal": "Animals",
+    "fruit": "Fruit",
+    "building": "Buildings",
+    "weather": "Weather",
+    "sport": "Sports",
+    "clothes": "Clothes",
+    "shape": "Shapes"
+  }
+}

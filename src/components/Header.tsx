@@ -1,8 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Header.css';
 
 interface HeaderProps {
+  nickname?: string;
+  avatarUrl?: string | null;
+  onOpenAccount?: () => void;
   onOpenCharacter?: () => void;
   onOpenExport?: () => void;
   onOpenRooms?: () => void;
@@ -57,7 +62,7 @@ function MenuItem({
   icon: ReactNode;
   label: string;
   hint: string;
-  tone?: 'peach' | 'mint' | 'lavender';
+  tone?: 'peach' | 'mint' | 'lavender' | 'cream';
   onClick: () => void;
 }) {
   return (
@@ -77,7 +82,15 @@ function MenuItem({
   );
 }
 
-function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
+function Header({
+  nickname = '',
+  avatarUrl = null,
+  onOpenAccount,
+  onOpenCharacter,
+  onOpenExport,
+  onOpenRooms,
+}: HeaderProps) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -94,10 +107,14 @@ function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
     fn?.();
   };
 
+  const accountHint = nickname.trim()
+    ? nickname.trim()
+    : t('header.accountHintEmpty');
+
   const menu =
     menuOpen &&
     createPortal(
-      <div className="header-menu" role="dialog" aria-label="메뉴">
+      <div className="header-menu" role="dialog" aria-label={t('header.menu')}>
         <div className="header-menu__backdrop" onClick={() => setMenuOpen(false)} />
         <nav className="header-menu__panel">
           <header className="header-menu__head">
@@ -107,24 +124,41 @@ function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
                 alt="PageBy"
                 className="header-menu__brand-logo"
               />
-              <p className="header-menu__brand-sub">나의 하루를 남기다</p>
+              <p className="header-menu__brand-sub">{t('header.tagline')}</p>
             </div>
             <button
               type="button"
               className="header-menu__close"
               onClick={() => setMenuOpen(false)}
-              aria-label="닫기"
+              aria-label={t('common.close')}
             >
               <IconClose />
             </button>
           </header>
 
+          <LanguageSwitcher variant="menu" />
+
           <ul className="header-menu__list">
+            {onOpenAccount && (
+              <MenuItem
+                icon={
+                  avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="header-menu__avatar-img" />
+                  ) : (
+                    <IconUser />
+                  )
+                }
+                label={t('header.account')}
+                hint={accountHint}
+                tone="cream"
+                onClick={() => closeAnd(onOpenAccount)}
+              />
+            )}
             {onOpenRooms && (
               <MenuItem
                 icon={<IconUsers />}
-                label="친구 방"
-                hint="내 방 목록"
+                label={t('header.rooms')}
+                hint={t('header.roomsHint')}
                 tone="lavender"
                 onClick={() => closeAnd(onOpenRooms)}
               />
@@ -132,8 +166,8 @@ function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
             {onOpenCharacter && (
               <MenuItem
                 icon={<IconUser />}
-                label="캐릭터"
-                hint="AI 그림 속 나"
+                label={t('header.character')}
+                hint={t('header.characterHint')}
                 tone="peach"
                 onClick={() => closeAnd(onOpenCharacter)}
               />
@@ -141,15 +175,15 @@ function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
             {onOpenExport && (
               <MenuItem
                 icon={<IconDownload />}
-                label="내보내기"
-                hint="기간 PDF · 일기장"
+                label={t('header.export')}
+                hint={t('header.exportHint')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenExport)}
               />
             )}
           </ul>
 
-          <p className="header-menu__foot">천천히, 하루씩</p>
+          <p className="header-menu__foot">{t('header.footer')}</p>
         </nav>
       </div>,
       document.getElementById('root') ?? document.body,
@@ -169,30 +203,33 @@ function Header({ onOpenCharacter, onOpenExport, onOpenRooms }: HeaderProps) {
           className="header__logo-wordmark"
         />
       </h1>
-      <button
-        type="button"
-        className="header__burger"
-        aria-label="메뉴"
-        aria-expanded={menuOpen}
-        onClick={() => setMenuOpen(true)}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
+      <div className="header__actions">
+        <LanguageSwitcher variant="header" />
+        <button
+          type="button"
+          className="header__burger"
+          aria-label={t('header.menu')}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
         >
-          <path d="M4 5h16" />
-          <path d="M4 12h16" />
-          <path d="M4 19h16" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M4 5h16" />
+            <path d="M4 12h16" />
+            <path d="M4 19h16" />
+          </svg>
+        </button>
+      </div>
       {menu}
     </header>
   );

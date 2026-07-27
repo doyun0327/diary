@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import {
   exportPdfFilename,
@@ -18,6 +19,7 @@ interface ExportSheetProps {
 }
 
 function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
+  const { t } = useTranslation();
   const initial = thisMonthRange();
   const [preset, setPreset] = useState<Preset>('thisMonth');
   const [start, setStart] = useState(initial.start);
@@ -53,7 +55,7 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
     try {
       await downloadDiaryBookPdf(filtered, exportPdfFilename(start, end));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'PDF 저장에 실패했어요');
+      setError(err instanceof Error ? err.message : t('export.err.pdf'));
     } finally {
       setDownloading(false);
     }
@@ -65,44 +67,44 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
   };
 
   return (
-    <div className="export-sheet" role="dialog" aria-label="내보내기">
+    <div className="export-sheet" role="dialog" aria-label={t('export.aria')}>
       <div className="export-sheet__backdrop" onClick={onClose} />
       <div className="export-sheet__panel">
         <header className="export-sheet__head">
-          <h2>내보내기</h2>
-          <button type="button" onClick={onClose} aria-label="닫기">
-            닫기
+          <h2>{t('export.title')}</h2>
+          <button type="button" onClick={onClose} aria-label={t('common.close')}>
+            {t('common.close')}
           </button>
         </header>
 
-        <p className="export-sheet__label">기간</p>
-        <div className="export-sheet__presets" role="group" aria-label="기간 프리셋">
+        <p className="export-sheet__label">{t('export.period')}</p>
+        <div className="export-sheet__presets" role="group" aria-label={t('export.presetsAria')}>
           <button
             type="button"
             className={preset === 'thisMonth' ? 'is-active' : ''}
             onClick={() => applyPreset('thisMonth')}
           >
-            이번 달
+            {t('export.thisMonth')}
           </button>
           <button
             type="button"
             className={preset === 'lastMonth' ? 'is-active' : ''}
             onClick={() => applyPreset('lastMonth')}
           >
-            지난달
+            {t('export.lastMonth')}
           </button>
           <button
             type="button"
             className={preset === 'custom' ? 'is-active' : ''}
             onClick={() => applyPreset('custom')}
           >
-            직접 선택
+            {t('export.custom')}
           </button>
         </div>
 
         <div className="export-sheet__dates">
           <label>
-            시작
+            {t('export.start')}
             <input
               type="date"
               value={start}
@@ -113,7 +115,7 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
             />
           </label>
           <label>
-            끝
+            {t('export.end')}
             <input
               type="date"
               value={end}
@@ -127,17 +129,17 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
 
         <p className="export-sheet__count">
           {filtered.length > 0
-            ? `${filtered.length}건의 일기`
-            : '이 기간에 작성한 일기가 없어요'}
+            ? t('export.count', { n: filtered.length })
+            : t('export.empty')}
         </p>
         {error && <p className="export-sheet__error">{error}</p>}
 
         <div className="export-sheet__actions">
           <button type="button" disabled={!canExport} onClick={handlePdf}>
-            {downloading ? '저장 중…' : 'PDF 저장'}
+            {downloading ? t('export.saving') : t('export.pdf')}
           </button>
           <button type="button" className="primary" disabled={!canExport} onClick={handleBook}>
-            일기장으로 보기
+            {t('export.openBook')}
           </button>
         </div>
       </div>

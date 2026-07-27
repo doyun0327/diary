@@ -1,32 +1,28 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RoomSummary } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
 import './RoomsPages.css';
 
 interface RoomsHubPageProps {
   nickname: string;
-  onNicknameChange: (name: string) => void;
+  avatarUrl: string | null;
   onOpenRoom: (roomId: string) => void;
   onBack: () => void;
 }
 
-type JoinTab = 'create' | 'join';
+type SheetKind = 'create' | 'join' | null;
 
-function RoomsHubPage({
-  nickname,
-  onNicknameChange,
-  onOpenRoom,
-  onBack,
-}: RoomsHubPageProps) {
+function RoomsHubPage({ nickname, avatarUrl, onOpenRoom, onBack }: RoomsHubPageProps) {
+  const { t } = useTranslation();
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [tab, setTab] = useState<JoinTab>('create');
+  const [sheet, setSheet] = useState<SheetKind>(null);
   const [roomName, setRoomName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  const [nickDraft, setNickDraft] = useState(nickname);
   const [busy, setBusy] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const refresh = async () => {
     setLoading(true);
@@ -35,7 +31,7 @@ function RoomsHubPage({
       const list = await roomsApi.listRooms();
       setRooms(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '방 목록을 불러오지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.list'));
       setRooms([]);
     } finally {
       setLoading(false);
@@ -46,29 +42,24 @@ function RoomsHubPage({
     void refresh();
   }, []);
 
-  useEffect(() => {
-    setNickDraft(nickname);
-  }, [nickname]);
-
   const ensureNickname = () => {
-    const name = nickDraft.trim();
-    if (!name) {
-      setError('친구 방에서 쓸 닉네임을 먼저 정해 주세요');
-      return false;
-    }
-    if (name !== nickname) onNicknameChange(name);
-    return true;
+    if (nickname.trim()) return true;
+    setError(t('rooms.err.needNickname'));
+    return false;
   };
 
-  const openSheet = (nextTab: JoinTab = 'create') => {
+  const openSheet = (kind: Exclude<SheetKind, null>) => {
     setError(null);
-    setTab(nextTab);
-    setSheetOpen(true);
+    if (!nickname.trim()) {
+      setError(t('rooms.err.needNickname'));
+      return;
+    }
+    setSheet(kind);
   };
 
   const closeSheet = () => {
     if (busy) return;
-    setSheetOpen(false);
+    setSheet(null);
     setError(null);
   };
 
@@ -76,23 +67,20 @@ function RoomsHubPage({
     if (!ensureNickname() || busy) return;
     const name = roomName.trim();
     if (!name) {
-      setError('방 이름을 입력해 주세요');
+      setError(t('rooms.err.nameRequired'));
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const nick = nickDraft.trim();
-      const room = await roomsApi.createRoom(name, nick);
+      const room = await roomsApi.createRoom(name, nickname.trim(), avatarUrl);
       setRoomName('');
-      setSheetOpen(false);
-      window.alert(
-        `방이 만들어졌어요!\n\n초대코드: ${room.inviteCode}\n\n친구에게 이 코드를 알려 주세요.`,
-      );
+      setSheet(null);
+      window.alert(t('rooms.alert.created', { code: room.inviteCode }));
       await refresh();
       onOpenRoom(room.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '방을 만들지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.create'));
     } finally {
       setBusy(false);
     }
@@ -102,168 +90,169 @@ function RoomsHubPage({
     if (!ensureNickname() || busy) return;
     const code = inviteCode.replace(/\D/g, '').slice(0, 6);
     if (code.length !== 6) {
-      setError('초대코드 6자리를 입력해 주세요');
+      setError(t('rooms.err.codeRequired'));
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const nick = nickDraft.trim();
-      const room = await roomsApi.joinRoom(code, nick);
+      const room = await roomsApi.joinRoom(code, nickname.trim(), avatarUrl);
       setInviteCode('');
-      setSheetOpen(false);
+      setSheet(null);
       await refresh();
       onOpenRoom(room.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '방에 들어가지 못했어요');
+      setError(err instanceof Error ? err.message : t('rooms.err.join'));
     } finally {
       setBusy(false);
     }
   };
 
-  const saveNick = () => {
-    const name = nickDraft.trim();
-    if (!name) {
-      setError('닉네임을 입력해 주세요');
-      return;
+  const copyRoomCode = async (roomId: string, code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(roomId);
+      setTimeout(() => setCopiedId((id) => (id === roomId ? null : id)), 1500);
+    } catch {
+      setError(t('rooms.err.copy'));
     }
-    onNicknameChange(name);
-    setError(null);
   };
+
+  const nickLabel = nickname.trim() || t('rooms.noNickname');
 
   return (
     <div className="rooms">
       <div className="rooms__toolbar">
         <button type="button" onClick={onBack}>
-          ← 
+          ←
+        </button>
+        <h2>{t('rooms.title')}</h2>
+        <span />
+      </div>
+
+      <div className="rooms__actions">
+        <button type="button" className="rooms__btn" onClick={() => openSheet('join')}>
+          {t('rooms.joinWithCode')}
+        </button>
+        <button type="button" className="rooms__btn primary" onClick={() => openSheet('create')}>
+          {t('rooms.create')}
         </button>
       </div>
 
-      <div className="rooms__nick-bar">
-        <label>
-          <span>닉네임</span>
-          <input
-            type="text"
-            value={nickDraft}
-            maxLength={20}
-            placeholder="친구들에게 보일 이름"
-            onChange={(e) => setNickDraft(e.target.value)}
-            onBlur={saveNick}
-          />
-        </label>
-        <button type="button" className="rooms__btn rooms__btn--sm" onClick={saveNick}>
-          저장
-        </button>
-      </div>
+      {!sheet && error && <p className="rooms__error">{error}</p>}
 
-      {!sheetOpen && error && <p className="rooms__error">{error}</p>}
-
-      {loading && <p className="rooms__muted">불러오는 중…</p>}
+      {loading && <p className="rooms__muted">{t('common.loading')}</p>}
 
       {!loading && rooms.length === 0 && (
         <div className="rooms__empty">
-          <p>아직 참여한 방이 없어요</p>
-          <button type="button" className="rooms__btn primary" onClick={() => openSheet('create')}>
-            방 만들기 · 입장
-          </button>
+          <p>{t('rooms.empty')}</p>
         </div>
       )}
 
       <ul className="rooms__list">
         {rooms.map((room) => (
           <li key={room.id}>
-            <button type="button" className="rooms__room-item" onClick={() => onOpenRoom(room.id)}>
+            <button
+              type="button"
+              className="rooms__room-item"
+              onClick={() => onOpenRoom(room.id)}
+            >
               <span className="rooms__room-name">{room.name}</span>
               <span className="rooms__room-meta">
-                코드 {room.inviteCode}
-                {room.memberCount != null ? ` · ${room.memberCount}명` : ''}
+                {room.memberCount != null ? t('rooms.memberCount', { n: room.memberCount }) : t('rooms.roomFallback')}
+                <span className="rooms__meta-sep" aria-hidden>
+                  ·
+                </span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className="rooms__invite-quiet"
+                  title={t('rooms.copyInviteTitle')}
+                  aria-label={t('rooms.copyInviteAria')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void copyRoomCode(room.id, room.inviteCode);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void copyRoomCode(room.id, room.inviteCode);
+                    }
+                  }}
+                >
+                  {copiedId === room.id ? t('rooms.copied') : t('rooms.copyInvite')}
+                </span>
               </span>
             </button>
           </li>
         ))}
       </ul>
 
-      {sheetOpen && (
-        <div className="rooms-sheet" role="dialog" aria-label="방 만들기 · 입장">
+      {sheet === 'create' && (
+        <div className="rooms-sheet" role="dialog" aria-label={t('rooms.createSheetAria')}>
           <div className="rooms-sheet__backdrop" onClick={closeSheet} />
           <div className="rooms-sheet__panel">
             <header className="rooms-sheet__head">
-              <h3>방 만들기 · 입장</h3>
+              <h3>{t('rooms.create')}</h3>
               <button type="button" onClick={closeSheet} disabled={busy}>
-                닫기
+                {t('common.close')}
               </button>
             </header>
-
-            <div className="rooms-sheet__tabs" role="tablist">
+            <div className="rooms-sheet__body">
+              <p className="rooms__as-chip">{t('rooms.asChipCreate', { name: nickLabel })}</p>
+              <p className="rooms__hint">{t('rooms.createHint')}</p>
+              <input
+                type="text"
+                value={roomName}
+                maxLength={30}
+                placeholder={t('rooms.roomNamePlaceholder')}
+                onChange={(e) => setRoomName(e.target.value)}
+              />
               <button
                 type="button"
-                role="tab"
-                aria-selected={tab === 'create'}
-                className={tab === 'create' ? 'is-active' : ''}
-                onClick={() => {
-                  setTab('create');
-                  setError(null);
-                }}
+                className="rooms__btn primary rooms__btn--block"
+                disabled={busy}
+                onClick={() => void handleCreate()}
               >
-                만들기
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={tab === 'join'}
-                className={tab === 'join' ? 'is-active' : ''}
-                onClick={() => {
-                  setTab('join');
-                  setError(null);
-                }}
-              >
-                입장
+                {busy ? t('rooms.creating') : t('rooms.create')}
               </button>
             </div>
+            {error && <p className="rooms__error">{error}</p>}
+          </div>
+        </div>
+      )}
 
-            {tab === 'create' && (
-              <div className="rooms-sheet__body">
-                <p className="rooms__hint">방 이름만 정하면 초대코드 6자리가 자동으로 만들어져요.</p>
-                <input
-                  type="text"
-                  value={roomName}
-                  maxLength={30}
-                  placeholder="방 이름"
-                  onChange={(e) => setRoomName(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="rooms__btn primary rooms__btn--block"
-                  disabled={busy}
-                  onClick={() => void handleCreate()}
-                >
-                  {busy ? '만드는 중…' : '방 만들기'}
-                </button>
-              </div>
-            )}
-
-            {tab === 'join' && (
-              <div className="rooms-sheet__body">
-                <p className="rooms__hint">친구가 알려 준 초대코드 6자리를 입력하세요.</p>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={inviteCode}
-                  maxLength={6}
-                  placeholder="예: 482913"
-                  onChange={(e) => setInviteCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                />
-                <button
-                  type="button"
-                  className="rooms__btn primary rooms__btn--block"
-                  disabled={busy}
-                  onClick={() => void handleJoin()}
-                >
-                  {busy ? '입장 중…' : '입장하기'}
-                </button>
-              </div>
-            )}
-
+      {sheet === 'join' && (
+        <div className="rooms-sheet" role="dialog" aria-label={t('rooms.joinSheetAria')}>
+          <div className="rooms-sheet__backdrop" onClick={closeSheet} />
+          <div className="rooms-sheet__panel">
+            <header className="rooms-sheet__head">
+              <h3>{t('rooms.joinWithCode')}</h3>
+              <button type="button" onClick={closeSheet} disabled={busy}>
+                {t('common.close')}
+              </button>
+            </header>
+            <div className="rooms-sheet__body">
+              <p className="rooms__as-chip">{t('rooms.asChipJoin', { name: nickLabel })}</p>
+              <p className="rooms__hint">{t('rooms.joinHint')}</p>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={inviteCode}
+                maxLength={6}
+                placeholder={t('rooms.invitePlaceholder')}
+                onChange={(e) => setInviteCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              />
+              <button
+                type="button"
+                className="rooms__btn primary rooms__btn--block"
+                disabled={busy}
+                onClick={() => void handleJoin()}
+              >
+                {busy ? t('rooms.joining') : t('rooms.joinSubmit')}
+              </button>
+            </div>
             {error && <p className="rooms__error">{error}</p>}
           </div>
         </div>

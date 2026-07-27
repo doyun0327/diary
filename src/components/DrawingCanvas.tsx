@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
-import { DEFAULT_FONT_ID, FONTS, FONT_CATEGORY_LABELS, findFont, setPreferredFontId } from '../utils/fonts';
+import { useTranslation } from 'react-i18next';
+import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
 import './DrawingCanvas.css';
 
@@ -45,9 +46,9 @@ const COLORS = [
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
 const PEN_WIDTH = 3;
 const ERASER_SIZES = [
-  { id: 's', label: '작게', width: 12 },
-  { id: 'm', label: '보통', width: 24 },
-  { id: 'l', label: '크게', width: 40 },
+  { id: 's', width: 12 },
+  { id: 'm', width: 24 },
+  { id: 'l', width: 40 },
 ] as const;
 const STICKER_SIZE = 36;
 const MIN_PHOTO_SIZE = 40;
@@ -57,6 +58,7 @@ function DrawingCanvas({
   fontId: fontIdProp,
   onFontIdChange,
 }: DrawingCanvasProps) {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +82,7 @@ function DrawingCanvas({
   const [fontOpen, setFontOpen] = useState(false);
   const [stickerCategoryId, setStickerCategoryId] =
     useState<StickerCategoryId>('face');
-  const [selectedSticker, setSelectedSticker] = useState(
+  const [selectedSticker, setSelectedSticker] = useState<string>(
     STICKER_CATEGORIES[0].items[0],
   );
   const [eraserSizeId, setEraserSizeId] =
@@ -114,12 +116,12 @@ function DrawingCanvas({
     new Promise((resolve, reject) => {
       const canvas = canvasRef.current;
       if (!canvas) {
-        reject(new Error('캔버스가 없습니다'));
+        reject(new Error(t('canvas.err.noCanvas')));
         return;
       }
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        reject(new Error('캔버스 컨텍스트를 열 수 없습니다'));
+        reject(new Error(t('canvas.err.noContext')));
         return;
       }
 
@@ -139,7 +141,7 @@ function DrawingCanvas({
         hasDrawn.current = true;
         resolve();
       };
-      img.onerror = () => reject(new Error('이미지를 불러오지 못했습니다'));
+      img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
       img.src = src;
     });
 
@@ -392,7 +394,7 @@ function DrawingCanvas({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 넣을 수 있어요');
+      alert(t('canvas.alert.imageOnly'));
       return;
     }
 
@@ -458,7 +460,7 @@ function DrawingCanvas({
   };
 
   const handleClear = () => {
-    if (confirm('그림을 모두 지울까요?')) {
+    if (confirm(t('canvas.confirm.clear'))) {
       fillWhite();
       hasDrawn.current = false;
       photoImages.current.clear();
@@ -536,13 +538,13 @@ function DrawingCanvas({
         </div>
 
         {activePhotoId && (
-          <p className="drawing__photo-hint">드래그로 이동 · 모서리로 크기 조절 · ✓ 로 붙이기</p>
+          <p className="drawing__photo-hint">{t('canvas.photoHint')}</p>
         )}
 
         <div className="drawing__dock">
           {mode === 'sticker' && !stickerOpen && (
             <p className="drawing__sticker-hint">
-              {selectedSticker} 선택됨 · 그림판을 눌러 붙이세요
+              {t('canvas.stickerSelected', { emoji: selectedSticker })}
             </p>
           )}
 
@@ -554,7 +556,7 @@ function DrawingCanvas({
                   type="button"
                   className={`drawing__color ${color === c ? 'selected' : ''}`}
                   style={{ backgroundColor: c }}
-                  aria-label={`색상 ${c}`}
+                  aria-label={t(`canvas.colorAria`, { c })}
                   onClick={() => setColor(c)}
                 />
               ))}
@@ -562,7 +564,7 @@ function DrawingCanvas({
                 className={`drawing__color drawing__color--custom ${
                   color === customColor ? 'selected' : ''
                 }`}
-                title="색 고르기"
+                title={t('canvas.pickColorTitle')}
               >
                 <input
                   type="color"
@@ -579,7 +581,7 @@ function DrawingCanvas({
 
           {mode === 'eraser' && !activePhotoId && (
             <div className="drawing__eraser-options">
-              <div className="drawing__eraser-sizes" role="group" aria-label="지우개 크기">
+              <div className="drawing__eraser-sizes" role="group" aria-label={t('canvas.eraserSizeAria')}>
                 {ERASER_SIZES.map((size) => (
                   <button
                     key={size.id}
@@ -591,7 +593,7 @@ function DrawingCanvas({
                       className="drawing__eraser-preview"
                       style={{ width: size.width * 0.45, height: size.width * 0.45 }}
                     />
-                    {size.label}
+                    {t(`canvas.eraserSize.${size.id}`)}
                   </button>
                 ))}
               </div>
@@ -600,7 +602,7 @@ function DrawingCanvas({
                 className="drawing__clear-all"
                 onClick={handleClear}
               >
-                전체 지우기
+                {t('canvas.clearAll')}
               </button>
             </div>
           )}
@@ -611,7 +613,7 @@ function DrawingCanvas({
               className={`drawing__dock-btn ${mode === 'pen' && !fontOpen ? 'active' : ''}`}
               onClick={selectPen}
             >
-              펜
+              {t('canvas.pen')}
             </button>
             <button
               type="button"
@@ -623,28 +625,28 @@ function DrawingCanvas({
                 fileInputRef.current?.click();
               }}
             >
-              사진
+              {t('canvas.photo')}
             </button>
             <button
               type="button"
               className={`drawing__dock-btn ${fontOpen ? 'active' : ''}`}
               onClick={toggleFontPanel}
             >
-              글씨체
+              {t('canvas.font')}
             </button>
             <button
               type="button"
               className={`drawing__dock-btn ${mode === 'sticker' || stickerOpen ? 'active' : ''}`}
               onClick={toggleStickerPanel}
             >
-              스티커
+              {t('canvas.sticker')}
             </button>
             <button
               type="button"
               className={`drawing__dock-btn ${mode === 'eraser' ? 'active' : ''}`}
               onClick={selectEraser}
             >
-              지우개
+              {t('canvas.eraser')}
             </button>
           </div>
         </div>
@@ -653,15 +655,15 @@ function DrawingCanvas({
       {fontOpen && (
         <div className="drawing__font-panel">
           <div className="drawing__sticker-panel-head">
-            <span>글씨체 고르기</span>
+            <span>{t('canvas.fontPickerTitle')}</span>
             <button type="button" onClick={() => setFontOpen(false)}>
-              닫기
+              {t('common.close')}
             </button>
           </div>
           <div className="drawing__fonts">
             {FONT_CATEGORIES.map((category) => (
               <div key={category} className="drawing__font-group">
-                <p className="drawing__font-category">{FONT_CATEGORY_LABELS[category]}</p>
+                <p className="drawing__font-category">{t(`font.cat.${category}`)}</p>
                 {FONTS.filter((f) => f.category === category).map((f) => (
                   <button
                     key={f.id}
@@ -671,7 +673,7 @@ function DrawingCanvas({
                     onClick={() => pickFont(f.id)}
                   >
                     <span>{f.label}</span>
-                    <span className="drawing__font-sample">오늘의 diary</span>
+                    <span className="drawing__font-sample">{t('canvas.sample')}</span>
                   </button>
                 ))}
               </div>
@@ -683,7 +685,7 @@ function DrawingCanvas({
       {stickerOpen && (
         <div className="drawing__sticker-panel">
           <div className="drawing__sticker-panel-head">
-            <span>스티커</span>
+            <span>{t('canvas.stickerSheetTitle')}</span>
             <button
               type="button"
               onClick={() => {
@@ -692,19 +694,19 @@ function DrawingCanvas({
                 setColorsOpen(true);
               }}
             >
-              닫기
+              {t('common.close')}
             </button>
           </div>
 
-          <div className="drawing__sticker-tabs" role="tablist" aria-label="스티커 카테고리">
+          <div className="drawing__sticker-tabs" role="tablist" aria-label={t('canvas.stickerCatsAria')}>
             {STICKER_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 role="tab"
                 aria-selected={stickerCategoryId === cat.id}
-                aria-label={cat.label}
-                title={cat.label}
+                aria-label={t(`stickers.${cat.id}`)}
+                title={t(`stickers.${cat.id}`)}
                 className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}`}
                 onClick={() => setStickerCategoryId(cat.id)}
               >

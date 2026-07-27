@@ -3,6 +3,8 @@ import type { Mood } from './diary';
 export interface RoomMember {
   clientId: string;
   nickname: string;
+  /** 프로필 사진 data URL 또는 http(s) URL */
+  avatarUrl?: string | null;
   joinedAt: string;
 }
 

@@ -44,23 +44,47 @@ export function listRooms(): Promise<RoomSummary[]> {
   return request<RoomSummary[]>('/api/rooms');
 }
 
-export function createRoom(name: string, nickname?: string): Promise<RoomSummary> {
+export function createRoom(
+  name: string,
+  nickname?: string,
+  avatarUrl?: string | null,
+): Promise<RoomSummary> {
   return request<RoomSummary>('/api/rooms', {
     method: 'POST',
     body: JSON.stringify({
       name,
       // 한글/기호 닉네임은 헤더 대신 body로 전달 (fetch 헤더 ASCII 제한 회피)
       nickname: nickname?.trim() || undefined,
+      avatarUrl: avatarUrl || undefined,
     }),
   });
 }
 
-export function joinRoom(inviteCode: string, nickname?: string): Promise<RoomSummary> {
+export function joinRoom(
+  inviteCode: string,
+  nickname?: string,
+  avatarUrl?: string | null,
+): Promise<RoomSummary> {
   return request<RoomSummary>('/api/rooms/join', {
     method: 'POST',
     body: JSON.stringify({
       inviteCode,
       nickname: nickname?.trim() || undefined,
+      avatarUrl: avatarUrl || undefined,
+    }),
+  });
+}
+
+/** 내가 속한 모든 방의 닉네임·프로필 사진 갱신 */
+export function updateMyProfile(body: {
+  nickname?: string;
+  avatarUrl?: string | null;
+}): Promise<void> {
+  return request<void>('/api/rooms/me', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      nickname: body.nickname?.trim() || undefined,
+      avatarUrl: body.avatarUrl === undefined ? undefined : body.avatarUrl,
     }),
   });
 }

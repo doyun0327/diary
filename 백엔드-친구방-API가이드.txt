@@ -35,7 +35,7 @@ Room
   id, name, inviteCode(6자리 숫자 문자열), createdAt, createdByClientId
 
 RoomMember
-  roomId, clientId, nickname, joinedAt
+  roomId, clientId, nickname, avatarUrl(nullable, TEXT), joinedAt
   (roomId+clientId 유니크)
 
 RoomPost  (방에 공유된 일기 스냅샷)
@@ -56,8 +56,9 @@ RoomComment
 
 (1) 방 만들기
 POST /api/rooms
-Body: { "name": "우리반 일기방" }
+Body: { "name": "우리반 일기방", "nickname": "민지", "avatarUrl": "data:image/..." }
   ※ inviteCode 는 요청에 넣지 않는다. 서버가 숫자 6자리를 자동 생성한다.
+  ※ nickname, avatarUrl 은 optional. 있으면 생성자 RoomMember 에 저장.
 Response 200:
 {
   "id": "uuid",
@@ -72,9 +73,9 @@ Response 200:
 
 (2) 초대코드로 입장
 POST /api/rooms/join
-Body: { "inviteCode": "482913" }
+Body: { "inviteCode": "482913", "nickname": "민지", "avatarUrl": "data:image/..." }
 Response 200: RoomSummary (위와 동일)
-- 이미 멤버면 그대로 방 정보 반환
+- 이미 멤버면 그대로 방 정보 반환 (nickname/avatarUrl 이 오면 갱신 권장)
 - 코드 없으면 404
 
 
@@ -94,10 +95,24 @@ Response 200:
   "createdAt": "...",
   "memberCount": 3,
   "members": [
-    { "clientId": "...", "nickname": "민지", "joinedAt": "..." }
+    { "clientId": "...", "nickname": "민지", "avatarUrl": "data:image/jpeg;base64,...", "joinedAt": "..." }
   ]
 }
 - 멤버가 아니면 403
+- avatarUrl 없으면 null 또는 필드 생략
+
+
+(4-1) 내 프로필 갱신 (닉네임 · 사진)
+PATCH /api/rooms/me
+Body:
+{
+  "nickname": "민지",           // optional
+  "avatarUrl": "data:image/..." // optional, null 이면 사진 삭제
+}
+Response 204
+- X-Client-Id 가 속한 모든 RoomMember 의 nickname / avatarUrl 을 일괄 갱신
+- 방 만들기·입장 Body 에도 nickname, avatarUrl 을 받을 수 있게 하면
+  처음 입장 순간부터 멤버 목록에 사진이 보인다
 
 
 (5) 일기 공유 (포스트 생성)
