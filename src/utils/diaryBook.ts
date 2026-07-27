@@ -85,21 +85,24 @@ function createPageCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingCo
 }
 
 function paintPaperBackground(ctx: CanvasRenderingContext2D) {
-  const bg = ctx.createLinearGradient(0, 0, 0, BOOK_H);
-  bg.addColorStop(0, '#fffdf8');
-  bg.addColorStop(1, '#fff4e6');
-  ctx.fillStyle = bg;
+  // 상세 화면 바깥 배경
+  ctx.fillStyle = '#faf8f4';
   ctx.fillRect(0, 0, BOOK_W, BOOK_H);
 
-  // 살짝 줄무늬
-  ctx.strokeStyle = 'rgba(224, 213, 192, 0.45)';
-  ctx.lineWidth = 1;
-  for (let y = 160; y < BOOK_H - 60; y += 42) {
-    ctx.beginPath();
-    ctx.moveTo(64, y);
-    ctx.lineTo(BOOK_W - 64, y);
-    ctx.stroke();
-  }
+  // diary-detail__paper 와 동일
+  const cardX = 36;
+  const cardY = 36;
+  const cardW = BOOK_W - 72;
+  const cardH = BOOK_H - 72;
+  ctx.shadowColor = 'rgba(80, 60, 20, 0.07)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 4;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
 }
 
 /** 표지 */
@@ -152,71 +155,114 @@ export async function renderCoverPage(entries: DiaryEntry[]): Promise<HTMLCanvas
   return canvas;
 }
 
-/** 일기 한 편 페이지 */
+/** 일기 한 편 — diary-detail__paper 와 동일 구성 */
 export async function renderEntryPage(entry: DiaryEntry): Promise<HTMLCanvasElement> {
   const { canvas, ctx } = createPageCanvas();
   const font = getDiaryFont();
   paintPaperBackground(ctx);
 
-  const pad = 72;
-  let y = 90;
+  // paper: margin 36 + padding 16*≈2.1 → 내부 시작
+  const pad = 36 + 34; // ≈ paper margin + padding
+  const contentRight = BOOK_W - pad;
+  const contentW = contentRight - pad;
+  const gap = 30; // detail gap 14px 스케일
+  let y = pad + 8;
 
+  // dateline
   const mood = MOOD_MAP[entry.mood];
-  ctx.fillStyle = '#868e96';
-  ctx.font = `500 28px ${font}`;
+  ctx.fillStyle = '#2c2a26';
+  ctx.font = `700 34px ${font}`;
+  ctx.textBaseline = 'alphabetic';
   ctx.fillText(formatDate(entry.date), pad, y);
-  const moodText = `${mood.emoji} ${mood.label}`;
-  const moodW = ctx.measureText(moodText).width;
-  ctx.fillText(moodText, BOOK_W - pad - moodW, y);
-  y += 50;
+  ctx.font = `400 36px ${font}`;
+  const moodEmoji = mood.emoji;
+  ctx.fillText(moodEmoji, contentRight - ctx.measureText(moodEmoji).width, y);
+  y += gap + 8;
 
-  ctx.strokeStyle = '#e0d5c0';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(pad, y);
-  ctx.lineTo(BOOK_W - pad, y);
-  ctx.stroke();
-  y += 48;
-
+  // title box (diary-detail__title)
   if (entry.title.trim()) {
-    ctx.fillStyle = '#212529';
-    ctx.font = `700 44px ${font}`;
-    for (const line of wrapText(ctx, entry.title.trim(), BOOK_W - pad * 2, 2)) {
-      ctx.fillText(line, pad, y);
-      y += 56;
+    ctx.font = `700 34px ${font}`;
+    const titleLines = wrapText(ctx, entry.title.trim(), contentW - 48, 2);
+    const titlePadY = 22;
+    const titleLineH = 40;
+    const titleBoxH = titlePadY * 2 + titleLines.length * titleLineH - 8;
+    roundRect(ctx, pad, y, contentW, titleBoxH, 10);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.strokeStyle = '#efe8dc';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#2c2a26';
+    ctx.font = `700 34px ${font}`;
+    let ty = y + titlePadY + 28;
+    for (const line of titleLines) {
+      ctx.fillText(line, pad + 24, ty);
+      ty += titleLineH;
     }
-    y += 12;
+    y += titleBoxH + gap;
   }
 
+  // image — 가로·세로 여백
   if (entry.imageUrl) {
     try {
       const img = await loadImage(entry.imageUrl);
-      const maxW = BOOK_W - pad * 2;
-      const maxH = 420;
-      const scale = Math.min(maxW / img.width, maxH / img.height, 1);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      const dx = (BOOK_W - dw) / 2;
-      roundRect(ctx, dx - 6, y - 6, dw + 12, dh + 12, 18);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
-      ctx.strokeStyle = '#eee3cf';
+      const imgInsetX = 28;
+      const imgInsetY = 20;
+      const dw = contentW - imgInsetX * 2;
+      const maxH = 360;
+      const drawH = (img.height / img.width) * dw;
+      const finalH = Math.min(drawH, maxH);
+      const dx = pad + imgInsetX;
+
+      y += imgInsetY;
+
+      roundRect(ctx, dx, y, dw, finalH, 12);
+      ctx.save();
+      ctx.clip();
+      if (drawH > maxH) {
+        const srcH = (maxH / drawH) * img.height;
+        const srcY = (img.height - srcH) / 2;
+        ctx.drawImage(img, 0, srcY, img.width, srcH, dx, y, dw, finalH);
+      } else {
+        ctx.drawImage(img, dx, y, dw, finalH);
+      }
+      ctx.restore();
+
+      roundRect(ctx, dx, y, dw, finalH, 12);
+      ctx.strokeStyle = '#efe8dc';
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.drawImage(img, dx, y, dw, dh);
-      y += dh + 36;
+      y += finalH + imgInsetY + gap;
     } catch {
       // skip
     }
   }
 
+  // content lined paper — 공간 축소
+  const contentLineH = 36;
+  const contentFont = 28;
+  const contentTop = y + 4;
+  const maxContentLines = 7;
+  const contentBlockH = contentLineH * maxContentLines;
+  const linedBottom = contentTop + contentBlockH;
+
+  ctx.strokeStyle = '#e8dcc8';
+  ctx.lineWidth = 1.5;
+  for (let ly = contentTop + contentLineH; ly <= linedBottom; ly += contentLineH) {
+    ctx.beginPath();
+    ctx.moveTo(pad + 8, ly);
+    ctx.lineTo(contentRight - 8, ly);
+    ctx.stroke();
+  }
+
   if (entry.content.trim()) {
-    ctx.fillStyle = '#495057';
-    ctx.font = `400 32px ${font}`;
-    const remain = Math.max(4, Math.floor((BOOK_H - 80 - y) / 42));
-    for (const line of wrapText(ctx, entry.content.trim(), BOOK_W - pad * 2, remain)) {
-      ctx.fillText(line, pad, y);
-      y += 42;
+    ctx.fillStyle = '#2c2a26';
+    ctx.font = `400 ${contentFont}px ${font}`;
+    let ty = contentTop + contentFont;
+    for (const line of wrapText(ctx, entry.content.trim(), contentW - 16, maxContentLines)) {
+      ctx.fillText(line, pad + 8, ty);
+      ty += contentLineH;
     }
   }
 

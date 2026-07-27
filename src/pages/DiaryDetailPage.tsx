@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { DiaryEntry } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
 import { shareDiaryTo, type ShareTarget } from '../utils/shareStory';
+import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
 import DiaryBookViewer from '../components/DiaryBookViewer';
 import './DiaryDetailPage.css';
@@ -26,8 +27,10 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [bookOpen, setBookOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [downloadingPng, setDownloadingPng] = useState(false);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const paperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -127,6 +130,20 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     }
   };
 
+  const handleDownloadPng = async () => {
+    if (downloadingPng || !paperRef.current) return;
+    setDownloadingPng(true);
+    setShareMsg(null);
+    try {
+      await downloadDiaryPaperPng(paperRef.current, entry.date);
+      setShareMsg('PNG로 저장했어요');
+    } catch (err) {
+      setShareMsg(err instanceof Error ? err.message : 'PNG 저장에 실패했어요');
+    } finally {
+      setDownloadingPng(false);
+    }
+  };
+
   const handlePick = async (target: ShareTarget) => {
     if (sharing) return;
     setShareMsg(null);
@@ -223,6 +240,36 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
           <button
             type="button"
             className="diary-detail__icon-btn"
+            onClick={() => void handleDownloadPng()}
+            disabled={downloadingPng}
+            aria-label="PNG 다운로드"
+            title="PNG로 저장"
+          >
+            {downloadingPng ? (
+              '…'
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" x2="12" y1="15" y2="3" />
+              </svg>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="diary-detail__icon-btn"
             onClick={openShare}
             disabled={sharing}
             aria-label="공유하기"
@@ -312,7 +359,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
         </div>
       </div>
 
-      <div className="diary-detail__paper">
+      <div className="diary-detail__paper" ref={paperRef}>
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>
           <span className="diary-detail__mood">
