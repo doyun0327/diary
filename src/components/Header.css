@@ -47,13 +47,6 @@
   min-width: 0;
 }
 
-.header__actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
 .header__burger {
   flex-shrink: 0;
   display: inline-flex;
@@ -62,15 +55,15 @@
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 0;
+  background: transparent;
   color: var(--color-text);
   cursor: pointer;
 }
 
 .header__burger:active {
-  background: var(--color-bg-muted);
+  opacity: 0.7;
 }
 
 /* #root 안에 포털 — 앱 컬럼(최대 480) 기준으로 열림 */

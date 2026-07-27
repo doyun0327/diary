@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { setStoredLanguage, type AppLanguage } from '../i18n';
 import * as roomsApi from '../api/roomsApi';
-import LanguageSwitcher from './LanguageSwitcher';
 import './AccountSheet.css';
 
 interface AccountSheetProps {
@@ -59,7 +59,7 @@ function AccountSheet({
   onAvatarChange,
   onClose,
 }: AccountSheetProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
   const [nameDraft, setNameDraft] = useState(nickname);
   const [msg, setMsg] = useState<string | null>(null);
@@ -216,7 +216,26 @@ function AccountSheet({
 
         {msg && <p className="account-sheet__msg">{msg}</p>}
 
-        <LanguageSwitcher variant="menu" />
+        <section className="account-sheet__block">
+          <label className="account-sheet__label">{t('language.label')}</label>
+          <p className="account-sheet__hint">{t('language.hint')}</p>
+          <div className="account-sheet__lang-row">
+            <button
+              type="button"
+              className={`account-sheet__lang-btn ${i18n.language?.startsWith('ko') ? 'is-active' : ''}`}
+              onClick={() => { void i18n.changeLanguage('ko'); setStoredLanguage('ko'); }}
+            >
+              {t('language.ko')}
+            </button>
+            <button
+              type="button"
+              className={`account-sheet__lang-btn ${i18n.language?.startsWith('en') ? 'is-active' : ''}`}
+              onClick={() => { void i18n.changeLanguage('en'); setStoredLanguage('en'); }}
+            >
+              {t('language.en')}
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );

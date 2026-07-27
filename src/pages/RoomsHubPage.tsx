@@ -234,8 +234,6 @@ function RoomsHubPage({ nickname, avatarUrl, onOpenRoom, onBack }: RoomsHubPageP
               </button>
             </header>
             <div className="rooms-sheet__body">
-              <p className="rooms__as-chip">{t('rooms.asChipJoin', { name: nickLabel })}</p>
-              <p className="rooms__hint">{t('rooms.joinHint')}</p>
               <input
                 type="text"
                 inputMode="numeric"

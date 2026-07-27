@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
 import './Header.css';
 
 interface HeaderProps {
@@ -126,17 +125,15 @@ function Header({
               />
               <p className="header-menu__brand-sub">{t('header.tagline')}</p>
             </div>
-            <button
+            {/* <button
               type="button"
               className="header-menu__close"
               onClick={() => setMenuOpen(false)}
               aria-label={t('common.close')}
             >
               <IconClose />
-            </button>
+            </button> */}
           </header>
-
-          <LanguageSwitcher variant="menu" />
 
           <ul className="header-menu__list">
             {onOpenAccount && (
@@ -203,33 +200,30 @@ function Header({
           className="header__logo-wordmark"
         />
       </h1>
-      <div className="header__actions">
-        <LanguageSwitcher variant="header" />
-        <button
-          type="button"
-          className="header__burger"
-          aria-label={t('header.menu')}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(true)}
+      <button
+        type="button"
+        className="header__burger"
+        aria-label={t('header.menu')}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen(true)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <path d="M4 5h16" />
-            <path d="M4 12h16" />
-            <path d="M4 19h16" />
-          </svg>
-        </button>
-      </div>
+          <path d="M4 5h16" />
+          <path d="M4 12h16" />
+          <path d="M4 19h16" />
+        </svg>
+      </button>
       {menu}
     </header>
   );
