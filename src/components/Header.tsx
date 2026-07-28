@@ -7,9 +7,10 @@ interface HeaderProps {
   nickname?: string;
   avatarUrl?: string | null;
   onOpenAccount?: () => void;
-  onOpenCharacter?: () => void;
+  onOpenDecorate?: () => void;
   onOpenExport?: () => void;
   onOpenRooms?: () => void;
+  onOpenAppInfo?: () => void;
 }
 
 function IconUser() {
@@ -38,6 +39,28 @@ function IconDownload() {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="7 10 12 15 17 10" />
       <line x1="12" x2="12" y1="15" y2="3" />
+    </svg>
+  );
+}
+
+function IconPalette() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    </svg>
+  );
+}
+
+function IconInfo() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
     </svg>
   );
 }
@@ -85,9 +108,10 @@ function Header({
   nickname = '',
   avatarUrl = null,
   onOpenAccount,
-  onOpenCharacter,
+  onOpenDecorate,
   onOpenExport,
   onOpenRooms,
+  onOpenAppInfo,
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -97,8 +121,13 @@ function Header({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMenuOpen(false);
     };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKey);
+    };
   }, [menuOpen]);
 
   const closeAnd = (fn?: () => void) => {
@@ -160,13 +189,13 @@ function Header({
                 onClick={() => closeAnd(onOpenRooms)}
               />
             )}
-            {onOpenCharacter && (
+            {onOpenDecorate && (
               <MenuItem
-                icon={<IconUser />}
-                label={t('header.character')}
-                hint={t('header.characterHint')}
+                icon={<IconPalette />}
+                label={t('header.decorate')}
+                hint={t('header.decorateHint')}
                 tone="peach"
-                onClick={() => closeAnd(onOpenCharacter)}
+                onClick={() => closeAnd(onOpenDecorate)}
               />
             )}
             {onOpenExport && (
@@ -176,6 +205,15 @@ function Header({
                 hint={t('header.exportHint')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenExport)}
+              />
+            )}
+            {onOpenAppInfo && (
+              <MenuItem
+                icon={<IconInfo />}
+                label={t('header.appInfo')}
+                hint={t('header.appInfoHint')}
+                tone="cream"
+                onClick={() => closeAnd(onOpenAppInfo)}
               />
             )}
           </ul>

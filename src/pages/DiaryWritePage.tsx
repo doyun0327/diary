@@ -7,6 +7,7 @@ import type { CharacterProfile } from '../types/character';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
+import MoodIcon from '../components/MoodIcon';
 import { HairStyleIcon } from '../components/CharacterIcons';
 import { generateDiaryImage } from '../api/aiImage';
 import type { AiProgress } from '../api/aiImage';
@@ -154,7 +155,7 @@ function DiaryWritePage({
                 title={t(`mood.${m.value}`)}
                 onClick={() => setMood(m.value)}
               >
-                {m.emoji}
+                <MoodIcon mood={m.value} />
               </button>
             ))}
           </div>

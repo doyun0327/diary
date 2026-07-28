@@ -66,10 +66,14 @@
   opacity: 0.7;
 }
 
-/* #root 안에 포털 — 앱 컬럼(최대 480) 기준으로 열림 */
+/* 스크롤 위치와 무관하게 뷰포트 상단부터 고정 */
 .header-menu {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(480px, 100vw);
+  translate: -50% 0;
   z-index: 80;
   display: flex;
   justify-content: flex-end;

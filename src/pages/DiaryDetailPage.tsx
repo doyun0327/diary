@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
-import { MOOD_MAP } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
 import { findFont } from '../utils/fonts';
 import { shareDiaryTo, type ShareTarget } from '../utils/shareStory';
 import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
+import MoodIcon from '../components/MoodIcon';
 import DiaryBookViewer from '../components/DiaryBookViewer';
 import './DiaryDetailPage.css';
 
@@ -368,7 +368,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>
           <span className="diary-detail__mood">
-            {MOOD_MAP[entry.mood].emoji}
+            <MoodIcon mood={entry.mood} size={22} />
           </span>
         </div>
 

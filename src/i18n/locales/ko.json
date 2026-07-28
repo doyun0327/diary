@@ -33,7 +33,81 @@
     "character": "캐릭터",
     "characterHint": "AI 그림 속 나",
     "export": "내보내기",
-    "exportHint": "기간 PDF · 일기장"
+    "exportHint": "기간 PDF · 일기장",
+    "decorate": "꾸미기",
+    "decorateHint": "테마 · 이모지",
+    "appInfo": "앱 정보",
+    "appInfoHint": "버전 · 약관 · 출처"
+  },
+  "decorate": {
+    "title": "꾸미기",
+    "aria": "꾸미기",
+    "tabsAria": "꾸미기 탭",
+    "tab": {
+      "theme": "테마",
+      "emoji": "이모지"
+    }
+  },
+  "emojiPack": {
+    "hint": "기분 아이콘 스타일을 바꿔요",
+    "classic": {
+      "name": "Classic",
+      "desc": "Flat 이모티콘 (Flaticon)"
+    },
+    "smileys": {
+      "name": "Smileys",
+      "desc": "애니 이모티콘 (Flaticon)"
+    },
+    "cat": {
+      "name": "Cat",
+      "desc": "고양이 이모지 (Flaticon)"
+    },
+    "dog": {
+      "name": "Dog",
+      "desc": "강아지 이모지 (Flaticon)"
+    },
+    "love": {
+      "name": "Love",
+      "desc": "하트 이모티콘 (Flaticon)"
+    },
+    "ghost": {
+      "name": "Ghost",
+      "desc": "유령 이모지 (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "앱 정보",
+    "aria": "앱 정보",
+    "back": "이전",
+    "version": "현재 버전",
+    "legal": {
+      "menu": "이용약관 및 개인정보처리방침",
+      "title": "약관 · 개인정보",
+      "termsHeading": "이용약관",
+      "termsBody": "PageBy는 개인 일기 기록을 위한 앱입니다. 서비스 이용 시 관련 법령을 준수해 주세요. 계정·닉네임·일기 내용은 사용자의 책임 하에 관리되며, 타인의 권리를 침해하는 내용의 게시·공유는 금지됩니다. 서비스 내용은 예고 없이 변경될 수 있습니다.",
+      "privacyHeading": "개인정보처리방침",
+      "privacyBody": "일기·그림·프로필 정보는 기기에 저장되거나, 친구 방 기능을 쓸 때 서버에 동기화될 수 있습니다. 수집 목적은 일기 저장·공유·앱 기능 제공에 한정됩니다. 제3자에게 판매하지 않으며, 법령에 따른 요청이 있는 경우를 제외하고 외부에 제공하지 않습니다. 문의는 앱 내 안내 채널을 이용해 주세요."
+    },
+    "licenses": {
+      "menu": "오픈소스 라이선스 및 출처",
+      "title": "라이선스 · 출처",
+      "iconsHeading": "아이콘 출처",
+      "libsHeading": "오픈소스 라이브러리",
+      "note": "무료 Flaticon 아이콘은 출처 표기가 필요합니다. 위 링크가 그 표기입니다."
+    }
+  },
+  "theme": {
+    "title": "테마",
+    "aria": "테마 선택",
+    "hint": "앱 전체 색감을 바꿔요",
+    "paper": {
+      "name": "Paper",
+      "desc": "따뜻한 종이 톤"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "부드러운 녹차 그린"
+    }
   },
   "account": {
     "title": "계정",
@@ -65,6 +139,9 @@
     "hint": "앱 표시 언어",
     "ko": "한국어",
     "en": "English"
+  },
+  "credits": {
+    "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "친구 방",
@@ -124,6 +201,11 @@
       "line2": "첫 번째 diary를 남겨 보세요!"
     },
     "writeFabAria": "일기 쓰기",
+    "list": {
+      "monthTitle": "{{month}} 일기",
+      "emptyMonth": "이 달에 쓴 일기가 없어요.",
+      "noPreview": "내용 없음"
+    },
     "card": {
       "imageAlt": "{{date}} 그림"
     }

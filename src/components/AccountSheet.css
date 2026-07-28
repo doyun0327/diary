@@ -1,6 +1,10 @@
 .account-sheet {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(480px, 100vw);
+  translate: -50% 0;
   z-index: 90;
   display: flex;
   align-items: flex-end;
@@ -225,4 +229,17 @@
   background: #fff;
   color: var(--color-text);
   box-shadow: 0 2px 8px rgba(40, 32, 20, 0.06);
+}
+
+.account-sheet__credit {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.account-sheet__credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

@@ -47,6 +47,30 @@
   --shadow: rgba(40, 32, 20, 0.08);
 }
 
+/* Matcha — soft sage paper */
+[data-theme='matcha'] {
+  --color-bg: #f2f6f1;
+  --color-bg-outer: #d5e0d4;
+  --color-bg-muted: #e7efe6;
+  --color-bg-soft: #eef3ec;
+  --color-bg-input: #ffffff;
+  --color-surface: #fbfdf9;
+  --color-border: #cfdccf;
+  --color-border-soft: #dde8dc;
+  --color-text: #2a2e2a;
+  --color-text-muted: #6f7a6e;
+  --color-accent: #6b8f6a;
+  --color-accent-hover: #567456;
+  --color-accent-soft: #e4efe3;
+  --color-accent-text: #3f5c3f;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(24, 32, 24, 0.36);
+  --shadow-soft: 0 12px 40px rgba(32, 40, 28, 0.1);
+  --shadow: rgba(32, 40, 28, 0.08);
+}
+
 html {
   -webkit-tap-highlight-color: transparent;
 }

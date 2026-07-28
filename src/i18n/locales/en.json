@@ -33,7 +33,81 @@
     "character": "Character",
     "characterHint": "Me in AI drawings",
     "export": "Export",
-    "exportHint": "Period PDF · diary book"
+    "exportHint": "Period PDF · diary book",
+    "decorate": "Decorate",
+    "decorateHint": "Theme · emoji",
+    "appInfo": "App info",
+    "appInfoHint": "Version · terms · credits"
+  },
+  "decorate": {
+    "title": "Decorate",
+    "aria": "Decorate",
+    "tabsAria": "Decorate tabs",
+    "tab": {
+      "theme": "Theme",
+      "emoji": "Emoji"
+    }
+  },
+  "emojiPack": {
+    "hint": "Change mood icon style",
+    "classic": {
+      "name": "Classic",
+      "desc": "Flat icons (Flaticon)"
+    },
+    "smileys": {
+      "name": "Smileys",
+      "desc": "Animated icons (Flaticon)"
+    },
+    "cat": {
+      "name": "Cat",
+      "desc": "Cat emojis (Flaticon)"
+    },
+    "dog": {
+      "name": "Dog",
+      "desc": "Dog emojis (Flaticon)"
+    },
+    "love": {
+      "name": "Love",
+      "desc": "Love emoticons (Flaticon)"
+    },
+    "ghost": {
+      "name": "Ghost",
+      "desc": "Ghost emojis (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "App info",
+    "aria": "App info",
+    "back": "Back",
+    "version": "Current version",
+    "legal": {
+      "menu": "Terms & Privacy Policy",
+      "title": "Terms · Privacy",
+      "termsHeading": "Terms of Service",
+      "termsBody": "PageBy is a personal diary app. Please follow applicable laws while using the service. You are responsible for your account, nickname, and diary content. Posting or sharing content that infringes others' rights is not allowed. Features may change without notice.",
+      "privacyHeading": "Privacy Policy",
+      "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use friend rooms. We use this data only to provide diary storage, sharing, and app features. We do not sell personal data, and we do not share it except when required by law. Contact us through in-app channels for privacy requests."
+    },
+    "licenses": {
+      "menu": "Open-source licenses & credits",
+      "title": "Licenses · Credits",
+      "iconsHeading": "Icon credits",
+      "libsHeading": "Open-source libraries",
+      "note": "Free Flaticon icons require attribution. The link above is that credit."
+    }
+  },
+  "theme": {
+    "title": "Theme",
+    "aria": "Choose theme",
+    "hint": "Change the look of the whole app",
+    "paper": {
+      "name": "Paper",
+      "desc": "Warm paper tones"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "Soft sage green"
+    }
   },
   "account": {
     "title": "Account",
@@ -65,6 +139,9 @@
     "hint": "App display language",
     "ko": "Korean",
     "en": "English"
+  },
+  "credits": {
+    "moodIcons": "Mood icons: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "Friend rooms",
@@ -124,6 +201,11 @@
       "line2": "Write your first diary!"
     },
     "writeFabAria": "Write diary",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "No diaries this month.",
+      "noPreview": "No content"
+    },
     "card": {
       "imageAlt": "Drawing for {{date}}"
     }

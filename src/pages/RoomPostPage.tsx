@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
-import { MOOD_MAP } from '../types/diary';
 import { formatDate } from '../utils/date';
 import * as roomsApi from '../api/roomsApi';
+import MoodIcon from '../components/MoodIcon';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
@@ -94,7 +94,13 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       {post && (
         <article className="rooms__post">
           <p className="rooms__post-meta">
-            {post.authorNickname} · {formatDate(post.date)} · {MOOD_MAP[post.mood]?.emoji}
+            {post.authorNickname} · {formatDate(post.date)}
+            {post.mood ? (
+              <>
+                {' · '}
+                <MoodIcon mood={post.mood} size={16} />
+              </>
+            ) : null}
           </p>
           {post.title && <h3 className="rooms__post-title">{post.title}</h3>}
           {post.imageUrl && (

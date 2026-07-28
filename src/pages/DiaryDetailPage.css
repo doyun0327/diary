@@ -150,13 +150,10 @@
 
 .diary-detail__mood {
   white-space: nowrap;
-  font-size: 1.2rem;
-  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
   color: var(--color-text);
-  /* Gaegu 등 손글씨 폰트에 이모지 글리프가 없어 캡처/표시가 깨짐 */
-  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji",
-    "Twemoji Mozilla", sans-serif;
 }
 
 .diary-detail__title {

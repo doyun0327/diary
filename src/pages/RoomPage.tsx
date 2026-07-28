@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
-import { MOOD_MAP } from '../types/diary';
 import { formatDate } from '../utils/date';
 import * as roomsApi from '../api/roomsApi';
+import MoodIcon from '../components/MoodIcon';
 import './RoomsPages.css';
 
 interface RoomPageProps {
@@ -122,7 +122,8 @@ function RoomPage({ roomId, clientId, myAvatarUrl, onBack, onOpenPost }: RoomPag
                     <div className="rooms__feed-body">
                       <p className="rooms__feed-author">{post.authorNickname}</p>
                       <p className="rooms__feed-title">
-                        {MOOD_MAP[post.mood]?.emoji ?? ''} {post.title || formatDate(post.date)}
+                        {post.mood ? <MoodIcon mood={post.mood} size={16} /> : null}{' '}
+                        {post.title || formatDate(post.date)}
                       </p>
                       <p className="rooms__feed-snippet">{post.content || formatDate(post.date)}</p>
                     </div>

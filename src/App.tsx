@@ -5,6 +5,8 @@ import WriteFab from './components/WriteFab';
 import CharacterSetup from './components/CharacterSetup';
 import AccountSheet from './components/AccountSheet';
 import ExportSheet from './components/ExportSheet';
+import DecorateSheet from './components/DecorateSheet';
+import AppInfoSheet from './components/AppInfoSheet';
 import { applyStoredFont } from './components/FontPicker';
 import DiaryBookViewer from './components/DiaryBookViewer';
 import DiaryListPage from './pages/DiaryListPage';
@@ -31,6 +33,8 @@ function App() {
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [decorateOpen, setDecorateOpen] = useState(false);
+  const [appInfoOpen, setAppInfoOpen] = useState(false);
   const [bookEntries, setBookEntries] = useState<DiaryEntry[] | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
@@ -95,9 +99,10 @@ function App() {
         nickname={nickname}
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}
-        onOpenCharacter={() => setCharacterOpen(true)}
+        onOpenDecorate={() => setDecorateOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
+        onOpenAppInfo={() => setAppInfoOpen(true)}
       />
       <main>
         {page === 'home' && <DiaryListPage entries={entries} onSelect={handleSelect} />}
@@ -187,6 +192,8 @@ function App() {
           }}
         />
       )}
+      {decorateOpen && <DecorateSheet onClose={() => setDecorateOpen(false)} />}
+      {appInfoOpen && <AppInfoSheet onClose={() => setAppInfoOpen(false)} />}
       {bookEntries && (
         <DiaryBookViewer entries={bookEntries} onClose={() => setBookEntries(null)} />
       )}

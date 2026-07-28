@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
-import { MOOD_MAP } from '../types/diary';
+import MoodIcon from './MoodIcon';
 import './DiaryCard.css';
 
 interface DiaryCardProps {
@@ -22,7 +22,7 @@ function DiaryCard({ entry, onClick }: DiaryCardProps) {
       </div>
       <div className="diary-card__body">
         <h3>
-          {MOOD_MAP[entry.mood].emoji} {entry.title || entry.date}
+          <MoodIcon mood={entry.mood} size={18} /> {entry.title || entry.date}
         </h3>
         <p className="diary-card__meta">
           {entry.content || entry.date}
