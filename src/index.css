@@ -71,6 +71,102 @@
   --shadow: rgba(32, 40, 28, 0.08);
 }
 
+/* Sky — clear blue paper */
+[data-theme='sky'] {
+  --color-bg: #f3f7fb;
+  --color-bg-outer: #d5e2ef;
+  --color-bg-muted: #e6eef6;
+  --color-bg-soft: #edf3f9;
+  --color-bg-input: #ffffff;
+  --color-surface: #fbfdfe;
+  --color-border: #cddceb;
+  --color-border-soft: #dce7f1;
+  --color-text: #263038;
+  --color-text-muted: #6a7a88;
+  --color-accent: #5a8fb8;
+  --color-accent-hover: #48789e;
+  --color-accent-soft: #e0ecf5;
+  --color-accent-text: #3a6282;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(24, 32, 40, 0.36);
+  --shadow-soft: 0 12px 40px rgba(28, 40, 52, 0.1);
+  --shadow: rgba(28, 40, 52, 0.08);
+}
+
+/* Blossom — soft rose paper */
+[data-theme='blossom'] {
+  --color-bg: #fbf4f6;
+  --color-bg-outer: #edd9df;
+  --color-bg-muted: #f4e6ea;
+  --color-bg-soft: #f8ecef;
+  --color-bg-input: #ffffff;
+  --color-surface: #fefbfc;
+  --color-border: #e5cdd4;
+  --color-border-soft: #efdde3;
+  --color-text: #32262a;
+  --color-text-muted: #8a7078;
+  --color-accent: #c4788a;
+  --color-accent-hover: #a86273;
+  --color-accent-soft: #f4e4e8;
+  --color-accent-text: #8f4f5e;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(40, 24, 28, 0.36);
+  --shadow-soft: 0 12px 40px rgba(48, 28, 36, 0.1);
+  --shadow: rgba(48, 28, 36, 0.08);
+}
+
+/* Ink — graphite paper */
+[data-theme='ink'] {
+  --color-bg: #f4f4f2;
+  --color-bg-outer: #d8d9d6;
+  --color-bg-muted: #e9e9e6;
+  --color-bg-soft: #efefec;
+  --color-bg-input: #ffffff;
+  --color-surface: #fafaf8;
+  --color-border: #d0d1cd;
+  --color-border-soft: #e0e1dd;
+  --color-text: #2a2c2e;
+  --color-text-muted: #72767a;
+  --color-accent: #4a5560;
+  --color-accent-hover: #3a444d;
+  --color-accent-soft: #e4e7ea;
+  --color-accent-text: #343c44;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(24, 26, 28, 0.4);
+  --shadow-soft: 0 12px 40px rgba(28, 30, 32, 0.12);
+  --shadow: rgba(28, 30, 32, 0.09);
+}
+
+/* Lemon — soft citrus paper */
+[data-theme='lemon'] {
+  --color-bg: #fbf9ef;
+  --color-bg-outer: #ebe4c8;
+  --color-bg-muted: #f3edd9;
+  --color-bg-soft: #f7f2e4;
+  --color-bg-input: #ffffff;
+  --color-surface: #fefdf7;
+  --color-border: #e4d9b4;
+  --color-border-soft: #eee6cc;
+  --color-text: #2e2b22;
+  --color-text-muted: #857d66;
+  --color-accent: #c9a227;
+  --color-accent-hover: #a8871d;
+  --color-accent-soft: #f5ecd0;
+  --color-accent-text: #7a6418;
+  --color-danger: #c23b3b;
+  --color-danger-soft: #f8e8e8;
+  --color-danger-border: #e8c4c4;
+  --color-overlay: rgba(36, 32, 20, 0.36);
+  --shadow-soft: 0 12px 40px rgba(44, 40, 24, 0.1);
+  --shadow: rgba(44, 40, 24, 0.08);
+}
+
 html {
   -webkit-tap-highlight-color: transparent;
 }

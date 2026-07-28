@@ -107,6 +107,22 @@
     "matcha": {
       "name": "Matcha",
       "desc": "부드러운 녹차 그린"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "맑은 하늘 블루"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "옅은 벚꽃 핑크"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "차분한 잉크 그레이"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "부드러운 시트러스"
     }
   },
   "account": {

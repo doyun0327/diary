@@ -107,6 +107,22 @@
     "matcha": {
       "name": "Matcha",
       "desc": "Soft sage green"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "Clear sky blue"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "Soft cherry blossom"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "Calm graphite gray"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "Soft citrus yellow"
     }
   },
   "account": {
