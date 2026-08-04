@@ -11,6 +11,7 @@ interface MoodCalendarProps {
   viewMonth: number;
   onViewChange: (year: number, month: number) => void;
   onSelectDate?: (date: string) => void;
+  hideHeader?: boolean;
 }
 
 function toDateString(year: number, month: number, day: number): string {
@@ -19,7 +20,14 @@ function toDateString(year: number, month: number, day: number): string {
 
 const CALENDAR_CELLS = 42;
 
-function MoodCalendar({ entries, viewYear, viewMonth, onViewChange, onSelectDate }: MoodCalendarProps) {
+function MoodCalendar({
+  entries,
+  viewYear,
+  viewMonth,
+  onViewChange,
+  onSelectDate,
+  hideHeader = false,
+}: MoodCalendarProps) {
   const { t } = useTranslation();
   const now = new Date();
 
@@ -48,16 +56,18 @@ function MoodCalendar({ entries, viewYear, viewMonth, onViewChange, onSelectDate
   const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6].map((i) => t(`common.weekday.${i}`));
 
   return (
-    <div className="mood-cal">
-      <div className="mood-cal__header">
-        <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
-          ‹
-        </button>
-        <strong>{formatYearMonth(toDateString(viewYear, viewMonth, 1))}</strong>
-        <button type="button" onClick={() => moveMonth(1)} aria-label={t('calendar.nextMonth')}>
-          ›
-        </button>
-      </div>
+    <div className={`mood-cal${hideHeader ? ' mood-cal--no-header' : ''}`}>
+      {!hideHeader && (
+        <div className="mood-cal__header">
+          <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
+            ‹
+          </button>
+          <strong>{formatYearMonth(toDateString(viewYear, viewMonth, 1))}</strong>
+          <button type="button" onClick={() => moveMonth(1)} aria-label={t('calendar.nextMonth')}>
+            ›
+          </button>
+        </div>
+      )}
 
       <div className="mood-cal__weekdays">
         {WEEKDAYS.map((w, i) => (

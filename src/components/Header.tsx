@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { formatYearMonth } from '../utils/date';
 import './Header.css';
 
 interface HeaderProps {
@@ -11,6 +12,12 @@ interface HeaderProps {
   onOpenExport?: () => void;
   onOpenRooms?: () => void;
   onOpenAppInfo?: () => void;
+  calendarNav?: {
+    year: number;
+    month: number;
+    onPrev: () => void;
+    onNext: () => void;
+  } | null;
 }
 
 function IconUser() {
@@ -65,6 +72,22 @@ function IconInfo() {
   );
 }
 
+function IconChevronLeft() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  );
+}
+
+function IconChevronRight() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  );
+}
+
 function IconClose() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -112,6 +135,7 @@ function Header({
   onOpenExport,
   onOpenRooms,
   onOpenAppInfo,
+  calendarNav = null,
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -226,18 +250,31 @@ function Header({
 
   return (
     <header className="header">
-      <h1 className="header__logo">
-        <img
-          src="/brand/my-cozy-diary.png?v=4"
-          alt=""
-          className="header__logo-img"
-        />
-        <img
-          src="/brand/PageByImg.png?v=2"
-          alt="PageBy"
-          className="header__logo-wordmark"
-        />
-      </h1>
+      {calendarNav ? (
+        <div className="header__calendar-nav">
+          <button
+            type="button"
+            className="header__month-btn"
+            onClick={calendarNav.onPrev}
+            aria-label={t('calendar.prevMonth')}
+          >
+            <IconChevronLeft />
+          </button>
+          <strong className="header__month-label">
+            {formatYearMonth(calendarNav.year, calendarNav.month)}
+          </strong>
+          <button
+            type="button"
+            className="header__month-btn"
+            onClick={calendarNav.onNext}
+            aria-label={t('calendar.nextMonth')}
+          >
+            <IconChevronRight />
+          </button>
+        </div>
+      ) : (
+        <span className="header__spacer" aria-hidden />
+      )}
       <button
         type="button"
         className="header__burger"

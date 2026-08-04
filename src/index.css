@@ -5,30 +5,50 @@
 :root {
   /* 일기 글씨체. FontPicker에서 사용자가 바꿀 수 있음 */
   --diary-font: 'Gaegu', cursive;
+  --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
-  /* 단정한 페이퍼 톤 */
-  --color-bg: #faf8f4;
-  --color-bg-outer: #e8e2d8;
-  --color-bg-muted: #f3eee6;
-  --color-bg-soft: #f7f3ec;
+  /* Brand pastels */
+  --pastel-cream: #fff9f5;
+  --pastel-peach: #ffdcc8;
+  --pastel-lavender: #dccfff;
+  --pastel-mint: #d8f5e8;
+  --warm-gray: #666666;
+
+  /* Cream cozy default */
+  --color-bg: #fff9f5;
+  --color-bg-outer: #f3e8e0;
+  --color-bg-muted: #fff1e9;
+  --color-bg-soft: #fff6f0;
   --color-bg-input: #ffffff;
-  --color-surface: #ffffff;
-  --color-border: #e5ddd0;
-  --color-border-soft: #efe8dc;
-  --color-text: #2c2a26;
-  --color-text-muted: #8b857a;
-  --color-accent: #c47a3a;
-  --color-accent-hover: #a8652e;
-  --color-accent-soft: #f6ebe0;
-  --color-accent-text: #8a5424;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(28, 24, 20, 0.36);
-  --shadow-soft: 0 12px 40px rgba(40, 32, 20, 0.1);
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
+  --color-surface: #fffcfa;
+  --color-border: #f0ddd2;
+  --color-border-soft: #f7ebe3;
+  --color-text: #3d3835;
+  --color-text-muted: #666666;
+  --color-accent: #e8a07a;
+  --color-accent-hover: #d48964;
+  --color-accent-soft: #ffdcc8;
+  --color-accent-text: #b86b4a;
+  --color-lavender: #dccfff;
+  --color-lavender-soft: #f0e8ff;
+  --color-mint: #d8f5e8;
+  --color-mint-soft: #eafaf3;
+  --color-danger: #e07171;
+  --color-danger-soft: #fdeeee;
+  --color-danger-border: #f3c8c8;
+  --color-overlay: rgba(61, 48, 40, 0.32);
+  --sheet-bg: #fffcfa;
+  --sheet-handle: #e8d8ce;
+  --shadow-soft: 0 14px 40px rgba(90, 60, 40, 0.08);
+  --shadow-card: 0 6px 24px rgba(90, 60, 40, 0.06);
+  --shadow-float: 0 12px 32px rgba(90, 60, 40, 0.14);
+  --shadow: rgba(90, 60, 40, 0.07);
+  --radius-xl: 24px;
+  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
 
   /* 짧은 별칭 (기존 화면 CSS 호환) */
   --bg-app: var(--color-bg);
@@ -44,127 +64,133 @@
   --accent-text: var(--color-accent-text);
   --accent-soft: var(--color-accent-soft);
   --danger: var(--color-danger);
-  --shadow: rgba(40, 32, 20, 0.08);
 }
 
-/* Matcha — soft sage paper */
+/* Matcha — soft mint paper */
 [data-theme='matcha'] {
-  --color-bg: #f2f6f1;
-  --color-bg-outer: #d5e0d4;
-  --color-bg-muted: #e7efe6;
-  --color-bg-soft: #eef3ec;
+  --color-bg: #f5fbf7;
+  --color-bg-outer: #dbeee4;
+  --color-bg-muted: #e8f7ef;
+  --color-bg-soft: #eff9f3;
   --color-bg-input: #ffffff;
-  --color-surface: #fbfdf9;
-  --color-border: #cfdccf;
-  --color-border-soft: #dde8dc;
-  --color-text: #2a2e2a;
-  --color-text-muted: #6f7a6e;
-  --color-accent: #6b8f6a;
-  --color-accent-hover: #567456;
-  --color-accent-soft: #e4efe3;
-  --color-accent-text: #3f5c3f;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(24, 32, 24, 0.36);
-  --shadow-soft: 0 12px 40px rgba(32, 40, 28, 0.1);
-  --shadow: rgba(32, 40, 28, 0.08);
+  --color-surface: #fafdfb;
+  --color-border: #cfe6da;
+  --color-border-soft: #dff0e7;
+  --color-text: #35403a;
+  --color-text-muted: #667570;
+  --color-accent: #7cb89a;
+  --color-accent-hover: #649c82;
+  --color-accent-soft: #d8f5e8;
+  --color-accent-text: #4a8066;
+  --color-overlay: rgba(36, 52, 44, 0.32);
+  --sheet-bg: #fafdfb;
+  --sheet-handle: #cfe0d6;
+  --shadow-soft: 0 14px 40px rgba(40, 70, 55, 0.08);
+  --shadow-card: 0 6px 24px rgba(40, 70, 55, 0.06);
+  --shadow-float: 0 12px 32px rgba(40, 70, 55, 0.12);
+  --shadow: rgba(40, 70, 55, 0.07);
 }
 
-/* Sky — clear blue paper */
+/* Sky — soft mist blue */
 [data-theme='sky'] {
-  --color-bg: #f3f7fb;
-  --color-bg-outer: #d5e2ef;
-  --color-bg-muted: #e6eef6;
-  --color-bg-soft: #edf3f9;
+  --color-bg: #f5f8fc;
+  --color-bg-outer: #dde8f3;
+  --color-bg-muted: #eaf1f9;
+  --color-bg-soft: #f0f5fb;
   --color-bg-input: #ffffff;
-  --color-surface: #fbfdfe;
-  --color-border: #cddceb;
-  --color-border-soft: #dce7f1;
-  --color-text: #263038;
-  --color-text-muted: #6a7a88;
-  --color-accent: #5a8fb8;
-  --color-accent-hover: #48789e;
-  --color-accent-soft: #e0ecf5;
-  --color-accent-text: #3a6282;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(24, 32, 40, 0.36);
-  --shadow-soft: 0 12px 40px rgba(28, 40, 52, 0.1);
-  --shadow: rgba(28, 40, 52, 0.08);
+  --color-surface: #fafcfe;
+  --color-border: #d0dff0;
+  --color-border-soft: #e2ebf5;
+  --color-text: #353c48;
+  --color-text-muted: #667082;
+  --color-accent: #8bb0d4;
+  --color-accent-hover: #7298bc;
+  --color-accent-soft: #dceaf6;
+  --color-accent-text: #5a7fa0;
+  --color-overlay: rgba(36, 48, 64, 0.32);
+  --sheet-bg: #fafcfe;
+  --sheet-handle: #cfdceb;
+  --shadow-soft: 0 14px 40px rgba(40, 55, 80, 0.08);
+  --shadow-card: 0 6px 24px rgba(40, 55, 80, 0.06);
+  --shadow-float: 0 12px 32px rgba(40, 55, 80, 0.12);
+  --shadow: rgba(40, 55, 80, 0.07);
 }
 
-/* Blossom — soft rose paper */
+/* Blossom — lavender peach */
 [data-theme='blossom'] {
-  --color-bg: #fbf4f6;
-  --color-bg-outer: #edd9df;
-  --color-bg-muted: #f4e6ea;
-  --color-bg-soft: #f8ecef;
+  --color-bg: #fbf6fa;
+  --color-bg-outer: #ecddea;
+  --color-bg-muted: #f5eaf2;
+  --color-bg-soft: #f8f0f6;
   --color-bg-input: #ffffff;
-  --color-surface: #fefbfc;
-  --color-border: #e5cdd4;
-  --color-border-soft: #efdde3;
-  --color-text: #32262a;
-  --color-text-muted: #8a7078;
-  --color-accent: #c4788a;
-  --color-accent-hover: #a86273;
-  --color-accent-soft: #f4e4e8;
-  --color-accent-text: #8f4f5e;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(40, 24, 28, 0.36);
-  --shadow-soft: 0 12px 40px rgba(48, 28, 36, 0.1);
-  --shadow: rgba(48, 28, 36, 0.08);
+  --color-surface: #fefbfd;
+  --color-border: #e8d3e4;
+  --color-border-soft: #f1e4ee;
+  --color-text: #403540;
+  --color-text-muted: #726672;
+  --color-accent: #c9a0d4;
+  --color-accent-hover: #b086bc;
+  --color-accent-soft: #ede0f5;
+  --color-accent-text: #8f6a9c;
+  --color-lavender: #dccfff;
+  --color-lavender-soft: #f0e8ff;
+  --color-overlay: rgba(56, 40, 56, 0.32);
+  --sheet-bg: #fefbfd;
+  --sheet-handle: #e2d0de;
+  --shadow-soft: 0 14px 40px rgba(70, 40, 70, 0.08);
+  --shadow-card: 0 6px 24px rgba(70, 40, 70, 0.06);
+  --shadow-float: 0 12px 32px rgba(70, 40, 70, 0.12);
+  --shadow: rgba(70, 40, 70, 0.07);
 }
 
-/* Ink — graphite paper */
+/* Ink — soft warm graphite */
 [data-theme='ink'] {
-  --color-bg: #f4f4f2;
-  --color-bg-outer: #d8d9d6;
-  --color-bg-muted: #e9e9e6;
-  --color-bg-soft: #efefec;
+  --color-bg: #f7f6f4;
+  --color-bg-outer: #e2e0dc;
+  --color-bg-muted: #eeece9;
+  --color-bg-soft: #f3f1ee;
   --color-bg-input: #ffffff;
-  --color-surface: #fafaf8;
-  --color-border: #d0d1cd;
-  --color-border-soft: #e0e1dd;
-  --color-text: #2a2c2e;
-  --color-text-muted: #72767a;
-  --color-accent: #4a5560;
-  --color-accent-hover: #3a444d;
-  --color-accent-soft: #e4e7ea;
-  --color-accent-text: #343c44;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(24, 26, 28, 0.4);
-  --shadow-soft: 0 12px 40px rgba(28, 30, 32, 0.12);
-  --shadow: rgba(28, 30, 32, 0.09);
+  --color-surface: #fbfaf8;
+  --color-border: #ddd9d4;
+  --color-border-soft: #eae7e2;
+  --color-text: #3a3a3a;
+  --color-text-muted: #666666;
+  --color-accent: #8a8580;
+  --color-accent-hover: #716c68;
+  --color-accent-soft: #ebe8e4;
+  --color-accent-text: #5c5854;
+  --color-overlay: rgba(40, 40, 40, 0.36);
+  --sheet-bg: #fbfaf8;
+  --sheet-handle: #d6d2cd;
+  --shadow-soft: 0 14px 40px rgba(40, 40, 40, 0.09);
+  --shadow-card: 0 6px 24px rgba(40, 40, 40, 0.06);
+  --shadow-float: 0 12px 32px rgba(40, 40, 40, 0.14);
+  --shadow: rgba(40, 40, 40, 0.08);
 }
 
-/* Lemon — soft citrus paper */
+/* Lemon — soft peachy citrus */
 [data-theme='lemon'] {
-  --color-bg: #fbf9ef;
-  --color-bg-outer: #ebe4c8;
-  --color-bg-muted: #f3edd9;
-  --color-bg-soft: #f7f2e4;
+  --color-bg: #fffaf0;
+  --color-bg-outer: #f0e4c8;
+  --color-bg-muted: #f7efd8;
+  --color-bg-soft: #fbf5e4;
   --color-bg-input: #ffffff;
-  --color-surface: #fefdf7;
-  --color-border: #e4d9b4;
-  --color-border-soft: #eee6cc;
-  --color-text: #2e2b22;
-  --color-text-muted: #857d66;
-  --color-accent: #c9a227;
-  --color-accent-hover: #a8871d;
-  --color-accent-soft: #f5ecd0;
-  --color-accent-text: #7a6418;
-  --color-danger: #c23b3b;
-  --color-danger-soft: #f8e8e8;
-  --color-danger-border: #e8c4c4;
-  --color-overlay: rgba(36, 32, 20, 0.36);
-  --shadow-soft: 0 12px 40px rgba(44, 40, 24, 0.1);
-  --shadow: rgba(44, 40, 24, 0.08);
+  --color-surface: #fffdf7;
+  --color-border: #eadab8;
+  --color-border-soft: #f3e9d0;
+  --color-text: #3d392e;
+  --color-text-muted: #726b58;
+  --color-accent: #e0b85a;
+  --color-accent-hover: #c9a044;
+  --color-accent-soft: #f5e8c4;
+  --color-accent-text: #9a7a28;
+  --color-overlay: rgba(56, 48, 28, 0.32);
+  --sheet-bg: #fffdf7;
+  --sheet-handle: #e4d7b4;
+  --shadow-soft: 0 14px 40px rgba(70, 55, 20, 0.08);
+  --shadow-card: 0 6px 24px rgba(70, 55, 20, 0.06);
+  --shadow-float: 0 12px 32px rgba(70, 55, 20, 0.12);
+  --shadow: rgba(70, 55, 20, 0.07);
 }
 
 html {
@@ -173,10 +199,23 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background-color: var(--color-bg-outer);
+  font-family: var(--ui-font);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  background:
+    radial-gradient(80% 50% at 50% -10%, rgba(255, 220, 200, 0.55), transparent 60%),
+    radial-gradient(60% 40% at 100% 100%, rgba(220, 207, 255, 0.35), transparent 55%),
+    var(--color-bg-outer);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
 }
 
 #root {
@@ -184,8 +223,20 @@ body {
   max-width: 480px;
   min-height: 100dvh;
   margin: 0 auto;
-  background-color: var(--color-bg);
-  box-shadow: 0 0 40px rgba(40, 32, 20, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 250, 0.65) 0%, transparent 28%),
+    var(--color-bg);
+  box-shadow: 0 0 60px rgba(90, 60, 40, 0.1);
   overflow-x: clip;
   isolation: isolate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

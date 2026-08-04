@@ -39,6 +39,10 @@ function App() {
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
 
+  const now = new Date();
+  const [calYear, setCalYear] = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+
   useEffect(() => {
     applyStoredFont();
   }, []);
@@ -93,6 +97,12 @@ function App() {
     setPage('rooms');
   };
 
+  const moveCalendarMonth = (delta: number) => {
+    const d = new Date(calYear, calMonth + delta, 1);
+    setCalYear(d.getFullYear());
+    setCalMonth(d.getMonth());
+  };
+
   return (
     <div className="app">
       <Header
@@ -103,9 +113,30 @@ function App() {
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
+        calendarNav={
+          page === 'home'
+            ? {
+                year: calYear,
+                month: calMonth,
+                onPrev: () => moveCalendarMonth(-1),
+                onNext: () => moveCalendarMonth(1),
+              }
+            : null
+        }
       />
       <main>
-        {page === 'home' && <DiaryListPage entries={entries} onSelect={handleSelect} />}
+        {page === 'home' && (
+          <DiaryListPage
+            entries={entries}
+            onSelect={handleSelect}
+            viewYear={calYear}
+            viewMonth={calMonth}
+            onViewChange={(year, month) => {
+              setCalYear(year);
+              setCalMonth(month);
+            }}
+          />
+        )}
         {page === 'write' && (
           <DiaryWritePage
             key={editingId ?? 'new'}

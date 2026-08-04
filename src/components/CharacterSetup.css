@@ -3,6 +3,7 @@
   inset: 0;
   z-index: 40;
   background: var(--color-overlay);
+  backdrop-filter: blur(8px);
 }
 
 .character-setup {
@@ -15,10 +16,21 @@
   max-height: 80dvh;
   overflow-y: auto;
   transform: translateX(-50%);
-  padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
-  border-radius: 20px 20px 0 0;
-  background: var(--color-surface);
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.12);
+  padding: 16px 18px calc(22px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--sheet-bg);
+  box-shadow: 0 -20px 50px rgba(90, 60, 40, 0.14);
+  animation: character-setup-up 0.3s var(--ease-out);
+}
+
+.character-setup::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  background: var(--sheet-handle);
 }
 
 .character-setup__head {
@@ -124,7 +136,7 @@
 .character-setup__emoji-btn.selected {
   background: var(--color-accent-soft);
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px rgba(232, 168, 56, 0.22);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 .character-setup__emoji-btn--labeled {
@@ -266,5 +278,16 @@
   text-align: right;
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+@keyframes character-setup-up {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0.85;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import MoodCalendar from '../components/MoodCalendar';
@@ -9,14 +9,19 @@ import './DiaryListPage.css';
 interface DiaryListPageProps {
   entries: DiaryEntry[];
   onSelect: (id: string) => void;
+  viewYear: number;
+  viewMonth: number;
+  onViewChange: (year: number, month: number) => void;
 }
 
-function DiaryListPage({ entries, onSelect }: DiaryListPageProps) {
+function DiaryListPage({
+  entries,
+  onSelect,
+  viewYear,
+  viewMonth,
+  onViewChange,
+}: DiaryListPageProps) {
   const { t } = useTranslation();
-  const now = new Date();
-  const [viewYear, setViewYear] = useState(now.getFullYear());
-  const [viewMonth, setViewMonth] = useState(now.getMonth());
-
   const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
 
   const monthEntries = useMemo(
@@ -40,11 +45,9 @@ function DiaryListPage({ entries, onSelect }: DiaryListPageProps) {
         entries={entries}
         viewYear={viewYear}
         viewMonth={viewMonth}
-        onViewChange={(year, month) => {
-          setViewYear(year);
-          setViewMonth(month);
-        }}
+        onViewChange={onViewChange}
         onSelectDate={handleCalendarDate}
+        hideHeader
       />
 
       {entries.length === 0 ? (

@@ -1,52 +1,64 @@
 .mood-cal {
-  margin: 0 0 18px;
-  padding: 14px;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  margin: 0 0 22px;
+  padding: 18px 14px 16px;
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.92), rgba(255, 249, 245, 0.65)),
+    var(--color-surface);
   border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-card);
+}
+
+.mood-cal--no-header {
+  padding-top: 14px;
 }
 
 .mood-cal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .mood-cal__header strong {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--color-text);
 }
 
 .mood-cal__header button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: none;
-  border-radius: 8px;
-  background: transparent;
-  font-size: 1.2rem;
+  border-radius: 12px;
+  background: var(--color-bg-muted);
+  font-size: 1.15rem;
   line-height: 1;
   color: var(--color-text-muted);
   cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
 }
 
 .mood-cal__header button:active {
-  background: var(--color-bg-muted);
+  transform: scale(0.94);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
 }
 
 .mood-cal__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .mood-cal__weekdays span {
   text-align: center;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--color-text-muted);
-  padding: 4px 0;
+  padding: 8px 0;
+  letter-spacing: 0.02em;
 }
 
 .mood-cal__weekdays span:first-child {
@@ -61,8 +73,8 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 2px;
-  height: 252px;
+  gap: 4px;
+  height: 336px;
 }
 
 .mood-cal__day {
@@ -73,13 +85,14 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   background: none;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 650;
   font-family: inherit;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: background 0.12s;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 
 .mood-cal__day--blank {
@@ -92,9 +105,10 @@
 }
 
 .mood-cal__day.today {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-text);
-  box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-accent) 55%, transparent);
 }
 
 .mood-cal__day.has-mood {
@@ -102,11 +116,15 @@
 }
 
 .mood-cal__day.has-mood .mood-icon {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
 }
 
 .mood-cal__day.has-mood.today {
   box-shadow: inset 0 0 0 2px var(--color-accent);
-  background: var(--color-accent-soft);
+  background: color-mix(in srgb, var(--color-accent-soft) 80%, white);
+}
+
+.mood-cal__day:active:not(.mood-cal__day--blank) {
+  transform: scale(0.94);
 }

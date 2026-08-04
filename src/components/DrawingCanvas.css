@@ -7,13 +7,14 @@
 
 .drawing__canvas-wrap {
   position: relative;
-  height: 260px;
-  border-radius: 16px;
+  height: 280px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--color-surface);
+  background:
+    linear-gradient(180deg, #fffefc, var(--color-surface));
   box-shadow:
-    0 2px 8px rgba(80, 60, 20, 0.08),
-    inset 0 0 0 1px rgba(200, 180, 140, 0.35);
+    var(--shadow-card),
+    inset 0 0 0 1px var(--color-border-soft);
 }
 
 .drawing__photo-layers {
@@ -115,11 +116,12 @@
 .drawing__dock-bar {
   display: flex;
   gap: 4px;
-  padding: 4px;
+  padding: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  background: color-mix(in srgb, var(--sheet-bg) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-float);
 }
 
 .drawing__dock-btn {
@@ -137,8 +139,9 @@
 }
 
 .drawing__dock-btn.active {
-  background: var(--color-accent);
+  background: linear-gradient(160deg, #ffe4d2, var(--color-accent));
   color: #fff;
+  box-shadow: 0 2px 8px rgba(180, 100, 70, 0.22);
 }
 
 .drawing__dock-btn--muted {
@@ -205,10 +208,11 @@
 }
 
 .drawing__sticker-panel {
-  padding: 10px 12px 12px;
-  border-radius: 14px;
+  padding: 12px 14px 14px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-input);
   border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-card);
 }
 
 .drawing__sticker-panel-head {
@@ -376,10 +380,11 @@
 }
 
 .drawing__font-panel {
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
   background: var(--color-bg-input);
   border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-card);
 }
 
 .drawing__fonts {

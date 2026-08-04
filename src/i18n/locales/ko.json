@@ -101,24 +101,24 @@
     "aria": "테마 선택",
     "hint": "앱 전체 색감을 바꿔요",
     "paper": {
-      "name": "Paper",
-      "desc": "따뜻한 종이 톤"
+      "name": "Cream",
+      "desc": "포근한 크림·피치"
     },
     "matcha": {
       "name": "Matcha",
-      "desc": "부드러운 녹차 그린"
+      "desc": "부드러운 민트 그린"
     },
     "sky": {
       "name": "Sky",
-      "desc": "맑은 하늘 블루"
+      "desc": "잔잔한 하늘 블루"
     },
     "blossom": {
       "name": "Blossom",
-      "desc": "옅은 벚꽃 핑크"
+      "desc": "라벤더·피치 블룸"
     },
     "ink": {
       "name": "Ink",
-      "desc": "차분한 잉크 그레이"
+      "desc": "따뜻한 웜 그레이"
     },
     "lemon": {
       "name": "Lemon",

@@ -101,28 +101,28 @@
     "aria": "Choose theme",
     "hint": "Change the look of the whole app",
     "paper": {
-      "name": "Paper",
-      "desc": "Warm paper tones"
+      "name": "Cream",
+      "desc": "Cozy cream & peach"
     },
     "matcha": {
       "name": "Matcha",
-      "desc": "Soft sage green"
+      "desc": "Soft mint green"
     },
     "sky": {
       "name": "Sky",
-      "desc": "Clear sky blue"
+      "desc": "Gentle sky blue"
     },
     "blossom": {
       "name": "Blossom",
-      "desc": "Soft cherry blossom"
+      "desc": "Lavender peach bloom"
     },
     "ink": {
       "name": "Ink",
-      "desc": "Calm graphite gray"
+      "desc": "Warm soft gray"
     },
     "lemon": {
       "name": "Lemon",
-      "desc": "Soft citrus yellow"
+      "desc": "Soft citrus glow"
     }
   },
   "account": {

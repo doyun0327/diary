@@ -6,15 +6,16 @@
 
 .calendar {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
   z-index: 21;
-  width: min(300px, calc(100vw - 48px));
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background-color: var(--color-bg);
-  box-shadow: var(--shadow-soft);
+  width: min(308px, calc(100vw - 48px));
+  padding: 14px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-xl);
+  background: var(--sheet-bg);
+  box-shadow: var(--shadow-float);
+  animation: calendar-in 0.22s var(--ease-out);
 }
 
 .calendar__header {
@@ -29,18 +30,18 @@
 }
 
 .calendar__header button {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: var(--color-surface);
-  font-size: 1.2rem;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--color-bg-muted);
+  font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
 }
 
 .calendar__header button:active {
-  background-color: var(--color-bg-muted);
+  background-color: var(--color-accent-soft);
 }
 
 .calendar__weekdays {
@@ -99,16 +100,30 @@
 
 .calendar__today-btn {
   width: 100%;
-  margin-top: 8px;
-  padding: 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: var(--color-surface);
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-text);
   font-size: 0.85rem;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
 }
 
 .calendar__today-btn:active {
-  background-color: var(--color-bg-muted);
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+@keyframes calendar-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

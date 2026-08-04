@@ -3,12 +3,12 @@ export type ThemeId = 'paper' | 'matcha' | 'sky' | 'blossom' | 'ink' | 'lemon';
 export const THEME_STORAGE_KEY = 'picture-diary-theme';
 
 export const THEMES: { id: ThemeId; swatch: string[] }[] = [
-  { id: 'paper', swatch: ['#faf8f4', '#c47a3a', '#e8e2d8'] },
-  { id: 'matcha', swatch: ['#f2f6f1', '#6b8f6a', '#d5e0d4'] },
-  { id: 'sky', swatch: ['#f3f7fb', '#5a8fb8', '#d5e2ef'] },
-  { id: 'blossom', swatch: ['#fbf4f6', '#c4788a', '#edd9df'] },
-  { id: 'ink', swatch: ['#f4f4f2', '#4a5560', '#d8d9d6'] },
-  { id: 'lemon', swatch: ['#fbf9ef', '#c9a227', '#ebe4c8'] },
+  { id: 'paper', swatch: ['#fff9f5', '#e8a07a', '#ffdcc8'] },
+  { id: 'matcha', swatch: ['#f5fbf7', '#7cb89a', '#d8f5e8'] },
+  { id: 'sky', swatch: ['#f5f8fc', '#8bb0d4', '#dceaf6'] },
+  { id: 'blossom', swatch: ['#fbf6fa', '#c9a0d4', '#dccfff'] },
+  { id: 'ink', swatch: ['#f7f6f4', '#8a8580', '#ebe8e4'] },
+  { id: 'lemon', swatch: ['#fffaf0', '#e0b85a', '#f5e8c4'] },
 ];
 
 const THEME_IDS = new Set<string>(THEMES.map((t) => t.id));

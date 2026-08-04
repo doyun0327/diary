@@ -2,6 +2,7 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  animation: app-fade-in 0.45s var(--ease-out) both;
 }
 
 .app main {
@@ -9,4 +10,13 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
