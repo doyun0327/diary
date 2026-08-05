@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setStoredLanguage, type AppLanguage } from '../i18n';
+import { setStoredLanguage } from '../i18n';
 import * as roomsApi from '../api/roomsApi';
 import './AccountSheet.css';
 

@@ -88,15 +88,6 @@ function IconChevronRight() {
   );
 }
 
-function IconClose() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
 function MenuItem({
   icon,
   label,
@@ -178,14 +169,6 @@ function Header({
               />
               <p className="header-menu__brand-sub">{t('header.tagline')}</p>
             </div>
-            {/* <button
-              type="button"
-              className="header-menu__close"
-              onClick={() => setMenuOpen(false)}
-              aria-label={t('common.close')}
-            >
-              <IconClose />
-            </button> */}
           </header>
 
           <ul className="header-menu__list">
