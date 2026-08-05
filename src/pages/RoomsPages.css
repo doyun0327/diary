@@ -2,10 +2,7 @@
   padding: 22px 18px;
   padding-bottom: calc(40px + env(safe-area-inset-bottom));
   min-height: 100%;
-  background:
-    radial-gradient(90% 50% at 0% 0%, rgba(216, 245, 232, 0.45), transparent 55%),
-    radial-gradient(70% 40% at 100% 10%, rgba(220, 207, 255, 0.28), transparent 50%),
-    var(--color-bg);
+  background: var(--color-bg);
 }
 
 .rooms__toolbar {
@@ -66,9 +63,9 @@
 
 .rooms__btn.primary {
   border-color: transparent;
-  background: linear-gradient(160deg, #ffe4d2, var(--color-accent) 55%, var(--color-accent-hover));
+  background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(180, 100, 70, 0.2);
+  box-shadow: none;
 }
 
 .rooms__btn.primary:active {
@@ -262,22 +259,19 @@
   padding: 16px;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 245, 0.7)),
-    var(--color-surface);
+  background: var(--color-surface);
   text-align: left;
   font-family: inherit;
   cursor: pointer;
   color: var(--color-text);
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, transform 0.15s, background 0.15s;
 }
 
 .rooms__room-item:active,
 .rooms__feed-item:active {
   transform: scale(0.99);
-  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
-  box-shadow: var(--shadow-soft);
+  background: var(--color-bg-soft);
+  border-color: var(--color-border);
 }
 
 .rooms__room-item {
@@ -309,10 +303,7 @@
   padding: 16px;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 245, 0.7)),
-    var(--color-surface);
-  box-shadow: var(--shadow-card);
+  background: var(--color-surface);
 }
 
 .rooms__card h3 {

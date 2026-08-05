@@ -1,25 +1,20 @@
 .diary-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 14px 14px;
+  padding: 12px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 245, 0.7)),
-    var(--bg-paper);
+  background: var(--bg-paper);
   text-align: left;
   cursor: pointer;
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s, border-color 0.2s;
-  box-shadow: var(--shadow-card);
-  animation: diary-row-in 0.4s var(--ease-out) both;
+  transition: transform 0.16s var(--ease-out), background 0.15s, border-color 0.15s;
 }
 
 .diary-row:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--border-soft));
-  box-shadow: var(--shadow-soft);
+  background: var(--color-bg-soft);
+  border-color: var(--color-border);
 }
 
 .diary-row:active {
@@ -27,20 +22,20 @@
 }
 
 .diary-row__mood {
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 50%;
   background: var(--color-bg-muted);
   line-height: 1;
 }
 
 .diary-row__mood .mood-icon {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
 }
 
 .diary-row__body {
@@ -48,19 +43,19 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .diary-row__date {
-  font-size: 0.92rem;
-  font-weight: 800;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
 .diary-row__preview {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 500;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,30 +64,18 @@
 }
 
 .diary-row__thumb {
-  flex: 0 0 56px;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   object-fit: cover;
   background: var(--bg-muted);
-  box-shadow: 0 2px 8px rgba(90, 60, 40, 0.08);
 }
 
 .diary-row__thumb--empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  opacity: 0.35;
-}
-
-@keyframes diary-row-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  font-size: 1.05rem;
+  opacity: 0.3;
 }

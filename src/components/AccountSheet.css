@@ -157,9 +157,8 @@
 
 .account-sheet__btn--solid {
   border-color: transparent;
-  background: linear-gradient(160deg, #ffe4d2, var(--color-accent) 55%, var(--color-accent-hover));
+  background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(180, 100, 70, 0.2);
 }
 
 .account-sheet__btn--ghost {

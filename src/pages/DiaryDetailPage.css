@@ -1,8 +1,6 @@
 .diary-detail {
   padding: 0 0 calc(32px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(80% 35% at 100% 0%, rgba(220, 207, 255, 0.22), transparent 55%),
-    var(--color-bg);
+  background: var(--color-bg);
   min-height: 100%;
 }
 
@@ -19,14 +17,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   margin-left: -4px;
   padding: 0;
-  border: none;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 50%;
+  background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
   transition: transform 0.15s, background 0.15s;
@@ -141,12 +138,8 @@
   margin: 0 14px 14px;
   padding: 18px;
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(255, 249, 245, 0.75)),
-    var(--color-surface);
+  background: var(--color-surface);
   border: 1px solid var(--color-border-soft);
-  box-shadow: var(--shadow-card);
-  animation: detail-paper-in 0.4s var(--ease-out) both;
 }
 
 .diary-detail__dateline {
@@ -242,12 +235,12 @@
   margin: 0 14px 12px;
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: linear-gradient(120deg, var(--color-accent-soft), var(--color-lavender-soft));
+  background: var(--color-accent-soft);
   color: var(--color-accent-text);
   font-size: 0.86rem;
   line-height: 1.45;
   text-align: center;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .diary-detail__share-preview {
@@ -484,14 +477,13 @@
   padding: 15px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(160deg, #ffe4d2, var(--color-accent) 55%, var(--color-accent-hover));
+  background: var(--color-accent);
   color: #fff;
   font-family: inherit;
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
-  box-shadow: 0 12px 28px rgba(180, 100, 70, 0.22);
 }
 
 .diary-detail__room-share-btn:disabled {
@@ -508,17 +500,6 @@
   to {
     transform: translate(-50%, 0);
     opacity: 1;
-  }
-}
-
-@keyframes detail-paper-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

@@ -1,12 +1,10 @@
 .diary-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 18px 18px;
+  gap: 6px;
+  padding: 16px 18px;
   padding-bottom: calc(108px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(90% 42% at 50% -8%, rgba(255, 220, 200, 0.4), transparent 58%),
-    radial-gradient(70% 35% at 100% 30%, rgba(220, 207, 255, 0.18), transparent 50%);
+  background: transparent;
 }
 
 .diary-list--empty {
@@ -19,45 +17,42 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 8px;
-  margin-top: 20px;
+  gap: 6px;
+  margin-top: 16px;
   padding: 28px 20px;
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  border: 1px dashed var(--color-border);
+  background: var(--color-bg-muted);
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 500;
   line-height: 1.55;
 }
 
 .diary-list__section {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .diary-list__heading {
-  margin: 0 0 12px;
-  padding: 0 4px;
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  padding: 0 2px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--color-text);
 }
 
 .diary-list__month-empty {
   margin: 0;
-  padding: 32px 12px;
+  padding: 28px 12px;
   text-align: center;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 500;
   color: var(--text-muted);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-bg-muted) 70%, transparent);
 }
 
 .diary-list__rows {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }

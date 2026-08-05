@@ -158,9 +158,8 @@
 
 .export-sheet__actions button.primary {
   border-color: transparent;
-  background: linear-gradient(160deg, #ffe4d2, var(--color-accent) 55%, var(--color-accent-hover));
+  background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(180, 100, 70, 0.2);
 }
 
 .export-sheet__actions button:disabled {

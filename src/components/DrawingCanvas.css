@@ -139,9 +139,8 @@
 }
 
 .drawing__dock-btn.active {
-  background: linear-gradient(160deg, #ffe4d2, var(--color-accent));
+  background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(180, 100, 70, 0.22);
 }
 
 .drawing__dock-btn--muted {
