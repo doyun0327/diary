@@ -1,6 +1,6 @@
 .mood-cal {
   margin: 0 0 20px;
-  padding: 14px 12px 12px;
+  padding: 14px 8px 12px;
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border-soft);
@@ -16,6 +16,7 @@
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+  padding: 0 4px;
 }
 
 .mood-cal__header {
@@ -111,56 +112,20 @@
 .mood-cal__days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  gap: 2px;
-  height: 320px;
-}
-
-.mood-cal--drawing {
-  padding-left: 8px;
-  padding-right: 8px;
-}
-
-.mood-cal--drawing .mood-cal__days {
-  height: auto;
-  grid-template-rows: none;
   gap: 5px;
-}
-
-.mood-cal--drawing .mood-cal__day {
   height: auto;
-  aspect-ratio: 1;
-  border-radius: 10px;
-}
-
-.mood-cal--drawing .mood-cal__day--blank {
-  background: transparent;
-}
-
-.mood-cal--drawing .mood-cal__day.has-drawing {
-  padding: 3px;
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 1px var(--color-border-soft);
-}
-
-.mood-cal--drawing .mood-cal__thumb {
-  border-radius: 7px;
-}
-
-.mood-cal--drawing .mood-cal__day.has-drawing.today {
-  padding: 3px;
-  border-radius: 10px;
 }
 
 .mood-cal__day {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 50%;
+  border-radius: 10px;
   background: none;
   font-size: 0.9rem;
   font-weight: 600;
@@ -173,6 +138,7 @@
 .mood-cal__day--blank {
   pointer-events: none;
   cursor: default;
+  background: transparent;
 }
 
 .mood-cal__day:hover,
@@ -189,6 +155,7 @@
   font-weight: 700;
   color: var(--color-accent-text);
   background: var(--color-accent-soft);
+  border-radius: 10px;
 }
 
 .mood-cal__day.has-mood {
@@ -202,10 +169,11 @@
 
 .mood-cal__day.has-drawing {
   color: unset;
-  padding: 2px;
+  padding: 3px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #fff;
+  box-shadow: inset 0 0 0 1px var(--color-border-soft);
 }
 
 .mood-cal__thumb {
@@ -213,7 +181,7 @@
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  border-radius: 9px;
+  border-radius: 7px;
   object-fit: contain;
   object-position: center;
   display: block;
@@ -228,6 +196,6 @@
 }
 
 .mood-cal__day.has-drawing.today {
-  border-radius: 12px;
-  padding: 2px;
+  border-radius: 10px;
+  padding: 3px;
 }
