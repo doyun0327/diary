@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "loading": "Đang tải…",
+    "anonymous": "Ẩn danh",
+    "back": "Quay lại",
+    "processing": "Đang xử lý…",
+    "requestFailed": "Yêu cầu thất bại ({{status}})",
+    "serverUnreachable": "Không kết nối được máy chủ. Kiểm tra xem Spring (8080) có đang chạy không.",
+    "weekday": {
+      "0": "CN",
+      "1": "T2",
+      "2": "T3",
+      "3": "T4",
+      "4": "T5",
+      "5": "T6",
+      "6": "T7"
+    },
+    "dateFull": "{{weekday}}, {{d}}/{{m}}/{{y}}",
+    "yearMonth": "{{m}}/{{y}}"
+  },
+  "header": {
+    "menu": "Menu",
+    "tagline": "Ghi lại một ngày của tôi",
+    "footer": "Thong thả, từng ngày một",
+    "account": "Tài khoản · Ngôn ngữ",
+    "accountHintEmpty": "Ảnh · tên · ngôn ngữ",
+    "rooms": "Phòng bạn bè",
+    "roomsHint": "Phòng của tôi",
+    "character": "Nhân vật",
+    "characterHint": "Tôi trong tranh AI",
+    "export": "Xuất",
+    "exportHint": "PDF theo kỳ · sổ nhật ký",
+    "decorate": "Trang trí",
+    "decorateHint": "Chủ đề · emoji",
+    "appInfo": "Thông tin app",
+    "appInfoHint": "Phiên bản · điều khoản · ghi công"
+  },
+  "decorate": {
+    "title": "Trang trí",
+    "aria": "Trang trí",
+    "tabsAria": "Tab trang trí",
+    "tab": {
+      "theme": "Chủ đề",
+      "emoji": "Emoji"
+    }
+  },
+  "emojiPack": {
+    "hint": "Đổi kiểu biểu tượng tâm trạng",
+    "classic": {
+      "name": "Cổ điển",
+      "desc": "Biểu tượng phẳng (Flaticon)"
+    },
+    "smileys": {
+      "name": "Mặt cười",
+      "desc": "Biểu tượng động (Flaticon)"
+    },
+    "cat": {
+      "name": "Mèo",
+      "desc": "Emoji mèo (Flaticon)"
+    },
+    "dog": {
+      "name": "Chó",
+      "desc": "Emoji chó (Flaticon)"
+    },
+    "love": {
+      "name": "Tình yêu",
+      "desc": "Biểu cảm tình yêu (Flaticon)"
+    },
+    "ghost": {
+      "name": "Ma",
+      "desc": "Emoji ma (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "Thông tin app",
+    "aria": "Thông tin app",
+    "back": "Quay lại",
+    "version": "Phiên bản hiện tại",
+    "legal": {
+      "menu": "Điều khoản & Chính sách riêng tư",
+      "title": "Điều khoản · Riêng tư",
+      "termsHeading": "Điều khoản sử dụng",
+      "termsBody": "PageBy là ứng dụng nhật ký cá nhân. Vui lòng tuân thủ luật hiện hành khi dùng dịch vụ. Bạn chịu trách nhiệm về tài khoản, biệt danh và nội dung nhật ký. Không được đăng hoặc chia sẻ nội dung xâm phạm quyền của người khác. Tính năng có thể thay đổi mà không báo trước.",
+      "privacyHeading": "Chính sách riêng tư",
+      "privacyBody": "Nhật ký, tranh vẽ và dữ liệu hồ sơ có thể lưu trên thiết bị của bạn, và có thể đồng bộ lên máy chủ khi dùng phòng bạn bè. Chúng tôi chỉ dùng dữ liệu này để lưu nhật ký, chia sẻ và các tính năng của app. Chúng tôi không bán dữ liệu cá nhân và không chia sẻ trừ khi pháp luật yêu cầu. Liên hệ qua kênh trong app cho các yêu cầu về riêng tư."
+    },
+    "licenses": {
+      "menu": "Giấy phép mã nguồn mở & ghi công",
+      "title": "Giấy phép · Ghi công",
+      "iconsHeading": "Ghi công biểu tượng",
+      "libsHeading": "Thư viện mã nguồn mở",
+      "note": "Biểu tượng miễn phí Flaticon cần ghi nguồn. Liên kết phía trên chính là ghi công đó."
+    }
+  },
+  "theme": {
+    "title": "Chủ đề",
+    "aria": "Chọn chủ đề",
+    "hint": "Đổi giao diện toàn bộ app",
+    "paper": {
+      "name": "Cream",
+      "desc": "Giấy viết kem dịu nhẹ"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "Xanh bạc hà dịu"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "Xanh trời nhẹ nhàng"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "Hoa oải hương đào"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "Xám ấm dịu"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "Ánh cam quýt mềm"
+    }
+  },
+  "account": {
+    "title": "Tài khoản · Ngôn ngữ",
+    "aria": "Tài khoản · Ngôn ngữ",
+    "photoLabel": "Ảnh đại diện",
+    "changePhotoAria": "Đổi ảnh đại diện",
+    "pickPhoto": "Chọn ảnh",
+    "removePhoto": "Xóa",
+    "nameLabel": "Tên",
+    "nameHint": "Tên hiển thị trong phòng bạn bè",
+    "namePlaceholder": "Nhập tên của bạn",
+    "save": "Lưu",
+    "ok": {
+      "nameSaved": "Đã lưu tên",
+      "photoSaved": "Đã lưu ảnh đại diện",
+      "photoRemoved": "Đã xóa ảnh đại diện"
+    },
+    "err": {
+      "nameRequired": "Vui lòng nhập tên",
+      "imageOnly": "Chỉ cho phép tệp ảnh",
+      "photoSave": "Không lưu được ảnh",
+      "photoRead": "Không đọc được ảnh",
+      "photoProcess": "Không xử lý được ảnh",
+      "photoLoad": "Không tải được ảnh"
+    }
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "hint": "Ngôn ngữ hiển thị của app",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "Phòng bạn bè",
+    "joinWithCode": "Tham gia bằng mã",
+    "create": "Tạo phòng",
+    "empty": "Bạn chưa tham gia phòng nào",
+    "memberCount": "{{n}} thành viên",
+    "roomFallback": "Phòng",
+    "copyInvite": "Mã mời",
+    "copied": "Đã sao chép",
+    "copyInviteTitle": "Sao chép mã mời",
+    "copyInviteAria": "Sao chép mã mời",
+    "createSheetAria": "Tạo phòng",
+    "createHint": "Đặt tên phòng; mã mời 6 chữ số được tạo tự động.",
+    "asChipCreate": "Tạo với tên {{name}}",
+    "roomNamePlaceholder": "Tên phòng",
+    "creating": "Đang tạo…",
+    "joinSheetAria": "Tham gia bằng mã",
+    "joinHint": "Nhập mã 6 chữ số từ bạn bè.",
+    "asChipJoin": "Tham gia với tên {{name}}",
+    "invitePlaceholder": "vd. 482913",
+    "joining": "Đang tham gia…",
+    "joinSubmit": "Tham gia",
+    "noNickname": "Chưa có biệt danh",
+    "backToList": "← Danh sách",
+    "refresh": "Làm mới",
+    "sharedDiaries": "Nhật ký đã chia sẻ",
+    "sharedEmpty": "Chưa có nhật ký chia sẻ. Thử “Chia sẻ vào phòng” trên nhật ký của bạn.",
+    "backToRoom": "← Về phòng",
+    "sharedDiary": "Nhật ký đã chia sẻ",
+    "comments": "Bình luận ({{n}})",
+    "commentPlaceholder": "Viết bình luận",
+    "commentSubmit": "Đăng",
+    "alert": {
+      "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
+    },
+    "confirm": {
+      "deletePost": "Xóa nhật ký đã chia sẻ này khỏi phòng?"
+    },
+    "err": {
+      "needNickname": "Hãy đặt tên trong Menu → Tài khoản trước",
+      "list": "Không tải được phòng",
+      "nameRequired": "Vui lòng nhập tên phòng",
+      "create": "Không tạo được phòng",
+      "codeRequired": "Nhập mã mời 6 chữ số",
+      "join": "Không tham gia được phòng",
+      "copy": "Không sao chép được mã mời",
+      "load": "Không tải được phòng",
+      "loadPost": "Không tải được bài đăng",
+      "comment": "Không đăng được bình luận",
+      "delete": "Xóa thất bại"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "Chưa có nhật ký.",
+      "line2": "Viết nhật ký đầu tiên của bạn!"
+    },
+    "writeFabAria": "Viết nhật ký",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "Không có nhật ký tháng này.",
+      "noPreview": "Không có nội dung"
+    },
+    "card": {
+      "imageAlt": "Tranh ngày {{date}}"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "Nhật ký hôm nay",
+      "edit": "Sửa nhật ký"
+    },
+    "save": "Lưu",
+    "saveEdit": "Xong chỉnh sửa",
+    "cancel": "Hủy",
+    "titlePlaceholder": "Nhập tiêu đề",
+    "contentPlaceholder": "vd. Hôm nay tôi đi bơi. Hôm nay tôi tập thể dục.",
+    "ai": {
+      "button": "✨ Vẽ AI",
+      "sceneStep": "Đang viết prompt…",
+      "drawStep": "Đang vẽ…",
+      "statusScene": "Đang tạo cảnh…",
+      "statusDraw": "Đang vẽ tranh…",
+      "tip": "Mẹo",
+      "tipBody": "Nhân vật của bạn là nhân vật chính; AI vẽ từ toàn bộ nội dung nhật ký.",
+      "tipVisible": "Hành động và địa điểm nhìn thấy được",
+      "tipAsk": " — hãy viết chúng ra.",
+      "exGood1": "Tốt: Hôm nay chúng tôi tổ chức tiệc pizza",
+      "exGood2": "Tốt: Tôi chơi với chó ở công viên",
+      "exBad": "Yếu: Hôm nay tôi cảm thấy vui",
+      "sceneUnderstood": "Cảnh AI hiểu: {{scene}}",
+      "characterAria": "Nhân vật cho tranh AI",
+      "characterTitle": "Nhân vật này sẽ thành nhân vật chính"
+    },
+    "confirm": {
+      "replaceWithAi": "Thay canvas bằng tranh AI?"
+    },
+    "err": {
+      "needContent": "Hãy viết nhật ký trước",
+      "aiFailed": "Không tạo được tranh",
+      "aiNeedContent": "Viết nội dung nhật ký trước khi tạo",
+      "aiHttp": "Vẽ thất bại: HTTP {{status}}",
+      "aiNoImage": "Không có ảnh trong phản hồi backend",
+      "aiUrl": "Không tải được URL ảnh",
+      "aiConvert": "Chuyển đổi ảnh thất bại"
+    }
+  },
+  "detail": {
+    "backAria": "Quay lại",
+    "bookAria": "Xem dạng sổ nhật ký",
+    "bookTitle": "Sổ nhật ký · PDF",
+    "pngAria": "Tải PNG",
+    "pngTitle": "Lưu dạng PNG",
+    "shareAria": "Chia sẻ",
+    "moreAria": "Thêm",
+    "menuCloseAria": "Đóng menu",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "imageAlt": "Tranh ngày {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "Thẻ chia sẻ nhật ký",
+    "confirm": {
+      "delete": "Xóa nhật ký này?"
+    },
+    "ok": {
+      "png": "Đã lưu dạng PNG"
+    },
+    "err": {
+      "png": "Lưu PNG thất bại",
+      "pngBlob": "Không tạo được PNG",
+      "share": "Chia sẻ thất bại",
+      "roomsList": "Không tải được phòng"
+    }
+  },
+  "share": {
+    "title": "Chia sẻ",
+    "toRoomAria": "Chia sẻ vào phòng",
+    "backToMenuAria": "Quay lại menu chia sẻ",
+    "instagram": "Instagram",
+    "instagramDesc": "Chia sẻ dạng thẻ story",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "Chia sẻ ảnh trong chat",
+    "rooms": "Phòng bạn bè",
+    "roomsIcon": "Phòng",
+    "roomsDesc": "Đăng vào các phòng bạn đang tham gia",
+    "roomsHint": "Chọn nhiều phòng để chia sẻ cùng lúc",
+    "roomsLoading": "Đang tải phòng…",
+    "roomsEmpty": "Chưa có phòng. Tạo hoặc tham gia tại Menu → Phòng bạn bè.",
+    "submit": "Chia sẻ",
+    "sharing": "Đang chia sẻ…",
+    "pcHint": "Web máy tính không chia sẻ thẳng sang app. Ảnh đã tải xuống—mở trên điện thoại hoặc tải lên trong app.",
+    "ok": {
+      "oneRoom": "Đã chia sẻ tới “{{name}}”",
+      "manyRooms": "Đã chia sẻ tới {{n}} phòng",
+      "partial": "Đã chia sẻ tới {{n}} phòng. Thất bại: {{fails}}"
+    },
+    "pick": {
+      "instagram": "Chọn Instagram trong bảng chia sẻ!",
+      "kakao": "Chọn KakaoTalk trong bảng chia sẻ!"
+    },
+    "saved": {
+      "instagram": "Đã lưu ảnh. Tải lên Instagram Stories!",
+      "kakao": "Đã lưu ảnh. Gửi qua KakaoTalk!"
+    },
+    "native": {
+      "instagram": "Đang chia sẻ nhật ký lên Instagram Stories",
+      "kakao": "Đang chia sẻ nhật ký qua KakaoTalk"
+    },
+    "err": {
+      "roomShare": "Không chia sẻ được vào phòng",
+      "build": "Không tạo được ảnh chia sẻ",
+      "convert": "Chuyển đổi ảnh chia sẻ thất bại",
+      "imageLoad": "Không tải được tranh"
+    }
+  },
+  "character": {
+    "dialogAria": "Cài đặt nhân vật của tôi",
+    "title": "Nhân vật của tôi",
+    "done": "Xong",
+    "desc": "Ngoại hình này là nhân vật chính trong tranh AI",
+    "who": "Bạn là ai?",
+    "hairLabel": "Tóc",
+    "outfitLabel": "Trang phục",
+    "gender": {
+      "boy": "Nam",
+      "girl": "Nữ"
+    },
+    "hair": {
+      "short": "Tóc ngắn",
+      "medium": "Bob",
+      "curly": "Tóc xoăn"
+    },
+    "outfit": {
+      "short-sleeve": "Áo ngắn tay",
+      "dress": "Váy",
+      "hoodie": "Hoodie",
+      "school-uniform": "Đồng phục học sinh"
+    }
+  },
+  "export": {
+    "title": "Xuất",
+    "aria": "Xuất",
+    "period": "Kỳ",
+    "presetsAria": "Kỳ có sẵn",
+    "thisMonth": "Tháng này",
+    "lastMonth": "Tháng trước",
+    "custom": "Tùy chọn",
+    "start": "Bắt đầu",
+    "end": "Kết thúc",
+    "count": "{{n}} nhật ký",
+    "empty": "Không có nhật ký trong kỳ này",
+    "pdf": "Lưu PDF",
+    "saving": "Đang lưu…",
+    "openBook": "Xem dạng sổ nhật ký",
+    "err": {
+      "pdf": "Lưu PDF thất bại"
+    }
+  },
+  "book": {
+    "dialogAria": "Xem sổ nhật ký",
+    "title": "Sổ nhật ký",
+    "pdfAria": "Lưu PDF",
+    "pdfTitle": "Lưu PDF",
+    "building": "Đang tạo sổ nhật ký…",
+    "prevPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "coverLabel": "Bìa",
+    "cover": {
+      "total": "Tổng {{n}} mục",
+      "hint": "Vuốt ngang để đọc"
+    },
+    "err": {
+      "build": "Không tạo được sổ nhật ký",
+      "empty": "Không có nhật ký để tải",
+      "page": "Không tạo được trang sổ",
+      "image": "Không tải được tranh"
+    }
+  },
+  "canvas": {
+    "pen": "Bút",
+    "photo": "Ảnh",
+    "font": "Phông chữ",
+    "sticker": "Sticker",
+    "eraser": "Tẩy",
+    "clearAll": "Xóa hết",
+    "photoHint": "Kéo để di chuyển · góc để đổi kích thước · ✓ để đặt",
+    "stickerSelected": "Đã chọn {{emoji}} · chạm canvas rồi chỉnh kích thước/xoay",
+    "colorAria": "Màu {{c}}",
+    "pickColorTitle": "Chọn màu",
+    "eraserSizeAria": "Cỡ tẩy",
+    "eraserSize": {
+      "s": "Nhỏ",
+      "m": "Vừa",
+      "l": "Lớn"
+    },
+    "fontPickerTitle": "Chọn phông chữ",
+    "stickerSheetTitle": "Sticker",
+    "stickerCatsAria": "Danh mục sticker",
+    "sample": "Nhật ký hôm nay",
+    "confirm": {
+      "clear": "Xóa toàn bộ tranh?"
+    },
+    "alert": {
+      "imageOnly": "Chỉ cho phép tệp ảnh"
+    },
+    "err": {
+      "noCanvas": "Không có canvas",
+      "noContext": "Không mở được ngữ cảnh canvas",
+      "imageLoad": "Tải ảnh thất bại"
+    },
+    "penKindAria": "Loại bút",
+    "penKind": {
+      "ballpoint": "Bút bi",
+      "gel": "Bút gel",
+      "brush": "Bút lông",
+      "marker": "Bút dạ",
+      "highlighter": "Bút dạ quang"
+    },
+    "stickerHint": "Kéo để di chuyển · góc để phóng · trên để xoay · ✓ dán",
+    "stickerRotate": "Xoay"
+  },
+  "font": {
+    "dialogAria": "Chọn phông chữ",
+    "title": "Phông chữ",
+    "sample": "Nhật ký hôm nay",
+    "cat": {
+      "cute": "Phông dễ thương",
+      "neat": "Phông gọn gàng"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "Chọn ngày",
+    "prevMonth": "Tháng trước",
+    "nextMonth": "Tháng sau",
+    "goToday": "Về hôm nay"
+  },
+  "mood": {
+    "happy": "Vui",
+    "excited": "Hứng khởi",
+    "love": "Yêu thương",
+    "proud": "Tự hào",
+    "calm": "Bình yên",
+    "sleepy": "Buồn ngủ",
+    "soso": "Bình thường",
+    "surprised": "Ngạc nhiên",
+    "sad": "Buồn",
+    "angry": "Giận",
+    "anxious": "Lo lắng",
+    "sick": "Ốm"
+  },
+  "stickers": {
+    "face": "Khuôn mặt",
+    "animal": "Động vật",
+    "fruit": "Trái cây",
+    "building": "Tòa nhà",
+    "weather": "Thời tiết",
+    "sport": "Thể thao",
+    "clothes": "Quần áo",
+    "shape": "Hình dạng"
+  }
+}

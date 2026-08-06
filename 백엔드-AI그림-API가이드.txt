@@ -1,285 +1,105 @@
 ==========================================================
-백엔드(Spring Boot) AI 그림 API 추가 가이드
-작성일: 2026-07-23
+백엔드 AI 그림 — SD 3.5 Large 단일 경로
+(프론트는 POST /api/ai/draw 1번만 호출)
+모델: stabilityai/stable-diffusion-3.5-large
+작성일: 2026-08-05
 ==========================================================
 
-[ 프론트 변경 ]
-- 외부 AI(번역/LLM/Pollinations) 직접 호출 제거
-- 오직 백엔드만 호출: POST /api/ai/draw
+※ Gemini / Flux / provider 분기 없음.
+※ 이미지는 무조건 Stable Diffusion 3.5 Large.
 
 
-----------------------------------------------------------
-1. 요청 / 응답 스펙
+■ 흐름
 ----------------------------------------------------------
 
-POST /api/ai/draw
-Content-Type: application/json
+  프론트
+    └─ POST /api/ai/draw
+         { diaryLine, title?, character? }
 
-요청 body 예시:
+  백엔드
+    ① 스타일 템플릿 + diaryLine (+ character) → prompt 조립
+    ② stabilityai/stable-diffusion-3.5-large 호출
+    ③ { imageBase64 } 반환  (scene/prompt는 선택)
+
+
+■ 요청
+----------------------------------------------------------
+
 {
-  "diaryLine": "오늘은 피자 파티를 했어요.",
-  "title": "피자 파티",
-  "character": "a young boy with black hair wearing a blue t-shirt and glasses"
-}
-
-필드 설명:
-- diaryLine  (필수) 일기 첫 줄(한글). 장면의 원문
-- title      (선택) 제목
-- character  (선택) 고정 캐릭터 영어 설명. 없으면 일반 아이로 그려도 됨
-
-성공 응답 예시:
-{
-  "scene": "A young boy with black hair and glasses sitting at a table eating pizza.",
-  "imageBase64": "data:image/png;base64,...."
-}
-
-또는:
-{
-  "scene": "...",
-  "imageUrl": "https://...."
-}
-
-실패 응답 예시 (4xx/5xx):
-{
-  "message": "장면 설명 생성에 실패했습니다"
+  "diaryLine": "오랜만에 수영장을 가서 수영을 했다. 힘들었지만 뿌듯했다.",
+  "title": "수영",
+  "character": "a young boy with black hair"
 }
 
 
-----------------------------------------------------------
-2. 백엔드가 해야 할 2단계 처리
-----------------------------------------------------------
-
-[1단계] LLM으로 장면 설명 생성 (영어 1문장)
-  입력: diaryLine(한글) + character(영어, 선택)
-  출력: 예) "Two children sitting at a table eating pizza."
-
-[2단계] 이미지 생성
-  입력: 1단계 scene + character + kids crayon 스타일
-  출력: PNG → Base64
-
-
-----------------------------------------------------------
-3. Spring Boot 컨트롤러 예시
+■ 프롬프트 조립 (분기 없이 고정)
 ----------------------------------------------------------
 
-package com.example.diary.controller;
+Children's crayon diary art style, wax crayon texture, handmade drawing on paper,
+soft pastel colors, warm cozy atmosphere, imperfect childlike strokes,
+cute and emotional storybook illustration, simple and heartwarming.
+Scene: {diaryLine 또는 이를 바탕으로 만든 영문 장면}
+Character look (brief): {character}   ← 있을 때만
+exactly one child, two arms, two legs, no extra limbs, no text, no watermark, no photorealism
 
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
-
-@RestController
-@RequestMapping("/api/ai")
-public class AiDrawController {
-
-    private final RestClient restClient = RestClient.create();
-
-    public record DrawRequest(
-            String diaryLine,
-            String title,
-            String character
-    ) {}
-
-    @PostMapping("/draw")
-    public Map<String, String> draw(@RequestBody DrawRequest req) {
-        if (req.diaryLine() == null || req.diaryLine().isBlank()) {
-            throw new IllegalArgumentException("diaryLine이 비어 있습니다");
-        }
-
-        String character = (req.character() == null || req.character().isBlank())
-                ? "a child"
-                : req.character().trim();
-
-        String diaryLine = req.diaryLine().trim();
-
-        // ---------- 1) LLM: 일기 장면을 영어로 (캐릭터는 맨 아래 보조) ----------
-        // ※ diary를 프롬프트 맨 위에 두고, character는 짧게만
-        String llmPrompt = """
-                Korean diary (MOST IMPORTANT — convert THIS action and place into English):
-                %s
-
-                Rules:
-                1) Output ONE English sentence about what happens in the diary.
-                2) Action and location from the diary MUST be the main focus.
-                3) Do NOT write a character portrait. Do NOT ignore the diary.
-                4) Optionally add a SHORT look hint at the end: %s
-                5) Exactly one child, two arms, two legs.
-                6) Output ONLY the sentence. No quotes. No Korean. No explanation.
-
-                Example:
-                Diary: 오늘은 피자 파티를 했어요.
-                Output: A child eating pizza at a party table with friends.
-                """.formatted(diaryLine, character);
-
-        String scene = restClient.get()
-                .uri("https://text.pollinations.ai/" + URLEncoder.encode(llmPrompt, StandardCharsets.UTF_8))
-                .retrieve()
-                .body(String.class);
-
-        if (scene == null || scene.isBlank()) {
-            throw new IllegalStateException("장면 설명 생성에 실패했습니다");
-        }
-        scene = scene.trim().replaceAll("^[\"']+|[\"']+$", "");
-        scene = scene.lines().map(String::trim).filter(s -> !s.isEmpty()).findFirst().orElse(scene);
-
-        // Pollinations 등이 붙이는 해시/잡문자 제거
-        // 예: "... hamburgere5de163d51c4c382 ..." → 해시 삭제
-        scene = scene.replaceAll("(?i)[a-f0-9]{24,}", " ");
-        scene = scene.replaceAll("\\s+", " ").trim();
-        // 문장이 너무 길면 앞 220자만 (이미지 프롬프트 오염 방지)
-        if (scene.length() > 220) {
-            scene = scene.substring(0, 220).trim();
-        }
-        // 일기가 아예 없으면 최소한의 fallback
-        if (scene.isBlank()) {
-            scene = "A child in a diary scene: " + diaryLine;
-        }
-
-        System.out.println("[AI] cleaned scene=" + scene);
-
-        // ---------- 2) Image: 한글 일기 원문을 반드시 앞에 넣음 ----------
-        // ※ LLM scene이 캐릭터만 말해도, diaryLine이 이미지에 직접 들어가 장면을 강제
-        String imagePrompt = String.join(", ",
-                "children's crayon drawing",
-                "MUST clearly show this diary event: " + diaryLine,
-                "English scene: " + scene,
-                "focus on the action and place from the diary",
-                "not a standing character portrait",
-                "brief look of the child: " + character,
-                "exactly one child",
-                "correct human anatomy, two arms, two legs",
-                "no extra limbs",
-                "simple cute doodle",
-                "thick wobbly crayon lines",
-                "bright primary colors",
-                "hand-drawn by a kid",
-                "no text",
-                "no watermark",
-                "no photorealism"
-        );
-
-        String imageUrl = "https://image.pollinations.ai/prompt/"
-                + URLEncoder.encode(imagePrompt, StandardCharsets.UTF_8)
-                + "?width=768&height=512&model=flux&nologo=true";
-
-        // 디버깅용 로그 (서버 콘솔에서 diaryLine / scene 확인)
-        System.out.println("[AI] diaryLine=" + diaryLine);
-        System.out.println("[AI] character=" + character);
-        System.out.println("[AI] scene=" + scene);
-        System.out.println("[AI] imagePrompt=" + imagePrompt);
-
-        byte[] imageBytes = restClient.get()
-                .uri(imageUrl)
-                .accept(MediaType.IMAGE_PNG, MediaType.IMAGE_JPEG, MediaType.ALL)
-                .retrieve()
-                .body(byte[].class);
-
-        if (imageBytes == null || imageBytes.length == 0) {
-            throw new IllegalStateException("이미지 생성에 실패했습니다");
-        }
-
-        String base64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
-        return Map.of(
-                "scene", scene,
-                "imageBase64", base64
-        );
-    }
-}
+negative_prompt 예:
+text, watermark, photorealistic, photo, 3d render, extra limbs, deformed hands,
+ugly, nsfw, multiple people
 
 
-----------------------------------------------------------
-4. 예외 처리 (권장)
+■ 이미지 호출
 ----------------------------------------------------------
 
-@RestControllerAdvice
-public class AiExceptionHandler {
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> badRequest(IllegalArgumentException e) {
-        return Map.of("message", e.getMessage());
-    }
+모델 ID 고정:
+  stabilityai/stable-diffusion-3.5-large
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> serverError(Exception e) {
-        return Map.of("message", "AI 그림 생성 중 오류가 발생했습니다");
-    }
-}
+호출처 예 (팀 인프라에 맞게 하나만):
+  - Hugging Face Inference API
+  - 자체 GPU 서버에 올린 SD3.5 Large
+  - 호스팅 SD API
 
+설정 예:
+  ai:
+    sd:
+      model: stabilityai/stable-diffusion-3.5-large
+      api-url: ${SD_API_URL}
+      api-key: ${SD_API_KEY}
+      width: 768
+      height: 512
 
-----------------------------------------------------------
-5. CORS (이미 있으면 유지)
-----------------------------------------------------------
-
-registry.addMapping("/api/**")
-        .allowedOrigins("http://localhost:5173")
-        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        .allowedHeaders("*");
+Gemini / Flux 설정·코드는 넣지 말 것.
 
 
-----------------------------------------------------------
-6. application.yml 타임아웃 (권장)
+■ 응답 (최소)
 ----------------------------------------------------------
 
-이미지 생성은 10~60초 걸릴 수 있음.
-RestClient/WebClient 읽기 타임아웃을 60초 이상으로 설정하세요.
+{ "imageBase64": "data:image/png;base64,...." }
+
+선택:
+{ "scene": "...", "prompt": "조립한 전체 프롬프트" }
+
+provider 필드 불필요.
 
 
+■ 의사코드
 ----------------------------------------------------------
-7. 확인 방법
-----------------------------------------------------------
-1) 백엔드 8080 실행
-2) 프론트 npm run dev
-3) 일기 첫 줄 입력 → ✨ AI 그림
-4) 콘솔에 [AI] 백엔드 요청/응답 로그 확인
-5) 그림판에 이미지 들어오면 성공
 
-curl 테스트:
+draw(req):
+  if blank(req.diaryLine): 400
+
+  prompt = STYLE
+         + "\nScene: " + req.diaryLine   // 또는 간단 영문화
+         + (character ? "\nCharacter look (brief): " + character : "")
+         + "\nexactly one child, ..."
+
+  png = callSd35Large(prompt, negative)
+  return { imageBase64: "data:image/png;base64," + png }
+
+
+■ curl
+----------------------------------------------------------
+
 curl -X POST http://localhost:8080/api/ai/draw ^
   -H "Content-Type: application/json" ^
-  -d "{\"diaryLine\":\"오늘은 피자 파티를 했어요.\",\"character\":\"a young boy with black hair wearing a blue t-shirt and glasses\"}"
-
-
-----------------------------------------------------------
-8. 다리가 3개 / 몸이 이상할 때
-----------------------------------------------------------
-원인:
-- 캐릭터 설명이 너무 길고, scene + imagePrompt에 이중으로 들어감
-- "childlike proportions" 같은 표현이 해부학을 망가뜨림
-- hex 색코드(#4dabf7)를 프롬프트에 넣으면 모델이 헷갈림
-
-프론트 대응 (이미 적용됨):
-- character 문자열을 외형만 짧게 (성별·머리·옷·액세서리 1개)
-- 액세서리/자유설명 길이 제한
-
-백엔드 필수 수정:
-- imagePrompt에서 character를 길게 반복하지 말 것
-- "childlike proportions" 삭제
-- "exactly two arms and two legs", "no extra limbs" 추가
-
-
-----------------------------------------------------------
-9. 일기 내용이 안 나올 때 (캐릭터만 나옴)
-----------------------------------------------------------
-원인:
-- LLM이 캐릭터 외형만 영어로 바꾸고 일기 행동을 무시
-- imagePrompt에 diaryLine이 없고 scene만 있음
-
-백엔드 필수 수정 (3절 예시 반영):
-1) LLM 프롬프트에서 한글 diaryLine을 맨 위에 두기
-2) imagePrompt 맨 앞에 반드시 넣기:
-   "MUST clearly show this diary event: " + diaryLine
-3) 캐릭터는 "brief look"로만 짧게
-
-확인:
-- 서버 로그의 [AI] diaryLine=... / scene=...
-- 프론트에 "AI가 이해한 장면:" 이 뜨면 scene 확인 가능
-- scene에 피자/공원 같은 일기 단어가 없으면 백엔드 프롬프트를 다시 확인
-
-위 3절 예시 코드를 Spring Boot에 다시 반영한 뒤 서버를 재시작하세요.
+  -d "{\"diaryLine\":\"오랜만에 수영장을 가서 수영을 했다.\",\"character\":\"a young boy with black hair\"}"
 ==========================================================

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLottie } from 'lottie-react';
 import type { DiaryEntry, Mood } from '../types/diary';
 import { MOODS } from '../types/diary';
 import type { CharacterProfile } from '../types/character';
@@ -10,10 +11,25 @@ import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { HairStyleIcon } from '../components/CharacterIcons';
 import { generateDiaryImage } from '../api/aiImage';
-import type { AiProgress } from '../api/aiImage';
 import { formatDate, today } from '../utils/date';
 import { findFont, getPreferredFontId } from '../utils/fonts';
 import './DiaryWritePage.css';
+
+function AiLoadingLottie({ animationData }: { animationData: object }) {
+  const { View } = useLottie({
+    animationData,
+    loop: true,
+    autoplay: true,
+  });
+  return <div className="diary-write__ai-lottie">{View}</div>;
+}
+
+const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
+
+function pickRandomLottie(pool: object[]): object | null {
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)] ?? null;
+}
 interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
@@ -41,12 +57,35 @@ function DiaryWritePage({
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiStep, setAiStep] = useState<AiProgress | null>(null);
   const [, setAiError] = useState<string | null>(null);
   const [, setAiScene] = useState<string | null>(null);
   const [tipOpen, setTipOpen] = useState(false);
+  const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
+  const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
+  const [aiLottieKey, setAiLottieKey] = useState(0);
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const imageLoadedRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.all(
+      AI_LOTTIE_URLS.map((url) => fetch(url).then((res) => res.json() as Promise<object>)),
+    )
+      .then((pool) => {
+        if (cancelled) return;
+        setAiLottiePool(pool);
+        setActiveAiLottie(pickRandomLottie(pool));
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAiLottiePool([]);
+          setActiveAiLottie(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!initialEntry?.imageUrl || imageLoadedRef.current) return;
@@ -67,14 +106,14 @@ function DiaryWritePage({
 
     setAiError(null);
     setAiScene(null);
+    setActiveAiLottie(pickRandomLottie(aiLottiePool));
+    setAiLottieKey((key) => key + 1);
     setAiLoading(true);
-    setAiStep('scene');
     try {
       const { imageUrl, scene } = await generateDiaryImage({
         title,
         content,
         character,
-        onProgress: setAiStep,
       });
       await canvasRef.current?.loadImage(imageUrl);
       if (scene) setAiScene(scene);
@@ -82,7 +121,6 @@ function DiaryWritePage({
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     } finally {
       setAiLoading(false);
-      setAiStep(null);
     }
   };
 
@@ -100,12 +138,7 @@ function DiaryWritePage({
     });
   };
 
-  const aiLabel =
-    aiStep === 'scene'
-      ? t('write.ai.sceneStep')
-      : aiStep === 'image'
-        ? t('write.ai.drawStep')
-        : t('write.ai.button');
+  const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
 
   return (
     <form className="diary-write" onSubmit={handleSubmit}>
@@ -181,12 +214,12 @@ function DiaryWritePage({
               fontId={fontId}
               onFontIdChange={setFontId}
             />
-            {aiLoading && (
-              <div className="diary-write__ai-loading">
-                <span className="diary-write__ai-spinner" />
-                <span>
-                  {aiStep === 'scene' ? t('write.ai.statusScene') : t('write.ai.statusDraw')}
-                </span>
+            {aiLoading  && (
+              <div className="diary-write__ai-loading" aria-busy="true" aria-label={t('write.ai.drawStep')}>
+                {activeAiLottie && (
+                  <AiLoadingLottie key={aiLottieKey} animationData={activeAiLottie} />
+                )}
+                <p className="diary-write__ai-loading-text">{t('write.ai.statusDraw')}</p>
               </div>
             )}
           </div>

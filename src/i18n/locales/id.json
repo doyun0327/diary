@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "Tutup",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "loading": "Memuat…",
+    "anonymous": "Anonim",
+    "back": "Kembali",
+    "processing": "Memproses…",
+    "requestFailed": "Permintaan gagal ({{status}})",
+    "serverUnreachable": "Tidak bisa terhubung ke server. Pastikan Spring (8080) berjalan.",
+    "weekday": {
+      "0": "Min",
+      "1": "Sen",
+      "2": "Sel",
+      "3": "Rab",
+      "4": "Kam",
+      "5": "Jum",
+      "6": "Sab"
+    },
+    "dateFull": "{{weekday}}, {{y}}-{{m}}-{{d}}",
+    "yearMonth": "{{y}}/{{m}}"
+  },
+  "header": {
+    "menu": "Menu",
+    "tagline": "abadikan hariku",
+    "footer": "Pelan-pelan, hari demi hari",
+    "account": "Akun · Bahasa",
+    "accountHintEmpty": "Foto · nama · bahasa",
+    "rooms": "Ruang teman",
+    "roomsHint": "Ruang saya",
+    "character": "Karakter",
+    "characterHint": "Saya di gambar AI",
+    "export": "Ekspor",
+    "exportHint": "PDF periode · buku diary",
+    "decorate": "Hias",
+    "decorateHint": "Tema · emoji",
+    "appInfo": "Info aplikasi",
+    "appInfoHint": "Versi · syarat · kredit"
+  },
+  "decorate": {
+    "title": "Hias",
+    "aria": "Hias",
+    "tabsAria": "Tab hias",
+    "tab": {
+      "theme": "Tema",
+      "emoji": "Emoji"
+    }
+  },
+  "emojiPack": {
+    "hint": "Ubah gaya ikon suasana hati",
+    "classic": {
+      "name": "Klasik",
+      "desc": "Ikon flat (Flaticon)"
+    },
+    "smileys": {
+      "name": "Smileys",
+      "desc": "Ikon animasi (Flaticon)"
+    },
+    "cat": {
+      "name": "Kucing",
+      "desc": "Emoji kucing (Flaticon)"
+    },
+    "dog": {
+      "name": "Anjing",
+      "desc": "Emoji anjing (Flaticon)"
+    },
+    "love": {
+      "name": "Cinta",
+      "desc": "Emotikon cinta (Flaticon)"
+    },
+    "ghost": {
+      "name": "Hantu",
+      "desc": "Emoji hantu (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "Info aplikasi",
+    "aria": "Info aplikasi",
+    "back": "Kembali",
+    "version": "Versi saat ini",
+    "legal": {
+      "menu": "Syarat & Kebijakan Privasi",
+      "title": "Syarat · Privasi",
+      "termsHeading": "Syarat Layanan",
+      "termsBody": "PageBy adalah aplikasi diary pribadi. Harap patuhi hukum yang berlaku saat menggunakan layanan. Anda bertanggung jawab atas akun, nama panggilan, dan isi diary. Dilarang memposting atau membagikan konten yang melanggar hak orang lain. Fitur dapat berubah tanpa pemberitahuan.",
+      "privacyHeading": "Kebijakan Privasi",
+      "privacyBody": "Diary, gambar, dan data profil dapat disimpan di perangkat Anda, dan dapat disinkronkan ke server saat memakai ruang teman. Kami memakai data ini hanya untuk penyimpanan diary, berbagi, dan fitur aplikasi. Kami tidak menjual data pribadi, dan tidak membagikannya kecuali diwajibkan hukum. Hubungi kami lewat saluran di aplikasi untuk permintaan privasi."
+    },
+    "licenses": {
+      "menu": "Lisensi open-source & kredit",
+      "title": "Lisensi · Kredit",
+      "iconsHeading": "Kredit ikon",
+      "libsHeading": "Pustaka open-source",
+      "note": "Ikon Flaticon gratis memerlukan atribusi. Tautan di atas adalah kredit tersebut."
+    }
+  },
+  "theme": {
+    "title": "Tema",
+    "aria": "Pilih tema",
+    "hint": "Ubah tampilan seluruh aplikasi",
+    "paper": {
+      "name": "Cream",
+      "desc": "Stationery krim yang lembut"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "Hijau mint lembut"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "Biru langit lembut"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "Lavender dan peach"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "Abu hangat lembut"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "Cahaya jeruk lembut"
+    }
+  },
+  "account": {
+    "title": "Akun · Bahasa",
+    "aria": "Akun · Bahasa",
+    "photoLabel": "Foto profil",
+    "changePhotoAria": "Ubah foto profil",
+    "pickPhoto": "Pilih foto",
+    "removePhoto": "Hapus",
+    "nameLabel": "Nama",
+    "nameHint": "Nama yang tampil di ruang teman",
+    "namePlaceholder": "Masukkan nama",
+    "save": "Simpan",
+    "ok": {
+      "nameSaved": "Nama disimpan",
+      "photoSaved": "Foto profil disimpan",
+      "photoRemoved": "Foto profil dihapus"
+    },
+    "err": {
+      "nameRequired": "Masukkan nama",
+      "imageOnly": "Hanya file gambar yang diizinkan",
+      "photoSave": "Tidak bisa menyimpan foto",
+      "photoRead": "Tidak bisa membaca foto",
+      "photoProcess": "Tidak bisa memproses foto",
+      "photoLoad": "Tidak bisa memuat foto"
+    }
+  },
+  "language": {
+    "label": "Bahasa",
+    "hint": "Bahasa tampilan aplikasi",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "Ikon mood: designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "Ruang teman",
+    "joinWithCode": "Gabung dengan kode",
+    "create": "Buat ruang",
+    "empty": "Anda belum bergabung di ruang mana pun",
+    "memberCount": "{{n}} anggota",
+    "roomFallback": "Ruang",
+    "copyInvite": "Kode undangan",
+    "copied": "Disalin",
+    "copyInviteTitle": "Salin kode undangan",
+    "copyInviteAria": "Salin kode undangan",
+    "createSheetAria": "Buat ruang",
+    "createHint": "Atur nama ruang; kode undangan 6 digit dibuat otomatis.",
+    "asChipCreate": "Buat sebagai {{name}}",
+    "roomNamePlaceholder": "Nama ruang",
+    "creating": "Membuat…",
+    "joinSheetAria": "Gabung dengan kode",
+    "joinHint": "Masukkan kode 6 digit dari teman.",
+    "asChipJoin": "Gabung sebagai {{name}}",
+    "invitePlaceholder": "mis. 482913",
+    "joining": "Bergabung…",
+    "joinSubmit": "Gabung",
+    "noNickname": "Belum ada nama",
+    "backToList": "← Daftar",
+    "refresh": "Muat ulang",
+    "sharedDiaries": "Diary bersama",
+    "sharedEmpty": "Belum ada diary bersama. Coba “Bagikan ke ruang” di diary Anda.",
+    "backToRoom": "← Ke ruang",
+    "sharedDiary": "Diary bersama",
+    "comments": "Komentar ({{n}})",
+    "commentPlaceholder": "Tulis komentar",
+    "commentSubmit": "Kirim",
+    "alert": {
+      "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
+    },
+    "confirm": {
+      "deletePost": "Hapus diary bersama ini dari ruang?"
+    },
+    "err": {
+      "needNickname": "Atur nama dulu di Menu → Akun",
+      "list": "Tidak bisa memuat ruang",
+      "nameRequired": "Masukkan nama ruang",
+      "create": "Tidak bisa membuat ruang",
+      "codeRequired": "Masukkan kode undangan 6 digit",
+      "join": "Tidak bisa bergabung",
+      "copy": "Tidak bisa menyalin kode",
+      "load": "Tidak bisa memuat ruang",
+      "loadPost": "Tidak bisa memuat postingan",
+      "comment": "Tidak bisa mengirim komentar",
+      "delete": "Hapus gagal"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "Belum ada diary.",
+      "line2": "Tulis diary pertamamu!"
+    },
+    "writeFabAria": "Tulis diary",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "Tidak ada diary bulan ini.",
+      "noPreview": "Tidak ada isi"
+    },
+    "card": {
+      "imageAlt": "Gambar {{date}}"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "Diary hari ini",
+      "edit": "Edit diary"
+    },
+    "save": "Simpan",
+    "saveEdit": "Selesai mengedit",
+    "cancel": "Batal",
+    "titlePlaceholder": "Masukkan judul",
+    "contentPlaceholder": "mis. Hari ini aku berenang. Hari ini aku olahraga.",
+    "ai": {
+      "button": "✨ Gambar AI",
+      "sceneStep": "Menulis prompt…",
+      "drawStep": "Menggambar…",
+      "statusScene": "Membuat adegan…",
+      "statusDraw": "Sedang menggambar…",
+      "tip": "Tips",
+      "tipBody": "Karaktermu jadi tokoh utama; AI menggambar dari seluruh teks diary.",
+      "tipVisible": "Aksi & tempat yang terlihat",
+      "tipAsk": " — tolong tuliskan.",
+      "exGood1": "Bagus: Hari ini pesta pizza",
+      "exGood2": "Bagus: Bermain dengan anjing di taman",
+      "exBad": "Kurang: Hari ini aku senang",
+      "sceneUnderstood": "Adegan yang dipahami AI: {{scene}}",
+      "characterAria": "Karakter untuk gambar AI",
+      "characterTitle": "Karakter ini menjadi tokoh utama"
+    },
+    "confirm": {
+      "replaceWithAi": "Ganti kanvas dengan gambar AI?"
+    },
+    "err": {
+      "needContent": "Tulis diary dulu",
+      "aiFailed": "Gagal membuat gambar",
+      "aiNeedContent": "Tulis isi diary sebelum membuat gambar",
+      "aiHttp": "Gambar gagal: HTTP {{status}}",
+      "aiNoImage": "Tidak ada gambar di respons backend",
+      "aiUrl": "Tidak bisa memuat URL gambar",
+      "aiConvert": "Konversi gambar gagal"
+    }
+  },
+  "detail": {
+    "backAria": "Kembali",
+    "bookAria": "Lihat sebagai buku diary",
+    "bookTitle": "Buku diary · PDF",
+    "pngAria": "Unduh PNG",
+    "pngTitle": "Simpan sebagai PNG",
+    "shareAria": "Bagikan",
+    "moreAria": "Lainnya",
+    "menuCloseAria": "Tutup menu",
+    "edit": "Edit",
+    "delete": "Hapus",
+    "imageAlt": "Gambar {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "Kartu bagikan diary",
+    "confirm": {
+      "delete": "Hapus diary ini?"
+    },
+    "ok": {
+      "png": "Disimpan sebagai PNG"
+    },
+    "err": {
+      "png": "Gagal menyimpan PNG",
+      "pngBlob": "Tidak bisa membuat PNG",
+      "share": "Bagikan gagal",
+      "roomsList": "Tidak bisa memuat ruang"
+    }
+  },
+  "share": {
+    "title": "Bagikan",
+    "toRoomAria": "Bagikan ke ruang",
+    "backToMenuAria": "Kembali ke menu bagikan",
+    "instagram": "Instagram",
+    "instagramDesc": "Bagikan sebagai kartu cerita",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "Bagikan foto di chat",
+    "rooms": "Ruang teman",
+    "roomsIcon": "Ruang",
+    "roomsDesc": "Posting ke ruang yang kamu ikuti",
+    "roomsHint": "Pilih beberapa ruang sekaligus",
+    "roomsLoading": "Memuat ruang…",
+    "roomsEmpty": "Belum ada ruang. Buat atau gabung di Menu → Ruang teman.",
+    "submit": "Bagikan",
+    "sharing": "Membagikan…",
+    "pcHint": "Web desktop tidak bisa langsung bagikan ke app. Gambar diunduh—buka di ponsel atau unggah di app.",
+    "ok": {
+      "oneRoom": "Dibagikan ke “{{name}}”",
+      "manyRooms": "Dibagikan ke {{n}} ruang",
+      "partial": "Dibagikan ke {{n}} ruang. Gagal: {{fails}}"
+    },
+    "pick": {
+      "instagram": "Pilih Instagram di lembar bagikan!",
+      "kakao": "Pilih KakaoTalk di lembar bagikan!"
+    },
+    "saved": {
+      "instagram": "Gambar disimpan. Unggah ke Instagram Stories!",
+      "kakao": "Gambar disimpan. Kirim lewat KakaoTalk!"
+    },
+    "native": {
+      "instagram": "Membagikan diary saya ke Instagram Stories",
+      "kakao": "Membagikan diary saya lewat KakaoTalk"
+    },
+    "err": {
+      "roomShare": "Tidak bisa bagikan ke ruang",
+      "build": "Tidak bisa membuat gambar bagikan",
+      "convert": "Konversi gambar bagikan gagal",
+      "imageLoad": "Tidak bisa memuat gambar"
+    }
+  },
+  "character": {
+    "dialogAria": "Pengaturan karakter saya",
+    "title": "Karakter saya",
+    "done": "Selesai",
+    "desc": "Tampilan ini jadi tokoh utama gambar AI",
+    "who": "Siapa kamu?",
+    "hairLabel": "Rambut",
+    "outfitLabel": "Pakaian",
+    "gender": {
+      "boy": "Anak laki-laki",
+      "girl": "Anak perempuan"
+    },
+    "hair": {
+      "short": "Rambut pendek",
+      "medium": "Bob",
+      "curly": "Rambut keriting"
+    },
+    "outfit": {
+      "short-sleeve": "Lengan pendek",
+      "dress": "Gaun",
+      "hoodie": "Hoodie",
+      "school-uniform": "Seragam sekolah"
+    }
+  },
+  "export": {
+    "title": "Ekspor",
+    "aria": "Ekspor",
+    "period": "Periode",
+    "presetsAria": "Preset periode",
+    "thisMonth": "Bulan ini",
+    "lastMonth": "Bulan lalu",
+    "custom": "Kustom",
+    "start": "Mulai",
+    "end": "Selesai",
+    "count": "{{n}} diary",
+    "empty": "Tidak ada diary di periode ini",
+    "pdf": "Simpan PDF",
+    "saving": "Menyimpan…",
+    "openBook": "Lihat sebagai buku diary",
+    "err": {
+      "pdf": "Gagal menyimpan PDF"
+    }
+  },
+  "book": {
+    "dialogAria": "Tampilan buku diary",
+    "title": "Buku diary",
+    "pdfAria": "Simpan PDF",
+    "pdfTitle": "Simpan PDF",
+    "building": "Membangun buku diary…",
+    "prevPage": "Halaman sebelumnya",
+    "nextPage": "Halaman berikutnya",
+    "coverLabel": "Sampul",
+    "cover": {
+      "total": "Total {{n}} entri",
+      "hint": "Geser ke samping untuk membaca"
+    },
+    "err": {
+      "build": "Tidak bisa membuat buku diary",
+      "empty": "Tidak ada diary untuk diunduh",
+      "page": "Tidak bisa membuat halaman buku",
+      "image": "Tidak bisa memuat gambar"
+    }
+  },
+  "canvas": {
+    "pen": "Pena",
+    "photo": "Foto",
+    "font": "Font",
+    "sticker": "Stiker",
+    "eraser": "Penghapus",
+    "clearAll": "Hapus semua",
+    "photoHint": "Geser untuk pindah · sudut untuk ubah ukuran · ✓ untuk pasang",
+    "stickerSelected": "{{emoji}} dipilih · ketuk kanvas, lalu ubah ukuran/putar",
+    "colorAria": "Warna {{c}}",
+    "pickColorTitle": "Pilih warna",
+    "eraserSizeAria": "Ukuran penghapus",
+    "eraserSize": {
+      "s": "Kecil",
+      "m": "Sedang",
+      "l": "Besar"
+    },
+    "fontPickerTitle": "Pilih font",
+    "stickerSheetTitle": "Stiker",
+    "stickerCatsAria": "Kategori stiker",
+    "sample": "Diary hari ini",
+    "confirm": {
+      "clear": "Hapus seluruh gambar?"
+    },
+    "alert": {
+      "imageOnly": "Hanya file gambar yang diizinkan"
+    },
+    "err": {
+      "noCanvas": "Tidak ada kanvas",
+      "noContext": "Tidak bisa membuka konteks kanvas",
+      "imageLoad": "Gagal memuat gambar"
+    },
+    "penKindAria": "Jenis pena",
+    "penKind": {
+      "ballpoint": "Bolpoin",
+      "gel": "Gel",
+      "brush": "Kuas",
+      "marker": "Spidol",
+      "highlighter": "Stabilo"
+    },
+    "stickerHint": "Geser pindah · sudut ubah ukuran · atas putar · ✓ pasang",
+    "stickerRotate": "Putar"
+  },
+  "font": {
+    "dialogAria": "Pilih font",
+    "title": "Font",
+    "sample": "Diary hari ini",
+    "cat": {
+      "cute": "Font lucu",
+      "neat": "Font rapi"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "Pilih tanggal",
+    "prevMonth": "Bulan sebelumnya",
+    "nextMonth": "Bulan berikutnya",
+    "goToday": "Ke hari ini"
+  },
+  "mood": {
+    "happy": "Bahagia",
+    "excited": "Semangat",
+    "love": "Sayang",
+    "proud": "Bangga",
+    "calm": "Tenang",
+    "sleepy": "Mengantuk",
+    "soso": "Biasa saja",
+    "surprised": "Terkejut",
+    "sad": "Sedih",
+    "angry": "Marah",
+    "anxious": "Cemas",
+    "sick": "Sakit"
+  },
+  "stickers": {
+    "face": "Wajah",
+    "animal": "Hewan",
+    "fruit": "Buah",
+    "building": "Bangunan",
+    "weather": "Cuaca",
+    "sport": "Olahraga",
+    "clothes": "Pakaian",
+    "shape": "Bentuk"
+  }
+}

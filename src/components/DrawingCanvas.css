@@ -79,6 +79,95 @@
   z-index: 3;
 }
 
+.drawing__sticker-layer {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  transform-origin: center center;
+  user-select: none;
+}
+
+.drawing__sticker-layer.active {
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 12px rgba(232, 168, 56, 0.25);
+  cursor: grab;
+  background: color-mix(in srgb, var(--color-surface) 35%, transparent);
+}
+
+.drawing__sticker-emoji {
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.drawing__sticker-rotate {
+  position: absolute;
+  left: 50%;
+  top: -28px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-surface);
+  cursor: grab;
+  touch-action: none;
+  z-index: 3;
+}
+
+.drawing__sticker-rotate::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 10px;
+  margin-left: -1px;
+  background: var(--color-accent);
+}
+
+.drawing__pen-kinds {
+  display: flex;
+  gap: 4px;
+  padding: 5px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+
+.drawing__pen-kinds::-webkit-scrollbar {
+  display: none;
+}
+
+.drawing__pen-kind {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.drawing__pen-kind.active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+}
+
 .drawing__canvas {
   width: 100%;
   height: 100%;
@@ -109,7 +198,8 @@
 }
 
 .drawing__dock-bar,
-.drawing__colors {
+.drawing__colors,
+.drawing__pen-kinds {
   pointer-events: auto;
 }
 

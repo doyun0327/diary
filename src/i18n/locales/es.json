@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "loading": "Cargando…",
+    "anonymous": "Anónimo",
+    "back": "Volver",
+    "processing": "Procesando…",
+    "requestFailed": "Error en la solicitud ({{status}})",
+    "serverUnreachable": "No se pudo conectar al servidor. Comprueba que Spring (8080) esté en marcha.",
+    "weekday": {
+      "0": "dom",
+      "1": "lun",
+      "2": "mar",
+      "3": "mié",
+      "4": "jue",
+      "5": "vie",
+      "6": "sáb"
+    },
+    "dateFull": "{{weekday}}, {{d}}/{{m}}/{{y}}",
+    "yearMonth": "{{m}}/{{y}}"
+  },
+  "header": {
+    "menu": "Menú",
+    "tagline": "Captura mi día",
+    "footer": "Despacio, día a día",
+    "account": "Cuenta · Idioma",
+    "accountHintEmpty": "Foto · nombre · idioma",
+    "rooms": "Salas de amigos",
+    "roomsHint": "Mis salas",
+    "character": "Personaje",
+    "characterHint": "Yo en dibujos IA",
+    "export": "Exportar",
+    "exportHint": "PDF por periodo · libro",
+    "decorate": "Decorar",
+    "decorateHint": "Tema · emoji",
+    "appInfo": "Info de la app",
+    "appInfoHint": "Versión · términos · créditos"
+  },
+  "decorate": {
+    "title": "Decorar",
+    "aria": "Decorar",
+    "tabsAria": "Pestañas de decoración",
+    "tab": {
+      "theme": "Tema",
+      "emoji": "Emoji"
+    }
+  },
+  "emojiPack": {
+    "hint": "Cambia el estilo de los iconos de ánimo",
+    "classic": {
+      "name": "Clásico",
+      "desc": "Iconos planos (Flaticon)"
+    },
+    "smileys": {
+      "name": "Caritas",
+      "desc": "Iconos animados (Flaticon)"
+    },
+    "cat": {
+      "name": "Gato",
+      "desc": "Emojis de gato (Flaticon)"
+    },
+    "dog": {
+      "name": "Perro",
+      "desc": "Emojis de perro (Flaticon)"
+    },
+    "love": {
+      "name": "Amor",
+      "desc": "Emoticonos de amor (Flaticon)"
+    },
+    "ghost": {
+      "name": "Fantasma",
+      "desc": "Emojis de fantasma (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "Info de la app",
+    "aria": "Info de la app",
+    "back": "Volver",
+    "version": "Versión actual",
+    "legal": {
+      "menu": "Términos y política de privacidad",
+      "title": "Términos · Privacidad",
+      "termsHeading": "Términos del servicio",
+      "termsBody": "PageBy es una app de diario personal. Usa el servicio respetando las leyes aplicables. Eres responsable de tu cuenta, apodo y contenido del diario. No está permitido publicar o compartir contenido que vulnere derechos de terceros. Las funciones pueden cambiar sin aviso.",
+      "privacyHeading": "Política de privacidad",
+      "privacyBody": "Las entradas, dibujos y datos de perfil pueden guardarse en tu dispositivo y sincronizarse con el servidor al usar salas de amigos. Usamos estos datos solo para guardar diarios, compartir y funciones de la app. No vendemos datos personales ni los compartimos salvo cuando la ley lo exija. Contáctanos por los canales de la app para solicitudes de privacidad."
+    },
+    "licenses": {
+      "menu": "Licencias open-source y créditos",
+      "title": "Licencias · Créditos",
+      "iconsHeading": "Créditos de iconos",
+      "libsHeading": "Bibliotecas open-source",
+      "note": "Los iconos gratuitos de Flaticon requieren atribución. El enlace de arriba es ese crédito."
+    }
+  },
+  "theme": {
+    "title": "Tema",
+    "aria": "Elegir tema",
+    "hint": "Cambia el aspecto de toda la app",
+    "paper": {
+      "name": "Cream",
+      "desc": "Papelería crema suave"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "Verde menta suave"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "Azul cielo suave"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "Lavanda y melocotón"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "Gris cálido suave"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "Brillo cítrico suave"
+    }
+  },
+  "account": {
+    "title": "Cuenta · Idioma",
+    "aria": "Cuenta · Idioma",
+    "photoLabel": "Foto de perfil",
+    "changePhotoAria": "Cambiar foto de perfil",
+    "pickPhoto": "Elegir foto",
+    "removePhoto": "Quitar",
+    "nameLabel": "Nombre",
+    "nameHint": "Nombre que se muestra en las salas",
+    "namePlaceholder": "Escribe tu nombre",
+    "save": "Guardar",
+    "ok": {
+      "nameSaved": "Nombre guardado",
+      "photoSaved": "Foto de perfil guardada",
+      "photoRemoved": "Foto de perfil eliminada"
+    },
+    "err": {
+      "nameRequired": "Introduce un nombre",
+      "imageOnly": "Solo se permiten imágenes",
+      "photoSave": "No se pudo guardar la foto",
+      "photoRead": "No se pudo leer la foto",
+      "photoProcess": "No se pudo procesar la foto",
+      "photoLoad": "No se pudo cargar la foto"
+    }
+  },
+  "language": {
+    "label": "Idioma",
+    "hint": "Idioma de la app",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "Iconos de ánimo: designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "Salas de amigos",
+    "joinWithCode": "Unirse con código",
+    "create": "Crear sala",
+    "empty": "Aún no estás en ninguna sala",
+    "memberCount": "{{n}} miembros",
+    "roomFallback": "Sala",
+    "copyInvite": "Código de invitación",
+    "copied": "Copiado",
+    "copyInviteTitle": "Copiar código de invitación",
+    "copyInviteAria": "Copiar código de invitación",
+    "createSheetAria": "Crear sala",
+    "createHint": "Pon un nombre; se crea automáticamente un código de 6 dígitos.",
+    "asChipCreate": "Crear como {{name}}",
+    "roomNamePlaceholder": "Nombre de la sala",
+    "creating": "Creando…",
+    "joinSheetAria": "Unirse con código",
+    "joinHint": "Introduce el código de 6 dígitos de un amigo.",
+    "asChipJoin": "Unirse como {{name}}",
+    "invitePlaceholder": "p. ej. 482913",
+    "joining": "Uniéndose…",
+    "joinSubmit": "Unirse",
+    "noNickname": "Sin apodo",
+    "backToList": "← Lista",
+    "refresh": "Actualizar",
+    "sharedDiaries": "Diarios compartidos",
+    "sharedEmpty": "Aún no hay diarios compartidos. Prueba “Compartir en sala” en tu diario.",
+    "backToRoom": "← A la sala",
+    "sharedDiary": "Diario compartido",
+    "comments": "Comentarios ({{n}})",
+    "commentPlaceholder": "Escribe un comentario",
+    "commentSubmit": "Publicar",
+    "alert": {
+      "created": "¡Sala creada!\n\nCódigo de invitación: {{code}}\n\nComparte este código con amigos."
+    },
+    "confirm": {
+      "deletePost": "¿Quitar este diario compartido de la sala?"
+    },
+    "err": {
+      "needNickname": "Pon tu nombre en Menú → Cuenta primero",
+      "list": "No se pudieron cargar las salas",
+      "nameRequired": "Introduce un nombre de sala",
+      "create": "No se pudo crear la sala",
+      "codeRequired": "Introduce un código de 6 dígitos",
+      "join": "No se pudo unir a la sala",
+      "copy": "No se pudo copiar el código",
+      "load": "No se pudo cargar la sala",
+      "loadPost": "No se pudo cargar la publicación",
+      "comment": "No se pudo publicar el comentario",
+      "delete": "Error al eliminar"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "Aún no hay diarios.",
+      "line2": "¡Escribe tu primer diario!"
+    },
+    "writeFabAria": "Escribir diario",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "No hay diarios este mes.",
+      "noPreview": "Sin contenido"
+    },
+    "card": {
+      "imageAlt": "Dibujo del {{date}}"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "Diario de hoy",
+      "edit": "Editar diario"
+    },
+    "save": "Guardar",
+    "saveEdit": "Terminar edición",
+    "cancel": "Cancelar",
+    "titlePlaceholder": "Escribe un título",
+    "contentPlaceholder": "p. ej. Hoy fui a nadar. Hoy hice ejercicio.",
+    "ai": {
+      "button": "✨ Dibujo IA",
+      "sceneStep": "Escribiendo el prompt…",
+      "drawStep": "Dibujando…",
+      "statusScene": "Creando la escena…",
+      "statusDraw": "Dibujando la imagen…",
+      "tip": "Consejo",
+      "tipBody": "Tu personaje es el protagonista; la IA dibuja con todo el texto del diario.",
+      "tipVisible": "Acciones y lugares visibles",
+      "tipAsk": " — escríbelos, por favor.",
+      "exGood1": "Bien: Hoy hubo una fiesta de pizza",
+      "exGood2": "Bien: Jugué con un perro en el parque",
+      "exBad": "Débil: Hoy me sentí bien",
+      "sceneUnderstood": "Escena que entendió la IA: {{scene}}",
+      "characterAria": "Personaje para el dibujo IA",
+      "characterTitle": "Este personaje será el protagonista"
+    },
+    "confirm": {
+      "replaceWithAi": "¿Reemplazar el lienzo con el dibujo IA?"
+    },
+    "err": {
+      "needContent": "Escribe el diario primero",
+      "aiFailed": "No se pudo generar el dibujo",
+      "aiNeedContent": "Escribe el diario antes de generar",
+      "aiHttp": "Error al dibujar: HTTP {{status}}",
+      "aiNoImage": "No hay imagen en la respuesta del backend",
+      "aiUrl": "No se pudo cargar la URL de la imagen",
+      "aiConvert": "Falló la conversión de imagen"
+    }
+  },
+  "detail": {
+    "backAria": "Volver",
+    "bookAria": "Ver como libro de diario",
+    "bookTitle": "Libro de diario · PDF",
+    "pngAria": "Descargar PNG",
+    "pngTitle": "Guardar como PNG",
+    "shareAria": "Compartir",
+    "moreAria": "Más",
+    "menuCloseAria": "Cerrar menú",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "imageAlt": "Dibujo del {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "Tarjeta para compartir el diario",
+    "confirm": {
+      "delete": "¿Eliminar este diario?"
+    },
+    "ok": {
+      "png": "Guardado como PNG"
+    },
+    "err": {
+      "png": "Error al guardar PNG",
+      "pngBlob": "No se pudo crear el PNG",
+      "share": "Error al compartir",
+      "roomsList": "No se pudieron cargar las salas"
+    }
+  },
+  "share": {
+    "title": "Compartir",
+    "toRoomAria": "Compartir en sala",
+    "backToMenuAria": "Volver al menú de compartir",
+    "instagram": "Instagram",
+    "instagramDesc": "Compartir como tarjeta de historia",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "Compartir foto en el chat",
+    "rooms": "Salas de amigos",
+    "roomsIcon": "Sala",
+    "roomsDesc": "Publicar en salas a las que perteneces",
+    "roomsHint": "Elige varias salas a la vez",
+    "roomsLoading": "Cargando salas…",
+    "roomsEmpty": "Aún no hay salas. Crea o únete en Menú → Salas de amigos.",
+    "submit": "Compartir",
+    "sharing": "Compartiendo…",
+    "pcHint": "La web de escritorio no puede compartir directamente a apps. Imagen descargada: ábrela en el móvil o súbela en la app.",
+    "ok": {
+      "oneRoom": "Compartido en “{{name}}”",
+      "manyRooms": "Compartido en {{n}} salas",
+      "partial": "Compartido en {{n}} salas. Fallos: {{fails}}"
+    },
+    "pick": {
+      "instagram": "¡Elige Instagram en la hoja de compartir!",
+      "kakao": "¡Elige KakaoTalk en la hoja de compartir!"
+    },
+    "saved": {
+      "instagram": "Imagen guardada. ¡Súbela a Instagram Stories!",
+      "kakao": "Imagen guardada. ¡Envíala por KakaoTalk!"
+    },
+    "native": {
+      "instagram": "Compartiendo mi diario en Instagram Stories",
+      "kakao": "Compartiendo mi diario por KakaoTalk"
+    },
+    "err": {
+      "roomShare": "No se pudo compartir en la sala",
+      "build": "No se puede crear la imagen para compartir",
+      "convert": "Falló la conversión de la imagen",
+      "imageLoad": "No se pudo cargar el dibujo"
+    }
+  },
+  "character": {
+    "dialogAria": "Ajustes de mi personaje",
+    "title": "Mi personaje",
+    "done": "Listo",
+    "desc": "Este aspecto es el protagonista del dibujo IA",
+    "who": "¿Quién eres?",
+    "hairLabel": "Pelo",
+    "outfitLabel": "Ropa",
+    "gender": {
+      "boy": "Chico",
+      "girl": "Chica"
+    },
+    "hair": {
+      "short": "Pelo corto",
+      "medium": "Bob",
+      "curly": "Rizado"
+    },
+    "outfit": {
+      "short-sleeve": "Manga corta",
+      "dress": "Vestido",
+      "hoodie": "Sudadera",
+      "school-uniform": "Uniforme escolar"
+    }
+  },
+  "export": {
+    "title": "Exportar",
+    "aria": "Exportar",
+    "period": "Periodo",
+    "presetsAria": "Presets de periodo",
+    "thisMonth": "Este mes",
+    "lastMonth": "Mes pasado",
+    "custom": "Personalizado",
+    "start": "Inicio",
+    "end": "Fin",
+    "count": "{{n}} diarios",
+    "empty": "No hay diarios en este periodo",
+    "pdf": "Guardar PDF",
+    "saving": "Guardando…",
+    "openBook": "Ver como libro de diario",
+    "err": {
+      "pdf": "Error al guardar PDF"
+    }
+  },
+  "book": {
+    "dialogAria": "Vista de libro de diario",
+    "title": "Libro de diario",
+    "pdfAria": "Guardar PDF",
+    "pdfTitle": "Guardar PDF",
+    "building": "Creando el libro…",
+    "prevPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "coverLabel": "Portada",
+    "cover": {
+      "total": "{{n}} entradas en total",
+      "hint": "Desliza de lado a lado para leer"
+    },
+    "err": {
+      "build": "No se pudo crear el libro",
+      "empty": "No hay diarios para descargar",
+      "page": "No se puede crear la página",
+      "image": "No se pudo cargar el dibujo"
+    }
+  },
+  "canvas": {
+    "pen": "Lápiz",
+    "photo": "Foto",
+    "font": "Fuente",
+    "sticker": "Stickers",
+    "eraser": "Borrador",
+    "clearAll": "Borrar todo",
+    "photoHint": "Arrastra para mover · esquinas para redimensionar · ✓ para colocar",
+    "stickerSelected": "{{emoji}} seleccionado · toca el lienzo y ajusta tamaño/giro",
+    "colorAria": "Color {{c}}",
+    "pickColorTitle": "Elegir color",
+    "eraserSizeAria": "Tamaño del borrador",
+    "eraserSize": {
+      "s": "Pequeño",
+      "m": "Mediano",
+      "l": "Grande"
+    },
+    "fontPickerTitle": "Elegir fuente",
+    "stickerSheetTitle": "Stickers",
+    "stickerCatsAria": "Categorías de stickers",
+    "sample": "Diario de hoy",
+    "confirm": {
+      "clear": "¿Borrar todo el dibujo?"
+    },
+    "alert": {
+      "imageOnly": "Solo se permiten imágenes"
+    },
+    "err": {
+      "noCanvas": "No hay lienzo",
+      "noContext": "No se puede abrir el contexto del lienzo",
+      "imageLoad": "Error al cargar la imagen"
+    },
+    "penKindAria": "Tipo de bolígrafo",
+    "penKind": {
+      "ballpoint": "Boli",
+      "gel": "Gel",
+      "brush": "Pincel",
+      "marker": "Rotulador",
+      "highlighter": "Marcador"
+    },
+    "stickerHint": "Arrastra · esquina para tamaño · arriba para girar · ✓ para colocar",
+    "stickerRotate": "Girar"
+  },
+  "font": {
+    "dialogAria": "Elegir fuente",
+    "title": "Fuente",
+    "sample": "Diario de hoy",
+    "cat": {
+      "cute": "Fuentes cute",
+      "neat": "Fuentes limpias"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "Elegir fecha",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "goToday": "Ir a hoy"
+  },
+  "mood": {
+    "happy": "Feliz",
+    "excited": "Emocionado",
+    "love": "Cariño",
+    "proud": "Orgulloso",
+    "calm": "Tranquilo",
+    "sleepy": "Somnoliento",
+    "soso": "Así así",
+    "surprised": "Sorprendido",
+    "sad": "Triste",
+    "angry": "Enojado",
+    "anxious": "Ansioso",
+    "sick": "Enfermo"
+  },
+  "stickers": {
+    "face": "Caras",
+    "animal": "Animales",
+    "fruit": "Fruta",
+    "building": "Edificios",
+    "weather": "Clima",
+    "sport": "Deportes",
+    "clothes": "Ropa",
+    "shape": "Formas"
+  }
+}

@@ -26,8 +26,8 @@
     "menu": "Menu",
     "tagline": "Capture my day",
     "footer": "Slowly, day by day",
-    "account": "Account",
-    "accountHintEmpty": "Profile photo · name",
+    "account": "Account · Language",
+    "accountHintEmpty": "Photo · name · language",
     "rooms": "Friend rooms",
     "roomsHint": "My rooms",
     "character": "Character",
@@ -126,8 +126,8 @@
     }
   },
   "account": {
-    "title": "Account",
-    "aria": "Account",
+    "title": "Account · Language",
+    "aria": "Account · Language",
     "photoLabel": "Profile photo",
     "changePhotoAria": "Change profile photo",
     "pickPhoto": "Choose photo",
@@ -153,8 +153,16 @@
   "language": {
     "label": "Language",
     "hint": "App display language",
-    "ko": "Korean",
-    "en": "English"
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
   },
   "credits": {
     "moodIcons": "Mood icons: designed by {{author}} from Flaticon"
@@ -238,12 +246,12 @@
     "contentPlaceholder": "e.g. I went swimming today. I worked out today.",
     "ai": {
       "button": "✨ AI drawing",
-      "sceneStep": "Creating scene…",
+      "sceneStep": "Writing prompt…",
       "drawStep": "Drawing…",
-      "statusScene": "Thinking of a scene…",
+      "statusScene": "Creating the scene…",
       "statusDraw": "Drawing the picture…",
       "tip": "Tip",
-      "tipBody": "Your character is the lead; AI draws from the diary's opening scene.",
+      "tipBody": "Your character is the lead; AI draws from the full diary text.",
       "tipVisible": "Visible actions & places",
       "tipAsk": " — please write them.",
       "exGood1": "Good: We had a pizza party today",
@@ -406,7 +414,7 @@
     "eraser": "Eraser",
     "clearAll": "Clear all",
     "photoHint": "Drag to move · corners to resize · ✓ to place",
-    "stickerSelected": "{{emoji}} selected · tap canvas to place",
+    "stickerSelected": "{{emoji}} selected · tap canvas, then resize/rotate",
     "colorAria": "Color {{c}}",
     "pickColorTitle": "Pick color",
     "eraserSizeAria": "Eraser size",
@@ -429,7 +437,17 @@
       "noCanvas": "No canvas",
       "noContext": "Can't open canvas context",
       "imageLoad": "Failed to load image"
-    }
+    },
+    "penKindAria": "Pen type",
+    "penKind": {
+      "ballpoint": "Ballpoint",
+      "gel": "Gel",
+      "brush": "Brush",
+      "marker": "Marker",
+      "highlighter": "Highlighter"
+    },
+    "stickerHint": "Drag to move · corner to resize · top to rotate · ✓ to place",
+    "stickerRotate": "Rotate"
   },
   "font": {
     "dialogAria": "Choose font",

@@ -26,8 +26,8 @@
     "menu": "메뉴",
     "tagline": "나의 하루를 남기다",
     "footer": "천천히, 하루씩",
-    "account": "계정",
-    "accountHintEmpty": "프로필 사진 · 이름",
+    "account": "계정 · 언어",
+    "accountHintEmpty": "프로필 · 이름 · 언어",
     "rooms": "친구 방",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
@@ -126,8 +126,8 @@
     }
   },
   "account": {
-    "title": "계정",
-    "aria": "계정",
+    "title": "계정 · 언어",
+    "aria": "계정 · 언어",
     "photoLabel": "프로필 사진",
     "changePhotoAria": "프로필 사진 변경",
     "pickPhoto": "사진 선택",
@@ -154,7 +154,15 @@
     "label": "언어",
     "hint": "앱 표시 언어",
     "ko": "한국어",
-    "en": "English"
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
   },
   "credits": {
     "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon"
@@ -238,12 +246,12 @@
     "contentPlaceholder": "예) 오늘 수영을 했다. 오늘 운동을 했다.",
     "ai": {
       "button": "✨ AI 그림",
-      "sceneStep": "장면 만드는 중…",
+      "sceneStep": "프롬프트 만드는 중…",
       "drawStep": "그리는 중…",
-      "statusScene": "장면을 생각하고 있어요…",
+      "statusScene": "장면을 만들고 있어요…",
       "statusDraw": "그림을 그리고 있어요…",
       "tip": "팁",
-      "tipBody": "설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 앞부분의 장면을 중심으로 그려요.",
+      "tipBody": "설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 전체 내용을 바탕으로 그려요.",
       "tipVisible": "눈에 보이는 행동·장소",
       "tipAsk": "를 적어 주세요.",
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
@@ -406,7 +414,7 @@
     "eraser": "지우개",
     "clearAll": "전체 지우기",
     "photoHint": "드래그로 이동 · 모서리로 크기 조절 · ✓ 로 붙이기",
-    "stickerSelected": "{{emoji}} 선택됨 · 그림판을 눌러 붙이세요",
+    "stickerSelected": "{{emoji}} 선택됨 · 그림판을 눌러 붙인 뒤 크기·회전하세요",
     "colorAria": "색상 {{c}}",
     "pickColorTitle": "색 고르기",
     "eraserSizeAria": "지우개 크기",
@@ -429,7 +437,17 @@
       "noCanvas": "캔버스가 없습니다",
       "noContext": "캔버스 컨텍스트를 열 수 없습니다",
       "imageLoad": "이미지를 불러오지 못했습니다"
-    }
+    },
+    "penKindAria": "펜 종류",
+    "penKind": {
+      "ballpoint": "볼펜",
+      "gel": "젤펜",
+      "brush": "붓펜",
+      "marker": "마카",
+      "highlighter": "형광펜"
+    },
+    "stickerHint": "드래그로 이동 · 모서리로 크기 · 위로 회전 · ✓ 로 붙이기",
+    "stickerRotate": "회전"
   },
   "font": {
     "dialogAria": "글씨체 선택",

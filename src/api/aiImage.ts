@@ -2,40 +2,44 @@ import type { CharacterProfile } from '../types/character';
 import { describeCharacter } from '../types/character';
 
 /**
- * 일기에서 AI용 장면 텍스트 추출.
- * 첫 줄만이 아니라 앞부분(최대 3줄 / 160자)을 보내 장면이 더 잘 반영되게 함.
+ * 일기 본문 전체에서 AI용 텍스트 추출.
+ * 줄바꿈은 공백으로 정리하고, 빈 줄은 제거한다.
  */
 export function extractSceneLine(content: string): string {
-  const lines = content
+  return content
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter(Boolean);
-
-  if (lines.length === 0) return '';
-
-  let scene = lines.slice(0, 3).join(' ').replace(/\s+/g, ' ').trim();
-  if (scene.length > 160) {
-    scene = `${scene.slice(0, 160).trim()}…`;
-  }
-  return scene;
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-export type AiProgress = 'scene' | 'image';
+/** UI 진행 단계 (백엔드는 한 요청 안에서 프롬프트 조립 → SD 3.5 이미지) */
+export type AiProgress = 'prompt' | 'image';
+
+export interface AiDrawResult {
+  imageUrl: string;
+  /** 백엔드가 이해한 장면/프롬프트 (표시·디버그용, 선택) */
+  scene?: string;
+  /** 최종 이미지 프롬프트 (선택) */
+  prompt?: string;
+}
 
 /**
- * 백엔드(Spring Boot)에 AI 그림 생성 요청.
- * 프론트는 외부 AI API를 직접 호출하지 않는다.
+ * 백엔드에 AI 그림 생성 1회 요청.
+ * 이미지 모델은 백엔드에서만 사용: stabilityai/stable-diffusion-3.5-large
  *
  * POST /api/ai/draw
  * body: { diaryLine, title?, character? }
- * response: { imageBase64 } 또는 { imageUrl }
+ * response: { imageBase64 | imageUrl, scene?, prompt? }
  */
 export async function generateDiaryImage(input: {
   title?: string;
   content: string;
   character?: CharacterProfile;
   onProgress?: (step: AiProgress) => void;
-}): Promise<{ imageUrl: string; scene?: string }> {
+}): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
   const diaryLine = extractSceneLine(input.content) || title;
 
@@ -43,37 +47,44 @@ export async function generateDiaryImage(input: {
     throw new Error('그림을 만들려면 일기 내용을 먼저 적어 주세요');
   }
 
-  // 외형만 짧게 — 길면 일기가 무시되고 캐릭터만 나옴
   const character = input.character
     ? describeCharacter(input.character)
     : undefined;
 
   const payload = {
-    diaryLine, // 일기 장면 (가장 중요)
+    diaryLine,
     title: title || undefined,
-    character, // 짧은 외형 힌트
+    character,
   };
 
-  console.info('[AI] ===== 백엔드 AI 그림 요청 =====');
-  console.info('[AI] 요청 body:', payload);
+  console.info('[AI] ===== POST /api/ai/draw =====');
+  console.info('[AI] body:', payload);
 
-  input.onProgress?.('scene');
+  input.onProgress?.('prompt');
 
-  const response = await fetch('/api/ai/draw', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+  try {
+    response = await fetch('/api/ai/draw', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error('서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요');
+  }
 
   input.onProgress?.('image');
-
-  console.info('[AI] 백엔드 응답 status:', response.status);
+  console.info('[AI] status:', response.status);
 
   if (!response.ok) {
     let message = `그림 생성 실패: HTTP ${response.status}`;
+    if (response.status === 501) {
+      message =
+        'AI 그림 API가 아직 준비되지 않았어요 (501). 백엔드 SD 3.5 연동을 확인해 주세요';
+    }
     try {
       const err = (await response.json()) as { message?: string };
       if (err.message) message = err.message;
@@ -87,26 +98,25 @@ export async function generateDiaryImage(input: {
     imageBase64?: string;
     imageUrl?: string;
     scene?: string;
+    prompt?: string;
   };
 
-  console.info('[AI] 백엔드 응답 키:', Object.keys(data));
-  let scene = data.scene?.trim();
+  console.info('[AI] response keys:', Object.keys(data));
+
+  let scene = data.scene?.trim() || data.prompt?.trim();
   if (scene) {
-    // 백엔드가 해시 찌꺼기를 남긴 경우 화면/로그용으로만 정리
     scene = scene.replace(/[a-f0-9]{24,}/gi, ' ').replace(/\s+/g, ' ').trim();
-    console.info('[AI] 생성된 장면 설명:', scene);
+    console.info('[AI] scene/prompt:', scene);
   }
 
   if (data.imageBase64) {
-    console.info('[AI] ===== 그림 생성 완료 (base64) =====');
     const imageUrl = data.imageBase64.startsWith('data:')
       ? data.imageBase64
       : `data:image/png;base64,${data.imageBase64}`;
-    return { imageUrl, scene };
+    return { imageUrl, scene, prompt: data.prompt?.trim() };
   }
 
   if (data.imageUrl) {
-    console.info('[AI] 이미지 URL 로드:', data.imageUrl);
     const imgRes = await fetch(data.imageUrl);
     if (!imgRes.ok) {
       throw new Error('이미지 URL을 불러오지 못했습니다');
@@ -118,8 +128,7 @@ export async function generateDiaryImage(input: {
       reader.onerror = () => reject(new Error('이미지 변환에 실패했습니다'));
       reader.readAsDataURL(blob);
     });
-    console.info('[AI] ===== 그림 생성 완료 (url) =====');
-    return { imageUrl, scene };
+    return { imageUrl, scene, prompt: data.prompt?.trim() };
   }
 
   throw new Error('백엔드 응답에 이미지가 없습니다');

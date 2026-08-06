@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "关闭",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "loading": "加载中…",
+    "anonymous": "匿名",
+    "back": "返回",
+    "processing": "处理中…",
+    "requestFailed": "请求失败（{{status}}）",
+    "serverUnreachable": "无法连接服务器。请确认 Spring（8080）是否在运行。",
+    "weekday": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "dateFull": "{{y}}年{{m}}月{{d}}日（{{weekday}}）",
+    "yearMonth": "{{y}}年{{m}}月"
+  },
+  "header": {
+    "menu": "菜单",
+    "tagline": "记录我的一天",
+    "footer": "慢慢地，一天一天",
+    "account": "账号 · 语言",
+    "accountHintEmpty": "头像 · 昵称 · 语言",
+    "rooms": "好友房",
+    "roomsHint": "我的房间",
+    "character": "角色",
+    "characterHint": "AI 画里的我",
+    "export": "导出",
+    "exportHint": "按日期 PDF · 日记本",
+    "decorate": "装扮",
+    "decorateHint": "主题 · 表情",
+    "appInfo": "应用信息",
+    "appInfoHint": "版本 · 条款 · 致谢"
+  },
+  "decorate": {
+    "title": "装扮",
+    "aria": "装扮",
+    "tabsAria": "装扮选项卡",
+    "tab": {
+      "theme": "主题",
+      "emoji": "表情"
+    }
+  },
+  "emojiPack": {
+    "hint": "更换心情图标样式",
+    "classic": {
+      "name": "经典",
+      "desc": "扁平图标（Flaticon）"
+    },
+    "smileys": {
+      "name": "笑脸",
+      "desc": "动态图标（Flaticon）"
+    },
+    "cat": {
+      "name": "猫咪",
+      "desc": "猫咪表情（Flaticon）"
+    },
+    "dog": {
+      "name": "小狗",
+      "desc": "小狗表情（Flaticon）"
+    },
+    "love": {
+      "name": "爱心",
+      "desc": "爱心情话（Flaticon）"
+    },
+    "ghost": {
+      "name": "幽灵",
+      "desc": "幽灵表情（Flaticon）"
+    }
+  },
+  "appInfo": {
+    "title": "应用信息",
+    "aria": "应用信息",
+    "back": "返回",
+    "version": "当前版本",
+    "legal": {
+      "menu": "条款与隐私政策",
+      "title": "条款 · 隐私",
+      "termsHeading": "服务条款",
+      "termsBody": "PageBy 是个人日记应用。请在遵守相关法律法规的前提下使用。您需对自己的账号、昵称和日记内容负责。禁止发布或分享侵犯他人权利的内容。功能可能不经另行通知而变更。",
+      "privacyHeading": "隐私政策",
+      "privacyBody": "日记、画作和资料可能保存在本设备；使用好友房时也可能同步到服务器。我们仅将该数据用于日记存储、分享与应用功能。我们不会出售个人数据，除依法要求外不会对外提供。隐私相关请求请通过应用内渠道联系我们。"
+    },
+    "licenses": {
+      "menu": "开源许可与致谢",
+      "title": "许可 · 致谢",
+      "iconsHeading": "图标致谢",
+      "libsHeading": "开源库",
+      "note": "免费的 Flaticon 图标需注明出处。上方链接即为致谢。"
+    }
+  },
+  "theme": {
+    "title": "主题",
+    "aria": "选择主题",
+    "hint": "更改整个应用的外观",
+    "paper": {
+      "name": "Cream",
+      "desc": "柔和奶油文具风"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "柔和薄荷绿"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "温柔天空蓝"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "薰衣草桃花粉"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "温暖柔灰"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "柔和柑橘光"
+    }
+  },
+  "account": {
+    "title": "账号 · 语言",
+    "aria": "账号 · 语言",
+    "photoLabel": "头像",
+    "changePhotoAria": "更换头像",
+    "pickPhoto": "选择照片",
+    "removePhoto": "删除",
+    "nameLabel": "昵称",
+    "nameHint": "好友房中显示的名字",
+    "namePlaceholder": "请输入昵称",
+    "save": "保存",
+    "ok": {
+      "nameSaved": "昵称已保存",
+      "photoSaved": "头像已保存",
+      "photoRemoved": "头像已删除"
+    },
+    "err": {
+      "nameRequired": "请输入昵称",
+      "imageOnly": "只能选择图片文件",
+      "photoSave": "无法保存照片",
+      "photoRead": "无法读取照片",
+      "photoProcess": "无法处理照片",
+      "photoLoad": "无法加载照片"
+    }
+  },
+  "language": {
+    "label": "语言",
+    "hint": "应用显示语言",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "心情图标：designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "好友房",
+    "joinWithCode": "用邀请码加入",
+    "create": "创建房间",
+    "empty": "还没有加入任何房间",
+    "memberCount": "{{n}} 人",
+    "roomFallback": "房间",
+    "copyInvite": "邀请码",
+    "copied": "已复制",
+    "copyInviteTitle": "复制邀请码",
+    "copyInviteAria": "复制邀请码",
+    "createSheetAria": "创建房间",
+    "createHint": "设置房间名后会自动生成 6 位邀请码。",
+    "asChipCreate": "以 {{name}} 创建",
+    "roomNamePlaceholder": "房间名",
+    "creating": "创建中…",
+    "joinSheetAria": "用邀请码加入",
+    "joinHint": "输入朋友给你的 6 位邀请码。",
+    "asChipJoin": "以 {{name}} 加入",
+    "invitePlaceholder": "例如 482913",
+    "joining": "加入中…",
+    "joinSubmit": "加入",
+    "noNickname": "未设置昵称",
+    "backToList": "← 列表",
+    "refresh": "刷新",
+    "sharedDiaries": "分享的日记",
+    "sharedEmpty": "还没有分享的日记。可在日记详情里点「分享到好友房」。",
+    "backToRoom": "← 返回房间",
+    "sharedDiary": "分享的日记",
+    "comments": "评论（{{n}}）",
+    "commentPlaceholder": "写评论",
+    "commentSubmit": "发送",
+    "alert": {
+      "created": "房间已创建！\n\n邀请码：{{code}}\n\n把这个码分享给朋友吧。"
+    },
+    "confirm": {
+      "deletePost": "从房间移除此分享日记？"
+    },
+    "err": {
+      "needNickname": "请先到菜单 → 账号设置昵称",
+      "list": "无法加载房间列表",
+      "nameRequired": "请输入房间名",
+      "create": "无法创建房间",
+      "codeRequired": "请输入 6 位邀请码",
+      "join": "无法加入房间",
+      "copy": "无法复制邀请码",
+      "load": "无法加载房间",
+      "loadPost": "无法加载帖子",
+      "comment": "无法发送评论",
+      "delete": "删除失败"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "还没有日记。",
+      "line2": "写下第一篇日记吧！"
+    },
+    "writeFabAria": "写日记",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "这个月还没有日记。",
+      "noPreview": "无内容"
+    },
+    "card": {
+      "imageAlt": "{{date}} 的画"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "今日日记",
+      "edit": "编辑日记"
+    },
+    "save": "保存",
+    "saveEdit": "完成编辑",
+    "cancel": "取消",
+    "titlePlaceholder": "请输入标题",
+    "contentPlaceholder": "例如：今天去游泳了。今天锻炼了。",
+    "ai": {
+      "button": "✨ AI 画画",
+      "sceneStep": "正在写提示词…",
+      "drawStep": "正在画画…",
+      "statusScene": "正在构思场景…",
+      "statusDraw": "正在画画…",
+      "tip": "提示",
+      "tipBody": "你设定的角色会成为主角，AI 会根据整篇日记来画。",
+      "tipVisible": "看得见的动作与地点",
+      "tipAsk": "请写出来。",
+      "exGood1": "好例子：今天开了披萨派对",
+      "exGood2": "好例子：在公园和狗狗一起玩",
+      "exBad": "较弱：今天心情不错",
+      "sceneUnderstood": "AI 理解的场景：{{scene}}",
+      "characterAria": "AI 画画用的角色",
+      "characterTitle": "这个角色会成为画中的主角"
+    },
+    "confirm": {
+      "replaceWithAi": "用 AI 画替换画布内容吗？"
+    },
+    "err": {
+      "needContent": "请先写日记",
+      "aiFailed": "生成画失败",
+      "aiNeedContent": "生成前请先写日记内容",
+      "aiHttp": "画画失败：HTTP {{status}}",
+      "aiNoImage": "后端响应中没有图片",
+      "aiUrl": "无法加载图片链接",
+      "aiConvert": "图片转换失败"
+    }
+  },
+  "detail": {
+    "backAria": "返回",
+    "bookAria": "以日记本查看",
+    "bookTitle": "日记本 · PDF",
+    "pngAria": "下载 PNG",
+    "pngTitle": "保存为 PNG",
+    "shareAria": "分享",
+    "moreAria": "更多",
+    "menuCloseAria": "关闭菜单",
+    "edit": "编辑",
+    "delete": "删除",
+    "imageAlt": "{{date}} 的画",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "日记分享卡片",
+    "confirm": {
+      "delete": "删除这篇日记？"
+    },
+    "ok": {
+      "png": "已保存为 PNG"
+    },
+    "err": {
+      "png": "PNG 保存失败",
+      "pngBlob": "无法创建 PNG",
+      "share": "分享失败",
+      "roomsList": "无法加载房间"
+    }
+  },
+  "share": {
+    "title": "分享",
+    "toRoomAria": "分享到好友房",
+    "backToMenuAria": "返回分享菜单",
+    "instagram": "Instagram",
+    "instagramDesc": "以故事卡片分享",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "在聊天中分享图片",
+    "rooms": "好友房",
+    "roomsIcon": "房间",
+    "roomsDesc": "发到你加入的房间",
+    "roomsHint": "可一次选择多个房间",
+    "roomsLoading": "正在加载房间…",
+    "roomsEmpty": "还没有房间。请到菜单 → 好友房创建或加入。",
+    "submit": "分享",
+    "sharing": "分享中…",
+    "pcHint": "电脑网页无法直接分享到 App。图片已下载，请在手机打开或在 App 中上传。",
+    "ok": {
+      "oneRoom": "已分享到「{{name}}」",
+      "manyRooms": "已分享到 {{n}} 个房间",
+      "partial": "已分享到 {{n}} 个房间。失败：{{fails}}"
+    },
+    "pick": {
+      "instagram": "请在分享面板中选择 Instagram！",
+      "kakao": "请在分享面板中选择 KakaoTalk！"
+    },
+    "saved": {
+      "instagram": "图片已保存。请上传到 Instagram Stories！",
+      "kakao": "图片已保存。请在 KakaoTalk 发送！"
+    },
+    "native": {
+      "instagram": "把我的日记分享到 Instagram Stories",
+      "kakao": "通过 KakaoTalk 分享我的日记"
+    },
+    "err": {
+      "roomShare": "无法分享到房间",
+      "build": "无法创建分享图",
+      "convert": "分享图转换失败",
+      "imageLoad": "无法加载画作"
+    }
+  },
+  "character": {
+    "dialogAria": "我的角色设置",
+    "title": "我的角色",
+    "done": "完成",
+    "desc": "这个样子会成为 AI 画里的主角",
+    "who": "你是谁？",
+    "hairLabel": "发型",
+    "outfitLabel": "服装",
+    "gender": {
+      "boy": "男孩",
+      "girl": "女孩"
+    },
+    "hair": {
+      "short": "短发",
+      "medium": "齐肩",
+      "curly": "卷发"
+    },
+    "outfit": {
+      "short-sleeve": "短袖",
+      "dress": "连衣裙",
+      "hoodie": "连帽衫",
+      "school-uniform": "校服"
+    }
+  },
+  "export": {
+    "title": "导出",
+    "aria": "导出",
+    "period": "期间",
+    "presetsAria": "期间预设",
+    "thisMonth": "本月",
+    "lastMonth": "上月",
+    "custom": "自定义",
+    "start": "开始",
+    "end": "结束",
+    "count": "{{n}} 篇日记",
+    "empty": "该期间没有日记",
+    "pdf": "保存 PDF",
+    "saving": "保存中…",
+    "openBook": "以日记本查看",
+    "err": {
+      "pdf": "PDF 保存失败"
+    }
+  },
+  "book": {
+    "dialogAria": "日记本视图",
+    "title": "日记本",
+    "pdfAria": "保存 PDF",
+    "pdfTitle": "保存 PDF",
+    "building": "正在生成日记本…",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "coverLabel": "封面",
+    "cover": {
+      "total": "共 {{n}} 篇",
+      "hint": "左右滑动翻页"
+    },
+    "err": {
+      "build": "无法生成日记本",
+      "empty": "没有可下载的日记",
+      "page": "无法创建书页",
+      "image": "无法加载画作"
+    }
+  },
+  "canvas": {
+    "pen": "笔",
+    "photo": "照片",
+    "font": "字体",
+    "sticker": "贴纸",
+    "eraser": "橡皮",
+    "clearAll": "全部清除",
+    "photoHint": "拖动移动 · 边角缩放 · ✓ 放置",
+    "stickerSelected": "已选 {{emoji}} · 点画布后可调整大小与旋转",
+    "colorAria": "颜色 {{c}}",
+    "pickColorTitle": "选择颜色",
+    "eraserSizeAria": "橡皮大小",
+    "eraserSize": {
+      "s": "小",
+      "m": "中",
+      "l": "大"
+    },
+    "fontPickerTitle": "选择字体",
+    "stickerSheetTitle": "贴纸",
+    "stickerCatsAria": "贴纸分类",
+    "sample": "今天的日记",
+    "confirm": {
+      "clear": "清除整幅画？"
+    },
+    "alert": {
+      "imageOnly": "只能选择图片文件"
+    },
+    "err": {
+      "noCanvas": "没有画布",
+      "noContext": "无法打开画布上下文",
+      "imageLoad": "图片加载失败"
+    },
+    "penKindAria": "笔类型",
+    "penKind": {
+      "ballpoint": "圆珠笔",
+      "gel": "中性笔",
+      "brush": "毛笔",
+      "marker": "马克笔",
+      "highlighter": "荧光笔"
+    },
+    "stickerHint": "拖动移动 · 边角缩放 · 上方旋转 · ✓ 放置",
+    "stickerRotate": "旋转"
+  },
+  "font": {
+    "dialogAria": "选择字体",
+    "title": "字体",
+    "sample": "今天的日记",
+    "cat": {
+      "cute": "可爱字体",
+      "neat": "端正字体"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "选择日期",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "goToday": "回到今天"
+  },
+  "mood": {
+    "happy": "开心",
+    "excited": "兴奋",
+    "love": "甜蜜",
+    "proud": "骄傲",
+    "calm": "平静",
+    "sleepy": "困倦",
+    "soso": "一般",
+    "surprised": "吃惊",
+    "sad": "难过",
+    "angry": "生气",
+    "anxious": "焦虑",
+    "sick": "不舒服"
+  },
+  "stickers": {
+    "face": "表情",
+    "animal": "动物",
+    "fruit": "水果",
+    "building": "建筑",
+    "weather": "天气",
+    "sport": "运动",
+    "clothes": "服饰",
+    "shape": "形状"
+  }
+}

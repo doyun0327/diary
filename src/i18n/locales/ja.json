@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "loading": "読み込み中…",
+    "anonymous": "匿名",
+    "back": "戻る",
+    "processing": "処理中…",
+    "requestFailed": "リクエストに失敗しました（{{status}}）",
+    "serverUnreachable": "サーバーに接続できません。Spring（8080）が起動しているか確認してください。",
+    "weekday": {
+      "0": "日",
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土"
+    },
+    "dateFull": "{{y}}年{{m}}月{{d}}日（{{weekday}}）",
+    "yearMonth": "{{y}}年{{m}}月"
+  },
+  "header": {
+    "menu": "メニュー",
+    "tagline": "わたしの一日を残す",
+    "footer": "ゆっくり、一日ずつ",
+    "account": "アカウント · 言語",
+    "accountHintEmpty": "写真 · 名前 · 言語",
+    "rooms": "フレンドルーム",
+    "roomsHint": "参加中のルーム",
+    "character": "キャラクター",
+    "characterHint": "AI絵のわたし",
+    "export": "書き出し",
+    "exportHint": "期間PDF · 日記帳",
+    "decorate": "カスタム",
+    "decorateHint": "テーマ · 絵文字",
+    "appInfo": "アプリ情報",
+    "appInfoHint": "バージョン · 規約 · クレジット"
+  },
+  "decorate": {
+    "title": "カスタム",
+    "aria": "カスタム",
+    "tabsAria": "カスタムタブ",
+    "tab": {
+      "theme": "テーマ",
+      "emoji": "絵文字"
+    }
+  },
+  "emojiPack": {
+    "hint": "気分アイコンのスタイルを変更",
+    "classic": {
+      "name": "クラシック",
+      "desc": "フラットアイコン（Flaticon）"
+    },
+    "smileys": {
+      "name": "スマイリー",
+      "desc": "アニメーションアイコン（Flaticon）"
+    },
+    "cat": {
+      "name": "ねこ",
+      "desc": "ねこ絵文字（Flaticon）"
+    },
+    "dog": {
+      "name": "いぬ",
+      "desc": "いぬ絵文字（Flaticon）"
+    },
+    "love": {
+      "name": "ラブ",
+      "desc": "ラブ絵文字（Flaticon）"
+    },
+    "ghost": {
+      "name": "ゴースト",
+      "desc": "ゴースト絵文字（Flaticon）"
+    }
+  },
+  "appInfo": {
+    "title": "アプリ情報",
+    "aria": "アプリ情報",
+    "back": "戻る",
+    "version": "現在のバージョン",
+    "legal": {
+      "menu": "利用規約とプライバシーポリシー",
+      "title": "規約 · プライバシー",
+      "termsHeading": "利用規約",
+      "termsBody": "PageByは個人の日記アプリです。法令を守り利用してください。アカウント、ニックネーム、日記内容の責任は利用者にあります。他者の権利を侵害する投稿・共有は禁止です。機能は予告なく変更される場合があります。",
+      "privacyHeading": "プライバシーポリシー",
+      "privacyBody": "日記、絵、プロフィールは端末に保存され、フレンドルーム利用時はサーバーに同期される場合があります。データは日記の保存・共有・アプリ機能のためにのみ使用します。個人データを販売せず、法令に基づく場合を除き第三者に提供しません。プライバシーに関するお問い合わせはアプリ内の窓口をご利用ください。"
+    },
+    "licenses": {
+      "menu": "オープンソースライセンスとクレジット",
+      "title": "ライセンス · クレジット",
+      "iconsHeading": "アイコンクレジット",
+      "libsHeading": "オープンソースライブラリ",
+      "note": "無料のFlaticonアイコンには帰属表示が必要です。上のリンクがそのクレジットです。"
+    }
+  },
+  "theme": {
+    "title": "テーマ",
+    "aria": "テーマを選ぶ",
+    "hint": "アプリ全体の見た目を変更",
+    "paper": {
+      "name": "Cream",
+      "desc": "やわらかいクリーム文具風"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "やさしいミントグリーン"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "穏やかなスカイブルー"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "ラベンダーとピーチ"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "あたたかいソフトグレー"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "やわらかい柑橘の光"
+    }
+  },
+  "account": {
+    "title": "アカウント · 言語",
+    "aria": "アカウント · 言語",
+    "photoLabel": "プロフィール写真",
+    "changePhotoAria": "プロフィール写真を変更",
+    "pickPhoto": "写真を選ぶ",
+    "removePhoto": "削除",
+    "nameLabel": "ニックネーム",
+    "nameHint": "フレンドルームに表示される名前",
+    "namePlaceholder": "ニックネームを入力",
+    "save": "保存",
+    "ok": {
+      "nameSaved": "ニックネームを保存しました",
+      "photoSaved": "プロフィール写真を保存しました",
+      "photoRemoved": "プロフィール写真を削除しました"
+    },
+    "err": {
+      "nameRequired": "ニックネームを入力してください",
+      "imageOnly": "画像ファイルのみ選択できます",
+      "photoSave": "写真を保存できませんでした",
+      "photoRead": "写真を読み取れませんでした",
+      "photoProcess": "写真を処理できませんでした",
+      "photoLoad": "写真を読み込めませんでした"
+    }
+  },
+  "language": {
+    "label": "言語",
+    "hint": "アプリの表示言語",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "気分アイコン：designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "フレンドルーム",
+    "joinWithCode": "招待コードで参加",
+    "create": "ルームを作成",
+    "empty": "まだどのルームにも参加していません",
+    "memberCount": "{{n}} 人",
+    "roomFallback": "ルーム",
+    "copyInvite": "招待コード",
+    "copied": "コピーしました",
+    "copyInviteTitle": "招待コードをコピー",
+    "copyInviteAria": "招待コードをコピー",
+    "createSheetAria": "ルームを作成",
+    "createHint": "ルーム名を決めると、6桁の招待コードが自動で作成されます。",
+    "asChipCreate": "{{name}} として作成",
+    "roomNamePlaceholder": "ルーム名",
+    "creating": "作成中…",
+    "joinSheetAria": "招待コードで参加",
+    "joinHint": "友達からもらった6桁のコードを入力してください。",
+    "asChipJoin": "{{name}} として参加",
+    "invitePlaceholder": "例：482913",
+    "joining": "参加中…",
+    "joinSubmit": "参加",
+    "noNickname": "ニックネーム未設定",
+    "backToList": "← 一覧",
+    "refresh": "更新",
+    "sharedDiaries": "共有された日記",
+    "sharedEmpty": "まだ共有された日記はありません。日記詳細の「ルームに共有」を試してみてください。",
+    "backToRoom": "← ルームへ",
+    "sharedDiary": "共有日記",
+    "comments": "コメント（{{n}}）",
+    "commentPlaceholder": "コメントを書く",
+    "commentSubmit": "投稿",
+    "alert": {
+      "created": "ルームを作成しました！\n\n招待コード：{{code}}\n\nこのコードを友達に共有してください。"
+    },
+    "confirm": {
+      "deletePost": "この共有日記をルームから削除しますか？"
+    },
+    "err": {
+      "needNickname": "先にメニュー → アカウントでニックネームを設定してください",
+      "list": "ルーム一覧を読み込めませんでした",
+      "nameRequired": "ルーム名を入力してください",
+      "create": "ルームを作成できませんでした",
+      "codeRequired": "6桁の招待コードを入力してください",
+      "join": "ルームに参加できませんでした",
+      "copy": "招待コードをコピーできませんでした",
+      "load": "ルームを読み込めませんでした",
+      "loadPost": "投稿を読み込めませんでした",
+      "comment": "コメントを投稿できませんでした",
+      "delete": "削除に失敗しました"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "まだ日記がありません。",
+      "line2": "最初の日記を書いてみましょう！"
+    },
+    "writeFabAria": "日記を書く",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "今月の日記はまだありません。",
+      "noPreview": "内容なし"
+    },
+    "card": {
+      "imageAlt": "{{date}} の絵"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "今日の日記",
+      "edit": "日記を編集"
+    },
+    "save": "保存",
+    "saveEdit": "編集完了",
+    "cancel": "キャンセル",
+    "titlePlaceholder": "タイトルを入力",
+    "contentPlaceholder": "例：今日は泳ぎに行った。今日は運動した。",
+    "ai": {
+      "button": "✨ AIで絵を描く",
+      "sceneStep": "プロンプト作成中…",
+      "drawStep": "描画中…",
+      "statusScene": "シーンを考えています…",
+      "statusDraw": "絵を描いています…",
+      "tip": "ヒント",
+      "tipBody": "設定したキャラクターが主役になり、日記全文をもとにAIが描きます。",
+      "tipVisible": "見える動作や場所",
+      "tipAsk": "を書いてみてください。",
+      "exGood1": "良い例：今日はピザパーティーをした",
+      "exGood2": "良い例：公園で犬と遊んだ",
+      "exBad": "弱い例：今日は気分がよかった",
+      "sceneUnderstood": "AIが理解したシーン：{{scene}}",
+      "characterAria": "AI絵用のキャラクター",
+      "characterTitle": "このキャラクターが主人公になります"
+    },
+    "confirm": {
+      "replaceWithAi": "キャンバスをAIの絵で置き換えますか？"
+    },
+    "err": {
+      "needContent": "先に日記を書いてください",
+      "aiFailed": "絵の生成に失敗しました",
+      "aiNeedContent": "生成前に日記の内容を書いてください",
+      "aiHttp": "描画失敗：HTTP {{status}}",
+      "aiNoImage": "バックエンド応答に画像がありません",
+      "aiUrl": "画像URLを読み込めませんでした",
+      "aiConvert": "画像変換に失敗しました"
+    }
+  },
+  "detail": {
+    "backAria": "戻る",
+    "bookAria": "日記帳として見る",
+    "bookTitle": "日記帳 · PDF",
+    "pngAria": "PNGをダウンロード",
+    "pngTitle": "PNGとして保存",
+    "shareAria": "共有",
+    "moreAria": "その他",
+    "menuCloseAria": "メニューを閉じる",
+    "edit": "編集",
+    "delete": "削除",
+    "imageAlt": "{{date}} の絵",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "日記共有カード",
+    "confirm": {
+      "delete": "この日記を削除しますか？"
+    },
+    "ok": {
+      "png": "PNGとして保存しました"
+    },
+    "err": {
+      "png": "PNGの保存に失敗しました",
+      "pngBlob": "PNGを作成できませんでした",
+      "share": "共有に失敗しました",
+      "roomsList": "ルームを読み込めませんでした"
+    }
+  },
+  "share": {
+    "title": "共有",
+    "toRoomAria": "ルームに共有",
+    "backToMenuAria": "共有メニューに戻る",
+    "instagram": "Instagram",
+    "instagramDesc": "ストーリーズ用カードで共有",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "チャットで写真を共有",
+    "rooms": "フレンドルーム",
+    "roomsIcon": "ルーム",
+    "roomsDesc": "参加中のルームに投稿",
+    "roomsHint": "複数のルームを一度に選べます",
+    "roomsLoading": "ルームを読み込み中…",
+    "roomsEmpty": "まだルームがありません。メニュー → フレンドルームで作成または参加してください。",
+    "submit": "共有",
+    "sharing": "共有中…",
+    "pcHint": "PCのWebからはアプリへ直接共有できません。画像をダウンロードしたので、スマホで開くかアプリでアップロードしてください。",
+    "ok": {
+      "oneRoom": "「{{name}}」に共有しました",
+      "manyRooms": "{{n}} 個のルームに共有しました",
+      "partial": "{{n}} 個のルームに共有しました。失敗：{{fails}}"
+    },
+    "pick": {
+      "instagram": "共有シートで Instagram を選んでください！",
+      "kakao": "共有シートで KakaoTalk を選んでください！"
+    },
+    "saved": {
+      "instagram": "画像を保存しました。Instagram Storiesにアップロードしてください！",
+      "kakao": "画像を保存しました。KakaoTalkで送信してください！"
+    },
+    "native": {
+      "instagram": "日記を Instagram Stories に共有",
+      "kakao": "日記を KakaoTalk で共有"
+    },
+    "err": {
+      "roomShare": "ルームに共有できませんでした",
+      "build": "共有画像を作成できません",
+      "convert": "共有画像の変換に失敗しました",
+      "imageLoad": "絵を読み込めませんでした"
+    }
+  },
+  "character": {
+    "dialogAria": "マイキャラクター設定",
+    "title": "マイキャラクター",
+    "done": "完了",
+    "desc": "この見た目がAI絵の主人公になります",
+    "who": "あなたは？",
+    "hairLabel": "髪型",
+    "outfitLabel": "服装",
+    "gender": {
+      "boy": "男の子",
+      "girl": "女の子"
+    },
+    "hair": {
+      "short": "ショート",
+      "medium": "ボブ",
+      "curly": "カーリー"
+    },
+    "outfit": {
+      "short-sleeve": "半袖",
+      "dress": "ワンピース",
+      "hoodie": "パーカー",
+      "school-uniform": "制服"
+    }
+  },
+  "export": {
+    "title": "書き出し",
+    "aria": "書き出し",
+    "period": "期間",
+    "presetsAria": "期間プリセット",
+    "thisMonth": "今月",
+    "lastMonth": "先月",
+    "custom": "カスタム",
+    "start": "開始",
+    "end": "終了",
+    "count": "{{n}} 件の日記",
+    "empty": "この期間に日記がありません",
+    "pdf": "PDFを保存",
+    "saving": "保存中…",
+    "openBook": "日記帳として見る",
+    "err": {
+      "pdf": "PDFの保存に失敗しました"
+    }
+  },
+  "book": {
+    "dialogAria": "日記帳ビュー",
+    "title": "日記帳",
+    "pdfAria": "PDFを保存",
+    "pdfTitle": "PDFを保存",
+    "building": "日記帳を作成中…",
+    "prevPage": "前のページ",
+    "nextPage": "次のページ",
+    "coverLabel": "表紙",
+    "cover": {
+      "total": "全 {{n}} 件",
+      "hint": "左右にスワイプして読む"
+    },
+    "err": {
+      "build": "日記帳を作成できませんでした",
+      "empty": "ダウンロードできる日記がありません",
+      "page": "ページを作成できません",
+      "image": "絵を読み込めませんでした"
+    }
+  },
+  "canvas": {
+    "pen": "ペン",
+    "photo": "写真",
+    "font": "フォント",
+    "sticker": "シール",
+    "eraser": "消しゴム",
+    "clearAll": "すべて消去",
+    "photoHint": "ドラッグで移動 · 角で拡大縮小 · ✓ で確定",
+    "stickerSelected": "{{emoji}} 選択中 · キャンバスをタップしてサイズ・回転",
+    "colorAria": "色 {{c}}",
+    "pickColorTitle": "色を選ぶ",
+    "eraserSizeAria": "消しゴムのサイズ",
+    "eraserSize": {
+      "s": "小",
+      "m": "中",
+      "l": "大"
+    },
+    "fontPickerTitle": "フォントを選ぶ",
+    "stickerSheetTitle": "シール",
+    "stickerCatsAria": "シールカテゴリ",
+    "sample": "今日の日記",
+    "confirm": {
+      "clear": "絵全体を消去しますか？"
+    },
+    "alert": {
+      "imageOnly": "画像ファイルのみ選択できます"
+    },
+    "err": {
+      "noCanvas": "キャンバスがありません",
+      "noContext": "キャンバスコンテキストを開けません",
+      "imageLoad": "画像の読み込みに失敗しました"
+    },
+    "penKindAria": "ペンの種類",
+    "penKind": {
+      "ballpoint": "ボールペン",
+      "gel": "ジェルペン",
+      "brush": "筆ペン",
+      "marker": "マーカー",
+      "highlighter": "蛍光ペン"
+    },
+    "stickerHint": "ドラッグで移動 · 角で拡大縮小 · 上で回転 · ✓ で確定",
+    "stickerRotate": "回転"
+  },
+  "font": {
+    "dialogAria": "フォントを選ぶ",
+    "title": "フォント",
+    "sample": "今日の日記",
+    "cat": {
+      "cute": "かわいいフォント",
+      "neat": "きれいなフォント"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "日付を選ぶ",
+    "prevMonth": "前月",
+    "nextMonth": "翌月",
+    "goToday": "今日へ"
+  },
+  "mood": {
+    "happy": "うれしい",
+    "excited": "わくわく",
+    "love": "すき",
+    "proud": "誇らしい",
+    "calm": "穏やか",
+    "sleepy": "眠い",
+    "soso": "ふつう",
+    "surprised": "びっくり",
+    "sad": "悲しい",
+    "angry": "おこ",
+    "anxious": "不安",
+    "sick": "具合わるい"
+  },
+  "stickers": {
+    "face": "顔",
+    "animal": "どうぶつ",
+    "fruit": "くだもの",
+    "building": "たてもの",
+    "weather": "天気",
+    "sport": "スポーツ",
+    "clothes": "衣類",
+    "shape": "かたち"
+  }
+}

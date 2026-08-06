@@ -29,8 +29,22 @@ interface PhotoLayer {
   aspect: number;
 }
 
+interface StickerLayer {
+  id: string;
+  emoji: string;
+  /** center x */
+  x: number;
+  /** center y */
+  y: number;
+  size: number;
+  /** radians */
+  rotation: number;
+}
+
 type ToolMode = 'pen' | 'eraser' | 'sticker';
+type PenKind = 'ballpoint' | 'gel' | 'brush' | 'marker' | 'highlighter';
 type PhotoDragKind = 'move' | 'resize';
+type StickerDragKind = 'move' | 'resize' | 'rotate';
 
 const COLORS = [
   '#333333',
@@ -44,14 +58,18 @@ const COLORS = [
 ];
 
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
-const PEN_WIDTH = 3;
+const PEN_KINDS: PenKind[] = ['ballpoint', 'gel', 'brush', 'marker', 'highlighter'];
 const ERASER_SIZES = [
   { id: 's', width: 12 },
   { id: 'm', width: 24 },
   { id: 'l', width: 40 },
 ] as const;
-const STICKER_SIZE = 36;
+const DEFAULT_STICKER_SIZE = 48;
+const MIN_STICKER_SIZE = 22;
+const MAX_STICKER_SIZE = 140;
 const MIN_PHOTO_SIZE = 40;
+const EMOJI_FONT =
+  '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
 
 function DrawingCanvas({
   ref,
@@ -73,10 +91,19 @@ function DrawingCanvas({
     startY: number;
     origin: PhotoLayer;
   } | null>(null);
+  const stickerDrag = useRef<{
+    kind: StickerDragKind;
+    id: string;
+    startX: number;
+    startY: number;
+    origin: StickerLayer;
+    startAngle: number;
+  } | null>(null);
 
   const [color, setColor] = useState(COLORS[0]);
   const [customColor, setCustomColor] = useState('#e91e63');
   const [mode, setMode] = useState<ToolMode>('pen');
+  const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
   const [colorsOpen, setColorsOpen] = useState(false);
   const [fontOpen, setFontOpen] = useState(false);
@@ -91,6 +118,8 @@ function DrawingCanvas({
   const fontId = fontIdProp ?? internalFontId;
   const [photoLayers, setPhotoLayers] = useState<PhotoLayer[]>([]);
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
+  const [stickerLayers, setStickerLayers] = useState<StickerLayer[]>([]);
+  const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
 
   const eraserWidth =
     ERASER_SIZES.find((s) => s.id === eraserSizeId)?.width ?? 24;
@@ -100,6 +129,7 @@ function DrawingCanvas({
     if (fontIdProp === undefined) setInternalFontId(id);
     setPreferredFontId(id);
   };
+
   const fillWhite = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -155,6 +185,36 @@ function DrawingCanvas({
     hasDrawn.current = true;
   };
 
+  const bakeStickerToCanvas = (layer: StickerLayer, targetCtx?: CanvasRenderingContext2D) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = targetCtx ?? canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = targetCtx ? (canvas.width / canvas.getBoundingClientRect().width || 1) : 1;
+    if (targetCtx) {
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.translate(layer.x, layer.y);
+      ctx.rotate(layer.rotation);
+      ctx.font = `${layer.size}px ${EMOJI_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(layer.emoji, 0, 0);
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.translate(layer.x, layer.y);
+      ctx.rotate(layer.rotation);
+      ctx.font = `${layer.size}px ${EMOJI_FONT}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(layer.emoji, 0, 0);
+      ctx.restore();
+    }
+    hasDrawn.current = true;
+  };
+
   const bakeAllPhotos = () => {
     photoLayers.forEach(bakePhotoToCanvas);
     photoLayers.forEach((l) => photoImages.current.delete(l.id));
@@ -162,12 +222,24 @@ function DrawingCanvas({
     setActivePhotoId(null);
   };
 
+  const bakeAllStickers = () => {
+    stickerLayers.forEach((layer) => bakeStickerToCanvas(layer));
+    setStickerLayers([]);
+    setActiveStickerId(null);
+  };
+
   const exportDataUrl = (): string | undefined => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-    if (!hasDrawn.current && photoLayers.length === 0) return undefined;
+    if (
+      !hasDrawn.current &&
+      photoLayers.length === 0 &&
+      stickerLayers.length === 0
+    ) {
+      return undefined;
+    }
 
-    if (photoLayers.length === 0) {
+    if (photoLayers.length === 0 && stickerLayers.length === 0) {
       return hasDrawn.current ? canvas.toDataURL('image/png') : undefined;
     }
 
@@ -178,27 +250,23 @@ function DrawingCanvas({
     if (!ctx) return undefined;
 
     ctx.drawImage(canvas, 0, 0);
+    const rect = canvas.getBoundingClientRect();
+    const dpr = canvas.width / rect.width;
     photoLayers.forEach((layer) => {
       const img = photoImages.current.get(layer.id);
-      if (img) ctx.drawImage(img, layer.x, layer.y, layer.width, layer.height);
+      if (img) {
+        ctx.drawImage(
+          img,
+          layer.x * dpr,
+          layer.y * dpr,
+          layer.width * dpr,
+          layer.height * dpr,
+        );
+      }
     });
+    stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
 
     return exportCanvas.toDataURL('image/png');
-  };
-
-  const placeSticker = (emoji: string, x: number, y: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.save();
-    ctx.font = `${STICKER_SIZE}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, x, y);
-    ctx.restore();
-    hasDrawn.current = true;
   };
 
   useEffect(() => {
@@ -242,26 +310,65 @@ function DrawingCanvas({
 
   useEffect(() => {
     const onMove = (e: globalThis.PointerEvent) => {
-      if (!photoDrag.current) return;
-      const { kind, id, startX, startY, origin } = photoDrag.current;
+      if (photoDrag.current) {
+        const { kind, id, startX, startY, origin } = photoDrag.current;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        setPhotoLayers((prev) =>
+          prev.map((layer) => {
+            if (layer.id !== id) return layer;
+            if (kind === 'move') {
+              return { ...layer, x: origin.x + dx, y: origin.y + dy };
+            }
+            const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width + dx);
+            const newHeight = newWidth / origin.aspect;
+            return { ...layer, width: newWidth, height: newHeight };
+          }),
+        );
+        return;
+      }
+
+      if (!stickerDrag.current) return;
+      const { kind, id, startX, startY, origin, startAngle } = stickerDrag.current;
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
 
-      setPhotoLayers((prev) =>
+      setStickerLayers((prev) =>
         prev.map((layer) => {
           if (layer.id !== id) return layer;
           if (kind === 'move') {
             return { ...layer, x: origin.x + dx, y: origin.y + dy };
           }
-          const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width + dx);
-          const newHeight = newWidth / origin.aspect;
-          return { ...layer, width: newWidth, height: newHeight };
+          if (kind === 'resize') {
+            const wrap = wrapRef.current?.getBoundingClientRect();
+            if (!wrap) return layer;
+            const cx = wrap.left + origin.x;
+            const cy = wrap.top + origin.y;
+            const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+            const originDist = Math.max(1, Math.hypot(startX - cx, startY - cy));
+            const next = Math.round(
+              Math.min(
+                MAX_STICKER_SIZE,
+                Math.max(MIN_STICKER_SIZE, origin.size * (dist / originDist)),
+              ),
+            );
+            return { ...layer, size: next };
+          }
+          // rotate
+          const wrap = wrapRef.current?.getBoundingClientRect();
+          if (!wrap) return layer;
+          const cx = wrap.left + origin.x;
+          const cy = wrap.top + origin.y;
+          const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+          return { ...layer, rotation: origin.rotation + (angle - startAngle) };
         }),
       );
     };
 
     const onUp = () => {
       photoDrag.current = null;
+      stickerDrag.current = null;
     };
 
     window.addEventListener('pointermove', onMove);
@@ -282,10 +389,14 @@ function DrawingCanvas({
       photoImages.current.clear();
       setPhotoLayers([]);
       setActivePhotoId(null);
+      setStickerLayers([]);
+      setActiveStickerId(null);
     },
-    hasContent: () => hasDrawn.current || photoLayers.length > 0,
+    hasContent: () =>
+      hasDrawn.current || photoLayers.length > 0 || stickerLayers.length > 0,
     loadImage: async (src: string) => {
       bakeAllPhotos();
+      bakeAllStickers();
       await drawImageOnCanvas(src, true);
     },
   }));
@@ -300,8 +411,22 @@ function DrawingCanvas({
     setActivePhotoId(null);
   };
 
-  const switchTool = (next: ToolMode, openColors: boolean) => {
+  const confirmActiveSticker = () => {
+    if (!activeStickerId) return;
+    const layer = stickerLayers.find((l) => l.id === activeStickerId);
+    if (!layer) return;
+    bakeStickerToCanvas(layer);
+    setStickerLayers((prev) => prev.filter((l) => l.id !== layer.id));
+    setActiveStickerId(null);
+  };
+
+  const confirmActiveOverlay = () => {
     if (activePhotoId) confirmActivePhoto();
+    if (activeStickerId) confirmActiveSticker();
+  };
+
+  const switchTool = (next: ToolMode, openColors: boolean) => {
+    confirmActiveOverlay();
     setMode(next);
     setStickerOpen(false);
     setFontOpen(false);
@@ -312,7 +437,7 @@ function DrawingCanvas({
   const selectEraser = () => switchTool('eraser', false);
 
   const toggleFontPanel = () => {
-    if (activePhotoId) confirmActivePhoto();
+    confirmActiveOverlay();
     setFontOpen((open) => {
       const next = !open;
       if (next) {
@@ -324,7 +449,7 @@ function DrawingCanvas({
   };
 
   const toggleStickerPanel = () => {
-    if (activePhotoId) confirmActivePhoto();
+    confirmActiveOverlay();
     setStickerOpen((open) => {
       const next = !open;
       if (next) {
@@ -377,6 +502,7 @@ function DrawingCanvas({
         aspect,
       };
 
+      confirmActiveOverlay();
       photoImages.current.set(id, img);
       setPhotoLayers((prev) => [...prev, layer]);
       setActivePhotoId(id);
@@ -386,6 +512,21 @@ function DrawingCanvas({
       setStickerOpen(false);
     };
     img.src = dataUrl;
+  };
+
+  const placeStickerLayer = (emoji: string, x: number, y: number) => {
+    confirmActiveOverlay();
+    const id = crypto.randomUUID();
+    const layer: StickerLayer = {
+      id,
+      emoji,
+      x,
+      y,
+      size: DEFAULT_STICKER_SIZE,
+      rotation: 0,
+    };
+    setStickerLayers((prev) => [...prev, layer]);
+    setActiveStickerId(id);
   };
 
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -410,6 +551,7 @@ function DrawingCanvas({
   ) => {
     e.stopPropagation();
     e.preventDefault();
+    if (activeStickerId) confirmActiveSticker();
     setActivePhotoId(layer.id);
     photoDrag.current = {
       kind,
@@ -420,18 +562,60 @@ function DrawingCanvas({
     };
   };
 
+  const startStickerDrag = (
+    e: PointerEvent,
+    kind: StickerDragKind,
+    layer: StickerLayer,
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (activePhotoId) confirmActivePhoto();
+    setActiveStickerId(layer.id);
+
+    const wrap = wrapRef.current?.getBoundingClientRect();
+    const cx = (wrap?.left ?? 0) + layer.x;
+    const cy = (wrap?.top ?? 0) + layer.y;
+    const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+
+    stickerDrag.current = {
+      kind,
+      id: layer.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origin: { ...layer },
+      startAngle,
+    };
+  };
+
   const getPos = (e: PointerEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
+  const strokeStyleForPen = (): { width: number; alpha: number; composite?: GlobalCompositeOperation } => {
+    switch (penKind) {
+      case 'ballpoint':
+        return { width: 1.6, alpha: 1 };
+      case 'gel':
+        return { width: 3, alpha: 1 };
+      case 'brush':
+        return { width: 8, alpha: 0.85 };
+      case 'marker':
+        return { width: 7, alpha: 0.95 };
+      case 'highlighter':
+        return { width: 16, alpha: 0.32 };
+      default:
+        return { width: 3, alpha: 1 };
+    }
+  };
+
   const handleDown = (e: PointerEvent<HTMLCanvasElement>) => {
-    if (activePhotoId) confirmActivePhoto();
+    confirmActiveOverlay();
 
     if (mode === 'sticker') {
       e.preventDefault();
       const pos = getPos(e);
-      placeSticker(selectedSticker, pos.x, pos.y);
+      placeStickerLayer(selectedSticker, pos.x, pos.y);
       return;
     }
 
@@ -445,12 +629,36 @@ function DrawingCanvas({
     const ctx = e.currentTarget.getContext('2d');
     if (!ctx) return;
     const pos = getPos(e);
-    ctx.strokeStyle = mode === 'eraser' ? '#ffffff' : color;
-    ctx.lineWidth = mode === 'eraser' ? eraserWidth : PEN_WIDTH;
+    const last = lastPos.current;
+    const dist = Math.hypot(pos.x - last.x, pos.y - last.y);
+
+    ctx.save();
+    if (mode === 'eraser') {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = eraserWidth;
+      ctx.globalAlpha = 1;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    } else {
+      const pen = strokeStyleForPen();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = pen.alpha;
+      ctx.lineCap = penKind === 'marker' ? 'square' : 'round';
+      ctx.lineJoin = 'round';
+      if (penKind === 'brush') {
+        // 느리면 굵게, 빠르면 얇게
+        ctx.lineWidth = Math.max(2.5, Math.min(14, 14 - dist * 0.55));
+      } else {
+        ctx.lineWidth = pen.width;
+      }
+    }
+
     ctx.beginPath();
-    ctx.moveTo(lastPos.current.x, lastPos.current.y);
+    ctx.moveTo(last.x, last.y);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
+    ctx.restore();
+
     lastPos.current = pos;
     hasDrawn.current = true;
   };
@@ -466,6 +674,8 @@ function DrawingCanvas({
       photoImages.current.clear();
       setPhotoLayers([]);
       setActivePhotoId(null);
+      setStickerLayers([]);
+      setActiveStickerId(null);
     }
   };
 
@@ -476,6 +686,8 @@ function DrawingCanvas({
   ]
     .filter(Boolean)
     .join(' ');
+
+  const editingOverlay = Boolean(activePhotoId || activeStickerId);
 
   return (
     <div className="drawing">
@@ -535,51 +747,116 @@ function DrawingCanvas({
               </div>
             );
           })}
+
+          {stickerLayers.map((layer) => {
+            const isActive = activeStickerId === layer.id;
+            const box = layer.size * 1.35;
+            return (
+              <div
+                key={layer.id}
+                className={`drawing__sticker-layer ${isActive ? 'active' : ''}`}
+                style={{
+                  left: layer.x,
+                  top: layer.y,
+                  width: box,
+                  height: box,
+                  fontSize: layer.size,
+                  transform: `translate(-50%, -50%) rotate(${layer.rotation}rad)`,
+                }}
+                onPointerDown={(e) => startStickerDrag(e, 'move', layer)}
+              >
+                <span className="drawing__sticker-emoji" aria-hidden>
+                  {layer.emoji}
+                </span>
+                {isActive && (
+                  <>
+                    <button
+                      type="button"
+                      className="drawing__photo-confirm"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmActiveSticker();
+                      }}
+                    >
+                      ✓
+                    </button>
+                    <div
+                      className="drawing__sticker-rotate"
+                      title={t('canvas.stickerRotate')}
+                      onPointerDown={(e) => startStickerDrag(e, 'rotate', layer)}
+                    />
+                    <div
+                      className="drawing__photo-handle"
+                      onPointerDown={(e) => startStickerDrag(e, 'resize', layer)}
+                    />
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {activePhotoId && (
           <p className="drawing__photo-hint">{t('canvas.photoHint')}</p>
         )}
+        {activeStickerId && !activePhotoId && (
+          <p className="drawing__photo-hint">{t('canvas.stickerHint')}</p>
+        )}
 
         <div className="drawing__dock">
-          {mode === 'sticker' && !stickerOpen && (
+          {mode === 'sticker' && !stickerOpen && !editingOverlay && (
             <p className="drawing__sticker-hint">
               {t('canvas.stickerSelected', { emoji: selectedSticker })}
             </p>
           )}
 
-          {colorsOpen && mode === 'pen' && !activePhotoId && !fontOpen && (
-            <div className="drawing__colors">
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`drawing__color ${color === c ? 'selected' : ''}`}
-                  style={{ backgroundColor: c }}
-                  aria-label={t(`canvas.colorAria`, { c })}
-                  onClick={() => setColor(c)}
-                />
-              ))}
-              <label
-                className={`drawing__color drawing__color--custom ${
-                  color === customColor ? 'selected' : ''
-                }`}
-                title={t('canvas.pickColorTitle')}
-              >
-                <input
-                  type="color"
-                  value={customColor}
-                  onChange={(e) => {
-                    setCustomColor(e.target.value);
-                    setColor(e.target.value);
-                  }}
-                />
-                <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
-              </label>
-            </div>
+          {colorsOpen && mode === 'pen' && !editingOverlay && !fontOpen && (
+            <>
+              <div className="drawing__pen-kinds" role="group" aria-label={t('canvas.penKindAria')}>
+                {PEN_KINDS.map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={`drawing__pen-kind ${penKind === kind ? 'active' : ''}`}
+                    onClick={() => setPenKind(kind)}
+                  >
+                    {t(`canvas.penKind.${kind}`)}
+                  </button>
+                ))}
+              </div>
+              <div className="drawing__colors">
+                {COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`drawing__color ${color === c ? 'selected' : ''}`}
+                    style={{ backgroundColor: c }}
+                    aria-label={t(`canvas.colorAria`, { c })}
+                    onClick={() => setColor(c)}
+                  />
+                ))}
+                <label
+                  className={`drawing__color drawing__color--custom ${
+                    color === customColor ? 'selected' : ''
+                  }`}
+                  title={t('canvas.pickColorTitle')}
+                >
+                  <input
+                    type="color"
+                    value={customColor}
+                    onChange={(e) => {
+                      setCustomColor(e.target.value);
+                      setColor(e.target.value);
+                    }}
+                  />
+                  <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
+                </label>
+              </div>
+            </>
           )}
 
-          {mode === 'eraser' && !activePhotoId && (
+          {mode === 'eraser' && !editingOverlay && (
             <div className="drawing__eraser-options">
               <div className="drawing__eraser-sizes" role="group" aria-label={t('canvas.eraserSizeAria')}>
                 {ERASER_SIZES.map((size) => (
@@ -619,7 +896,7 @@ function DrawingCanvas({
               type="button"
               className="drawing__dock-btn"
               onClick={() => {
-                if (activePhotoId) confirmActivePhoto();
+                confirmActiveOverlay();
                 setFontOpen(false);
                 setStickerOpen(false);
                 fileInputRef.current?.click();

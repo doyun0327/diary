@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setStoredLanguage } from '../i18n';
+import { APP_LANGUAGES, setStoredLanguage } from '../i18n';
 import * as roomsApi from '../api/roomsApi';
 import './AccountSheet.css';
 
@@ -220,20 +220,16 @@ function AccountSheet({
           <label className="account-sheet__label">{t('language.label')}</label>
           <p className="account-sheet__hint">{t('language.hint')}</p>
           <div className="account-sheet__lang-row">
-            <button
-              type="button"
-              className={`account-sheet__lang-btn ${i18n.language?.startsWith('ko') ? 'is-active' : ''}`}
-              onClick={() => { void i18n.changeLanguage('ko'); setStoredLanguage('ko'); }}
-            >
-              {t('language.ko')}
-            </button>
-            <button
-              type="button"
-              className={`account-sheet__lang-btn ${i18n.language?.startsWith('en') ? 'is-active' : ''}`}
-              onClick={() => { void i18n.changeLanguage('en'); setStoredLanguage('en'); }}
-            >
-              {t('language.en')}
-            </button>
+            {APP_LANGUAGES.map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                className={`account-sheet__lang-btn ${i18n.language?.startsWith(lang) ? 'is-active' : ''}`}
+                onClick={() => { void i18n.changeLanguage(lang); setStoredLanguage(lang); }}
+              >
+                {t(`language.${lang}`)}
+              </button>
+            ))}
           </div>
         </section>
       </div>

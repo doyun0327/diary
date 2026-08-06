@@ -1,0 +1,511 @@
+{
+  "common": {
+    "close": "ปิด",
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "delete": "ลบ",
+    "loading": "กำลังโหลด…",
+    "anonymous": "ไม่ระบุชื่อ",
+    "back": "ย้อนกลับ",
+    "processing": "กำลังดำเนินการ…",
+    "requestFailed": "คำขอล้มเหลว ({{status}})",
+    "serverUnreachable": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบว่า Spring (8080) ทำงานอยู่",
+    "weekday": {
+      "0": "อา",
+      "1": "จ",
+      "2": "อ",
+      "3": "พ",
+      "4": "พฤ",
+      "5": "ศ",
+      "6": "ส"
+    },
+    "dateFull": "{{weekday}} {{d}}/{{m}}/{{y}}",
+    "yearMonth": "{{m}}/{{y}}"
+  },
+  "header": {
+    "menu": "เมนู",
+    "tagline": "บันทึกวันของฉัน",
+    "footer": "ช้า ๆ วันแล้ววันเล่า",
+    "account": "บัญชี · ภาษา",
+    "accountHintEmpty": "รูป · ชื่อ · ภาษา",
+    "rooms": "ห้องเพื่อน",
+    "roomsHint": "ห้องของฉัน",
+    "character": "ตัวละคร",
+    "characterHint": "ฉันในภาพวาด AI",
+    "export": "ส่งออก",
+    "exportHint": "PDF ตามช่วง · สมุดไดอารี่",
+    "decorate": "ตกแต่ง",
+    "decorateHint": "ธีม · อีโมจิ",
+    "appInfo": "ข้อมูลแอป",
+    "appInfoHint": "เวอร์ชัน · ข้อกำหนด · เครดิต"
+  },
+  "decorate": {
+    "title": "ตกแต่ง",
+    "aria": "ตกแต่ง",
+    "tabsAria": "แท็บตกแต่ง",
+    "tab": {
+      "theme": "ธีม",
+      "emoji": "อีโมจิ"
+    }
+  },
+  "emojiPack": {
+    "hint": "เปลี่ยนสไตล์ไอคอนอารมณ์",
+    "classic": {
+      "name": "คลาสสิก",
+      "desc": "ไอคอนแบบแบน (Flaticon)"
+    },
+    "smileys": {
+      "name": "หน้ายิ้ม",
+      "desc": "ไอคอนเคลื่อนไหว (Flaticon)"
+    },
+    "cat": {
+      "name": "แมว",
+      "desc": "อีโมจิแมว (Flaticon)"
+    },
+    "dog": {
+      "name": "สุนัข",
+      "desc": "อีโมจิสุนัข (Flaticon)"
+    },
+    "love": {
+      "name": "ความรัก",
+      "desc": "อีโมติคอนความรัก (Flaticon)"
+    },
+    "ghost": {
+      "name": "ผี",
+      "desc": "อีโมจิผี (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "ข้อมูลแอป",
+    "aria": "ข้อมูลแอป",
+    "back": "กลับ",
+    "version": "เวอร์ชันปัจจุบัน",
+    "legal": {
+      "menu": "ข้อกำหนดและนโยบายความเป็นส่วนตัว",
+      "title": "ข้อกำหนด · ความเป็นส่วนตัว",
+      "termsHeading": "ข้อกำหนดการให้บริการ",
+      "termsBody": "PageBy เป็นแอปไดอารี่ส่วนตัว กรุณาใช้บริการตามกฎหมายที่เกี่ยวข้อง คุณรับผิดชอบบัญชี ชื่อเล่น และเนื้อหาไดอารี่ของตนเอง ห้ามโพสต์หรือแชร์เนื้อหาที่ละเมิดสิทธิ์ของผู้อื่น คุณสมบัติต่าง ๆ อาจเปลี่ยนแปลงโดยไม่แจ้งล่วงหน้า",
+      "privacyHeading": "นโยบายความเป็นส่วนตัว",
+      "privacyBody": "รายการไดอารี่ ภาพวาด และข้อมูลโปรไฟล์อาจถูกเก็บไว้ในเครื่องของคุณ และอาจซิงค์กับเซิร์ฟเวอร์เมื่อใช้ห้องเพื่อน เราใช้ข้อมูลนี้เพื่อจัดเก็บไดอารี่ การแชร์ และฟีเจอร์ของแอปเท่านั้น เราไม่ขายข้อมูลส่วนบุคคล และไม่แชร์ยกเว้นเมื่อกฎหมายกำหนด ติดต่อเราผ่านช่องทางในแอปสำหรับคำขอเกี่ยวกับความเป็นส่วนตัว"
+    },
+    "licenses": {
+      "menu": "ใบอนุญาตโอเพนซอร์สและเครดิต",
+      "title": "ใบอนุญาต · เครดิต",
+      "iconsHeading": "เครดิตไอคอน",
+      "libsHeading": "ไลบรารีโอเพนซอร์ส",
+      "note": "ไอคอนฟรีจาก Flaticon ต้องระบุแหล่งที่มา ลิงก์ด้านบนคือเครดิตนั้น"
+    }
+  },
+  "theme": {
+    "title": "ธีม",
+    "aria": "เลือกธีม",
+    "hint": "เปลี่ยนรูปลักษณ์ของทั้งแอป",
+    "paper": {
+      "name": "Cream",
+      "desc": "เครื่องเขียนครีมอ่อนโยน"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "เขียวมิ้นต์อ่อน"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "ฟ้าครามอ่อนโยน"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "ม่วงลาเวนเดอร์พีช"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "เทาอุ่นอ่อนนุ่ม"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "แสงซิตรัสอ่อน"
+    }
+  },
+  "account": {
+    "title": "บัญชี · ภาษา",
+    "aria": "บัญชี · ภาษา",
+    "photoLabel": "รูปโปรไฟล์",
+    "changePhotoAria": "เปลี่ยนรูปโปรไฟล์",
+    "pickPhoto": "เลือกรูป",
+    "removePhoto": "ลบออก",
+    "nameLabel": "ชื่อ",
+    "nameHint": "ชื่อที่แสดงในห้องเพื่อน",
+    "namePlaceholder": "ใส่ชื่อของคุณ",
+    "save": "บันทึก",
+    "ok": {
+      "nameSaved": "บันทึกชื่อแล้ว",
+      "photoSaved": "บันทึกรูปโปรไฟล์แล้ว",
+      "photoRemoved": "ลบรูปโปรไฟล์แล้ว"
+    },
+    "err": {
+      "nameRequired": "กรุณาใส่ชื่อ",
+      "imageOnly": "อนุญาตเฉพาะไฟล์รูปภาพ",
+      "photoSave": "บันทึกรูปไม่ได้",
+      "photoRead": "อ่านรูปไม่ได้",
+      "photoProcess": "ประมวลผลรูปไม่ได้",
+      "photoLoad": "โหลดรูปไม่ได้"
+    }
+  },
+  "language": {
+    "label": "ภาษา",
+    "hint": "ภาษาที่แสดงในแอป",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย"
+  },
+  "credits": {
+    "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "ห้องเพื่อน",
+    "joinWithCode": "เข้าร่วมด้วยรหัส",
+    "create": "สร้างห้อง",
+    "empty": "คุณยังไม่ได้เข้าร่วมห้องใด",
+    "memberCount": "{{n}} สมาชิก",
+    "roomFallback": "ห้อง",
+    "copyInvite": "รหัสเชิญ",
+    "copied": "คัดลอกแล้ว",
+    "copyInviteTitle": "คัดลอกรหัสเชิญ",
+    "copyInviteAria": "คัดลอกรหัสเชิญ",
+    "createSheetAria": "สร้างห้อง",
+    "createHint": "ตั้งชื่อห้อง ระบบจะสร้างรหัสเชิญ 6 หลักให้อัตโนมัติ",
+    "asChipCreate": "สร้างในชื่อ {{name}}",
+    "roomNamePlaceholder": "ชื่อห้อง",
+    "creating": "กำลังสร้าง…",
+    "joinSheetAria": "เข้าร่วมด้วยรหัส",
+    "joinHint": "ใส่รหัส 6 หลักจากเพื่อน",
+    "asChipJoin": "เข้าร่วมในชื่อ {{name}}",
+    "invitePlaceholder": "เช่น 482913",
+    "joining": "กำลังเข้าร่วม…",
+    "joinSubmit": "เข้าร่วม",
+    "noNickname": "ยังไม่มีชื่อเล่น",
+    "backToList": "← รายการ",
+    "refresh": "รีเฟรช",
+    "sharedDiaries": "ไดอารี่ที่แชร์",
+    "sharedEmpty": "ยังไม่มีไดอารี่ที่แชร์ ลอง “แชร์ไปห้อง” ในไดอารี่ของคุณ",
+    "backToRoom": "← ไปห้อง",
+    "sharedDiary": "ไดอารี่ที่แชร์",
+    "comments": "ความคิดเห็น ({{n}})",
+    "commentPlaceholder": "เขียนความคิดเห็น",
+    "commentSubmit": "โพสต์",
+    "alert": {
+      "created": "สร้างห้องแล้ว!\n\nรหัสเชิญ: {{code}}\n\nแชร์รหัสนี้ให้เพื่อน"
+    },
+    "confirm": {
+      "deletePost": "ลบไดอารี่ที่แชร์นี้ออกจากห้อง?"
+    },
+    "err": {
+      "needNickname": "ตั้งชื่อใน เมนู → บัญชีก่อน",
+      "list": "โหลดห้องไม่ได้",
+      "nameRequired": "กรุณาใส่ชื่อห้อง",
+      "create": "สร้างห้องไม่ได้",
+      "codeRequired": "ใส่รหัสเชิญ 6 หลัก",
+      "join": "เข้าร่วมห้องไม่ได้",
+      "copy": "คัดลอกรหัสเชิญไม่ได้",
+      "load": "โหลดห้องไม่ได้",
+      "loadPost": "โหลดโพสต์ไม่ได้",
+      "comment": "โพสต์ความคิดเห็นไม่ได้",
+      "delete": "ลบล้มเหลว"
+    }
+  },
+  "diary": {
+    "empty": {
+      "line1": "ยังไม่มีไดอารี่",
+      "line2": "เขียนไดอารี่เล่มแรกของคุณ!"
+    },
+    "writeFabAria": "เขียนไดอารี่",
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "ไม่มีไดอารี่ในเดือนนี้",
+      "noPreview": "ไม่มีเนื้อหา"
+    },
+    "card": {
+      "imageAlt": "ภาพวาดวันที่ {{date}}"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "ไดอารี่วันนี้",
+      "edit": "แก้ไขไดอารี่"
+    },
+    "save": "บันทึก",
+    "saveEdit": "แก้ไขเสร็จ",
+    "cancel": "ยกเลิก",
+    "titlePlaceholder": "ใส่ชื่อเรื่อง",
+    "contentPlaceholder": "เช่น วันนี้ไปว่ายน้ำ วันนี้ไปออกกำลังกาย",
+    "ai": {
+      "button": "✨ ภาพวาด AI",
+      "sceneStep": "กำลังเขียนพรอมป์…",
+      "drawStep": "กำลังวาด…",
+      "statusScene": "กำลังสร้างฉาก…",
+      "statusDraw": "กำลังวาดภาพ…",
+      "tip": "เคล็ดลับ",
+      "tipBody": "ตัวละครของคุณเป็นตัวเอก AI วาดจากข้อความไดอารี่ทั้งหมด",
+      "tipVisible": "การกระทำและสถานที่ที่มองเห็นได้",
+      "tipAsk": " — กรุณาเขียนไว้",
+      "exGood1": "ดี: วันนี้มีปาร์ตี้พิซซ่า",
+      "exGood2": "ดี: ฉันเล่นกับสุนัขที่สวนสาธารณะ",
+      "exBad": "อ่อน: วันนี้รู้สึกดี",
+      "sceneUnderstood": "ฉากที่ AI เข้าใจ: {{scene}}",
+      "characterAria": "ตัวละครสำหรับภาพวาด AI",
+      "characterTitle": "ตัวละครนี้จะเป็นตัวเอก"
+    },
+    "confirm": {
+      "replaceWithAi": "แทนที่แคนวาสด้วยภาพวาด AI?"
+    },
+    "err": {
+      "needContent": "เขียนไดอารี่ก่อน",
+      "aiFailed": "สร้างภาพวาดไม่สำเร็จ",
+      "aiNeedContent": "เขียนเนื้อหาไดอารี่ก่อนสร้างภาพ",
+      "aiHttp": "วาดไม่สำเร็จ: HTTP {{status}}",
+      "aiNoImage": "ไม่มีรูปในตอบกลับจากแบ็กเอนด์",
+      "aiUrl": "โหลด URL รูปไม่ได้",
+      "aiConvert": "แปลงรูปไม่สำเร็จ"
+    }
+  },
+  "detail": {
+    "backAria": "ย้อนกลับ",
+    "bookAria": "ดูแบบสมุดไดอารี่",
+    "bookTitle": "สมุดไดอารี่ · PDF",
+    "pngAria": "ดาวน์โหลด PNG",
+    "pngTitle": "บันทึกเป็น PNG",
+    "shareAria": "แชร์",
+    "moreAria": "เพิ่มเติม",
+    "menuCloseAria": "ปิดเมนู",
+    "edit": "แก้ไข",
+    "delete": "ลบ",
+    "imageAlt": "ภาพวาดวันที่ {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "การ์ดแชร์ไดอารี่",
+    "confirm": {
+      "delete": "ลบไดอารี่นี้?"
+    },
+    "ok": {
+      "png": "บันทึกเป็น PNG แล้ว"
+    },
+    "err": {
+      "png": "บันทึก PNG ไม่สำเร็จ",
+      "pngBlob": "สร้าง PNG ไม่ได้",
+      "share": "แชร์ไม่สำเร็จ",
+      "roomsList": "โหลดห้องไม่ได้"
+    }
+  },
+  "share": {
+    "title": "แชร์",
+    "toRoomAria": "แชร์ไปห้อง",
+    "backToMenuAria": "กลับไปเมนูแชร์",
+    "instagram": "Instagram",
+    "instagramDesc": "แชร์เป็นการ์ดสตอรี่",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "แชร์รูปในแชท",
+    "rooms": "ห้องเพื่อน",
+    "roomsIcon": "ห้อง",
+    "roomsDesc": "โพสต์ไปยังห้องที่คุณอยู่",
+    "roomsHint": "เลือกหลายห้องเพื่อแชร์พร้อมกัน",
+    "roomsLoading": "กำลังโหลดห้อง…",
+    "roomsEmpty": "ยังไม่มีห้อง สร้างหรือเข้าร่วมที่ เมนู → ห้องเพื่อน",
+    "submit": "แชร์",
+    "sharing": "กำลังแชร์…",
+    "pcHint": "เว็บบนเดสก์ท็อปแชร์ไปแอปโดยตรงไม่ได้ ดาวน์โหลดรูปแล้ว — เปิดบนมือถือหรืออัปโหลดในแอป",
+    "ok": {
+      "oneRoom": "แชร์ไปยัง “{{name}}” แล้ว",
+      "manyRooms": "แชร์ไปยัง {{n}} ห้องแล้ว",
+      "partial": "แชร์ไปยัง {{n}} ห้องแล้ว ล้มเหลว: {{fails}}"
+    },
+    "pick": {
+      "instagram": "เลือก Instagram ในแผ่นแชร์!",
+      "kakao": "เลือก KakaoTalk ในแผ่นแชร์!"
+    },
+    "saved": {
+      "instagram": "บันทึกรูปแล้ว อัปโหลดไป Instagram Stories!",
+      "kakao": "บันทึกรูปแล้ว ส่งใน KakaoTalk!"
+    },
+    "native": {
+      "instagram": "กำลังแชร์ไดอารี่ไป Instagram Stories",
+      "kakao": "กำลังแชร์ไดอารี่ผ่าน KakaoTalk"
+    },
+    "err": {
+      "roomShare": "แชร์ไปห้องไม่ได้",
+      "build": "สร้างรูปแชร์ไม่ได้",
+      "convert": "แปลงรูปแชร์ไม่สำเร็จ",
+      "imageLoad": "โหลดภาพวาดไม่ได้"
+    }
+  },
+  "character": {
+    "dialogAria": "ตั้งค่าตัวละครของฉัน",
+    "title": "ตัวละครของฉัน",
+    "done": "เสร็จ",
+    "desc": "ลุคนี้คือตัวเอกในภาพวาด AI",
+    "who": "คุณเป็นใคร?",
+    "hairLabel": "ผม",
+    "outfitLabel": "ชุด",
+    "gender": {
+      "boy": "ผู้ชาย",
+      "girl": "ผู้หญิง"
+    },
+    "hair": {
+      "short": "ผมสั้น",
+      "medium": "บ็อบ",
+      "curly": "ผมหยิก"
+    },
+    "outfit": {
+      "short-sleeve": "แขนสั้น",
+      "dress": "ชุดเดรส",
+      "hoodie": "ฮู้ดดี้",
+      "school-uniform": "ชุดนักเรียน"
+    }
+  },
+  "export": {
+    "title": "ส่งออก",
+    "aria": "ส่งออก",
+    "period": "ช่วงเวลา",
+    "presetsAria": "ช่วงเวลาที่ตั้งไว้",
+    "thisMonth": "เดือนนี้",
+    "lastMonth": "เดือนที่แล้ว",
+    "custom": "กำหนดเอง",
+    "start": "เริ่ม",
+    "end": "สิ้นสุด",
+    "count": "{{n}} ไดอารี่",
+    "empty": "ไม่มีไดอารี่ในช่วงนี้",
+    "pdf": "บันทึก PDF",
+    "saving": "กำลังบันทึก…",
+    "openBook": "ดูแบบสมุดไดอารี่",
+    "err": {
+      "pdf": "บันทึก PDF ไม่สำเร็จ"
+    }
+  },
+  "book": {
+    "dialogAria": "มุมมองสมุดไดอารี่",
+    "title": "สมุดไดอารี่",
+    "pdfAria": "บันทึก PDF",
+    "pdfTitle": "บันทึก PDF",
+    "building": "กำลังสร้างสมุดไดอารี่…",
+    "prevPage": "หน้าก่อน",
+    "nextPage": "หน้าถัดไป",
+    "coverLabel": "ปก",
+    "cover": {
+      "total": "ทั้งหมด {{n}} รายการ",
+      "hint": "ปัดด้านข้างเพื่ออ่าน"
+    },
+    "err": {
+      "build": "สร้างสมุดไดอารี่ไม่ได้",
+      "empty": "ไม่มีไดอารี่ให้ดาวน์โหลด",
+      "page": "สร้างหน้าสมุดไม่ได้",
+      "image": "โหลดภาพวาดไม่ได้"
+    }
+  },
+  "canvas": {
+    "pen": "ปากกา",
+    "photo": "รูปภาพ",
+    "font": "ฟอนต์",
+    "sticker": "สติกเกอร์",
+    "eraser": "ยางลบ",
+    "clearAll": "ล้างทั้งหมด",
+    "photoHint": "ลากเพื่อย้าย · มุมเพื่อปรับขนาด · ✓ เพื่อวาง",
+    "stickerSelected": "เลือก {{emoji}} แล้ว · แตะแคนวาส แล้วปรับขนาด/หมุน",
+    "colorAria": "สี {{c}}",
+    "pickColorTitle": "เลือกสี",
+    "eraserSizeAria": "ขนาดยางลบ",
+    "eraserSize": {
+      "s": "เล็ก",
+      "m": "กลาง",
+      "l": "ใหญ่"
+    },
+    "fontPickerTitle": "เลือกฟอนต์",
+    "stickerSheetTitle": "สติกเกอร์",
+    "stickerCatsAria": "หมวดสติกเกอร์",
+    "sample": "ไดอารี่วันนี้",
+    "confirm": {
+      "clear": "ล้างภาพวาดทั้งหมด?"
+    },
+    "alert": {
+      "imageOnly": "อนุญาตเฉพาะไฟล์รูปภาพ"
+    },
+    "err": {
+      "noCanvas": "ไม่มีแคนวาส",
+      "noContext": "เปิดบริบทแคนวาสไม่ได้",
+      "imageLoad": "โหลดรูปไม่สำเร็จ"
+    },
+    "penKindAria": "ชนิดปากกา",
+    "penKind": {
+      "ballpoint": "ปากกาลูกลื่น",
+      "gel": "เจล",
+      "brush": "พู่กัน",
+      "marker": "มาร์กเกอร์",
+      "highlighter": "ไฮไลต์"
+    },
+    "stickerHint": "ลากย้าย · มุมปรับขนาด · ด้านบนหมุน · ✓ ติด",
+    "stickerRotate": "หมุน"
+  },
+  "font": {
+    "dialogAria": "เลือกฟอนต์",
+    "title": "ฟอนต์",
+    "sample": "ไดอารี่วันนี้",
+    "cat": {
+      "cute": "ฟอนต์น่ารัก",
+      "neat": "ฟอนต์สะอาดตา"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "เลือกวันที่",
+    "prevMonth": "เดือนก่อน",
+    "nextMonth": "เดือนถัดไป",
+    "goToday": "ไปวันนี้"
+  },
+  "mood": {
+    "happy": "มีความสุข",
+    "excited": "ตื่นเต้น",
+    "love": "รัก ๆ",
+    "proud": "ภูมิใจ",
+    "calm": "สงบ",
+    "sleepy": "ง่วง",
+    "soso": "เฉย ๆ",
+    "surprised": "ประหลาดใจ",
+    "sad": "เศร้า",
+    "angry": "โกรธ",
+    "anxious": "กังวล",
+    "sick": "ไม่สบาย"
+  },
+  "stickers": {
+    "face": "ใบหน้า",
+    "animal": "สัตว์",
+    "fruit": "ผลไม้",
+    "building": "อาคาร",
+    "weather": "สภาพอากาศ",
+    "sport": "กีฬา",
+    "clothes": "เสื้อผ้า",
+    "shape": "รูปทรง"
+  }
+}
