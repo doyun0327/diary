@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import {
+  ACCESSORY_OPTIONS,
   GENDER_OPTIONS,
   HAIR_STYLE_OPTIONS,
   OUTFIT_OPTIONS,
@@ -43,13 +44,12 @@ function CharacterSetup({ character, onChange, onClose }: CharacterSetupProps) {
                 <button
                   key={opt.value}
                   type="button"
-                  className={`character-setup__emoji-btn character-setup__emoji-btn--labeled ${character.gender === opt.value ? 'selected' : ''}`}
+                  className={`character-setup__emoji-btn ${character.gender === opt.value ? 'selected' : ''}`}
                   onClick={() => onChange({ ...character, gender: opt.value })}
                   aria-label={label}
                   title={label}
                 >
                   <span className="character-setup__emoji">{GENDER_EMOJI[opt.value]}</span>
-                  <span className="character-setup__emoji-caption">{label}</span>
                 </button>
               );
             })}
@@ -86,13 +86,33 @@ function CharacterSetup({ character, onChange, onClose }: CharacterSetupProps) {
                 <button
                   key={opt.value}
                   type="button"
-                  className={`character-setup__emoji-btn character-setup__emoji-btn--labeled ${character.outfit === opt.value ? 'selected' : ''}`}
+                  className={`character-setup__emoji-btn ${character.outfit === opt.value ? 'selected' : ''}`}
                   onClick={() => onChange({ ...character, outfit: opt.value })}
                   aria-label={label}
                   title={label}
                 >
                   <span className="character-setup__emoji">{opt.emoji}</span>
-                  <span className="character-setup__emoji-caption">{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section>
+          <h3>{t('character.accessoryLabel')}</h3>
+          <div className="character-setup__emoji-row character-setup__emoji-row--wrap">
+            {ACCESSORY_OPTIONS.map((opt) => {
+              const label = t(`character.accessory.${opt.value}`);
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`character-setup__emoji-btn ${character.accessory === opt.value ? 'selected' : ''}`}
+                  onClick={() => onChange({ ...character, accessory: opt.value })}
+                  aria-label={label}
+                  title={label}
+                >
+                  <span className="character-setup__emoji">{opt.emoji}</span>
                 </button>
               );
             })}

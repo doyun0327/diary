@@ -348,7 +348,7 @@
     "title": "My character",
     "done": "Done",
     "desc": "This look is the AI-drawing protagonist",
-    "who": "Who are you?",
+    "who": "Gender",
     "hairLabel": "Hair",
     "outfitLabel": "Outfit",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "Short sleeves",
       "dress": "Dress",
       "hoodie": "Hoodie",
-      "school-uniform": "School uniform"
+      "school-uniform": "School uniform",
+      "swimsuit": "Swimsuit",
+      "ski-suit": "Ski suit"
+    },
+    "accessoryLabel": "Accessory",
+    "accessory": {
+      "none": "None",
+      "glasses": "Glasses",
+      "hat": "Hat",
+      "ribbon": "Ribbon"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "Pick a date",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
-    "goToday": "Go to today"
+    "goToday": "Go to today",
+    "displayLabel": "Calendar",
+    "displayAria": "Calendar display",
+    "displayEmoji": "Emoji",
+    "displayDrawing": "Drawing"
   },
   "mood": {
     "happy": "Happy",
@@ -506,6 +519,7 @@
     "weather": "Weather",
     "sport": "Sports",
     "clothes": "Clothes",
-    "shape": "Shapes"
+    "shape": "Shapes",
+    "flag": "Flags"
   }
 }

@@ -348,7 +348,7 @@
     "title": "マイキャラクター",
     "done": "完了",
     "desc": "この見た目がAI絵の主人公になります",
-    "who": "あなたは？",
+    "who": "性別",
     "hairLabel": "髪型",
     "outfitLabel": "服装",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "半袖",
       "dress": "ワンピース",
       "hoodie": "パーカー",
-      "school-uniform": "制服"
+      "school-uniform": "制服",
+      "swimsuit": "水着",
+      "ski-suit": "スキーウェア"
+    },
+    "accessoryLabel": "アクセサリー",
+    "accessory": {
+      "none": "なし",
+      "glasses": "メガネ",
+      "hat": "帽子",
+      "ribbon": "リボン"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "日付を選ぶ",
     "prevMonth": "前月",
     "nextMonth": "翌月",
-    "goToday": "今日へ"
+    "goToday": "今日へ",
+    "displayLabel": "カレンダー表示",
+    "displayAria": "カレンダーの表示",
+    "displayEmoji": "絵文字",
+    "displayDrawing": "絵"
   },
   "mood": {
     "happy": "うれしい",
@@ -506,6 +519,7 @@
     "weather": "天気",
     "sport": "スポーツ",
     "clothes": "衣類",
-    "shape": "かたち"
+    "shape": "かたち",
+    "flag": "国旗"
   }
 }

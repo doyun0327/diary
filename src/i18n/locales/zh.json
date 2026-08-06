@@ -348,7 +348,7 @@
     "title": "我的角色",
     "done": "完成",
     "desc": "这个样子会成为 AI 画里的主角",
-    "who": "你是谁？",
+    "who": "性别",
     "hairLabel": "发型",
     "outfitLabel": "服装",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "短袖",
       "dress": "连衣裙",
       "hoodie": "连帽衫",
-      "school-uniform": "校服"
+      "school-uniform": "校服",
+      "swimsuit": "泳装",
+      "ski-suit": "滑雪服"
+    },
+    "accessoryLabel": "配饰",
+    "accessory": {
+      "none": "无",
+      "glasses": "眼镜",
+      "hat": "帽子",
+      "ribbon": "发带"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "选择日期",
     "prevMonth": "上个月",
     "nextMonth": "下个月",
-    "goToday": "回到今天"
+    "goToday": "回到今天",
+    "displayLabel": "日历显示",
+    "displayAria": "日历显示方式",
+    "displayEmoji": "表情",
+    "displayDrawing": "图画"
   },
   "mood": {
     "happy": "开心",
@@ -506,6 +519,7 @@
     "weather": "天气",
     "sport": "运动",
     "clothes": "服饰",
-    "shape": "形状"
+    "shape": "形状",
+    "flag": "国旗"
   }
 }

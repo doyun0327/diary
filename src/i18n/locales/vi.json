@@ -348,7 +348,7 @@
     "title": "Nhân vật của tôi",
     "done": "Xong",
     "desc": "Ngoại hình này là nhân vật chính trong tranh AI",
-    "who": "Bạn là ai?",
+    "who": "Giới tính",
     "hairLabel": "Tóc",
     "outfitLabel": "Trang phục",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "Áo ngắn tay",
       "dress": "Váy",
       "hoodie": "Hoodie",
-      "school-uniform": "Đồng phục học sinh"
+      "school-uniform": "Đồng phục học sinh",
+      "swimsuit": "Đồ bơi",
+      "ski-suit": "Đồ trượt tuyết"
+    },
+    "accessoryLabel": "Phụ kiện",
+    "accessory": {
+      "none": "Không",
+      "glasses": "Kính",
+      "hat": "Mũ",
+      "ribbon": "Nơ"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "Chọn ngày",
     "prevMonth": "Tháng trước",
     "nextMonth": "Tháng sau",
-    "goToday": "Về hôm nay"
+    "goToday": "Về hôm nay",
+    "displayLabel": "Lịch",
+    "displayAria": "Hiển thị lịch",
+    "displayEmoji": "Emoji",
+    "displayDrawing": "Tranh"
   },
   "mood": {
     "happy": "Vui",
@@ -506,6 +519,7 @@
     "weather": "Thời tiết",
     "sport": "Thể thao",
     "clothes": "Quần áo",
-    "shape": "Hình dạng"
+    "shape": "Hình dạng",
+    "flag": "Cờ"
   }
 }

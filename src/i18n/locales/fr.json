@@ -348,7 +348,7 @@
     "title": "Mon personnage",
     "done": "Terminé",
     "desc": "Cette apparence est le protagoniste du dessin IA",
-    "who": "Qui êtes-vous ?",
+    "who": "Genre",
     "hairLabel": "Cheveux",
     "outfitLabel": "Tenue",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "Manches courtes",
       "dress": "Robe",
       "hoodie": "Hoodie",
-      "school-uniform": "Uniforme scolaire"
+      "school-uniform": "Uniforme scolaire",
+      "swimsuit": "Maillot",
+      "ski-suit": "Combinaison de ski"
+    },
+    "accessoryLabel": "Accessoire",
+    "accessory": {
+      "none": "Aucun",
+      "glasses": "Lunettes",
+      "hat": "Casquette",
+      "ribbon": "Ruban"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "Choisir une date",
     "prevMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
-    "goToday": "Aller à aujourd'hui"
+    "goToday": "Aller à aujourd'hui",
+    "displayLabel": "Calendrier",
+    "displayAria": "Affichage du calendrier",
+    "displayEmoji": "Emoji",
+    "displayDrawing": "Dessin"
   },
   "mood": {
     "happy": "Heureux",
@@ -506,6 +519,7 @@
     "weather": "Météo",
     "sport": "Sports",
     "clothes": "Vêtements",
-    "shape": "Formes"
+    "shape": "Formes",
+    "flag": "Drapeaux"
   }
 }

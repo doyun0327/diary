@@ -1,13 +1,15 @@
 export interface CharacterProfile {
   gender: 'boy' | 'girl';
   hairStyle: 'short' | 'medium' | 'curly';
-  outfit: 'short-sleeve' | 'dress' | 'hoodie' | 'school-uniform';
+  outfit: 'short-sleeve' | 'dress' | 'hoodie' | 'school-uniform' | 'swimsuit' | 'ski-suit';
+  accessory: 'none' | 'glasses' | 'hat' | 'ribbon';
 }
 
 export const DEFAULT_CHARACTER: CharacterProfile = {
   gender: 'girl',
   hairStyle: 'short',
   outfit: 'short-sleeve',
+  accessory: 'none',
 };
 
 export const GENDER_OPTIONS: { value: CharacterProfile['gender']; label: string }[] = [
@@ -26,6 +28,19 @@ export const OUTFIT_OPTIONS: { value: CharacterProfile['outfit']; label: string;
   { value: 'dress', label: '원피스', emoji: '👗' },
   { value: 'hoodie', label: '후드티', emoji: '🧥' },
   { value: 'school-uniform', label: '교복', emoji: '👔' },
+  { value: 'swimsuit', label: '수영복', emoji: '🩱' },
+  { value: 'ski-suit', label: '스키복', emoji: '⛷️' },
+];
+
+export const ACCESSORY_OPTIONS: {
+  value: CharacterProfile['accessory'];
+  label: string;
+  emoji: string;
+}[] = [
+  { value: 'none', label: '없음', emoji: '🚫' },
+  { value: 'glasses', label: '안경', emoji: '👓' },
+  { value: 'hat', label: '모자', emoji: '🧢' },
+  { value: 'ribbon', label: '리본', emoji: '🎀' },
 ];
 
 const GENDER_EN: Record<CharacterProfile['gender'], string> = {
@@ -44,6 +59,15 @@ const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
   dress: 'a simple dress',
   hoodie: 'a hoodie',
   'school-uniform': 'a school uniform',
+  swimsuit: 'a swimsuit',
+  'ski-suit': 'a ski suit',
+};
+
+const ACCESSORY_EN: Record<CharacterProfile['accessory'], string | null> = {
+  none: null,
+  glasses: 'wearing glasses',
+  hat: 'wearing a hat',
+  ribbon: 'with a hair ribbon',
 };
 
 const HAIR_STYLE_FALLBACK: Record<string, CharacterProfile['hairStyle']> = {
@@ -68,6 +92,8 @@ const OUTFIT_FALLBACK: Record<string, CharacterProfile['outfit']> = {
   dress: 'dress',
   hoodie: 'hoodie',
   'school-uniform': 'school-uniform',
+  swimsuit: 'swimsuit',
+  'ski-suit': 'ski-suit',
   'long-sleeve': 'short-sleeve',
   overalls: 'short-sleeve',
   'tank-top': 'short-sleeve',
@@ -85,6 +111,13 @@ const OUTFIT_FALLBACK: Record<string, CharacterProfile['outfit']> = {
   custom: 'short-sleeve',
 };
 
+const ACCESSORY_FALLBACK: Record<string, CharacterProfile['accessory']> = {
+  none: 'none',
+  glasses: 'glasses',
+  hat: 'hat',
+  ribbon: 'ribbon',
+};
+
 /** 이전 저장 형식도 새 필드로 보정 */
 export function normalizeCharacter(
   raw: Partial<CharacterProfile> | (Partial<CharacterProfile> & Record<string, unknown>),
@@ -100,16 +133,23 @@ export function normalizeCharacter(
   const outfit =
     (rawOutfit && OUTFIT_FALLBACK[rawOutfit]) || DEFAULT_CHARACTER.outfit;
 
-  return { gender, hairStyle, outfit };
+  const rawAccessory = typeof raw.accessory === 'string' ? raw.accessory : undefined;
+  const accessory =
+    (rawAccessory && ACCESSORY_FALLBACK[rawAccessory]) || DEFAULT_CHARACTER.accessory;
+
+  return { gender, hairStyle, outfit, accessory };
 }
 
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */
 export function describeCharacter(profile: CharacterProfile): string {
-  return [
+  const parts = [
     GENDER_EN[profile.gender],
     HAIR_STYLE_EN[profile.hairStyle],
     `wearing ${OUTFIT_EN[profile.outfit]}`,
-  ].join(', ');
+  ];
+  const accessory = ACCESSORY_EN[profile.accessory];
+  if (accessory) parts.push(accessory);
+  return parts.join(', ');
 }
 
 /** 화면에 보여줄 한글 요약 */
@@ -117,5 +157,8 @@ export function summarizeCharacterKo(profile: CharacterProfile): string {
   const gender = GENDER_OPTIONS.find((o) => o.value === profile.gender)?.label ?? '';
   const hair = HAIR_STYLE_OPTIONS.find((o) => o.value === profile.hairStyle)?.label ?? '';
   const outfit = OUTFIT_OPTIONS.find((o) => o.value === profile.outfit)?.label ?? '';
-  return [gender, hair, outfit].filter(Boolean).join(' · ');
+  const accessory = ACCESSORY_OPTIONS.find((o) => o.value === profile.accessory)?.label ?? '';
+  return [gender, hair, outfit, accessory === '없음' ? '' : accessory]
+    .filter(Boolean)
+    .join(' · ');
 }

@@ -348,7 +348,7 @@
     "title": "Karakter saya",
     "done": "Selesai",
     "desc": "Tampilan ini jadi tokoh utama gambar AI",
-    "who": "Siapa kamu?",
+    "who": "Jenis kelamin",
     "hairLabel": "Rambut",
     "outfitLabel": "Pakaian",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "Lengan pendek",
       "dress": "Gaun",
       "hoodie": "Hoodie",
-      "school-uniform": "Seragam sekolah"
+      "school-uniform": "Seragam sekolah",
+      "swimsuit": "Baju renang",
+      "ski-suit": "Baju ski"
+    },
+    "accessoryLabel": "Aksesoris",
+    "accessory": {
+      "none": "Tidak ada",
+      "glasses": "Kacamata",
+      "hat": "Topi",
+      "ribbon": "Pita"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "Pilih tanggal",
     "prevMonth": "Bulan sebelumnya",
     "nextMonth": "Bulan berikutnya",
-    "goToday": "Ke hari ini"
+    "goToday": "Ke hari ini",
+    "displayLabel": "Kalender",
+    "displayAria": "Tampilan kalender",
+    "displayEmoji": "Emoji",
+    "displayDrawing": "Gambar"
   },
   "mood": {
     "happy": "Bahagia",
@@ -506,6 +519,7 @@
     "weather": "Cuaca",
     "sport": "Olahraga",
     "clothes": "Pakaian",
-    "shape": "Bentuk"
+    "shape": "Bentuk",
+    "flag": "Bendera"
   }
 }

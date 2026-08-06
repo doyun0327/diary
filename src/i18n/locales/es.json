@@ -348,7 +348,7 @@
     "title": "Mi personaje",
     "done": "Listo",
     "desc": "Este aspecto es el protagonista del dibujo IA",
-    "who": "¿Quién eres?",
+    "who": "Género",
     "hairLabel": "Pelo",
     "outfitLabel": "Ropa",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "Manga corta",
       "dress": "Vestido",
       "hoodie": "Sudadera",
-      "school-uniform": "Uniforme escolar"
+      "school-uniform": "Uniforme escolar",
+      "swimsuit": "Traje de baño",
+      "ski-suit": "Traje de esquí"
+    },
+    "accessoryLabel": "Accesorio",
+    "accessory": {
+      "none": "Ninguno",
+      "glasses": "Gafas",
+      "hat": "Gorra",
+      "ribbon": "Lazo"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "Elegir fecha",
     "prevMonth": "Mes anterior",
     "nextMonth": "Mes siguiente",
-    "goToday": "Ir a hoy"
+    "goToday": "Ir a hoy",
+    "displayLabel": "Calendario",
+    "displayAria": "Vista del calendario",
+    "displayEmoji": "Emoji",
+    "displayDrawing": "Dibujo"
   },
   "mood": {
     "happy": "Feliz",
@@ -506,6 +519,7 @@
     "weather": "Clima",
     "sport": "Deportes",
     "clothes": "Ropa",
-    "shape": "Formas"
+    "shape": "Formas",
+    "flag": "Banderas"
   }
 }

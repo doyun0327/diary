@@ -10,11 +10,55 @@
   padding-top: 12px;
 }
 
+.mood-cal__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
 .mood-cal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.mood-cal__display-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.mood-cal__display {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--color-bg-muted);
+}
+
+.mood-cal__display-btn {
+  padding: 6px 11px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mood-cal__display-btn.is-active {
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .mood-cal__header strong {
@@ -87,7 +131,7 @@
   font-family: inherit;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: background 0.12s, transform 0.12s, color 0.12s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mood-cal__day--blank {
@@ -95,9 +139,14 @@
   cursor: default;
 }
 
-.mood-cal__day:hover {
-  background: var(--color-bg-muted);
-  color: var(--color-text);
+.mood-cal__day:hover,
+.mood-cal__day:focus,
+.mood-cal__day:focus-visible,
+.mood-cal__day:active {
+  background: none;
+  color: inherit;
+  outline: none;
+  box-shadow: none;
 }
 
 .mood-cal__day.today {
@@ -115,11 +164,32 @@
   height: 30px;
 }
 
-.mood-cal__day.has-mood.today {
+.mood-cal__day.has-drawing {
+  color: unset;
+  padding: 0;
+  overflow: visible;
+  border-radius: 10px;
+}
+
+.mood-cal__thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.mood-cal__day.has-mood.today,
+.mood-cal__day.has-drawing.today {
   background: var(--color-accent-soft);
   box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
-.mood-cal__day:active:not(.mood-cal__day--blank) {
-  transform: scale(0.92);
+.mood-cal__day.has-drawing.today {
+  border-radius: 12px;
 }

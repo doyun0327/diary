@@ -348,7 +348,7 @@
     "title": "내 캐릭터",
     "done": "완료",
     "desc": "이 모습이 AI 그림 속 주인공이 돼요",
-    "who": "누구인가요?",
+    "who": "성별",
     "hairLabel": "머리",
     "outfitLabel": "옷",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "반팔",
       "dress": "원피스",
       "hoodie": "후드티",
-      "school-uniform": "교복"
+      "school-uniform": "교복",
+      "swimsuit": "수영복",
+      "ski-suit": "스키복"
+    },
+    "accessoryLabel": "악세서리",
+    "accessory": {
+      "none": "없음",
+      "glasses": "안경",
+      "hat": "모자",
+      "ribbon": "리본"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "날짜 선택",
     "prevMonth": "이전 달",
     "nextMonth": "다음 달",
-    "goToday": "오늘로 이동"
+    "goToday": "오늘로 이동",
+    "displayLabel": "달력 표시",
+    "displayAria": "달력 표시 방식",
+    "displayEmoji": "이모지",
+    "displayDrawing": "그림"
   },
   "mood": {
     "happy": "행복해요",
@@ -506,6 +519,7 @@
     "weather": "날씨",
     "sport": "운동",
     "clothes": "의류",
-    "shape": "도형"
+    "shape": "도형",
+    "flag": "국기"
   }
 }

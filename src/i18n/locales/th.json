@@ -348,7 +348,7 @@
     "title": "ตัวละครของฉัน",
     "done": "เสร็จ",
     "desc": "ลุคนี้คือตัวเอกในภาพวาด AI",
-    "who": "คุณเป็นใคร?",
+    "who": "เพศ",
     "hairLabel": "ผม",
     "outfitLabel": "ชุด",
     "gender": {
@@ -364,7 +364,16 @@
       "short-sleeve": "แขนสั้น",
       "dress": "ชุดเดรส",
       "hoodie": "ฮู้ดดี้",
-      "school-uniform": "ชุดนักเรียน"
+      "school-uniform": "ชุดนักเรียน",
+      "swimsuit": "ชุดว่ายน้ำ",
+      "ski-suit": "ชุดสกี"
+    },
+    "accessoryLabel": "เครื่องประดับ",
+    "accessory": {
+      "none": "ไม่มี",
+      "glasses": "แว่น",
+      "hat": "หมวก",
+      "ribbon": "โบว์"
     }
   },
   "export": {
@@ -482,7 +491,11 @@
     "dialogAria": "เลือกวันที่",
     "prevMonth": "เดือนก่อน",
     "nextMonth": "เดือนถัดไป",
-    "goToday": "ไปวันนี้"
+    "goToday": "ไปวันนี้",
+    "displayLabel": "ปฏิทิน",
+    "displayAria": "การแสดงปฏิทิน",
+    "displayEmoji": "อีโมจิ",
+    "displayDrawing": "รูป"
   },
   "mood": {
     "happy": "มีความสุข",
@@ -506,6 +519,7 @@
     "weather": "สภาพอากาศ",
     "sport": "กีฬา",
     "clothes": "เสื้อผ้า",
-    "shape": "รูปทรง"
+    "shape": "รูปทรง",
+    "flag": "ธง"
   }
 }

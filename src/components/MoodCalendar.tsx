@@ -1,6 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import type { DiaryEntry } from '../types/diary';
+import type { DiaryEntry, Mood } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
+import {
+  applyCalendarDisplayMode,
+  useCalendarDisplayMode,
+} from '../utils/calendarDisplay';
 import { formatYearMonth } from '../utils/date';
 import MoodIcon from './MoodIcon';
 import './MoodCalendar.css';
@@ -12,6 +16,11 @@ interface MoodCalendarProps {
   onViewChange: (year: number, month: number) => void;
   onSelectDate?: (date: string) => void;
   hideHeader?: boolean;
+}
+
+interface DayMark {
+  mood?: Mood;
+  imageUrl?: string;
 }
 
 function toDateString(year: number, month: number, day: number): string {
@@ -29,6 +38,7 @@ function MoodCalendar({
   hideHeader = false,
 }: MoodCalendarProps) {
   const { t } = useTranslation();
+  const displayMode = useCalendarDisplayMode();
   const now = new Date();
 
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
@@ -41,10 +51,13 @@ function MoodCalendar({
   ];
   while (cells.length < CALENDAR_CELLS) cells.push(null);
 
-  const moodByDate = new Map<string, DiaryEntry['mood']>();
+  const markByDate = new Map<string, DayMark>();
   for (const entry of entries) {
-    if (MOOD_MAP[entry.mood] && !moodByDate.has(entry.date)) {
-      moodByDate.set(entry.date, entry.mood);
+    if (markByDate.has(entry.date)) continue;
+    const mood = MOOD_MAP[entry.mood] ? entry.mood : undefined;
+    const imageUrl = entry.imageUrl?.trim() ? entry.imageUrl : undefined;
+    if (mood || imageUrl) {
+      markByDate.set(entry.date, { mood, imageUrl });
     }
   }
 
@@ -57,17 +70,38 @@ function MoodCalendar({
 
   return (
     <div className={`mood-cal${hideHeader ? ' mood-cal--no-header' : ''}`}>
-      {!hideHeader && (
-        <div className="mood-cal__header">
-          <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
-            ‹
+      <div className="mood-cal__toolbar">
+        {!hideHeader ? (
+          <div className="mood-cal__header">
+            <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
+              ‹
+            </button>
+            <strong>{formatYearMonth(toDateString(viewYear, viewMonth, 1))}</strong>
+            <button type="button" onClick={() => moveMonth(1)} aria-label={t('calendar.nextMonth')}>
+              ›
+            </button>
+          </div>
+        ) : (
+          <span className="mood-cal__display-label">{t('calendar.displayLabel')}</span>
+        )}
+
+        <div className="mood-cal__display" role="group" aria-label={t('calendar.displayAria')}>
+          <button
+            type="button"
+            className={`mood-cal__display-btn ${displayMode === 'emoji' ? 'is-active' : ''}`}
+            onClick={() => applyCalendarDisplayMode('emoji')}
+          >
+            {t('calendar.displayEmoji')}
           </button>
-          <strong>{formatYearMonth(toDateString(viewYear, viewMonth, 1))}</strong>
-          <button type="button" onClick={() => moveMonth(1)} aria-label={t('calendar.nextMonth')}>
-            ›
+          <button
+            type="button"
+            className={`mood-cal__display-btn ${displayMode === 'drawing' ? 'is-active' : ''}`}
+            onClick={() => applyCalendarDisplayMode('drawing')}
+          >
+            {t('calendar.displayDrawing')}
           </button>
         </div>
-      )}
+      </div>
 
       <div className="mood-cal__weekdays">
         {WEEKDAYS.map((w, i) => (
@@ -81,7 +115,11 @@ function MoodCalendar({
             return <span key={`blank-${i}`} className="mood-cal__day mood-cal__day--blank" aria-hidden />;
           }
           const dateStr = toDateString(viewYear, viewMonth, day);
-          const mood = moodByDate.get(dateStr);
+          const mark = markByDate.get(dateStr);
+          const mood = mark?.mood;
+          const imageUrl = mark?.imageUrl;
+          const showDrawing = displayMode === 'drawing' && Boolean(imageUrl);
+          const showMood = Boolean(mood) && !showDrawing;
           const isToday = dateStr === todayStr;
 
           return (
@@ -90,13 +128,25 @@ function MoodCalendar({
               type="button"
               className={[
                 'mood-cal__day',
-                mood ? 'has-mood' : '',
+                showDrawing ? 'has-drawing' : '',
+                showMood ? 'has-mood' : '',
                 isToday ? 'today' : '',
               ].filter(Boolean).join(' ')}
               onClick={() => onSelectDate?.(dateStr)}
               aria-label={`${day}${mood ? ` ${t(`mood.${mood}`)}` : ''}`}
             >
-              {mood ? <MoodIcon mood={mood} /> : day}
+              {showDrawing ? (
+                <img
+                  className="mood-cal__thumb"
+                  src={imageUrl}
+                  alt=""
+                  draggable={false}
+                />
+              ) : showMood && mood ? (
+                <MoodIcon mood={mood} />
+              ) : (
+                day
+              )}
             </button>
           );
         })}
