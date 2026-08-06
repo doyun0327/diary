@@ -64,12 +64,14 @@
 }
 
 .diary-row__thumb {
-  flex: 0 0 52px;
-  width: 52px;
-  height: 52px;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
   border-radius: 14px;
-  object-fit: cover;
-  background: var(--bg-muted);
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--color-border-soft);
 }
 
 .diary-row__thumb--empty {
