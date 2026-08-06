@@ -1,41 +1,54 @@
 .diary-row {
+  --story-title: 'Gaegu', 'Hi Melody', cursive;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-  background: var(--bg-paper);
+  padding: 9px 10px;
+  border: 1px solid rgba(228, 204, 184, 0.8);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, #ffffff 0%, #fff8f1 55%, #ffefe4 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 6px 16px rgba(90, 60, 40, 0.05);
   text-align: left;
   cursor: pointer;
-  transition: transform 0.16s var(--ease-out), background 0.15s, border-color 0.15s;
+  transition:
+    transform 0.18s var(--ease-out),
+    box-shadow 0.18s,
+    border-color 0.15s;
 }
 
 .diary-row:hover {
-  background: var(--color-bg-soft);
-  border-color: var(--color-border);
+  border-color: rgba(220, 180, 150, 0.9);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 10px 22px rgba(90, 60, 40, 0.08);
 }
 
 .diary-row:active {
-  transform: scale(0.99);
+  transform: scale(0.985);
 }
 
 .diary-row__mood {
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: var(--color-bg-muted);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 30% 25%, #fff6, transparent 45%),
+    linear-gradient(160deg, #ffe8dc, #ffd9c8 55%, #f5e6d8);
   line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(200, 120, 90, 0.12);
 }
 
 .diary-row__mood .mood-icon {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .diary-row__body {
@@ -43,41 +56,47 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .diary-row__date {
-  font-size: 0.9rem;
+  font-family: var(--story-title);
+  font-size: 1.02rem;
   font-weight: 700;
-  color: var(--color-text);
-  letter-spacing: -0.02em;
+  color: #4a3f38;
+  letter-spacing: -0.01em;
 }
 
 .diary-row__preview {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #8a786c;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .diary-row__thumb {
-  flex: 0 0 56px;
-  width: 56px;
-  height: 56px;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
   object-fit: contain;
   object-position: center;
-  background: #fff;
-  box-shadow: inset 0 0 0 1px var(--color-border-soft);
+  background: #fffefb;
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 210, 190, 0.9),
+    0 3px 8px rgba(90, 60, 40, 0.05);
+  transform: rotate(1deg);
 }
 
 .diary-row__thumb--empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
-  opacity: 0.3;
+  font-size: 0.95rem;
+  opacity: 0.28;
+  background: #f6efe8;
+  transform: none;
 }

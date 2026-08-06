@@ -1,13 +1,51 @@
 .mood-cal {
-  margin: 0 0 20px;
-  padding: 14px 8px 12px;
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-soft);
+  --story-title: 'Gaegu', 'Hi Melody', cursive;
+  margin: 0;
+  padding: 18px 14px 16px;
+  border-radius: 30px;
+  background:
+    linear-gradient(155deg, #fffdf9 0%, #fff6ec 42%, #fcefe4 100%);
+  border: 1px solid rgba(228, 204, 184, 0.85);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 16px 40px rgba(90, 60, 40, 0.08),
+    0 2px 0 rgba(255, 236, 214, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* painted wash */
+.mood-cal::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 55%;
+  background:
+    radial-gradient(ellipse at 20% 40%, rgba(255, 214, 196, 0.45), transparent 55%),
+    radial-gradient(ellipse at 85% 20%, rgba(214, 232, 245, 0.4), transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(214, 236, 220, 0.35), transparent 50%);
+  z-index: 0;
+}
+
+.mood-cal::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  z-index: 0;
+}
+
+.mood-cal > * {
+  position: relative;
+  z-index: 1;
 }
 
 .mood-cal--no-header {
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 .mood-cal__toolbar {
@@ -15,8 +53,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
-  padding: 0 4px;
+  margin-bottom: 14px;
+  padding: 0 2px;
 }
 
 .mood-cal__header {
@@ -29,90 +67,99 @@
 }
 
 .mood-cal__display-label {
-  font-size: 0.78rem;
+  font-family: var(--story-title);
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  letter-spacing: -0.01em;
+  color: #6d5c50;
 }
 
 .mood-cal__display {
   display: inline-flex;
   flex-shrink: 0;
-  gap: 2px;
-  padding: 3px;
+  gap: 3px;
+  padding: 4px;
   border-radius: 999px;
-  background: var(--color-bg-muted);
+  background: rgba(255, 248, 240, 0.9);
+  border: 1px solid rgba(232, 210, 190, 0.7);
+  box-shadow: inset 0 1px 3px rgba(90, 60, 40, 0.04);
 }
 
 .mood-cal__display-btn {
-  padding: 6px 11px;
+  padding: 7px 14px;
   border: none;
   border-radius: 999px;
   background: transparent;
-  font-size: 0.72rem;
+  font-family: var(--story-title);
+  font-size: 0.95rem;
   font-weight: 700;
-  font-family: inherit;
-  color: var(--color-text-muted);
+  color: #8a786c;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.18s var(--ease-out), color 0.18s, box-shadow 0.18s;
 }
 
 .mood-cal__display-btn.is-active {
-  background: var(--color-surface);
-  color: var(--color-accent-text);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, #fff, #ffe8dc);
+  color: #b56b52;
+  box-shadow: 0 3px 10px rgba(180, 100, 70, 0.12);
 }
 
 .mood-cal__header strong {
-  font-size: 1rem;
+  font-family: var(--story-title);
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
+  letter-spacing: -0.01em;
+  color: #4a3f38;
 }
 
 .mood-cal__header button {
   width: 34px;
   height: 34px;
   border: none;
-  border-radius: 50%;
-  background: var(--color-bg-muted);
+  border-radius: 12px;
+  background: rgba(255, 248, 240, 0.95);
   font-size: 1.1rem;
   line-height: 1;
-  color: var(--color-text-muted);
+  color: #8a786c;
   cursor: pointer;
+  border: 1px solid rgba(232, 210, 190, 0.7);
 }
 
 .mood-cal__header button:active {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
+  background: #ffe8dc;
+  color: #b56b52;
 }
 
 .mood-cal__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  padding: 0 1px;
 }
 
 .mood-cal__weekdays span {
   text-align: center;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  padding: 6px 0;
+  font-family: var(--story-title);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #9a8778;
+  padding: 4px 0 8px;
   letter-spacing: 0.02em;
 }
 
 .mood-cal__weekdays span:first-child {
-  color: var(--color-danger);
+  color: #d08080;
 }
 
 .mood-cal__weekdays span:last-child {
-  color: var(--color-accent-text);
+  color: #b56b52;
 }
 
 .mood-cal__days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 6px;
   height: auto;
 }
 
@@ -125,41 +172,52 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 10px;
-  background: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--color-text-muted);
+  border-radius: 16px;
+  background: rgba(255, 252, 248, 0.55);
+  font-family: var(--story-title);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #9a8778;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 0.16s var(--ease-out), background 0.16s;
 }
 
 .mood-cal__day--blank {
   pointer-events: none;
   cursor: default;
   background: transparent;
+  box-shadow: none;
 }
 
 .mood-cal__day:hover,
 .mood-cal__day:focus,
 .mood-cal__day:focus-visible,
 .mood-cal__day:active {
-  background: none;
+  background: rgba(255, 252, 248, 0.55);
   color: inherit;
   outline: none;
   box-shadow: none;
 }
 
+.mood-cal__day:active:not(.mood-cal__day--blank) {
+  transform: scale(0.95);
+}
+
 .mood-cal__day.today {
   font-weight: 700;
-  color: var(--color-accent-text);
-  background: var(--color-accent-soft);
-  border-radius: 10px;
+  color: #b56b52;
+  background: linear-gradient(160deg, #ffe8dc, #ffd9c8);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1.5px rgba(200, 120, 90, 0.28);
 }
 
 .mood-cal__day.has-mood {
   color: unset;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 4px 12px rgba(90, 60, 40, 0.05);
 }
 
 .mood-cal__day.has-mood .mood-icon {
@@ -171,9 +229,12 @@
   color: unset;
   padding: 3px;
   overflow: hidden;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: inset 0 0 0 1px var(--color-border-soft);
+  border-radius: 16px;
+  background: #fffefb;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    inset 0 0 0 1px rgba(232, 210, 190, 0.85),
+    0 4px 12px rgba(90, 60, 40, 0.06);
 }
 
 .mood-cal__thumb {
@@ -181,21 +242,21 @@
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  border-radius: 7px;
+  border-radius: 13px;
   object-fit: contain;
   object-position: center;
   display: block;
   pointer-events: none;
-  background: #fff;
+  background: #fffefb;
 }
 
 .mood-cal__day.has-mood.today,
 .mood-cal__day.has-drawing.today {
-  background: var(--color-accent-soft);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: linear-gradient(160deg, #ffe8dc, #ffd9c8);
+  box-shadow: inset 0 0 0 1.5px rgba(200, 120, 90, 0.35);
 }
 
 .mood-cal__day.has-drawing.today {
-  border-radius: 10px;
+  border-radius: 16px;
   padding: 3px;
 }

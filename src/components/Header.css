@@ -6,12 +6,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 16px 10px 12px;
+  padding: 10px 16px 12px 12px;
   padding-top: calc(10px + env(safe-area-inset-top));
-  border-bottom: 1px solid var(--color-border-soft);
-  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg) 92%, #fff8f2) 0%,
+      color-mix(in srgb, var(--color-bg) 78%, transparent) 100%
+    );
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
 }
 
 .header__spacer {
@@ -35,11 +40,12 @@
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid var(--color-border-soft);
-  border-radius: 50%;
-  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-border-soft) 80%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-surface) 90%, #fff);
   color: var(--color-text-muted);
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(70, 48, 36, 0.04);
   transition: transform 0.16s var(--ease-out), background 0.15s, color 0.15s, border-color 0.15s;
 }
 
@@ -63,10 +69,11 @@
 }
 
 .header__month-label {
-  font-size: 1.12rem;
+  font-family: 'Gaegu', 'Hi Melody', cursive;
+  font-size: 1.28rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--color-text);
+  letter-spacing: -0.01em;
+  color: #4a3f38;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

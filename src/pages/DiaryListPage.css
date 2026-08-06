@@ -1,10 +1,61 @@
 .diary-list {
+  --story-title: 'Gaegu', 'Hi Melody', cursive;
+  --story-ui: 'Nunito', 'Apple SD Gothic Neo', sans-serif;
+  --story-ink: #4a3f38;
+  --story-rose: #f6d4c8;
+  --story-butter: #f7e9c8;
+  --story-sky: #d8e8f4;
+  --story-mint: #d7efe4;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px;
-  padding-bottom: calc(108px + env(safe-area-inset-bottom));
-  background: transparent;
+  gap: 18px;
+  padding: 10px 14px 22px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse 90% 55% at 10% 0%, color-mix(in srgb, var(--story-butter) 70%, transparent), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 100% 8%, color-mix(in srgb, var(--story-rose) 55%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 50% 100%, color-mix(in srgb, var(--story-mint) 45%, transparent), transparent 60%),
+    linear-gradient(180deg, #fff9f3 0%, #f7efe6 48%, #f3eae1 100%);
+  font-family: var(--story-ui);
+  overflow: hidden;
+}
+
+/* soft vignette + paper grain */
+.diary-list::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 45%, rgba(90, 60, 40, 0.07) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+}
+
+/* faint storybook corner flourishes */
+.diary-list::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 8px 10px auto auto;
+  width: 72px;
+  height: 72px;
+  z-index: 0;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 70% 30%, #ffd9c8 0 8px, transparent 9px),
+    radial-gradient(circle at 40% 55%, #ffe9a8 0 6px, transparent 7px),
+    radial-gradient(circle at 75% 65%, #cfeadf 0 5px, transparent 6px);
+  filter: blur(0.2px);
+}
+
+.diary-list > * {
+  position: relative;
+  z-index: 1;
 }
 
 .diary-list--empty {
@@ -17,38 +68,56 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 6px;
-  margin-top: 16px;
-  padding: 28px 20px;
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-muted);
+  gap: 10px;
+  margin-top: 6px;
+  padding: 40px 24px;
+  border-radius: 28px;
+  background:
+    linear-gradient(165deg, rgba(255, 252, 248, 0.95), rgba(255, 244, 232, 0.92));
+  border: 1.5px dashed color-mix(in srgb, var(--color-accent) 28%, #e8d2c2);
+  box-shadow: 0 12px 32px rgba(90, 60, 40, 0.06);
   text-align: center;
-  color: var(--text-muted);
-  font-size: 0.92rem;
-  font-weight: 500;
+  color: #7a6a5e;
+  font-family: var(--story-title);
+  font-size: 1.2rem;
+  font-weight: 700;
   line-height: 1.55;
 }
 
+.diary-list__empty-copy p {
+  margin: 0;
+}
+
 .diary-list__section {
-  margin-top: 8px;
+  margin-top: 0;
+  padding: 14px 12px 12px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 250, 0.98) 0%, rgba(255, 247, 238, 0.95) 100%);
+  border: 1px solid rgba(230, 208, 188, 0.75);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 14px 36px rgba(90, 60, 40, 0.07);
 }
 
 .diary-list__heading {
   margin: 0 0 10px;
-  padding: 0 2px;
-  font-size: 0.95rem;
+  padding: 0 4px;
+  font-family: var(--story-title);
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
+  letter-spacing: -0.01em;
+  color: var(--story-ink);
 }
 
 .diary-list__month-empty {
   margin: 0;
-  padding: 28px 12px;
+  padding: 26px 12px;
   text-align: center;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--text-muted);
+  font-family: var(--story-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #8a786c;
 }
 
 .diary-list__rows {
