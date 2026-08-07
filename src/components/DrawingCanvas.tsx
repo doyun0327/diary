@@ -231,7 +231,7 @@ function DrawingCanvas({
   };
 
   const bakeAllPhotos = () => {
-    photoLayers.forEach(bakePhotoToCanvas);
+    photoLayers.forEach((layer) => bakePhotoToCanvas(layer));
     photoLayers.forEach((l) => photoImages.current.delete(l.id));
     setPhotoLayers([]);
     setActivePhotoId(null);
