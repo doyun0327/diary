@@ -6,6 +6,7 @@ import type {
   RoomSummary,
 } from '../types/room';
 import { getClientHeaders } from '../hooks/useClientProfile';
+import { apiUrl, isRemoteApi } from './config';
 
 async function parseError(res: Response): Promise<string> {
   try {
@@ -25,10 +26,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   let res: Response;
   try {
-    res = await fetch(path, { ...init, headers });
+    res = await fetch(apiUrl(path), { ...init, headers });
   } catch {
     throw new Error(
-      '서버에 연결하지 못했어요. Spring(8080)이 켜져 있는지 확인해 주세요.',
+      isRemoteApi()
+        ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'
+        : '서버에 연결하지 못했어요. Spring(8080)이 켜져 있는지 확인해 주세요.',
     );
   }
   if (!res.ok) {

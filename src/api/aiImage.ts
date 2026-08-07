@@ -1,5 +1,6 @@
 import type { CharacterProfile } from '../types/character';
 import { describeCharacter } from '../types/character';
+import { apiUrl, isRemoteApi } from './config';
 
 /**
  * 일기 본문 전체에서 AI용 텍스트 추출.
@@ -28,11 +29,12 @@ export interface AiDrawResult {
 
 /**
  * 백엔드에 AI 그림 생성 1회 요청.
- * 이미지 모델은 백엔드에서만 사용: stabilityai/stable-diffusion-3.5-large
  *
  * POST /api/ai/draw
  * body: { diaryLine, title?, character? }
- * response: { imageBase64 | imageUrl, scene?, prompt? }
+ * response: { imageUrl? | imageBase64?, scene?, prompt? }
+ * - GCS 사용 시 imageUrl(HTTPS)만 옴 → 그대로 사용
+ * - 로컬 폴백 시 imageBase64(data URL)
  */
 export async function generateDiaryImage(input: {
   title?: string;
@@ -64,7 +66,7 @@ export async function generateDiaryImage(input: {
 
   let response: Response;
   try {
-    response = await fetch('/api/ai/draw', {
+    response = await fetch(apiUrl('/api/ai/draw'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,7 +75,11 @@ export async function generateDiaryImage(input: {
       body: JSON.stringify(payload),
     });
   } catch {
-    throw new Error('서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요');
+    throw new Error(
+      isRemoteApi()
+        ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요'
+        : '서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요',
+    );
   }
 
   input.onProgress?.('image');
@@ -109,6 +115,11 @@ export async function generateDiaryImage(input: {
     console.info('[AI] scene/prompt:', scene);
   }
 
+  // GCS HTTPS URL은 다시 base64로 바꾸지 않음 (용량·분리 목적)
+  if (data.imageUrl?.startsWith('http://') || data.imageUrl?.startsWith('https://')) {
+    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
+  }
+
   if (data.imageBase64) {
     const imageUrl = data.imageBase64.startsWith('data:')
       ? data.imageBase64
@@ -116,19 +127,8 @@ export async function generateDiaryImage(input: {
     return { imageUrl, scene, prompt: data.prompt?.trim() };
   }
 
-  if (data.imageUrl) {
-    const imgRes = await fetch(data.imageUrl);
-    if (!imgRes.ok) {
-      throw new Error('이미지 URL을 불러오지 못했습니다');
-    }
-    const blob = await imgRes.blob();
-    const imageUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('이미지 변환에 실패했습니다'));
-      reader.readAsDataURL(blob);
-    });
-    return { imageUrl, scene, prompt: data.prompt?.trim() };
+  if (data.imageUrl?.startsWith('data:')) {
+    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
   }
 
   throw new Error('백엔드 응답에 이미지가 없습니다');
