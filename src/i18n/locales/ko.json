@@ -455,7 +455,6 @@
     "sticker": "스티커",
     "eraser": "지우개",
     "clearAll": "전체 지우기",
-    "photoHint": "드래그로 이동 · 모서리로 크기 조절 · ✓ 로 붙이기",
     "stickerSelected": "{{emoji}} 선택됨 · 그림판을 눌러 붙인 뒤 크기·회전하세요",
     "colorAria": "색상 {{c}}",
     "pickColorTitle": "색 고르기",
@@ -488,7 +487,6 @@
       "marker": "마카",
       "highlighter": "형광펜"
     },
-    "stickerHint": "드래그로 이동 · 모서리로 크기 · 위로 회전 · ✓ 로 붙이기",
     "stickerRotate": "회전"
   },
   "font": {

@@ -455,7 +455,6 @@
     "sticker": "Stiker",
     "eraser": "Penghapus",
     "clearAll": "Hapus semua",
-    "photoHint": "Geser untuk pindah · sudut untuk ubah ukuran · ✓ untuk pasang",
     "stickerSelected": "{{emoji}} dipilih · ketuk kanvas, lalu ubah ukuran/putar",
     "colorAria": "Warna {{c}}",
     "pickColorTitle": "Pilih warna",
@@ -488,7 +487,6 @@
       "marker": "Spidol",
       "highlighter": "Stabilo"
     },
-    "stickerHint": "Geser pindah · sudut ubah ukuran · atas putar · ✓ pasang",
     "stickerRotate": "Putar"
   },
   "font": {

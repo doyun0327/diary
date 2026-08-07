@@ -27,6 +27,8 @@ interface PhotoLayer {
   width: number;
   height: number;
   aspect: number;
+  /** radians */
+  rotation: number;
 }
 
 interface StickerLayer {
@@ -43,7 +45,7 @@ interface StickerLayer {
 
 type ToolMode = 'pen' | 'eraser' | 'sticker';
 type PenKind = 'ballpoint' | 'gel' | 'brush' | 'marker' | 'highlighter';
-type PhotoDragKind = 'move' | 'resize';
+type PhotoDragKind = 'move' | 'resize' | 'rotate';
 type StickerDragKind = 'move' | 'resize' | 'rotate';
 
 const COLORS = [
@@ -90,6 +92,7 @@ function DrawingCanvas({
     startX: number;
     startY: number;
     origin: PhotoLayer;
+    startAngle: number;
   } | null>(null);
   const stickerDrag = useRef<{
     kind: StickerDragKind;
@@ -175,13 +178,25 @@ function DrawingCanvas({
       img.src = src;
     });
 
-  const bakePhotoToCanvas = (layer: PhotoLayer) => {
+  const bakePhotoToCanvas = (layer: PhotoLayer, targetCtx?: CanvasRenderingContext2D) => {
     const canvas = canvasRef.current;
     const img = photoImages.current.get(layer.id);
     if (!canvas || !img) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = targetCtx ?? canvas.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(img, layer.x, layer.y, layer.width, layer.height);
+
+    const dpr = targetCtx ? (canvas.width / canvas.getBoundingClientRect().width || 1) : 1;
+    const cx = layer.x + layer.width / 2;
+    const cy = layer.y + layer.height / 2;
+
+    ctx.save();
+    if (targetCtx) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    ctx.translate(cx, cy);
+    ctx.rotate(layer.rotation);
+    ctx.drawImage(img, -layer.width / 2, -layer.height / 2, layer.width, layer.height);
+    ctx.restore();
     hasDrawn.current = true;
   };
 
@@ -250,20 +265,7 @@ function DrawingCanvas({
     if (!ctx) return undefined;
 
     ctx.drawImage(canvas, 0, 0);
-    const rect = canvas.getBoundingClientRect();
-    const dpr = canvas.width / rect.width;
-    photoLayers.forEach((layer) => {
-      const img = photoImages.current.get(layer.id);
-      if (img) {
-        ctx.drawImage(
-          img,
-          layer.x * dpr,
-          layer.y * dpr,
-          layer.width * dpr,
-          layer.height * dpr,
-        );
-      }
-    });
+    photoLayers.forEach((layer) => bakePhotoToCanvas(layer, ctx));
     stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
 
     return exportCanvas.toDataURL('image/png');
@@ -311,7 +313,7 @@ function DrawingCanvas({
   useEffect(() => {
     const onMove = (e: globalThis.PointerEvent) => {
       if (photoDrag.current) {
-        const { kind, id, startX, startY, origin } = photoDrag.current;
+        const { kind, id, startX, startY, origin, startAngle } = photoDrag.current;
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
 
@@ -321,9 +323,36 @@ function DrawingCanvas({
             if (kind === 'move') {
               return { ...layer, x: origin.x + dx, y: origin.y + dy };
             }
-            const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width + dx);
-            const newHeight = newWidth / origin.aspect;
-            return { ...layer, width: newWidth, height: newHeight };
+            if (kind === 'resize') {
+              const wrap = wrapRef.current?.getBoundingClientRect();
+              if (!wrap) return layer;
+              const cx = wrap.left + origin.x + origin.width / 2;
+              const cy = wrap.top + origin.y + origin.height / 2;
+              const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+              const originDist = Math.max(
+                1,
+                Math.hypot(startX - cx, startY - cy),
+              );
+              const scale = dist / originDist;
+              const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width * scale);
+              const newHeight = newWidth / origin.aspect;
+              const cxLocal = origin.x + origin.width / 2;
+              const cyLocal = origin.y + origin.height / 2;
+              return {
+                ...layer,
+                width: newWidth,
+                height: newHeight,
+                x: cxLocal - newWidth / 2,
+                y: cyLocal - newHeight / 2,
+              };
+            }
+            // rotate
+            const wrap = wrapRef.current?.getBoundingClientRect();
+            if (!wrap) return layer;
+            const cx = wrap.left + origin.x + origin.width / 2;
+            const cy = wrap.top + origin.y + origin.height / 2;
+            const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+            return { ...layer, rotation: origin.rotation + (angle - startAngle) };
           }),
         );
         return;
@@ -500,6 +529,7 @@ function DrawingCanvas({
         width,
         height,
         aspect,
+        rotation: 0,
       };
 
       confirmActiveOverlay();
@@ -553,12 +583,19 @@ function DrawingCanvas({
     e.preventDefault();
     if (activeStickerId) confirmActiveSticker();
     setActivePhotoId(layer.id);
+
+    const wrap = wrapRef.current?.getBoundingClientRect();
+    const cx = (wrap?.left ?? 0) + layer.x + layer.width / 2;
+    const cy = (wrap?.top ?? 0) + layer.y + layer.height / 2;
+    const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+
     photoDrag.current = {
       kind,
       id: layer.id,
       startX: e.clientX,
       startY: e.clientY,
-      origin: layer,
+      origin: { ...layer },
+      startAngle,
     };
   };
 
@@ -721,6 +758,7 @@ function DrawingCanvas({
                   top: layer.y,
                   width: layer.width,
                   height: layer.height,
+                  transform: `rotate(${layer.rotation}rad)`,
                 }}
                 onPointerDown={(e) => startPhotoDrag(e, 'move', layer)}
               >
@@ -738,6 +776,11 @@ function DrawingCanvas({
                     >
                       ✓
                     </button>
+                    <div
+                      className="drawing__sticker-rotate"
+                      title={t('canvas.stickerRotate')}
+                      onPointerDown={(e) => startPhotoDrag(e, 'rotate', layer)}
+                    />
                     <div
                       className="drawing__photo-handle"
                       onPointerDown={(e) => startPhotoDrag(e, 'resize', layer)}
@@ -797,20 +840,7 @@ function DrawingCanvas({
           })}
         </div>
 
-        {activePhotoId && (
-          <p className="drawing__photo-hint">{t('canvas.photoHint')}</p>
-        )}
-        {activeStickerId && !activePhotoId && (
-          <p className="drawing__photo-hint">{t('canvas.stickerHint')}</p>
-        )}
-
         <div className="drawing__dock">
-          {mode === 'sticker' && !stickerOpen && !editingOverlay && (
-            <p className="drawing__sticker-hint">
-              {t('canvas.stickerSelected', { emoji: selectedSticker })}
-            </p>
-          )}
-
           {colorsOpen && mode === 'pen' && !editingOverlay && !fontOpen && (
             <>
               <div className="drawing__pen-kinds" role="group" aria-label={t('canvas.penKindAria')}>

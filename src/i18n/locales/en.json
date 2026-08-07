@@ -455,7 +455,6 @@
     "sticker": "Stickers",
     "eraser": "Eraser",
     "clearAll": "Clear all",
-    "photoHint": "Drag to move · corners to resize · ✓ to place",
     "stickerSelected": "{{emoji}} selected · tap canvas, then resize/rotate",
     "colorAria": "Color {{c}}",
     "pickColorTitle": "Pick color",
@@ -488,7 +487,6 @@
       "marker": "Marker",
       "highlighter": "Highlighter"
     },
-    "stickerHint": "Drag to move · corner to resize · top to rotate · ✓ to place",
     "stickerRotate": "Rotate"
   },
   "font": {

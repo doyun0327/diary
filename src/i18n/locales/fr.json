@@ -455,7 +455,6 @@
     "sticker": "Stickers",
     "eraser": "Gomme",
     "clearAll": "Tout effacer",
-    "photoHint": "Glisser pour déplacer · coins pour redimensionner · ✓ pour placer",
     "stickerSelected": "{{emoji}} choisi · touchez le canevas, puis redimensionnez/pivotez",
     "colorAria": "Couleur {{c}}",
     "pickColorTitle": "Choisir une couleur",
@@ -488,7 +487,6 @@
       "marker": "Feutre",
       "highlighter": "Surligneur"
     },
-    "stickerHint": "Glisser · coin pour taille · haut pour pivoter · ✓ pour poser",
     "stickerRotate": "Pivoter"
   },
   "font": {

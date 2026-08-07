@@ -455,7 +455,6 @@
     "sticker": "Sticker",
     "eraser": "Tẩy",
     "clearAll": "Xóa hết",
-    "photoHint": "Kéo để di chuyển · góc để đổi kích thước · ✓ để đặt",
     "stickerSelected": "Đã chọn {{emoji}} · chạm canvas rồi chỉnh kích thước/xoay",
     "colorAria": "Màu {{c}}",
     "pickColorTitle": "Chọn màu",
@@ -488,7 +487,6 @@
       "marker": "Bút dạ",
       "highlighter": "Bút dạ quang"
     },
-    "stickerHint": "Kéo để di chuyển · góc để phóng · trên để xoay · ✓ dán",
     "stickerRotate": "Xoay"
   },
   "font": {

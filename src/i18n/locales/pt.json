@@ -455,7 +455,6 @@
     "sticker": "Adesivos",
     "eraser": "Borracha",
     "clearAll": "Limpar tudo",
-    "photoHint": "Arraste para mover · cantos para redimensionar · ✓ para colocar",
     "stickerSelected": "{{emoji}} selecionado · toque na tela e ajuste tamanho/giro",
     "colorAria": "Cor {{c}}",
     "pickColorTitle": "Escolher cor",
@@ -488,7 +487,6 @@
       "marker": "Marcador",
       "highlighter": "Marca-texto"
     },
-    "stickerHint": "Arraste · canto para tamanho · cima para girar · ✓ para fixar",
     "stickerRotate": "Girar"
   },
   "font": {

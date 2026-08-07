@@ -455,7 +455,6 @@
     "sticker": "Stickers",
     "eraser": "Borrador",
     "clearAll": "Borrar todo",
-    "photoHint": "Arrastra para mover · esquinas para redimensionar · ✓ para colocar",
     "stickerSelected": "{{emoji}} seleccionado · toca el lienzo y ajusta tamaño/giro",
     "colorAria": "Color {{c}}",
     "pickColorTitle": "Elegir color",
@@ -488,7 +487,6 @@
       "marker": "Rotulador",
       "highlighter": "Marcador"
     },
-    "stickerHint": "Arrastra · esquina para tamaño · arriba para girar · ✓ para colocar",
     "stickerRotate": "Girar"
   },
   "font": {

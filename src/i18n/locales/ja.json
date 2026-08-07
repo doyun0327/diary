@@ -455,7 +455,6 @@
     "sticker": "シール",
     "eraser": "消しゴム",
     "clearAll": "すべて消去",
-    "photoHint": "ドラッグで移動 · 角で拡大縮小 · ✓ で確定",
     "stickerSelected": "{{emoji}} 選択中 · キャンバスをタップしてサイズ・回転",
     "colorAria": "色 {{c}}",
     "pickColorTitle": "色を選ぶ",
@@ -488,7 +487,6 @@
       "marker": "マーカー",
       "highlighter": "蛍光ペン"
     },
-    "stickerHint": "ドラッグで移動 · 角で拡大縮小 · 上で回転 · ✓ で確定",
     "stickerRotate": "回転"
   },
   "font": {

@@ -455,7 +455,6 @@
     "sticker": "贴纸",
     "eraser": "橡皮",
     "clearAll": "全部清除",
-    "photoHint": "拖动移动 · 边角缩放 · ✓ 放置",
     "stickerSelected": "已选 {{emoji}} · 点画布后可调整大小与旋转",
     "colorAria": "颜色 {{c}}",
     "pickColorTitle": "选择颜色",
@@ -488,7 +487,6 @@
       "marker": "马克笔",
       "highlighter": "荧光笔"
     },
-    "stickerHint": "拖动移动 · 边角缩放 · 上方旋转 · ✓ 放置",
     "stickerRotate": "旋转"
   },
   "font": {
