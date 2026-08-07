@@ -92,8 +92,8 @@
   gap: 6px;
   margin-top: 8px;
   overflow-x: auto;
-  overflow-y: visible;
-  padding: 12px 4px 14px;
+  overflow-y: hidden;
+  padding: 12px 10px 14px;
   scrollbar-width: none;
 }
 
