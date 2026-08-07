@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
 import WriteFab from './components/WriteFab';
 import CharacterSetup from './components/CharacterSetup';
 import AccountSheet from './components/AccountSheet';
+import LanguageSheet from './components/LanguageSheet';
+import ScreenLockGate from './components/ScreenLockGate';
+import PinSetupScreen from './components/PinSetupScreen';
+import PinVerifyScreen from './components/PinVerifyScreen';
 import ExportSheet from './components/ExportSheet';
 import DecorateSheet from './components/DecorateSheet';
 import AppInfoSheet from './components/AppInfoSheet';
@@ -18,20 +23,26 @@ import RoomPostPage from './pages/RoomPostPage';
 import { useDiary } from './hooks/useDiary';
 import { useCharacter } from './hooks/useCharacter';
 import { useClientProfile } from './hooks/useClientProfile';
+import { useScreenLock } from './hooks/useScreenLock';
 import type { DiaryEntry } from './types/diary';
 import './App.css';
 
 export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
 
 function App() {
+  const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry } = useDiary();
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } = useClientProfile();
+  const screenLock = useScreenLock();
   const [page, setPage] = useState<Page>('home');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [lockSetupOpen, setLockSetupOpen] = useState(false);
+  const [lockDisableOpen, setLockDisableOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [decorateOpen, setDecorateOpen] = useState(false);
   const [appInfoOpen, setAppInfoOpen] = useState(false);
@@ -97,6 +108,18 @@ function App() {
     setPage('rooms');
   };
 
+  const handleToggleScreenLock = () => {
+    if (screenLock.enabled) {
+      setLockDisableOpen(true);
+      return;
+    }
+    if (screenLock.hasPin) {
+      screenLock.turnOn();
+      return;
+    }
+    setLockSetupOpen(true);
+  };
+
   const moveCalendarMonth = (delta: number) => {
     const d = new Date(calYear, calMonth + delta, 1);
     setCalYear(d.getFullYear());
@@ -109,6 +132,9 @@ function App() {
         nickname={nickname}
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}
+        onOpenLanguage={() => setLanguageOpen(true)}
+        screenLockEnabled={screenLock.enabled}
+        onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
@@ -206,6 +232,36 @@ function App() {
           />,
           document.getElementById('root') ?? document.body,
         )}
+      {languageOpen &&
+        createPortal(
+          <LanguageSheet onClose={() => setLanguageOpen(false)} />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {lockSetupOpen &&
+        createPortal(
+          <PinSetupScreen
+            onDone={async (pin) => {
+              await screenLock.enableLock(pin);
+              setLockSetupOpen(false);
+            }}
+            onCancel={() => setLockSetupOpen(false)}
+          />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {lockDisableOpen &&
+        createPortal(
+          <PinVerifyScreen
+            title={t('lock.disableTitle')}
+            hint={t('lock.disableHint')}
+            onVerified={async (pin) => {
+              const ok = await screenLock.disableLock(pin);
+              if (ok) setLockDisableOpen(false);
+              return ok;
+            }}
+            onCancel={() => setLockDisableOpen(false)}
+          />,
+          document.getElementById('root') ?? document.body,
+        )}
       {characterOpen && (
         <CharacterSetup
           character={character}
@@ -228,6 +284,11 @@ function App() {
       {bookEntries && (
         <DiaryBookViewer entries={bookEntries} onClose={() => setBookEntries(null)} />
       )}
+      {screenLock.locked &&
+        createPortal(
+          <ScreenLockGate onUnlock={screenLock.unlock} />,
+          document.getElementById('root') ?? document.body,
+        )}
     </div>
   );
 }

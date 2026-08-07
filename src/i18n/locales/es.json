@@ -26,8 +26,8 @@
     "menu": "Menú",
     "tagline": "Captura mi día",
     "footer": "Despacio, día a día",
-    "account": "Cuenta · Idioma",
-    "accountHintEmpty": "Foto · nombre · idioma",
+    "account": "Cuenta",
+    "accountHintEmpty": "Foto · sync",
     "rooms": "Salas de amigos",
     "roomsHint": "Mis salas",
     "character": "Personaje",
@@ -37,7 +37,13 @@
     "decorate": "Decorar",
     "decorateHint": "Tema · emoji",
     "appInfo": "Info de la app",
-    "appInfoHint": "Versión · términos · créditos"
+    "appInfoHint": "Versión · términos · créditos",
+    "language": "Idioma",
+    "languageHint": "Idioma de la app",
+    "screenLock": "Bloqueo",
+    "screenLockHint": "Bloquear con contraseña",
+    "screenLockHintOn": "Activado · toca para desactivar",
+    "screenLockHintOff": "Desactivado · toca para activar"
   },
   "decorate": {
     "title": "Decorar",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "Cuenta · Idioma",
-    "aria": "Cuenta · Idioma",
+    "title": "Cuenta",
+    "aria": "Cuenta",
     "photoLabel": "Foto de perfil",
     "changePhotoAria": "Cambiar foto de perfil",
     "pickPhoto": "Elegir foto",
@@ -148,6 +154,29 @@
       "photoRead": "No se pudo leer la foto",
       "photoProcess": "No se pudo procesar la foto",
       "photoLoad": "No se pudo cargar la foto"
+    },
+    "useAccountPhoto": "Usar foto de la cuenta",
+    "nameHintLoggedIn": "Rellenado desde tu cuenta — puedes cambiarlo cuando quieras",
+    "sync": {
+      "label": "Sincronización en la nube",
+      "hint": "Inicia sesión para guardar tu diario en la cuenta y restaurarlo en otro teléfono.",
+      "continueGoogle": "Continuar con Google",
+      "continueApple": "Continuar con Apple",
+      "signingIn": "Iniciando sesión…",
+      "signOut": "Cerrar sesión",
+      "syncNow": "Sincronizar ahora",
+      "syncing": "Sincronizando…",
+      "lastSynced": "Última sync · {{time}}",
+      "never": "Nunca",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "Solo vista previa de UI — login y copia real pronto.",
+      "okSignedIn": "Sesión iniciada (vista previa)",
+      "okSignedOut": "Sesión cerrada",
+      "okSynced": "Sincronizado (vista previa)",
+      "errSignIn": "No se pudo iniciar sesión",
+      "errSync": "No se pudo sincronizar",
+      "noAccountPhoto": "Esta cuenta no tiene foto de perfil"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "Idioma",
+    "aria": "Idioma"
   },
   "credits": {
     "moodIcons": "Iconos de ánimo: designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "Ropa",
     "shape": "Formas",
     "flag": "Banderas"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

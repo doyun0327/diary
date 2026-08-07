@@ -26,8 +26,8 @@
     "menu": "Menu",
     "tagline": "abadikan hariku",
     "footer": "Pelan-pelan, hari demi hari",
-    "account": "Akun · Bahasa",
-    "accountHintEmpty": "Foto · nama · bahasa",
+    "account": "Akun",
+    "accountHintEmpty": "Foto · sinkron",
     "rooms": "Ruang teman",
     "roomsHint": "Ruang saya",
     "character": "Karakter",
@@ -37,7 +37,13 @@
     "decorate": "Hias",
     "decorateHint": "Tema · emoji",
     "appInfo": "Info aplikasi",
-    "appInfoHint": "Versi · syarat · kredit"
+    "appInfoHint": "Versi · syarat · kredit",
+    "language": "Bahasa",
+    "languageHint": "Bahasa tampilan",
+    "screenLock": "Kunci layar",
+    "screenLockHint": "Kunci dengan kata sandi",
+    "screenLockHintOn": "Aktif · ketuk untuk mematikan",
+    "screenLockHintOff": "Mati · ketuk untuk mengaktifkan"
   },
   "decorate": {
     "title": "Hias",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "Akun · Bahasa",
-    "aria": "Akun · Bahasa",
+    "title": "Akun",
+    "aria": "Akun",
     "photoLabel": "Foto profil",
     "changePhotoAria": "Ubah foto profil",
     "pickPhoto": "Pilih foto",
@@ -148,6 +154,29 @@
       "photoRead": "Tidak bisa membaca foto",
       "photoProcess": "Tidak bisa memproses foto",
       "photoLoad": "Tidak bisa memuat foto"
+    },
+    "useAccountPhoto": "Pakai foto akun",
+    "nameHintLoggedIn": "Terisi dari akun — bisa diubah kapan saja di aplikasi",
+    "sync": {
+      "label": "Sinkronisasi cloud",
+      "hint": "Masuk untuk menyimpan diary ke akun dan memulihkannya di ponsel baru.",
+      "continueGoogle": "Lanjutkan dengan Google",
+      "continueApple": "Lanjutkan dengan Apple",
+      "signingIn": "Masuk…",
+      "signOut": "Keluar",
+      "syncNow": "Sinkronkan sekarang",
+      "syncing": "Menyinkronkan…",
+      "lastSynced": "Terakhir sinkron · {{time}}",
+      "never": "Belum pernah",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "Pratinjau UI saja — login & backup asli segera hadir.",
+      "okSignedIn": "Masuk (pratinjau)",
+      "okSignedOut": "Keluar",
+      "okSynced": "Tersinkron (pratinjau)",
+      "errSignIn": "Gagal masuk",
+      "errSync": "Gagal sinkron",
+      "noAccountPhoto": "Akun ini tidak punya foto profil"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "Bahasa",
+    "aria": "Bahasa"
   },
   "credits": {
     "moodIcons": "Ikon mood: designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "Pakaian",
     "shape": "Bentuk",
     "flag": "Bendera"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

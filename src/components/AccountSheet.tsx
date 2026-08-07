@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { APP_LANGUAGES, setStoredLanguage } from '../i18n';
 import * as roomsApi from '../api/roomsApi';
+import {
+  useAuthSession,
+  type AuthProvider,
+  type AuthSession,
+} from '../hooks/useAuthSession';
 import './AccountSheet.css';
 
 interface AccountSheetProps {
@@ -52,6 +56,18 @@ function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | nul
   });
 }
 
+function formatSyncedAt(iso: string | null, locale: string, neverLabel: string): string {
+  if (!iso) return neverLabel;
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
 function AccountSheet({
   nickname,
   avatarUrl,
@@ -60,10 +76,12 @@ function AccountSheet({
   onClose,
 }: AccountSheetProps) {
   const { t, i18n } = useTranslation();
+  const { session, signIn, signOut, markSynced } = useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const [nameDraft, setNameDraft] = useState(nickname);
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [authBusy, setAuthBusy] = useState<AuthProvider | 'sync' | null>(null);
 
   useEffect(() => {
     setNameDraft(nickname);
@@ -76,6 +94,71 @@ function AccountSheet({
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  /** 로그인 직후: 빈 이름만 채우고, 사진은 없을 때만 계정 사진 시드 */
+  const seedProfileFromAuth = (next: AuthSession) => {
+    const name = next.displayName.trim();
+    if (name && !nickname.trim()) {
+      onNicknameChange(name);
+      setNameDraft(name);
+      syncProfileToRooms({ nickname: name, avatarUrl: next.photoUrl ?? avatarUrl });
+    }
+    if (next.photoUrl && !avatarUrl) {
+      onAvatarChange(next.photoUrl);
+      syncProfileToRooms({
+        nickname: name || nickname || nameDraft.trim(),
+        avatarUrl: next.photoUrl,
+      });
+    }
+  };
+
+  const handleSignIn = async (provider: AuthProvider) => {
+    setAuthBusy(provider);
+    setMsg(null);
+    try {
+      const next = await signIn(provider);
+      seedProfileFromAuth(next);
+      setMsg(t('account.sync.okSignedIn'));
+    } catch {
+      setMsg(t('account.sync.errSignIn'));
+    } finally {
+      setAuthBusy(null);
+    }
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    setMsg(t('account.sync.okSignedOut'));
+  };
+
+  const handleSyncNow = async () => {
+    if (!session) return;
+    setAuthBusy('sync');
+    setMsg(null);
+    try {
+      // 실제 API 붙이기 전: 시각만 갱신
+      await new Promise((r) => setTimeout(r, 500));
+      markSynced();
+      setMsg(t('account.sync.okSynced'));
+    } catch {
+      setMsg(t('account.sync.errSync'));
+    } finally {
+      setAuthBusy(null);
+    }
+  };
+
+  const useAccountPhoto = () => {
+    if (!session?.photoUrl) {
+      setMsg(t('account.sync.noAccountPhoto'));
+      return;
+    }
+    onAvatarChange(session.photoUrl);
+    syncProfileToRooms({
+      nickname: nameDraft.trim() || nickname,
+      avatarUrl: session.photoUrl,
+    });
+    setMsg(t('account.ok.photoSaved'));
+  };
 
   const saveName = () => {
     const name = nameDraft.trim();
@@ -122,6 +205,20 @@ function AccountSheet({
     setMsg(t('account.ok.photoRemoved'));
   };
 
+  const providerLabel =
+    session?.provider === 'apple'
+      ? t('account.sync.providerApple')
+      : t('account.sync.providerGoogle');
+
+  const syncedLabel = formatSyncedAt(
+    session?.lastSyncedAt ?? null,
+    i18n.language,
+    t('account.sync.never'),
+  );
+
+  const showUseAccountPhoto =
+    Boolean(session?.photoUrl) && session?.photoUrl !== avatarUrl;
+
   return (
     <div className="account-sheet" role="dialog" aria-label={t('account.aria')}>
       <div className="account-sheet__backdrop" onClick={onClose} />
@@ -132,6 +229,68 @@ function AccountSheet({
             {t('common.close')}
           </button>
         </header>
+
+        <section className="account-sheet__block">
+          <p className="account-sheet__label">{t('account.sync.label')}</p>
+          <p className="account-sheet__hint">{t('account.sync.hint')}</p>
+
+          {session ? (
+            <div className="account-sheet__sync">
+              <div className="account-sheet__sync-card">
+                <span className="account-sheet__sync-provider">{providerLabel}</span>
+                <strong className="account-sheet__sync-email">{session.email}</strong>
+                <span className="account-sheet__sync-meta">
+                  {t('account.sync.lastSynced', { time: syncedLabel })}
+                </span>
+              </div>
+              <div className="account-sheet__sync-actions">
+                <button
+                  type="button"
+                  className="account-sheet__btn account-sheet__btn--solid"
+                  disabled={authBusy !== null}
+                  onClick={() => void handleSyncNow()}
+                >
+                  {authBusy === 'sync'
+                    ? t('account.sync.syncing')
+                    : t('account.sync.syncNow')}
+                </button>
+                <button
+                  type="button"
+                  className="account-sheet__btn account-sheet__btn--ghost"
+                  disabled={authBusy !== null}
+                  onClick={handleSignOut}
+                >
+                  {t('account.sync.signOut')}
+                </button>
+              </div>
+              <p className="account-sheet__sync-note">{t('account.sync.mockNote')}</p>
+            </div>
+          ) : (
+            <div className="account-sheet__oauth">
+              <button
+                type="button"
+                className="account-sheet__oauth-btn account-sheet__oauth-btn--google"
+                disabled={authBusy !== null}
+                onClick={() => void handleSignIn('google')}
+              >
+                {authBusy === 'google'
+                  ? t('account.sync.signingIn')
+                  : t('account.sync.continueGoogle')}
+              </button>
+              <button
+                type="button"
+                className="account-sheet__oauth-btn account-sheet__oauth-btn--apple"
+                disabled={authBusy !== null}
+                onClick={() => void handleSignIn('apple')}
+              >
+                {authBusy === 'apple'
+                  ? t('account.sync.signingIn')
+                  : t('account.sync.continueApple')}
+              </button>
+              <p className="account-sheet__sync-note">{t('account.sync.mockNote')}</p>
+            </div>
+          )}
+        </section>
 
         <section className="account-sheet__block">
           <p className="account-sheet__label">{t('account.photoLabel')}</p>
@@ -160,6 +319,16 @@ function AccountSheet({
               >
                 {busy ? t('common.processing') : t('account.pickPhoto')}
               </button>
+              {showUseAccountPhoto && (
+                <button
+                  type="button"
+                  className="account-sheet__btn"
+                  disabled={busy}
+                  onClick={useAccountPhoto}
+                >
+                  {t('account.useAccountPhoto')}
+                </button>
+              )}
               {avatarUrl && (
                 <button
                   type="button"
@@ -185,7 +354,9 @@ function AccountSheet({
           <label className="account-sheet__label" htmlFor="account-name">
             {t('account.nameLabel')}
           </label>
-          <p className="account-sheet__hint">{t('account.nameHint')}</p>
+          <p className="account-sheet__hint">
+            {session ? t('account.nameHintLoggedIn') : t('account.nameHint')}
+          </p>
           <div className="account-sheet__name-row">
             <input
               id="account-name"
@@ -215,23 +386,6 @@ function AccountSheet({
         </section>
 
         {msg && <p className="account-sheet__msg">{msg}</p>}
-
-        <section className="account-sheet__block">
-          <label className="account-sheet__label">{t('language.label')}</label>
-          <p className="account-sheet__hint">{t('language.hint')}</p>
-          <div className="account-sheet__lang-row">
-            {APP_LANGUAGES.map((lang) => (
-              <button
-                key={lang}
-                type="button"
-                className={`account-sheet__lang-btn ${i18n.language?.startsWith(lang) ? 'is-active' : ''}`}
-                onClick={() => { void i18n.changeLanguage(lang); setStoredLanguage(lang); }}
-              >
-                {t(`language.${lang}`)}
-              </button>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   );

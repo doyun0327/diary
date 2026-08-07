@@ -26,8 +26,8 @@
     "menu": "メニュー",
     "tagline": "わたしの一日を残す",
     "footer": "ゆっくり、一日ずつ",
-    "account": "アカウント · 言語",
-    "accountHintEmpty": "写真 · 名前 · 言語",
+    "account": "アカウント",
+    "accountHintEmpty": "写真 · 同期",
     "rooms": "フレンドルーム",
     "roomsHint": "参加中のルーム",
     "character": "キャラクター",
@@ -37,7 +37,13 @@
     "decorate": "カスタム",
     "decorateHint": "テーマ · 絵文字",
     "appInfo": "アプリ情報",
-    "appInfoHint": "バージョン · 規約 · クレジット"
+    "appInfoHint": "バージョン · 規約 · クレジット",
+    "language": "言語",
+    "languageHint": "表示言語",
+    "screenLock": "画面ロック",
+    "screenLockHint": "パスワードでロック",
+    "screenLockHintOn": "オン · タップでオフ",
+    "screenLockHintOff": "オフ · タップでオン"
   },
   "decorate": {
     "title": "カスタム",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "アカウント · 言語",
-    "aria": "アカウント · 言語",
+    "title": "アカウント",
+    "aria": "アカウント",
     "photoLabel": "プロフィール写真",
     "changePhotoAria": "プロフィール写真を変更",
     "pickPhoto": "写真を選ぶ",
@@ -148,6 +154,29 @@
       "photoRead": "写真を読み取れませんでした",
       "photoProcess": "写真を処理できませんでした",
       "photoLoad": "写真を読み込めませんでした"
+    },
+    "useAccountPhoto": "アカウントの写真を使う",
+    "nameHintLoggedIn": "アカウント名が入っています。アプリでいつでも変更できます",
+    "sync": {
+      "label": "クラウド同期",
+      "hint": "ログインすると日記がアカウントに保存され、別の端末でも同じアカウントで復元できます。",
+      "continueGoogle": "Googleで続行",
+      "continueApple": "Appleで続行",
+      "signingIn": "ログイン中…",
+      "signOut": "ログアウト",
+      "syncNow": "今すぐ同期",
+      "syncing": "同期中…",
+      "lastSynced": "最終同期 · {{time}}",
+      "never": "まだなし",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "いまは画面のみです。本番のログイン・バックアップは準備中です。",
+      "okSignedIn": "ログインしました（プレビュー）",
+      "okSignedOut": "ログアウトしました",
+      "okSynced": "同期しました（プレビュー）",
+      "errSignIn": "ログインできませんでした",
+      "errSync": "同期できませんでした",
+      "noAccountPhoto": "このアカウントにプロフィール写真がありません"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "言語",
+    "aria": "言語"
   },
   "credits": {
     "moodIcons": "気分アイコン：designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "衣類",
     "shape": "かたち",
     "flag": "国旗"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

@@ -26,8 +26,8 @@
     "menu": "Menu",
     "tagline": "Ghi lại một ngày của tôi",
     "footer": "Thong thả, từng ngày một",
-    "account": "Tài khoản · Ngôn ngữ",
-    "accountHintEmpty": "Ảnh · tên · ngôn ngữ",
+    "account": "Tài khoản",
+    "accountHintEmpty": "Ảnh · đồng bộ",
     "rooms": "Phòng bạn bè",
     "roomsHint": "Phòng của tôi",
     "character": "Nhân vật",
@@ -37,7 +37,13 @@
     "decorate": "Trang trí",
     "decorateHint": "Chủ đề · emoji",
     "appInfo": "Thông tin app",
-    "appInfoHint": "Phiên bản · điều khoản · ghi công"
+    "appInfoHint": "Phiên bản · điều khoản · ghi công",
+    "language": "Ngôn ngữ",
+    "languageHint": "Ngôn ngữ hiển thị",
+    "screenLock": "Khóa màn hình",
+    "screenLockHint": "Khóa bằng mật khẩu",
+    "screenLockHintOn": "Bật · chạm để tắt",
+    "screenLockHintOff": "Tắt · chạm để bật"
   },
   "decorate": {
     "title": "Trang trí",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "Tài khoản · Ngôn ngữ",
-    "aria": "Tài khoản · Ngôn ngữ",
+    "title": "Tài khoản",
+    "aria": "Tài khoản",
     "photoLabel": "Ảnh đại diện",
     "changePhotoAria": "Đổi ảnh đại diện",
     "pickPhoto": "Chọn ảnh",
@@ -148,6 +154,29 @@
       "photoRead": "Không đọc được ảnh",
       "photoProcess": "Không xử lý được ảnh",
       "photoLoad": "Không tải được ảnh"
+    },
+    "useAccountPhoto": "Dùng ảnh tài khoản",
+    "nameHintLoggedIn": "Đã điền từ tài khoản — bạn có thể đổi bất cứ lúc nào",
+    "sync": {
+      "label": "Đồng bộ đám mây",
+      "hint": "Đăng nhập để lưu nhật ký vào tài khoản và khôi phục trên điện thoại mới.",
+      "continueGoogle": "Tiếp tục với Google",
+      "continueApple": "Tiếp tục với Apple",
+      "signingIn": "Đang đăng nhập…",
+      "signOut": "Đăng xuất",
+      "syncNow": "Đồng bộ ngay",
+      "syncing": "Đang đồng bộ…",
+      "lastSynced": "Đồng bộ lần cuối · {{time}}",
+      "never": "Chưa từng",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "Chỉ xem trước giao diện — đăng nhập & sao lưu thật sẽ sớm có.",
+      "okSignedIn": "Đã đăng nhập (xem trước)",
+      "okSignedOut": "Đã đăng xuất",
+      "okSynced": "Đã đồng bộ (xem trước)",
+      "errSignIn": "Không đăng nhập được",
+      "errSync": "Không đồng bộ được",
+      "noAccountPhoto": "Tài khoản này không có ảnh đại diện"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "Ngôn ngữ",
+    "aria": "Ngôn ngữ"
   },
   "credits": {
     "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "Quần áo",
     "shape": "Hình dạng",
     "flag": "Cờ"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

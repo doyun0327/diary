@@ -287,11 +287,38 @@
   color: var(--color-text);
 }
 
-.header-menu__hint {
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  line-height: 1.35;
+.header-menu__item--toggle {
+  cursor: pointer;
+}
+
+.header-menu__switch {
+  flex-shrink: 0;
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  background: #e0d4c8;
+  transition: background 0.18s ease;
+}
+
+.header-menu__switch.is-on {
+  background: color-mix(in srgb, var(--color-accent, #b56b52) 85%, #c98);
+}
+
+.header-menu__switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(90, 60, 40, 0.18);
+  transition: transform 0.18s ease;
+}
+
+.header-menu__switch.is-on .header-menu__switch-knob {
+  transform: translateX(18px);
 }
 
 .header-menu__chevron {

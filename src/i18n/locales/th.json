@@ -26,8 +26,8 @@
     "menu": "เมนู",
     "tagline": "บันทึกวันของฉัน",
     "footer": "ช้า ๆ วันแล้ววันเล่า",
-    "account": "บัญชี · ภาษา",
-    "accountHintEmpty": "รูป · ชื่อ · ภาษา",
+    "account": "บัญชี",
+    "accountHintEmpty": "รูป · ซิงค์",
     "rooms": "ห้องเพื่อน",
     "roomsHint": "ห้องของฉัน",
     "character": "ตัวละคร",
@@ -37,7 +37,13 @@
     "decorate": "ตกแต่ง",
     "decorateHint": "ธีม · อีโมจิ",
     "appInfo": "ข้อมูลแอป",
-    "appInfoHint": "เวอร์ชัน · ข้อกำหนด · เครดิต"
+    "appInfoHint": "เวอร์ชัน · ข้อกำหนด · เครดิต",
+    "language": "ภาษา",
+    "languageHint": "ภาษาที่แสดง",
+    "screenLock": "ล็อกหน้าจอ",
+    "screenLockHint": "ล็อกด้วยรหัสผ่าน",
+    "screenLockHintOn": "เปิด · แตะเพื่อปิด",
+    "screenLockHintOff": "ปิด · แตะเพื่อเปิด"
   },
   "decorate": {
     "title": "ตกแต่ง",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "บัญชี · ภาษา",
-    "aria": "บัญชี · ภาษา",
+    "title": "บัญชี",
+    "aria": "บัญชี",
     "photoLabel": "รูปโปรไฟล์",
     "changePhotoAria": "เปลี่ยนรูปโปรไฟล์",
     "pickPhoto": "เลือกรูป",
@@ -148,6 +154,29 @@
       "photoRead": "อ่านรูปไม่ได้",
       "photoProcess": "ประมวลผลรูปไม่ได้",
       "photoLoad": "โหลดรูปไม่ได้"
+    },
+    "useAccountPhoto": "ใช้รูปจากบัญชี",
+    "nameHintLoggedIn": "ดึงชื่อจากบัญชีแล้ว แก้ไขในแอปได้ตลอด",
+    "sync": {
+      "label": "ซิงค์คลาวด์",
+      "hint": "เข้าสู่ระบบเพื่อบันทึกไดอารี่ไว้ในบัญชี และกู้คืนบนมือถือเครื่องใหม่ได้",
+      "continueGoogle": "ดำเนินการต่อด้วย Google",
+      "continueApple": "ดำเนินการต่อด้วย Apple",
+      "signingIn": "กำลังเข้าสู่ระบบ…",
+      "signOut": "ออกจากระบบ",
+      "syncNow": "ซิงค์เลย",
+      "syncing": "กำลังซิงค์…",
+      "lastSynced": "ซิงค์ล่าสุด · {{time}}",
+      "never": "ยังไม่เคย",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "ตัวอย่าง UI เท่านั้น — ล็อกอินและสำรองจริงจะมาเร็วๆ นี้",
+      "okSignedIn": "เข้าสู่ระบบแล้ว (ตัวอย่าง)",
+      "okSignedOut": "ออกจากระบบแล้ว",
+      "okSynced": "ซิงค์แล้ว (ตัวอย่าง)",
+      "errSignIn": "เข้าสู่ระบบไม่ได้",
+      "errSync": "ซิงค์ไม่ได้",
+      "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "ภาษา",
+    "aria": "ภาษา"
   },
   "credits": {
     "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "เสื้อผ้า",
     "shape": "รูปทรง",
     "flag": "ธง"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

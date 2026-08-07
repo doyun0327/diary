@@ -83,6 +83,91 @@
   margin-bottom: 22px;
 }
 
+.account-sheet__oauth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-sheet__oauth-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--color-border-soft);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.account-sheet__oauth-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.account-sheet__oauth-btn--google {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.account-sheet__oauth-btn--apple {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.account-sheet__sync {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-sheet__sync-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border-soft);
+}
+
+.account-sheet__sync-provider {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.account-sheet__sync-email {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.account-sheet__sync-meta {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.account-sheet__sync-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.account-sheet__sync-note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 .account-sheet__label {
   display: block;
   margin: 0 0 6px;

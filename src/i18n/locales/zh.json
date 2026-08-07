@@ -26,8 +26,8 @@
     "menu": "菜单",
     "tagline": "记录我的一天",
     "footer": "慢慢地，一天一天",
-    "account": "账号 · 语言",
-    "accountHintEmpty": "头像 · 昵称 · 语言",
+    "account": "账号",
+    "accountHintEmpty": "头像 · 同步",
     "rooms": "好友房",
     "roomsHint": "我的房间",
     "character": "角色",
@@ -37,7 +37,13 @@
     "decorate": "装扮",
     "decorateHint": "主题 · 表情",
     "appInfo": "应用信息",
-    "appInfoHint": "版本 · 条款 · 致谢"
+    "appInfoHint": "版本 · 条款 · 致谢",
+    "language": "语言",
+    "languageHint": "显示语言",
+    "screenLock": "屏幕锁定",
+    "screenLockHint": "用密码锁定",
+    "screenLockHintOn": "已开启 · 点按关闭",
+    "screenLockHintOff": "已关闭 · 点按开启"
   },
   "decorate": {
     "title": "装扮",
@@ -126,8 +132,8 @@
     }
   },
   "account": {
-    "title": "账号 · 语言",
-    "aria": "账号 · 语言",
+    "title": "账号",
+    "aria": "账号",
     "photoLabel": "头像",
     "changePhotoAria": "更换头像",
     "pickPhoto": "选择照片",
@@ -148,6 +154,29 @@
       "photoRead": "无法读取照片",
       "photoProcess": "无法处理照片",
       "photoLoad": "无法加载照片"
+    },
+    "useAccountPhoto": "使用账号照片",
+    "nameHintLoggedIn": "已填入账号名称，可随时在应用中修改",
+    "sync": {
+      "label": "云同步",
+      "hint": "登录后日记会保存到账号，换手机也能用同一账号恢复。",
+      "continueGoogle": "使用 Google 继续",
+      "continueApple": "使用 Apple 继续",
+      "signingIn": "登录中…",
+      "signOut": "退出登录",
+      "syncNow": "立即同步",
+      "syncing": "同步中…",
+      "lastSynced": "上次同步 · {{time}}",
+      "never": "尚未同步",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "目前仅为界面预览，正式登录与备份即将上线。",
+      "okSignedIn": "已登录（预览）",
+      "okSignedOut": "已退出",
+      "okSynced": "已同步（预览）",
+      "errSignIn": "无法登录",
+      "errSync": "无法同步",
+      "noAccountPhoto": "此账号没有头像"
     }
   },
   "language": {
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "语言",
+    "aria": "语言"
   },
   "credits": {
     "moodIcons": "心情图标：designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "服饰",
     "shape": "形状",
     "flag": "国旗"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
   }
 }

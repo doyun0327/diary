@@ -26,8 +26,8 @@
     "menu": "메뉴",
     "tagline": "나의 하루를 남기다",
     "footer": "천천히, 하루씩",
-    "account": "계정 · 언어",
-    "accountHintEmpty": "프로필 · 이름 · 언어",
+    "account": "계정",
+    "accountHintEmpty": "프로필 · 동기화",
     "rooms": "친구 방",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
@@ -37,7 +37,13 @@
     "decorate": "꾸미기",
     "decorateHint": "테마 · 이모지",
     "appInfo": "앱 정보",
-    "appInfoHint": "버전 · 약관 · 출처"
+    "appInfoHint": "버전 · 약관 · 출처",
+    "language": "언어",
+    "languageHint": "표시 언어",
+    "screenLock": "화면 잠금",
+    "screenLockHint": "비밀번호로 잠그기",
+    "screenLockHintOn": "켜짐 · 탭해서 끄기",
+    "screenLockHintOff": "꺼짐 · 탭해서 켜기"
   },
   "decorate": {
     "title": "꾸미기",
@@ -126,16 +132,39 @@
     }
   },
   "account": {
-    "title": "계정 · 언어",
-    "aria": "계정 · 언어",
+    "title": "계정",
+    "aria": "계정",
     "photoLabel": "프로필 사진",
     "changePhotoAria": "프로필 사진 변경",
     "pickPhoto": "사진 선택",
+    "useAccountPhoto": "계정 사진 쓰기",
     "removePhoto": "삭제",
     "nameLabel": "이름",
     "nameHint": "친구 방에서 보일 이름이에요",
+    "nameHintLoggedIn": "계정 이름으로 채워졌고, 앱에서 언제든 바꿀 수 있어요",
     "namePlaceholder": "이름을 입력해 주세요",
     "save": "저장",
+    "sync": {
+      "label": "클라우드 동기화",
+      "hint": "로그인하면 일기장이 계정에 저장되고, 폰을 바꿔도 같은 계정으로 불러와요.",
+      "continueGoogle": "Google로 계속",
+      "continueApple": "Apple로 계속",
+      "signingIn": "로그인 중…",
+      "signOut": "로그아웃",
+      "syncNow": "지금 동기화",
+      "syncing": "동기화 중…",
+      "lastSynced": "마지막 동기화 · {{time}}",
+      "never": "아직 없음",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "지금은 화면만 연결돼 있어요. 실제 로그인·백업은 곧 이어질 예정이에요.",
+      "okSignedIn": "로그인했어요 (미리보기)",
+      "okSignedOut": "로그아웃했어요",
+      "okSynced": "동기화했어요 (미리보기)",
+      "errSignIn": "로그인하지 못했어요",
+      "errSync": "동기화하지 못했어요",
+      "noAccountPhoto": "이 계정에는 프로필 사진이 없어요"
+    },
     "ok": {
       "nameSaved": "이름을 저장했어요",
       "photoSaved": "프로필 사진을 저장했어요",
@@ -162,7 +191,9 @@
     "fr": "Français",
     "pt": "Português (Brasil)",
     "es": "Español",
-    "th": "ไทย"
+    "th": "ไทย",
+    "title": "언어",
+    "aria": "언어"
   },
   "credits": {
     "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon"
@@ -523,5 +554,49 @@
     "clothes": "의류",
     "shape": "도형",
     "flag": "국기"
+  },
+  "lock": {
+    "title": "화면 잠금",
+    "aria": "화면 잠금",
+    "hint": "켜 두면 앱을 열 때와 다른 앱 갔다 올 때 비밀번호를 물어봐요.",
+    "status": "상태",
+    "on": "켜짐",
+    "off": "꺼짐",
+    "turnOn": "잠금 켜기",
+    "turnOff": "잠금 끄기",
+    "changePassword": "비밀번호 변경",
+    "enableTitle": "비밀번호 설정",
+    "disableTitle": "잠금 끄기",
+    "changeTitle": "비밀번호 변경",
+    "setHint": "비밀번호 {{min}}자 이상으로 정해 주세요.",
+    "disableHint": "비밀번호 4자리를 입력하면 잠금이 꺼져요.",
+    "password": "비밀번호",
+    "newPassword": "새 비밀번호",
+    "confirmPassword": "비밀번호 확인",
+    "currentPassword": "현재 비밀번호",
+    "unlock": "잠금 해제",
+    "gateTitle": "잠금 중",
+    "gateHint": "비밀번호를 입력해 주세요",
+    "gateAria": "화면 잠금",
+    "forgotNote": "4자리 숫자 비밀번호예요. 잊으면 이 기기의 앱 데이터를 지워야 해요.",
+    "ok": {
+      "enabled": "화면 잠금을 켰어요",
+      "disabled": "화면 잠금을 껐어요",
+      "changed": "비밀번호를 바꿨어요"
+    },
+    "err": {
+      "passwordRequired": "비밀번호를 입력해 주세요",
+      "wrongPassword": "비밀번호가 맞지 않아요",
+      "tooShort": "비밀번호는 {{min}}자 이상이어야 해요",
+      "mismatch": "비밀번호가 서로 달라요. 다시 입력해 주세요",
+      "save": "저장하지 못했어요"
+    },
+    "pinTitle": "비밀번호 입력",
+    "pinEnterHint": "비밀번호를 입력해주세요",
+    "pinConfirmHint": "비밀번호를 한번더 입력해주세요",
+    "pinRestart": "처음부터 다시",
+    "delete": "지우기",
+    "keypadAria": "숫자 키패드",
+    "changeVerifyHint": "지금 쓰는 비밀번호 4자리를 입력해 주세요."
   }
 }
