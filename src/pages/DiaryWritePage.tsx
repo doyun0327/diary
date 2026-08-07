@@ -57,8 +57,7 @@ function DiaryWritePage({
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
-  const [, setAiError] = useState<string | null>(null);
-  const [, setAiScene] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [tipOpen, setTipOpen] = useState(false);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
@@ -105,18 +104,16 @@ function DiaryWritePage({
     }
 
     setAiError(null);
-    setAiScene(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
     try {
-      const { imageUrl, scene } = await generateDiaryImage({
+      const { imageUrl } = await generateDiaryImage({
         title,
         content,
         character,
       });
       await canvasRef.current?.loadImage(imageUrl);
-      if (scene) setAiScene(scene);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     } finally {
@@ -214,7 +211,7 @@ function DiaryWritePage({
               fontId={fontId}
               onFontIdChange={setFontId}
             />
-            {aiLoading  && (
+            {aiLoading && (
               <div className="diary-write__ai-loading" aria-busy="true" aria-label={t('write.ai.drawStep')}>
                 {activeAiLottie && (
                   <AiLoadingLottie key={aiLottieKey} animationData={activeAiLottie} />
@@ -282,10 +279,7 @@ function DiaryWritePage({
             onChange={(e) => setContent(e.target.value)}
             placeholder={t('write.contentPlaceholder')}
           />
-          {/* {aiScene && (
-            <p className="diary-write__ai-scene">{t('write.ai.sceneUnderstood', { scene: aiScene })}</p>
-          )}
-          {aiError && <p className="diary-write__ai-error">{aiError}</p>} */}
+          {aiError && <p className="diary-write__ai-error">{aiError}</p>}
         </section>
       </div>
     </form>
