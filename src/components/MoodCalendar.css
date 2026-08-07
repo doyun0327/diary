@@ -214,15 +214,14 @@
 
 .mood-cal__day.has-mood {
   color: unset;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 4px 12px rgba(90, 60, 40, 0.05);
+  background: transparent;
+  box-shadow: none;
 }
 
 .mood-cal__day.has-mood .mood-icon {
   width: 30px;
   height: 30px;
+  background: transparent;
 }
 
 .mood-cal__day.has-drawing {
@@ -250,13 +249,16 @@
   background: #fffefb;
 }
 
-.mood-cal__day.has-mood.today,
-.mood-cal__day.has-drawing.today {
-  background: linear-gradient(160deg, #ffe8dc, #ffd9c8);
-  box-shadow: inset 0 0 0 1.5px rgba(200, 120, 90, 0.35);
+.mood-cal__day.has-mood.today {
+  background: transparent;
+  box-shadow: none;
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  outline-offset: 1px;
 }
 
 .mood-cal__day.has-drawing.today {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: 16px;
   padding: 3px;
 }

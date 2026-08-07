@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}} 일기",
       "emptyMonth": "이 달에 쓴 일기가 없어요.",
+      "showMore": "더 보기 · {{count}}",
+      "collapse": "접기",
       "noPreview": "내용 없음"
     },
     "card": {

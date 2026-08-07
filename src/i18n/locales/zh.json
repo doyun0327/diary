@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "这个月还没有日记。",
+      "showMore": "查看更多 · {{count}}",
+      "collapse": "收起",
       "noPreview": "无内容"
     },
     "card": {

@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Nenhum diário neste mês.",
+      "showMore": "Ver mais · {{count}}",
+      "collapse": "Mostrar menos",
       "noPreview": "Sem conteúdo"
     },
     "card": {

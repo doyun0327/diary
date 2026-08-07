@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Không có nhật ký tháng này.",
+      "showMore": "Xem thêm · {{count}}",
+      "collapse": "Thu gọn",
       "noPreview": "Không có nội dung"
     },
     "card": {

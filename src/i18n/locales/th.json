@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "ไม่มีไดอารี่ในเดือนนี้",
+      "showMore": "ดูเพิ่ม · {{count}}",
+      "collapse": "ย่อ",
       "noPreview": "ไม่มีเนื้อหา"
     },
     "card": {

@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Tidak ada diary bulan ini.",
+      "showMore": "Lihat lainnya · {{count}}",
+      "collapse": "Sembunyikan",
       "noPreview": "Tidak ada isi"
     },
     "card": {

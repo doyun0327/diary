@@ -27,20 +27,21 @@
 }
 
 .diary-row__mood {
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: linear-gradient(160deg, #ffe8dc, #ffd9c8);
+  border-radius: 12px;
+  background: transparent;
   line-height: 1;
 }
 
 .diary-row__mood .mood-icon {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
 }
 
 .diary-row__body {
@@ -74,6 +75,8 @@
   flex: 0 0 44px;
   width: 44px;
   height: 44px;
+  padding: 3px;
+  box-sizing: border-box;
   border-radius: 11px;
   object-fit: contain;
   object-position: center;

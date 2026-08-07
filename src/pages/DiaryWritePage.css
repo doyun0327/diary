@@ -90,9 +90,10 @@
 .diary-write__moods {
   display: flex;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: 8px;
   overflow-x: auto;
-  padding: 4px 2px 8px;
+  overflow-y: visible;
+  padding: 12px 4px 14px;
   scrollbar-width: none;
 }
 
@@ -113,25 +114,30 @@
   cursor: pointer;
   line-height: 1;
   padding: 0;
-  transition: transform 0.18s var(--ease-spring), background 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .diary-write__moods button:hover {
-  background: var(--color-bg-muted);
+  background: transparent;
 }
 
 .diary-write__moods button.selected {
   background: transparent;
-  transform: scale(1.1);
+  transform: none;
   box-shadow: none;
   outline: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .diary-write__moods button .mood-icon {
   width: 32px;
   height: 32px;
   background: transparent;
+}
+
+.diary-write__moods button.selected .mood-icon {
+  width: 36px;
+  height: 36px;
 }
 
 .diary-write__section h2 {

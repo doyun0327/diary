@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "今月の日記はまだありません。",
+      "showMore": "もっと見る · {{count}}",
+      "collapse": "閉じる",
       "noPreview": "内容なし"
     },
     "card": {

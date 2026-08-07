@@ -228,6 +228,8 @@
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Aucun journal ce mois-ci.",
+      "showMore": "Voir plus · {{count}}",
+      "collapse": "Réduire",
       "noPreview": "Pas de contenu"
     },
     "card": {
