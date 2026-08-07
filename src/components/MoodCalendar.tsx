@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, Mood } from '../types/diary';
 import { MOOD_MAP } from '../types/diary';
@@ -7,7 +6,6 @@ import {
   useCalendarDisplayMode,
 } from '../utils/calendarDisplay';
 import { formatYearMonth } from '../utils/date';
-import { trimDrawingForThumb } from '../utils/trimDrawingForThumb';
 import MoodIcon from './MoodIcon';
 import './MoodCalendar.css';
 
@@ -42,7 +40,6 @@ function MoodCalendar({
   const { t } = useTranslation();
   const displayMode = useCalendarDisplayMode();
   const now = new Date();
-  const [thumbBySrc, setThumbBySrc] = useState<Record<string, string>>({});
 
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -63,35 +60,6 @@ function MoodCalendar({
       markByDate.set(entry.date, { mood, imageUrl });
     }
   }
-
-  const monthImageUrls = useMemo(() => {
-    const urls: string[] = [];
-    for (const day of cells) {
-      if (day === null) continue;
-      const url = markByDate.get(toDateString(viewYear, viewMonth, day))?.imageUrl;
-      if (url) urls.push(url);
-    }
-    return [...new Set(urls)];
-  }, [entries, viewYear, viewMonth]);
-
-  useEffect(() => {
-    if (displayMode !== 'drawing' || monthImageUrls.length === 0) return;
-
-    let cancelled = false;
-    void (async () => {
-      const next: Record<string, string> = {};
-      await Promise.all(
-        monthImageUrls.map(async (url) => {
-          next[url] = await trimDrawingForThumb(url);
-        }),
-      );
-      if (!cancelled) setThumbBySrc((prev) => ({ ...prev, ...next }));
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [displayMode, monthImageUrls]);
 
   const moveMonth = (delta: number) => {
     const d = new Date(viewYear, viewMonth + delta, 1);
@@ -161,8 +129,6 @@ function MoodCalendar({
           const showDrawing = displayMode === 'drawing' && Boolean(imageUrl);
           const showMood = Boolean(mood) && !showDrawing;
           const isToday = dateStr === todayStr;
-          const thumbSrc =
-            imageUrl ? thumbBySrc[imageUrl] ?? imageUrl : undefined;
 
           return (
             <button
@@ -177,10 +143,10 @@ function MoodCalendar({
               onClick={() => onSelectDate?.(dateStr)}
               aria-label={`${day}${mood ? ` ${t(`mood.${mood}`)}` : ''}`}
             >
-              {showDrawing && thumbSrc ? (
+              {showDrawing && imageUrl ? (
                 <img
                   className="mood-cal__thumb"
-                  src={thumbSrc}
+                  src={imageUrl}
                   alt=""
                   draggable={false}
                 />
