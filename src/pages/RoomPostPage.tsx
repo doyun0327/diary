@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
-import { formatDate } from '../utils/date';
 import * as roomsApi from '../api/roomsApi';
-import MoodIcon from '../components/MoodIcon';
+import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
@@ -73,7 +72,7 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
   };
 
   return (
-    <div className="rooms">
+    <div className="rooms rooms--post">
       <div className="rooms__toolbar">
         <button type="button" onClick={onBack}>
           {t('rooms.backToRoom')}
@@ -92,35 +91,35 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
       {loading && <p className="rooms__muted">{t('common.loading')}</p>}
 
       {post && (
-        <article className="rooms__post">
-          <p className="rooms__post-meta">
-            {post.authorNickname} · {formatDate(post.date)}
-            {post.mood ? (
-              <>
-                {' · '}
-                <MoodIcon mood={post.mood} size={16} />
-              </>
-            ) : null}
-          </p>
-          {post.title && <h3 className="rooms__post-title">{post.title}</h3>}
-          {post.imageUrl && (
-            <div className="rooms__post-image">
-              <img src={post.imageUrl} alt="" />
-            </div>
-          )}
-          <p className="rooms__post-content">{post.content}</p>
-        </article>
+        <div className="rooms__post-expand">
+          <p className="rooms__post-by">{post.authorNickname}</p>
+          <RoomDiaryPaper post={post} className="rooms__paper--expand" />
+        </div>
       )}
 
       <section className="rooms__comments">
         <h3>{t('rooms.comments', { n: comments.length })}</h3>
         <ul className="rooms__comment-list">
-          {comments.map((c) => (
-            <li key={c.id}>
-              <strong>{c.authorNickname}</strong>
-              <span>{c.text}</span>
-            </li>
-          ))}
+          {comments.map((c, i) => {
+            const prev = comments[i - 1];
+            const showName = !prev || prev.authorClientId !== c.authorClientId;
+            const isMine = c.authorClientId === clientId;
+            return (
+              <li
+                key={c.id}
+                className={[
+                  'rooms__comment',
+                  isMine ? 'rooms__comment--mine' : 'rooms__comment--other',
+                  showName ? 'rooms__comment--named' : 'rooms__comment--cont',
+                ].join(' ')}
+              >
+                {showName && !isMine && (
+                  <strong className="rooms__comment-name">{c.authorNickname}</strong>
+                )}
+                <span className="rooms__comment-bubble">{c.text}</span>
+              </li>
+            );
+          })}
         </ul>
         <div className="rooms__comment-form">
           <input
@@ -133,7 +132,12 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
               if (e.key === 'Enter') void handleComment();
             }}
           />
-          <button type="button" className="rooms__btn primary" disabled={busy || !text.trim()} onClick={() => void handleComment()}>
+          <button
+            type="button"
+            className="rooms__btn primary"
+            disabled={busy || !text.trim()}
+            onClick={() => void handleComment()}
+          >
             {t('rooms.commentSubmit')}
           </button>
         </div>

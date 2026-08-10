@@ -225,6 +225,9 @@
     "refresh": "Làm mới",
     "sharedDiaries": "Nhật ký đã chia sẻ",
     "sharedEmpty": "Chưa có nhật ký chia sẻ. Thử “Chia sẻ vào phòng” trên nhật ký của bạn.",
+    "coach": {
+      "comment": "Hãy để lại bình luận!"
+    },
     "backToRoom": "← Về phòng",
     "sharedDiary": "Nhật ký đã chia sẻ",
     "comments": "Bình luận ({{n}})",

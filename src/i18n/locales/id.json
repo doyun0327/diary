@@ -225,6 +225,9 @@
     "refresh": "Muat ulang",
     "sharedDiaries": "Diary bersama",
     "sharedEmpty": "Belum ada diary bersama. Coba “Bagikan ke ruang” di diary Anda.",
+    "coach": {
+      "comment": "Tinggalkan komentar!"
+    },
     "backToRoom": "← Ke ruang",
     "sharedDiary": "Diary bersama",
     "comments": "Komentar ({{n}})",

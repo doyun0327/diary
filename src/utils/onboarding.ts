@@ -1,6 +1,7 @@
 const CHARACTER_DONE_KEY = 'picture-diary-onboarding-character-done';
 const CHARACTER_COACH_KEY = 'picture-diary-onboarding-character-coach';
 const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
+const ROOM_COMMENT_COACH_KEY = 'picture-diary-onboarding-room-comment-coach';
 
 function readFlag(key: string): boolean {
   try {
@@ -40,4 +41,12 @@ export function isAiCoachSeen(): boolean {
 
 export function markAiCoachSeen() {
   writeFlag(AI_COACH_KEY);
+}
+
+export function isRoomCommentCoachSeen(): boolean {
+  return readFlag(ROOM_COMMENT_COACH_KEY);
+}
+
+export function markRoomCommentCoachSeen() {
+  writeFlag(ROOM_COMMENT_COACH_KEY);
 }

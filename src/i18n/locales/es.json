@@ -225,6 +225,9 @@
     "refresh": "Actualizar",
     "sharedDiaries": "Diarios compartidos",
     "sharedEmpty": "Aún no hay diarios compartidos. Prueba “Compartir en sala” en tu diario.",
+    "coach": {
+      "comment": "¡Deja un comentario!"
+    },
     "backToRoom": "← A la sala",
     "sharedDiary": "Diario compartido",
     "comments": "Comentarios ({{n}})",

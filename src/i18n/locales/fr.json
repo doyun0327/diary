@@ -225,6 +225,9 @@
     "refresh": "Actualiser",
     "sharedDiaries": "Journaux partagés",
     "sharedEmpty": "Pas encore de journaux partagés. Essayez « Partager dans un salon » sur votre journal.",
+    "coach": {
+      "comment": "Laissez un commentaire !"
+    },
     "backToRoom": "← Au salon",
     "sharedDiary": "Journal partagé",
     "comments": "Commentaires ({{n}})",

@@ -227,8 +227,6 @@ function App() {
         {page === 'room' && activeRoomId && (
           <RoomPage
             roomId={activeRoomId}
-            clientId={clientId}
-            myAvatarUrl={avatarUrl}
             onBack={() => {
               setActivePostId(null);
               setPage('rooms');

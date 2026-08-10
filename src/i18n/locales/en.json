@@ -227,6 +227,10 @@
     "refresh": "Refresh",
     "sharedDiaries": "Shared diaries",
     "sharedEmpty": "No shared diaries yet. Try “Share to room” on your diary.",
+    "openPostAria": "Open {{author}}’s diary {{title}}",
+    "coach": {
+      "comment": "Leave a comment!"
+    },
     "backToRoom": "← To room",
     "sharedDiary": "Shared diary",
     "comments": "Comments ({{n}})",

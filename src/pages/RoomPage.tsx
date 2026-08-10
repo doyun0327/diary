@@ -1,26 +1,28 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
-import { formatDate } from '../utils/date';
 import * as roomsApi from '../api/roomsApi';
-import MoodIcon from '../components/MoodIcon';
+import RoomDiaryPaper from '../components/RoomDiaryPaper';
+import {
+  isRoomCommentCoachSeen,
+  markRoomCommentCoachSeen,
+} from '../utils/onboarding';
 import './RoomsPages.css';
 
 interface RoomPageProps {
   roomId: string;
-  clientId: string;
-  myAvatarUrl: string | null;
   onBack: () => void;
   onOpenPost: (postId: string) => void;
 }
 
-function RoomPage({ roomId, clientId, myAvatarUrl, onBack, onOpenPost }: RoomPageProps) {
+function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -43,6 +45,16 @@ function RoomPage({ roomId, clientId, myAvatarUrl, onBack, onOpenPost }: RoomPag
     void refresh();
   }, [refresh]);
 
+  const dismissCoach = () => {
+    markRoomCommentCoachSeen();
+    setShowCoach(false);
+  };
+
+  const handleOpenPost = (postId: string) => {
+    if (showCoach) dismissCoach();
+    onOpenPost(postId);
+  };
+
   const copyCode = async () => {
     if (!room) return;
     try {
@@ -61,78 +73,74 @@ function RoomPage({ roomId, clientId, myAvatarUrl, onBack, onOpenPost }: RoomPag
           {t('rooms.backToList')}
         </button>
         <h2>{room?.name ?? t('rooms.title')}</h2>
-        <button type="button" className="rooms__link" onClick={() => void refresh()} disabled={loading}>
-          {t('rooms.refresh')}
-        </button>
+        <div className="rooms__toolbar-actions">
+          {room && (
+            <button
+              type="button"
+              className="rooms__invite-quiet"
+              onClick={() => void copyCode()}
+              title={t('rooms.copyInviteTitle')}
+              aria-label={t('rooms.copyInviteAria')}
+            >
+              {copied ? t('rooms.copied') : t('rooms.copyInvite')}
+            </button>
+          )}
+          <button type="button" className="rooms__link" onClick={() => void refresh()} disabled={loading}>
+            {t('rooms.refresh')}
+          </button>
+        </div>
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
       {loading && !room && <p className="rooms__muted">{t('common.loading')}</p>}
 
       {room && (
-        <>
-          <section className="rooms__card">
-            <div className="rooms__card-head">
-              <h3>
-                {room.name}
-              </h3>
-              <button
-                type="button"
-                className="rooms__invite-quiet"
-                onClick={() => void copyCode()}
-                title={t('rooms.copyInviteTitle')}
-                aria-label={t('rooms.copyInviteAria')}
-              >
-                {copied ? t('rooms.copied') : t('rooms.copyInvite')}
-              </button>
-            </div>
-            <ul className="rooms__members">
-              {room.members.map((m) => {
-                const name = m.nickname || t('common.anonymous');
-                const photo =
-                  (m.clientId === clientId ? myAvatarUrl : null) || m.avatarUrl || null;
-                return (
-                  <li key={m.clientId} className="rooms__member">
-                    <span className="rooms__member-avatar" aria-hidden>
-                      {photo ? (
-                        <img src={photo} alt="" />
-                      ) : (
-                        <span>{name.slice(0, 1)}</span>
-                      )}
-                    </span>
-                    <span className="rooms__member-name">{name}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-
-          <section className="rooms__list-wrap">
+        <section className="rooms__list-wrap">
+          <div className="rooms__section-head">
             <h3>{t('rooms.sharedDiaries')}</h3>
-            {posts.length === 0 && (
-              <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
+            {posts.length > 0 && (
+              <span className="rooms__section-count">{posts.length}</span>
             )}
-            <ul className="rooms__feed">
-              {posts.map((post) => (
-                <li key={post.id}>
-                  <button type="button" className="rooms__feed-item" onClick={() => onOpenPost(post.id)}>
-                    {post.imageUrl && (
-                      <img src={post.imageUrl} alt="" className="rooms__feed-thumb" />
-                    )}
-                    <div className="rooms__feed-body">
-                      <p className="rooms__feed-author">{post.authorNickname}</p>
-                      <p className="rooms__feed-title">
-                        {post.mood ? <MoodIcon mood={post.mood} size={16} /> : null}{' '}
-                        {post.title || formatDate(post.date)}
-                      </p>
-                      <p className="rooms__feed-snippet">{post.content || formatDate(post.date)}</p>
-                    </div>
+          </div>
+          {posts.length === 0 && (
+            <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
+          )}
+          {posts.length > 0 && (
+            <div className="rooms__coach-anchor">
+              {showCoach && (
+                <div className="rooms__coach" role="status">
+                  <p>{t('rooms.coach.comment')}</p>
+                  <button
+                    type="button"
+                    className="rooms__coach-dismiss"
+                    aria-label={t('common.close')}
+                    onClick={dismissCoach}
+                  >
+                    ×
                   </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </>
+                </div>
+              )}
+              <ul className="rooms__gallery">
+                {posts.map((post) => (
+                  <li key={post.id}>
+                    <button
+                      type="button"
+                      className="rooms__gallery-item"
+                      onClick={() => handleOpenPost(post.id)}
+                      aria-label={t('rooms.openPostAria', {
+                        author: post.authorNickname,
+                        title: post.title || post.date,
+                      })}
+                    >
+                      <span className="rooms__gallery-author">{post.authorNickname}</span>
+                      <RoomDiaryPaper post={post} compact />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       )}
     </div>
   );

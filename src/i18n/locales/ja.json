@@ -225,6 +225,9 @@
     "refresh": "更新",
     "sharedDiaries": "共有された日記",
     "sharedEmpty": "まだ共有された日記はありません。日記詳細の「ルームに共有」を試してみてください。",
+    "coach": {
+      "comment": "コメントを残してみてね！"
+    },
     "backToRoom": "← ルームへ",
     "sharedDiary": "共有日記",
     "comments": "コメント（{{n}}）",
