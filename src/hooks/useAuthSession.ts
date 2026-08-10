@@ -102,10 +102,13 @@ export function useAuthSession() {
     setSession(null);
   }, []);
 
-  const markSynced = useCallback(() => {
+  const markSynced = useCallback((serverTime?: string | null) => {
     setSession((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, lastSyncedAt: new Date().toISOString() };
+      const next = {
+        ...prev,
+        lastSyncedAt: serverTime || new Date().toISOString(),
+      };
       saveSession(next);
       return next;
     });

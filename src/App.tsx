@@ -32,7 +32,7 @@ export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
 
 function App() {
   const { t } = useTranslation();
-  const { entries, addEntry, updateEntry, removeEntry } = useDiary();
+  const { entries, addEntry, updateEntry, removeEntry, syncWithCloud } = useDiary();
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } = useClientProfile();
   const screenLock = useScreenLock();
@@ -240,6 +240,7 @@ function App() {
             avatarUrl={avatarUrl}
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
+            onSyncDiaries={syncWithCloud}
             onClose={() => setAccountOpen(false)}
           />,
           document.getElementById('root') ?? document.body,

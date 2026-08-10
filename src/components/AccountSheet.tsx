@@ -13,6 +13,8 @@ interface AccountSheetProps {
   avatarUrl: string | null;
   onNicknameChange: (name: string) => void;
   onAvatarChange: (dataUrl: string | null) => void;
+  /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
+  onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
   onClose: () => void;
 }
 
@@ -73,6 +75,7 @@ function AccountSheet({
   avatarUrl,
   onNicknameChange,
   onAvatarChange,
+  onSyncDiaries,
   onClose,
 }: AccountSheetProps) {
   const { t, i18n } = useTranslation();
@@ -118,7 +121,13 @@ function AccountSheet({
     try {
       const next = await signIn(provider);
       seedProfileFromAuth(next);
-      setMsg(t('account.sync.okSignedIn'));
+      try {
+      const result = await onSyncDiaries(null);
+        markSynced(result.serverTime);
+        setMsg(t('account.sync.okSignedInSynced'));
+      } catch {
+        setMsg(t('account.sync.okSignedIn'));
+      }
     } catch {
       setMsg(t('account.sync.errSignIn'));
     } finally {
@@ -136,10 +145,9 @@ function AccountSheet({
     setAuthBusy('sync');
     setMsg(null);
     try {
-      // 실제 API 붙이기 전: 시각만 갱신
-      await new Promise((r) => setTimeout(r, 500));
-      markSynced();
-      setMsg(t('account.sync.okSynced'));
+      const result = await onSyncDiaries(session.lastSyncedAt);
+      markSynced(result.serverTime);
+      setMsg(t('account.sync.okSynced', { count: result.entryCount }));
     } catch {
       setMsg(t('account.sync.errSync'));
     } finally {
