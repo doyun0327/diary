@@ -24,6 +24,7 @@ import { useDiary } from './hooks/useDiary';
 import { useCharacter } from './hooks/useCharacter';
 import { useClientProfile } from './hooks/useClientProfile';
 import { useScreenLock } from './hooks/useScreenLock';
+import { getAccessToken, useAuthSession } from './hooks/useAuthSession';
 import { isCharacterSetupDone } from './utils/onboarding';
 import type { DiaryEntry } from './types/diary';
 import './App.css';
@@ -33,6 +34,7 @@ export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
 function App() {
   const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry, syncWithCloud } = useDiary();
+  const { session, markSynced } = useAuthSession();
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } = useClientProfile();
   const screenLock = useScreenLock();
@@ -71,17 +73,34 @@ function App() {
     setPage('detail');
   };
 
+  /** 로그인된 경우 저장/삭제 후 백그라운드 동기화 */
+  const syncInBackground = () => {
+    if (!getAccessToken()) return;
+    void syncWithCloud(session?.lastSyncedAt ?? null)
+      .then((result) => markSynced(result.serverTime))
+      .catch((err) => {
+        console.warn('[sync] background failed', err);
+      });
+  };
+
   const handleSave: Parameters<typeof DiaryWritePage>[0]['onSave'] = (entry) => {
     if (editingId) {
       updateEntry(editingId, entry);
       setSelectedId(editingId);
       setEditingId(null);
       setPage('detail');
+      syncInBackground();
       return;
     }
 
     addEntry(entry);
     setPage('home');
+    syncInBackground();
+  };
+
+  const handleDelete = (id: string) => {
+    removeEntry(id);
+    syncInBackground();
   };
 
   const handleEdit = () => {
@@ -190,7 +209,7 @@ function App() {
             entry={selectedEntry}
             onBack={() => setPage('home')}
             onEdit={handleEdit}
-            onDelete={removeEntry}
+            onDelete={handleDelete}
           />
         )}
         {page === 'rooms' && (

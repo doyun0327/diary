@@ -7,17 +7,16 @@ Google 로그인 후 일기(`DiaryEntry`)를 Spring Boot에 백업·복구하는
 ## 흐름
 
 ```
-계정 → 지금 동기화
-  → Authorization: Bearer <JWT>
-  → POST /api/diaries/sync
-      { since, entries(로컬 전체), deletedIds }
-  → 서버 LWW(updatedAt) upsert + soft-delete
-  → { serverTime, entries, deletedIds }
-  → 로컬 merge → localStorage 갱신
-  → lastSyncedAt = serverTime
+일기 저장 / 삭제 (로그인된 경우)
+  → localStorage 반영 후
+  → POST /api/diaries/sync (백그라운드)
+  → lastSyncedAt 갱신
+
+로그인 직후
+  → since: null 전체 sync 1회
 ```
 
-로그인 직후에도 `since: null`로 한 번 전체 동기화를 시도합니다.
+수동 「지금 동기화」 버튼은 없습니다.
 
 ---
 
@@ -85,7 +84,8 @@ Google 로그인 후 일기(`DiaryEntry`)를 Spring Boot에 백업·복구하는
 | `src/api/diariesApi.ts` | `fetchDiaries` / `syncDiaries` |
 | `src/utils/diarySync.ts` | 로컬 LWW merge |
 | `src/hooks/useDiary.ts` | tombstone(`picture-diary-deleted-ids`) + `syncWithCloud` |
-| `src/components/AccountSheet.tsx` | 「지금 동기화」·로그인 직후 sync |
+| `src/components/AccountSheet.tsx` | 로그인 직후 sync · 수동 버튼 없음 |
+| `src/App.tsx` | 저장·삭제 시 `syncInBackground` |
 | `src/App.tsx` | `onSyncDiaries={syncWithCloud}` |
 
 ### localStorage
@@ -111,6 +111,5 @@ Google 로그인 후 일기(`DiaryEntry`)를 Spring Boot에 백업·복구하는
 
 1. `diary_back` 실행 (`8080`)
 2. `diary` → `npm run dev` (Vite가 `/api` 프록시)
-3. Google 로그인 → 「지금 동기화」
-4. Network: `POST /api/diaries/sync` 200 확인
-5. 다른 브라우저/시크릿에서 같은 계정 로그인 → 동기화 후 일기 복구 확인
+3. Google 로그인 → 일기 저장 시 Network에서 `POST /api/diaries/sync` 확인
+4. 다른 기기/시크릿에서 같은 계정 로그인 → 일기 복구 확인

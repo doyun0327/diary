@@ -484,8 +484,9 @@ function DrawingCanvas({
     loadImage: async (src: string) => {
       bakeAllPhotos();
       bakeAllStickers();
-      pushUndoSnapshot();
+      // AI 그림을 새 기준으로 두고, 「뒤로」로 AI 자체가 사라지지 않게 함
       await drawImageOnCanvas(src, true);
+      clearUndoStack();
     },
   }));
 

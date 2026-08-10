@@ -84,7 +84,7 @@ function AccountSheet({
   const [nameDraft, setNameDraft] = useState(nickname);
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [authBusy, setAuthBusy] = useState<AuthProvider | 'sync' | null>(null);
+  const [authBusy, setAuthBusy] = useState<AuthProvider | null>(null);
 
   useEffect(() => {
     setNameDraft(nickname);
@@ -138,21 +138,6 @@ function AccountSheet({
   const handleSignOut = () => {
     signOut();
     setMsg(t('account.sync.okSignedOut'));
-  };
-
-  const handleSyncNow = async () => {
-    if (!session) return;
-    setAuthBusy('sync');
-    setMsg(null);
-    try {
-      const result = await onSyncDiaries(session.lastSyncedAt);
-      markSynced(result.serverTime);
-      setMsg(t('account.sync.okSynced', { count: result.entryCount }));
-    } catch {
-      setMsg(t('account.sync.errSync'));
-    } finally {
-      setAuthBusy(null);
-    }
   };
 
   const useAccountPhoto = () => {
@@ -254,16 +239,6 @@ function AccountSheet({
               <div className="account-sheet__sync-actions">
                 <button
                   type="button"
-                  className="account-sheet__btn account-sheet__btn--solid"
-                  disabled={authBusy !== null}
-                  onClick={() => void handleSyncNow()}
-                >
-                  {authBusy === 'sync'
-                    ? t('account.sync.syncing')
-                    : t('account.sync.syncNow')}
-                </button>
-                <button
-                  type="button"
                   className="account-sheet__btn account-sheet__btn--ghost"
                   disabled={authBusy !== null}
                   onClick={handleSignOut}
@@ -271,7 +246,7 @@ function AccountSheet({
                   {t('account.sync.signOut')}
                 </button>
               </div>
-              <p className="account-sheet__sync-note">{t('account.sync.mockNote')}</p>
+              <p className="account-sheet__sync-note">{t('account.sync.autoNote')}</p>
             </div>
           ) : (
             <div className="account-sheet__oauth">
@@ -295,7 +270,7 @@ function AccountSheet({
                   ? t('account.sync.signingIn')
                   : t('account.sync.continueApple')}
               </button>
-              <p className="account-sheet__sync-note">{t('account.sync.mockNote')}</p>
+              <p className="account-sheet__sync-note">{t('account.sync.autoNote')}</p>
             </div>
           )}
         </section>

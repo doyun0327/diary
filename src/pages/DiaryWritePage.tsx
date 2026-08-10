@@ -20,6 +20,12 @@ import {
   markAiCoachSeen,
   markCharacterCoachSeen,
 } from '../utils/onboarding';
+import {
+  clearWriteDraft,
+  loadWriteDraft,
+  saveWriteDraft,
+  writeDraftHasContent,
+} from '../utils/writeDraft';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -55,12 +61,13 @@ function DiaryWritePage({
 }: DiaryWritePageProps) {
   const { t } = useTranslation();
   const isEdit = Boolean(initialEntry);
-  const [date, setDate] = useState(initialEntry?.date ?? today());
-  const [title, setTitle] = useState(initialEntry?.title ?? '');
-  const [content, setContent] = useState(initialEntry?.content ?? '');
-  const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? 'happy');
+  const draft = !initialEntry ? loadWriteDraft() : null;
+  const [date, setDate] = useState(initialEntry?.date ?? draft?.date ?? today());
+  const [title, setTitle] = useState(initialEntry?.title ?? draft?.title ?? '');
+  const [content, setContent] = useState(initialEntry?.content ?? draft?.content ?? '');
+  const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? draft?.mood ?? 'happy');
   const [fontId, setFontId] = useState(
-    () => initialEntry?.fontId ?? getPreferredFontId(),
+    () => initialEntry?.fontId ?? draft?.fontId ?? getPreferredFontId(),
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -77,6 +84,7 @@ function DiaryWritePage({
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const imageLoadedRef = useRef(false);
+  const draftImageUrl = draft?.imageUrl;
 
   useEffect(() => {
     if (isEdit) {
@@ -126,10 +134,39 @@ function DiaryWritePage({
   }, []);
 
   useEffect(() => {
-    if (!initialEntry?.imageUrl || imageLoadedRef.current) return;
+    const src = initialEntry?.imageUrl || draftImageUrl;
+    if (!src || imageLoadedRef.current) return;
     imageLoadedRef.current = true;
-    void canvasRef.current?.loadImage(initialEntry.imageUrl);
-  }, [initialEntry?.imageUrl]);
+    void canvasRef.current?.loadImage(src);
+  }, [initialEntry?.imageUrl, draftImageUrl]);
+
+  const persistDraftIfNeeded = () => {
+    if (isEdit) return;
+    let imageUrl: string | undefined;
+    try {
+      imageUrl = canvasRef.current?.toDataURL();
+    } catch {
+      imageUrl = draftImageUrl;
+    }
+    const next = {
+      date,
+      title,
+      content,
+      mood,
+      fontId,
+      imageUrl,
+    };
+    if (writeDraftHasContent(next)) {
+      saveWriteDraft(next);
+    } else {
+      clearWriteDraft();
+    }
+  };
+
+  const handleCancel = () => {
+    persistDraftIfNeeded();
+    onCancel();
+  };
 
   const handleAiDraw = async () => {
     if (!content.trim()) {
@@ -175,6 +212,7 @@ function DiaryWritePage({
       return;
     }
     setAiError(null);
+    clearWriteDraft();
     onSave({
       date,
       title: title.trim(),
@@ -190,7 +228,7 @@ function DiaryWritePage({
   return (
     <form className="diary-write" onSubmit={handleSubmit}>
       <nav className="diary-write__nav">
-        <button type="button" className="diary-write__nav-btn" onClick={onCancel}>
+        <button type="button" className="diary-write__nav-btn" onClick={handleCancel}>
           {t('write.cancel')}
         </button>
         <span className="diary-write__nav-title">{isEdit ? t('write.title.edit') : t('write.title.new')}</span>

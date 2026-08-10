@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { syncDiaries } from '../api/diariesApi';
 import { getAccessToken } from './useAuthSession';
 import type { DiaryEntry } from '../types/diary';
@@ -16,6 +16,14 @@ function loadEntries(): DiaryEntry[] {
   }
 }
 
+function persistEntries(entries: DiaryEntry[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  } catch {
+    // ignore
+  }
+}
+
 function loadDeletedIds(): string[] {
   try {
     const raw = localStorage.getItem(DELETED_KEY);
@@ -27,7 +35,7 @@ function loadDeletedIds(): string[] {
   }
 }
 
-function saveDeletedIds(ids: string[]) {
+function persistDeletedIds(ids: string[]) {
   try {
     localStorage.setItem(DELETED_KEY, JSON.stringify([...new Set(ids)]));
   } catch {
@@ -40,14 +48,6 @@ export function useDiary() {
   const [entries, setEntries] = useState<DiaryEntry[]>(loadEntries);
   const [deletedIds, setDeletedIds] = useState<string[]>(loadDeletedIds);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }, [entries]);
-
-  useEffect(() => {
-    saveDeletedIds(deletedIds);
-  }, [deletedIds]);
-
   const addEntry = useCallback(
     (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
       const now = new Date().toISOString();
@@ -57,8 +57,16 @@ export function useDiary() {
         createdAt: now,
         updatedAt: now,
       };
-      setEntries((prev) => [newEntry, ...prev]);
-      setDeletedIds((prev) => prev.filter((id) => id !== newEntry.id));
+      setEntries((prev) => {
+        const next = [newEntry, ...prev];
+        persistEntries(next);
+        return next;
+      });
+      setDeletedIds((prev) => {
+        const next = prev.filter((id) => id !== newEntry.id);
+        persistDeletedIds(next);
+        return next;
+      });
       return newEntry;
     },
     [],
@@ -66,23 +74,34 @@ export function useDiary() {
 
   const updateEntry = useCallback(
     (id: string, patch: Partial<Omit<DiaryEntry, 'id' | 'createdAt'>>) => {
-      setEntries((prev) =>
-        prev.map((e) =>
+      setEntries((prev) => {
+        const next = prev.map((e) =>
           e.id === id
             ? { ...e, ...patch, updatedAt: new Date().toISOString() }
             : e,
-        ),
-      );
+        );
+        persistEntries(next);
+        return next;
+      });
     },
     [],
   );
 
   const removeEntry = useCallback((id: string) => {
-    setEntries((prev) => prev.filter((e) => e.id !== id));
-    setDeletedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    setEntries((prev) => {
+      const next = prev.filter((e) => e.id !== id);
+      persistEntries(next);
+      return next;
+    });
+    setDeletedIds((prev) => {
+      const next = prev.includes(id) ? prev : [...prev, id];
+      persistDeletedIds(next);
+      return next;
+    });
   }, []);
 
   const replaceEntries = useCallback((next: DiaryEntry[]) => {
+    persistEntries(next);
     setEntries(next);
   }, []);
 
@@ -90,41 +109,43 @@ export function useDiary() {
    * 서버와 LWW 동기화.
    * @param since 마지막 성공 동기화 시각 (없으면 전체 pull)
    */
-  const syncWithCloud = useCallback(
-    async (since: string | null) => {
-      const token = getAccessToken();
-      if (!token) {
-        throw new Error('로그인이 필요해요');
-      }
+  const syncWithCloud = useCallback(async (since: string | null) => {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error('로그인이 필요해요');
+    }
 
-      const pendingDeletes = loadDeletedIds();
-      const localEntries = loadEntries();
+    const pendingDeletes = loadDeletedIds();
+    const localEntries = loadEntries();
 
-      const res = await syncDiaries(token, {
-        since,
-        entries: localEntries,
-        deletedIds: pendingDeletes,
-      });
+    const res = await syncDiaries(token, {
+      since,
+      entries: localEntries,
+      deletedIds: pendingDeletes,
+    });
 
-      const merged = mergeDiaryEntries(localEntries, res.entries ?? [], [
-        ...pendingDeletes,
-        ...(res.deletedIds ?? []),
-      ]);
+    const merged = mergeDiaryEntries(localEntries, res.entries ?? [], [
+      ...pendingDeletes,
+      ...(res.deletedIds ?? []),
+    ]);
 
-      setEntries(merged);
-      // push 성공한 로컬 삭제는 tombstone에서 제거
-      const sentDeletes = new Set(pendingDeletes);
-      setDeletedIds((prev) =>
-        prev.filter((id) => !sentDeletes.has(id) && !merged.some((e) => e.id === id)),
+    persistEntries(merged);
+    setEntries(merged);
+
+    const sentDeletes = new Set(pendingDeletes);
+    setDeletedIds((prev) => {
+      const next = prev.filter(
+        (id) => !sentDeletes.has(id) && !merged.some((e) => e.id === id),
       );
+      persistDeletedIds(next);
+      return next;
+    });
 
-      return {
-        serverTime: res.serverTime || new Date().toISOString(),
-        entryCount: merged.length,
-      };
-    },
-    [],
-  );
+    return {
+      serverTime: res.serverTime || new Date().toISOString(),
+      entryCount: merged.length,
+    };
+  }, []);
 
   return {
     entries,
