@@ -1,24 +1,25 @@
 import { useCallback, useState } from 'react';
+import { fetchMe, loginWithGoogleIdToken, logoutRemote } from '../api/authApi';
+import { requestGoogleIdToken } from '../lib/googleAuth';
 
 export type AuthProvider = 'google' | 'apple';
 
 export interface AuthSession {
   provider: AuthProvider;
-  /** 계정 식별용 (표시·동기화). 프론트 mock 단계 */
   email: string;
-  /** 소셜 계정에서 가져온 표시 이름 */
   displayName: string;
-  /** 소셜 프로필 사진 URL (없을 수 있음 — Apple은 자주 비어 있음) */
   photoUrl: string | null;
-  /** ISO — 프론트에서 ‘마지막 동기화’ 표시용 */
   lastSyncedAt: string | null;
+  /** 서버 사용자 id */
+  userId?: string;
 }
 
-const STORAGE_KEY = 'picture-diary-auth-session';
+const SESSION_KEY = 'picture-diary-auth-session';
+const TOKEN_KEY = 'picture-diary-access-token';
 
 function loadSession(): AuthSession | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthSession;
     if (!parsed?.provider || !parsed?.email) return null;
@@ -30,52 +31,73 @@ function loadSession(): AuthSession | null {
 
 function saveSession(session: AuthSession | null) {
   try {
-    if (session) localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-    else localStorage.removeItem(STORAGE_KEY);
+    if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SESSION_KEY);
   } catch {
     // ignore
   }
 }
 
-/** 실제 OAuth 전까지 쓰는 가짜 프로필 (UI·플로우 검증용) */
-function mockProfile(provider: AuthProvider): Omit<AuthSession, 'lastSyncedAt'> {
-  if (provider === 'google') {
-    return {
-      provider: 'google',
-      email: 'you@gmail.com',
-      displayName: 'PageBy User',
-      photoUrl: 'https://api.dicebear.com/9.x/thumbs/svg?seed=pageby-google',
-    };
+function loadToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
   }
-  return {
-    provider: 'apple',
-    email: 'you@privaterelay.appleid.com',
-    displayName: 'PageBy User',
-    // Apple은 프로필 사진을 거의 주지 않음
-    photoUrl: null,
-  };
+}
+
+function saveToken(token: string | null) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function getAccessToken(): string | null {
+  return loadToken();
 }
 
 /**
- * 계정 로그인·동기화 상태 (프론트 mock).
- * 백엔드 OAuth 붙일 때 signIn 본문만 교체하면 됨.
+ * Google: GIS idToken → POST /api/auth/google → JWT 저장
+ * Apple: 아직 미연동
  */
 export function useAuthSession() {
   const [session, setSession] = useState<AuthSession | null>(loadSession);
 
   const signIn = useCallback(async (provider: AuthProvider) => {
-    // 실제 연동 전: 짧은 딜레이로 로딩 UX만
-    await new Promise((r) => setTimeout(r, 450));
+    if (provider === 'apple') {
+      throw new Error('Apple 로그인은 아직 준비 중이에요');
+    }
+
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+    if (!clientId) {
+      throw new Error('VITE_GOOGLE_CLIENT_ID 설정이 없어요');
+    }
+
+    const idToken = await requestGoogleIdToken(clientId);
+    const auth = await loginWithGoogleIdToken(idToken);
+
     const next: AuthSession = {
-      ...mockProfile(provider),
-      lastSyncedAt: new Date().toISOString(),
+      provider: 'google',
+      userId: auth.user.id,
+      email: auth.user.email || 'unknown@gmail.com',
+      displayName: auth.user.name || auth.user.email || 'User',
+      photoUrl: auth.user.photoUrl,
+      lastSyncedAt: null,
     };
+
+    saveToken(auth.accessToken);
     saveSession(next);
     setSession(next);
     return next;
   }, []);
 
   const signOut = useCallback(() => {
+    const token = loadToken();
+    void logoutRemote(token);
+    saveToken(null);
     saveSession(null);
     setSession(null);
   }, []);
@@ -89,5 +111,29 @@ export function useAuthSession() {
     });
   }, []);
 
-  return { session, signIn, signOut, markSynced };
+  const refreshMe = useCallback(async () => {
+    const token = loadToken();
+    if (!token) return null;
+    try {
+      const me = await fetchMe(token);
+      const next: AuthSession = {
+        provider: 'google',
+        userId: me.id,
+        email: me.email || 'unknown@gmail.com',
+        displayName: me.name || me.email || 'User',
+        photoUrl: me.photoUrl,
+        lastSyncedAt: loadSession()?.lastSyncedAt ?? null,
+      };
+      saveSession(next);
+      setSession(next);
+      return next;
+    } catch {
+      saveToken(null);
+      saveSession(null);
+      setSession(null);
+      return null;
+    }
+  }, []);
+
+  return { session, signIn, signOut, markSynced, refreshMe, getAccessToken };
 }
