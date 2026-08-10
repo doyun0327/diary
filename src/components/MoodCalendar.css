@@ -77,8 +77,8 @@
 .mood-cal__display {
   display: inline-flex;
   flex-shrink: 0;
-  gap: 3px;
-  padding: 4px;
+  gap: 1px;
+  padding: 1px;
   border-radius: 999px;
   background: rgba(255, 248, 240, 0.9);
   border: 1px solid rgba(232, 210, 190, 0.7);
@@ -86,12 +86,12 @@
 }
 
 .mood-cal__display-btn {
-  padding: 7px 14px;
+  padding: 3px 8px;
   border: none;
   border-radius: 999px;
   background: transparent;
   font-family: var(--story-title);
-  font-size: 0.95rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #8a786c;
   cursor: pointer;
@@ -102,7 +102,7 @@
 .mood-cal__display-btn.is-active {
   background: linear-gradient(180deg, #fff, #ffe8dc);
   color: #b56b52;
-  box-shadow: 0 3px 10px rgba(180, 100, 70, 0.12);
+  box-shadow: 0 1px 4px rgba(180, 100, 70, 0.1);
 }
 
 .mood-cal__header strong {

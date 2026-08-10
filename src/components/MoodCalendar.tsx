@@ -90,7 +90,7 @@ function MoodCalendar({
             </button>
           </div>
         ) : (
-          <span className="mood-cal__display-label">{t('calendar.displayLabel')}</span>
+          <span className="mood-cal__display-label"></span>
         )}
 
         <div className="mood-cal__display" role="group" aria-label={t('calendar.displayAria')}>
