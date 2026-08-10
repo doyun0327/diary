@@ -306,7 +306,9 @@
       "aiHttp": "Drawing failed: HTTP {{status}}",
       "aiNoImage": "No image in backend response",
       "aiUrl": "Couldn't load image URL",
-      "aiConvert": "Image conversion failed"
+      "aiConvert": "Image conversion failed",
+      "saveImage": "Couldn't export the drawing",
+      "empty": "Add a title, text, or drawing"
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
@@ -483,7 +485,9 @@
     "err": {
       "noCanvas": "No canvas",
       "noContext": "Can't open canvas context",
-      "imageLoad": "Failed to load image"
+      "imageLoad": "Failed to load image",
+      "tainted": "This drawing can't be saved due to browser security. Generate the AI image again, or refresh and retry",
+      "export": "Couldn't export the drawing"
     },
     "penKindAria": "Pen type",
     "penKind": {

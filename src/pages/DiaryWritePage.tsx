@@ -163,8 +163,18 @@ function DiaryWritePage({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const imageUrl = canvasRef.current?.toDataURL();
-    if (!title.trim() && !content.trim() && !imageUrl) return;
+    let imageUrl: string | undefined;
+    try {
+      imageUrl = canvasRef.current?.toDataURL();
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
+      return;
+    }
+    if (!title.trim() && !content.trim() && !imageUrl) {
+      setAiError(t('write.err.empty'));
+      return;
+    }
+    setAiError(null);
     onSave({
       date,
       title: title.trim(),

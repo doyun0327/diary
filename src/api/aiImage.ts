@@ -115,11 +115,8 @@ export async function generateDiaryImage(input: {
     console.info('[AI] scene/prompt:', scene);
   }
 
-  // GCS HTTPS URL은 다시 base64로 바꾸지 않음 (용량·분리 목적)
-  if (data.imageUrl?.startsWith('http://') || data.imageUrl?.startsWith('https://')) {
-    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
-  }
-
+  // 캔버스 export(toDataURL)를 위해 data URL을 우선 사용.
+  // GCS https URL만 쓰면 CORS 없이 그릴 때 캔버스가 tainted 되어 저장이 깨짐.
   if (data.imageBase64) {
     const imageUrl = data.imageBase64.startsWith('data:')
       ? data.imageBase64
@@ -128,6 +125,10 @@ export async function generateDiaryImage(input: {
   }
 
   if (data.imageUrl?.startsWith('data:')) {
+    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
+  }
+
+  if (data.imageUrl?.startsWith('http://') || data.imageUrl?.startsWith('https://')) {
     return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
   }
 

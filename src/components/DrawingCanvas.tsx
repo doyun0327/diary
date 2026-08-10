@@ -2,6 +2,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
+import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
 import './DrawingCanvas.css';
 
@@ -198,25 +199,69 @@ function DrawingCanvas({
         return;
       }
 
-      const img = new Image();
-      img.onload = () => {
-        const rect = canvas.getBoundingClientRect();
-        if (replace || !hasDrawn.current) {
-          fillWhite();
-        }
+      void materializeImageSrc(src)
+        .then((safeSrc) => {
+          const img = new Image();
+          img.onload = () => {
+            const rect = canvas.getBoundingClientRect();
+            if (replace || !hasDrawn.current) {
+              fillWhite();
+            }
 
-        const scale = Math.min(rect.width / img.width, rect.height / img.height) * 0.85;
-        const w = img.width * scale;
-        const h = img.height * scale;
-        const x = (rect.width - w) / 2;
-        const y = (rect.height - h) / 2;
-        ctx.drawImage(img, x, y, w, h);
-        hasDrawn.current = true;
-        resolve();
-      };
-      img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
-      img.src = src;
+            const scale =
+              Math.min(rect.width / img.width, rect.height / img.height) * 0.85;
+            const w = img.width * scale;
+            const h = img.height * scale;
+            const x = (rect.width - w) / 2;
+            const y = (rect.height - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+            hasDrawn.current = true;
+            resolve();
+          };
+          img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
+          img.src = safeSrc;
+        })
+        .catch((err) => {
+          reject(err instanceof Error ? err : new Error(t('canvas.err.imageLoad')));
+        });
     });
+
+  const exportDataUrl = (): string | undefined => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+    if (
+      !hasDrawn.current &&
+      photoLayers.length === 0 &&
+      stickerLayers.length === 0
+    ) {
+      return undefined;
+    }
+
+    try {
+      if (photoLayers.length === 0 && stickerLayers.length === 0) {
+        return hasDrawn.current ? canvas.toDataURL('image/png') : undefined;
+      }
+
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height;
+      const ctx = exportCanvas.getContext('2d');
+      if (!ctx) return undefined;
+
+      ctx.drawImage(canvas, 0, 0);
+      photoLayers.forEach((layer) => bakePhotoToCanvas(layer, ctx));
+      stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
+
+      return exportCanvas.toDataURL('image/png');
+    } catch (err) {
+      console.error('[canvas] toDataURL failed', err);
+      throw new Error(
+        err instanceof DOMException && err.name === 'SecurityError'
+          ? t('canvas.err.tainted')
+          : t('canvas.err.export'),
+      );
+    }
+  };
 
   const bakePhotoToCanvas = (layer: PhotoLayer, targetCtx?: CanvasRenderingContext2D) => {
     const canvas = canvasRef.current;
