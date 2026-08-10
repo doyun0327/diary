@@ -214,9 +214,9 @@
   max-width: min(220px, 70vw);
   padding: 10px 10px 10px 12px;
   border-radius: 14px;
-  background: #4a3f38;
-  color: #fffef9;
-  box-shadow: 0 10px 24px rgba(70, 50, 35, 0.22);
+  background: #1a1a1a;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
   text-align: left;
   animation: diary-coach-in 0.28s var(--ease-out, ease);
 }
@@ -227,7 +227,7 @@
   right: 14px;
   top: 100%;
   border: 7px solid transparent;
-  border-top-color: #4a3f38;
+  border-top-color: #1a1a1a;
 }
 
 .diary-write__coach--ai::after {

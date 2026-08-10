@@ -224,11 +224,7 @@ function Header({
         <nav className="header-menu__panel">
           <header className="header-menu__head">
             <div className="header-menu__brand">
-              <img
-                src="/brand/PageByImg.png?v=2"
-                alt="PageBy"
-                className="header-menu__brand-logo"
-              />
+              <p className="header-menu__brand-title">PageBy</p>
               <p className="header-menu__brand-sub">{t('header.tagline')}</p>
             </div>
           </header>

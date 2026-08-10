@@ -8,15 +8,10 @@
   gap: 12px;
   padding: 10px 16px 12px 12px;
   padding-top: calc(10px + env(safe-area-inset-top));
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-bg) 92%, #fff8f2) 0%,
-      color-mix(in srgb, var(--color-bg) 78%, transparent) 100%
-    );
-  backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom: 1px solid var(--color-border-soft);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .header__spacer {
@@ -40,12 +35,12 @@
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--color-border-soft) 80%, transparent);
+  border: 1px solid var(--color-border-soft);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--color-surface) 90%, #fff);
+  background: var(--color-surface);
   color: var(--color-text-muted);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(70, 48, 36, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
   transition: transform 0.16s var(--ease-out), background 0.15s, color 0.15s, border-color 0.15s;
 }
 
@@ -64,7 +59,7 @@
 .header__month-btn:active {
   transform: scale(0.94);
   background: var(--color-accent-soft);
-  color: var(--color-accent-text);
+  color: var(--color-text);
   border-color: transparent;
 }
 
@@ -73,7 +68,7 @@
   font-size: 1.28rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #4a3f38;
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -133,7 +128,7 @@
   background: var(--sheet-bg);
   border-left: 1px solid var(--color-border-soft);
   border-radius: 22px 0 0 22px;
-  box-shadow: -12px 0 36px rgba(55, 40, 30, 0.1);
+  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.1);
   animation: header-menu-in 0.3s var(--ease-out);
 }
 
@@ -145,14 +140,14 @@
   margin-bottom: 24px;
 }
 
-.header-menu__brand-logo {
-  display: block;
-  height: 48px;
-  width: auto;
-  max-width: 200px;
-  margin: 0 0 2px -6px;
-  object-fit: contain;
-  object-position: left center;
+.header-menu__brand-title {
+  margin: 0;
+  font-family: 'Gaegu', 'Hi Melody', cursive;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  line-height: 1.2;
 }
 
 .header-menu__brand-sub {
@@ -227,10 +222,12 @@
   background: var(--color-bg-soft);
 }
 
-.header-menu__item--lavender:active { background: var(--color-lavender-soft); }
-.header-menu__item--peach:active { background: var(--color-accent-soft); }
-.header-menu__item--mint:active { background: var(--color-mint-soft); }
-.header-menu__item--cream:active { background: var(--color-bg-muted); }
+.header-menu__item--lavender:active,
+.header-menu__item--peach:active,
+.header-menu__item--mint:active,
+.header-menu__item--cream:active {
+  background: var(--color-bg-muted);
+}
 
 .header-menu__icon {
   flex-shrink: 0;
@@ -243,6 +240,7 @@
   border: none;
   color: var(--color-text);
   overflow: hidden;
+  background: var(--color-bg-muted);
 }
 
 .header-menu__avatar-img {
@@ -252,24 +250,12 @@
   object-fit: cover;
 }
 
-.header-menu__item--lavender .header-menu__icon {
-  background: var(--color-lavender-soft);
-  color: #7a6aa0;
-}
-
-.header-menu__item--peach .header-menu__icon {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
-}
-
-.header-menu__item--mint .header-menu__icon {
-  background: var(--color-mint-soft);
-  color: #4f8f78;
-}
-
+.header-menu__item--lavender .header-menu__icon,
+.header-menu__item--peach .header-menu__icon,
+.header-menu__item--mint .header-menu__icon,
 .header-menu__item--cream .header-menu__icon {
   background: var(--color-bg-muted);
-  color: #8a7660;
+  color: var(--color-text);
 }
 
 .header-menu__text {
@@ -297,12 +283,12 @@
   width: 46px;
   height: 28px;
   border-radius: 999px;
-  background: #e0d4c8;
+  background: #d0d0d0;
   transition: background 0.18s ease;
 }
 
 .header-menu__switch.is-on {
-  background: color-mix(in srgb, var(--color-accent, #b56b52) 85%, #c98);
+  background: #2a2a2a;
 }
 
 .header-menu__switch-knob {
@@ -312,8 +298,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(90, 60, 40, 0.18);
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
   transition: transform 0.18s ease;
 }
 

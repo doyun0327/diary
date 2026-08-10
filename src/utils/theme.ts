@@ -3,7 +3,7 @@ export type ThemeId = 'paper' | 'matcha' | 'sky' | 'blossom' | 'ink' | 'lemon';
 export const THEME_STORAGE_KEY = 'picture-diary-theme';
 
 export const THEMES: { id: ThemeId; swatch: string[] }[] = [
-  { id: 'paper', swatch: ['#fffaf7', '#d4927a', '#f8e8df'] },
+  { id: 'paper', swatch: ['#ffffff', '#2a2a2a', '#f0f0f0'] },
   { id: 'matcha', swatch: ['#f5fbf7', '#7cb89a', '#d8f5e8'] },
   { id: 'sky', swatch: ['#f5f8fc', '#8bb0d4', '#dceaf6'] },
   { id: 'blossom', swatch: ['#fbf6fa', '#c9a0d4', '#ebe3f7'] },

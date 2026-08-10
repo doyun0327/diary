@@ -107,8 +107,8 @@
     "aria": "Choose theme",
     "hint": "Change the look of the whole app",
     "paper": {
-      "name": "Cream",
-      "desc": "Soft cream stationery"
+      "name": "Mono",
+      "desc": "White, gray & black"
     },
     "matcha": {
       "name": "Matcha",

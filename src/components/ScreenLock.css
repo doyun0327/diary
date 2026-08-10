@@ -8,10 +8,7 @@
     calc(12px + env(safe-area-inset-top))
     20px
     calc(20px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(ellipse at 25% 15%, rgba(255, 214, 196, 0.5), transparent 48%),
-    radial-gradient(ellipse at 85% 75%, rgba(214, 232, 245, 0.4), transparent 45%),
-    linear-gradient(165deg, #fffdf9 0%, #f6ebe1 100%);
+  background: var(--color-bg);
 }
 
 .pin-screen__head {
@@ -27,7 +24,7 @@
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 650;
-  color: var(--color-accent-text, #b56b52);
+  color: var(--color-text);
   cursor: pointer;
   padding: 8px 0;
   justify-self: start;
@@ -48,7 +45,7 @@
   font-family: var(--story-title, inherit);
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--color-text, #4a3f38);
+  color: var(--color-text);
 }
 
 .pin-screen__body {
@@ -92,14 +89,14 @@
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--color-text, #4a3f38);
+  color: var(--color-text);
 }
 
 .pin-screen__hint {
   margin: 0 0 10px;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: var(--color-text-muted, #8a786c);
+  color: var(--color-text-muted);
 }
 
 .pin-screen__error {
@@ -107,7 +104,7 @@
   min-height: 1.2em;
   font-size: 0.88rem;
   font-weight: 650;
-  color: #c45c5c;
+  color: #333333;
 }
 
 .pin-screen__redo {
@@ -117,7 +114,7 @@
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 650;
-  color: var(--color-text-muted, #8a786c);
+  color: var(--color-text-muted);
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -139,14 +136,14 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--color-accent, #b56b52) 55%, #c4b0a0);
+  border: 2px solid #b0b0b0;
   background: transparent;
   transition: background 0.12s ease, transform 0.12s ease;
 }
 
 .pin-pad__dot.is-filled {
-  background: var(--color-accent, #b56b52);
-  border-color: var(--color-accent, #b56b52);
+  background: #1a1a1a;
+  border-color: #1a1a1a;
   transform: scale(1.08);
 }
 
@@ -162,14 +159,14 @@
   aspect-ratio: 1;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 252, 248, 0.88);
+  background: #ffffff;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 4px 14px rgba(90, 60, 40, 0.06);
+    0 4px 14px rgba(0, 0, 0, 0.06);
   font-family: inherit;
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--color-text, #4a3f38);
+  color: var(--color-text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.1s ease, background 0.1s ease;
@@ -177,7 +174,7 @@
 
 .pin-pad__key:active:not(:disabled) {
   transform: scale(0.94);
-  background: #ffe8dc;
+  background: #f0f0f0;
 }
 
 .pin-pad__key:disabled {
@@ -194,7 +191,7 @@
 
 .pin-pad__key--action {
   font-size: 1.2rem;
-  color: var(--color-text-muted, #8a786c);
+  color: var(--color-text-muted);
 }
 
 .pin-inline {
@@ -233,7 +230,7 @@
 }
 
 .screen-lock-sheet__status strong.is-on {
-  color: var(--color-accent-text, #b56b52);
+  color: var(--color-text);
 }
 
 .screen-lock-sheet__status strong.is-off {
@@ -256,7 +253,7 @@
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--color-accent-text);
+  color: var(--color-text);
   cursor: pointer;
   padding: 6px 2px;
   justify-self: start;

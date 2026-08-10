@@ -107,8 +107,8 @@
     "aria": "테마 선택",
     "hint": "앱 전체 색감을 바꿔요",
     "paper": {
-      "name": "Cream",
-      "desc": "포근한 크림 스테이셔리"
+      "name": "Mono",
+      "desc": "화이트 · 그레이 · 블랙"
     },
     "matcha": {
       "name": "Matcha",
