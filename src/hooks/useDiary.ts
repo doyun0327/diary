@@ -46,7 +46,7 @@ function persistDeletedIds(ids: string[]) {
 /** 일기 목록을 localStorage에 저장/관리 + 클라우드 동기화 */
 export function useDiary() {
   const [entries, setEntries] = useState<DiaryEntry[]>(loadEntries);
-  const [deletedIds, setDeletedIds] = useState<string[]>(loadDeletedIds);
+  const [, setDeletedIds] = useState<string[]>(loadDeletedIds);
 
   const addEntry = useCallback(
     (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
