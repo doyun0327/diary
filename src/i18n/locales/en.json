@@ -351,6 +351,9 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "Share photo in chat",
+    "sns": "Share to SNS",
+    "snsIcon": "SNS",
+    "snsDesc": "Pick Instagram, KakaoTalk, and more",
     "rooms": "Friend rooms",
     "roomsIcon": "Room",
     "roomsDesc": "Post to rooms you're in",
@@ -367,15 +370,18 @@
     },
     "pick": {
       "instagram": "Choose Instagram in the share sheet!",
-      "kakao": "Choose KakaoTalk in the share sheet!"
+      "kakao": "Choose KakaoTalk in the share sheet!",
+      "sns": "Choose Instagram, KakaoTalk, or another app in the share sheet!"
     },
     "saved": {
       "instagram": "Image saved. Upload it to Instagram Stories!",
-      "kakao": "Image saved. Send it in KakaoTalk!"
+      "kakao": "Image saved. Send it in KakaoTalk!",
+      "sns": "Image saved. Open Instagram, KakaoTalk, or another app to post it!"
     },
     "native": {
       "instagram": "Sharing my diary to Instagram Stories",
-      "kakao": "Sharing my diary via KakaoTalk"
+      "kakao": "Sharing my diary via KakaoTalk",
+      "sns": "Sharing my diary"
     },
     "err": {
       "roomShare": "Couldn't share to room",

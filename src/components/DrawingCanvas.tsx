@@ -328,34 +328,6 @@ function DrawingCanvas({
     setActiveStickerId(null);
   };
 
-  const exportDataUrl = (): string | undefined => {
-    const canvas = canvasRef.current;
-    if (!canvas) return undefined;
-    if (
-      !hasDrawn.current &&
-      photoLayers.length === 0 &&
-      stickerLayers.length === 0
-    ) {
-      return undefined;
-    }
-
-    if (photoLayers.length === 0 && stickerLayers.length === 0) {
-      return hasDrawn.current ? canvas.toDataURL('image/png') : undefined;
-    }
-
-    const exportCanvas = document.createElement('canvas');
-    exportCanvas.width = canvas.width;
-    exportCanvas.height = canvas.height;
-    const ctx = exportCanvas.getContext('2d');
-    if (!ctx) return undefined;
-
-    ctx.drawImage(canvas, 0, 0);
-    photoLayers.forEach((layer) => bakePhotoToCanvas(layer, ctx));
-    stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
-
-    return exportCanvas.toDataURL('image/png');
-  };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;

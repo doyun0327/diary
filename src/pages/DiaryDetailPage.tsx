@@ -4,7 +4,7 @@ import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
 import { findFont } from '../utils/fonts';
-import { shareDiaryTo, type ShareTarget } from '../utils/shareStory';
+import { shareDiaryTo } from '../utils/shareStory';
 import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
 import MoodIcon from '../components/MoodIcon';
@@ -147,7 +147,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     }
   };
 
-  const handlePick = async (target: ShareTarget) => {
+  const handlePickSns = async () => {
     if (sharing) return;
     setShareMsg(null);
     if (previewUrl) {
@@ -156,21 +156,13 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     }
     setSharing(true);
     try {
-      const { result, previewUrl: url, isMobileShare } = await shareDiaryTo(entry, target);
+      const { result, previewUrl: url, isMobileShare } = await shareDiaryTo(entry, 'sns');
       closeShare({ force: true });
 
       if (result === 'shared') {
-        setShareMsg(
-          target === 'instagram'
-            ? t('share.pick.instagram')
-            : t('share.pick.kakao'),
-        );
+        setShareMsg(t('share.pick.sns'));
       } else if (isMobileShare) {
-        setShareMsg(
-          target === 'instagram'
-            ? t('share.saved.instagram')
-            : t('share.saved.kakao'),
-        );
+        setShareMsg(t('share.saved.sns'));
         if (url) setPreviewUrl(url);
       } else {
         setShareMsg(t('share.pcHint'));
@@ -407,24 +399,12 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                   type="button"
                   className="diary-detail__picker-item"
                   disabled={sharing}
-                  onClick={() => void handlePick('instagram')}
+                  onClick={() => void handlePickSns()}
                 >
-                  <span className="diary-detail__picker-icon">IG</span>
+                  <span className="diary-detail__picker-icon">{t('share.snsIcon')}</span>
                   <span>
-                    <strong>{t('share.instagram')}</strong>
-                    <small>{t('share.instagramDesc')}</small>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="diary-detail__picker-item"
-                  disabled={sharing}
-                  onClick={() => void handlePick('kakao')}
-                >
-                  <span className="diary-detail__picker-icon">{t('share.kakaoIcon')}</span>
-                  <span>
-                    <strong>{t('share.kakao')}</strong>
-                    <small>{t('share.kakaoDesc')}</small>
+                    <strong>{t('share.sns')}</strong>
+                    <small>{t('share.snsDesc')}</small>
                   </span>
                 </button>
                 <button

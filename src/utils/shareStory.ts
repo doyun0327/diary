@@ -5,7 +5,7 @@ import { formatDate } from './date';
 const STORY_W = 1080;
 const STORY_H = 1920;
 
-export type ShareTarget = 'instagram' | 'kakao';
+export type ShareTarget = 'sns';
 
 export type ShareResult =
   | 'shared'
@@ -194,12 +194,6 @@ function downloadBlob(blob: Blob, filename: string) {
   return url;
 }
 
-function tryOpenApp(scheme: string) {
-  const link = document.createElement('a');
-  link.href = scheme;
-  link.click();
-}
-
 /** 모바일에서 파일 공유(Web Share) 지원 여부 — PC 웹은 보통 false */
 export function canShareImageFile(): boolean {
   if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
@@ -237,22 +231,19 @@ async function tryNativeShare(file: File, title: string, text: string): Promise<
 }
 
 /**
- * 인스타 / 카카오톡 공유
- * - 폰: 시스템 공유 시트 → 해당 앱 선택
+ * SNS 공유 (인스타·카카오톡 등 시스템 공유 시트)
+ * - 폰: 시스템 공유 시트 → 원하는 앱 선택
  * - PC 웹: 이미지 다운로드 (앱 공유 API 미지원)
  */
 export async function shareDiaryTo(
   entry: DiaryEntry,
-  target: ShareTarget,
+  _target: ShareTarget = 'sns',
 ): Promise<{ result: 'shared' | 'downloaded'; previewUrl?: string; isMobileShare: boolean }> {
   const blob = await buildDiaryStoryBlob(entry);
-  const filename = `diary-${target}-${entry.date}.png`;
+  const filename = `diary-${entry.date}.png`;
   const file = new File([blob], filename, { type: 'image/png' });
   const title = entry.title || 'diary';
-  const text =
-    target === 'instagram'
-      ? '내 diary를 인스타 스토리에 공유해요'
-      : '내 diary를 카카오톡으로 공유해요';
+  const text = '내 diary를 SNS로 공유해요';
 
   const isMobileShare = canShareImageFile();
 
@@ -264,12 +255,5 @@ export async function shareDiaryTo(
   }
 
   const previewUrl = downloadBlob(blob, filename);
-
-  if (target === 'instagram') {
-    tryOpenApp('instagram://story-camera');
-  } else {
-    tryOpenApp('kakaotalk://');
-  }
-
   return { result: 'downloaded', previewUrl, isMobileShare };
 }
