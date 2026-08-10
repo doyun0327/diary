@@ -156,7 +156,9 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     }
     setSharing(true);
     try {
-      const { result, previewUrl: url, isMobileShare } = await shareDiaryTo(entry, 'sns');
+      const { result, previewUrl: url, isMobileShare } = await shareDiaryTo(entry, 'sns', {
+        paperElement: paperRef.current,
+      });
       closeShare({ force: true });
 
       if (result === 'shared') {
