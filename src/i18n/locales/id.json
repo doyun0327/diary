@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "Belum ada diary.",
-      "line2": "Tulis diary pertamamu!"
+      "line2": "Tulis diary pertamamu!",
+      "cta": "Buat karakter & gambar pertama"
     },
     "writeFabAria": "Tulis diary",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "Tidak ada gambar di respons backend",
       "aiUrl": "Tidak bisa memuat URL gambar",
       "aiConvert": "Konversi gambar gagal"
+    },
+    "coach": {
+      "character": "Atur dirimu agar AI menggambarmu",
+      "ai": "Tulis diary, lalu biarkan AI menggambar"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "Spidol",
       "highlighter": "Stabilo"
     },
-    "stickerRotate": "Putar"
+    "stickerRotate": "Putar",
+    "undo": "Urungkan"
   },
   "font": {
     "dialogAria": "Pilih font",

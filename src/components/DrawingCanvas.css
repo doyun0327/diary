@@ -237,6 +237,24 @@
   color: var(--color-text-muted);
 }
 
+.drawing__dock-btn--icon {
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 0;
+  color: var(--color-text-muted);
+}
+
+.drawing__dock-btn--icon svg {
+  display: block;
+}
+
+.drawing__dock-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 .drawing__colors {
   display: flex;
   gap: 6px;

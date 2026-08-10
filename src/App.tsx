@@ -24,6 +24,7 @@ import { useDiary } from './hooks/useDiary';
 import { useCharacter } from './hooks/useCharacter';
 import { useClientProfile } from './hooks/useClientProfile';
 import { useScreenLock } from './hooks/useScreenLock';
+import { isCharacterSetupDone } from './utils/onboarding';
 import type { DiaryEntry } from './types/diary';
 import './App.css';
 
@@ -39,6 +40,7 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [characterOpen, setCharacterOpen] = useState(false);
+  const [writeAfterCharacter, setWriteAfterCharacter] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
@@ -102,6 +104,15 @@ function App() {
     setPage('write');
   };
 
+  const handleStartFirstDiary = () => {
+    if (isCharacterSetupDone()) {
+      handleNewWrite();
+      return;
+    }
+    setWriteAfterCharacter(true);
+    setCharacterOpen(true);
+  };
+
   const openRooms = () => {
     setActiveRoomId(null);
     setActivePostId(null);
@@ -161,6 +172,7 @@ function App() {
               setCalYear(year);
               setCalMonth(month);
             }}
+            onStartFirstDiary={handleStartFirstDiary}
           />
         )}
         {page === 'write' && (
@@ -266,7 +278,18 @@ function App() {
         <CharacterSetup
           character={character}
           onChange={setCharacter}
-          onClose={() => setCharacterOpen(false)}
+          onClose={() => {
+            setCharacterOpen(false);
+            if (writeAfterCharacter) {
+              setWriteAfterCharacter(false);
+            }
+          }}
+          onComplete={() => {
+            if (writeAfterCharacter) {
+              setWriteAfterCharacter(false);
+              handleNewWrite();
+            }
+          }}
         />
       )}
       {exportOpen && (

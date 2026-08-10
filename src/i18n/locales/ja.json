@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "まだ日記がありません。",
-      "line2": "最初の日記を書いてみましょう！"
+      "line2": "最初の日記を書いてみましょう！",
+      "cta": "キャラを作って最初の絵を描く"
     },
     "writeFabAria": "日記を書く",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "バックエンド応答に画像がありません",
       "aiUrl": "画像URLを読み込めませんでした",
       "aiConvert": "画像変換に失敗しました"
+    },
+    "coach": {
+      "character": "自分を決めるとAIがその姿で描きます",
+      "ai": "日記を書いてAIで絵を描いてみよう"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "マーカー",
       "highlighter": "蛍光ペン"
     },
-    "stickerRotate": "回転"
+    "stickerRotate": "回転",
+    "undo": "戻る"
   },
   "font": {
     "dialogAria": "フォントを選ぶ",

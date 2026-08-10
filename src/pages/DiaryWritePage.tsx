@@ -13,6 +13,13 @@ import { HairStyleIcon } from '../components/CharacterIcons';
 import { generateDiaryImage } from '../api/aiImage';
 import { formatDate, today } from '../utils/date';
 import { findFont, getPreferredFontId } from '../utils/fonts';
+import {
+  isAiCoachSeen,
+  isCharacterCoachSeen,
+  isCharacterSetupDone,
+  markAiCoachSeen,
+  markCharacterCoachSeen,
+} from '../utils/onboarding';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -62,8 +69,40 @@ function DiaryWritePage({
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
+  const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
+    if (isEdit) return null;
+    if (!isCharacterCoachSeen() && !isCharacterSetupDone()) return 'character';
+    if (!isAiCoachSeen()) return 'ai';
+    return null;
+  });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const imageLoadedRef = useRef(false);
+
+  useEffect(() => {
+    if (isEdit) {
+      setCoach(null);
+      return;
+    }
+    if (!isCharacterCoachSeen() && !isCharacterSetupDone()) {
+      setCoach('character');
+      return;
+    }
+    if (!isAiCoachSeen()) {
+      setCoach('ai');
+      return;
+    }
+    setCoach(null);
+  }, [isEdit, character]);
+
+  const dismissCharacterCoach = () => {
+    markCharacterCoachSeen();
+    setCoach((prev) => (prev === 'character' ? (isAiCoachSeen() ? null : 'ai') : prev));
+  };
+
+  const dismissAiCoach = () => {
+    markAiCoachSeen();
+    setCoach((prev) => (prev === 'ai' ? null : prev));
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -114,6 +153,7 @@ function DiaryWritePage({
         character,
       });
       await canvasRef.current?.loadImage(imageUrl);
+      dismissAiCoach();
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     } finally {
@@ -235,23 +275,56 @@ function DiaryWritePage({
                   {t('write.ai.tip')}
                 </button>
                 <div className="diary-write__ai-draw">
-                  <button
-                    type="button"
-                    className="diary-write__ai-char"
-                    onClick={onOpenCharacter}
-                    aria-label={t('write.ai.characterAria')}
-                    title={t('write.ai.characterTitle')}
-                  >
-                  <HairStyleIcon style={character.hairStyle} />
-                  </button>
-                  <button
-                    type="button"
-                    className="diary-write__ai-link"
-                    onClick={handleAiDraw}
-                    disabled={aiLoading || !content.trim()}
-                  >
-                    {aiLabel}
-                  </button>
+                  <div className="diary-write__coach-anchor">
+                    <button
+                      type="button"
+                      className="diary-write__ai-char"
+                      onClick={() => {
+                        dismissCharacterCoach();
+                        onOpenCharacter();
+                      }}
+                      aria-label={t('write.ai.characterAria')}
+                      title={t('write.ai.characterTitle')}
+                    >
+                      <HairStyleIcon style={character.hairStyle} />
+                    </button>
+                    {coach === 'character' && (
+                      <div className="diary-write__coach" role="status">
+                        <p>{t('write.coach.character')}</p>
+                        <button
+                          type="button"
+                          className="diary-write__coach-dismiss"
+                          aria-label={t('common.close')}
+                          onClick={dismissCharacterCoach}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="diary-write__coach-anchor diary-write__coach-anchor--ai">
+                    <button
+                      type="button"
+                      className="diary-write__ai-link"
+                      onClick={handleAiDraw}
+                      disabled={aiLoading || !content.trim()}
+                    >
+                      {aiLabel}
+                    </button>
+                    {coach === 'ai' && (
+                      <div className="diary-write__coach diary-write__coach--ai" role="status">
+                        <p>{t('write.coach.ai')}</p>
+                        <button
+                          type="button"
+                          className="diary-write__coach-dismiss"
+                          aria-label={t('common.close')}
+                          onClick={dismissAiCoach}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

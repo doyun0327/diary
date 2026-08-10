@@ -88,6 +88,27 @@
   margin: 0;
 }
 
+.diary-list__empty-cta {
+  margin-top: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, #ffe8dc);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 6px 16px rgba(180, 100, 70, 0.16);
+  font-family: var(--story-title);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #b56b52;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.diary-list__empty-cta:active {
+  transform: scale(0.97);
+}
+
 .diary-list__section {
   margin-top: 0;
   padding: 0;

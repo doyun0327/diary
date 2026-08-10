@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "아직 작성한 일기가 없어요.",
-      "line2": "첫 번째 diary를 남겨 보세요!"
+      "line2": "첫 번째 diary를 남겨 보세요!",
+      "cta": "내 캐릭터 만들고 첫 그림 그리기"
     },
     "writeFabAria": "일기 쓰기",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "백엔드 응답에 이미지가 없습니다",
       "aiUrl": "이미지 URL을 불러오지 못했습니다",
       "aiConvert": "이미지 변환에 실패했습니다"
+    },
+    "coach": {
+      "character": "나를 정하면 AI가 그 모습으로 그려줘요",
+      "ai": "일기를 쓰고 AI로 그림을 그려보세요"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "마카",
       "highlighter": "형광펜"
     },
-    "stickerRotate": "회전"
+    "stickerRotate": "회전",
+    "undo": "뒤로"
   },
   "font": {
     "dialogAria": "글씨체 선택",

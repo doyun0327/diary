@@ -70,6 +70,7 @@ const DEFAULT_STICKER_SIZE = 48;
 const MIN_STICKER_SIZE = 22;
 const MAX_STICKER_SIZE = 140;
 const MIN_PHOTO_SIZE = 40;
+const MAX_UNDO = 30;
 const EMOJI_FONT =
   '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
 
@@ -85,6 +86,8 @@ function DrawingCanvas({
   const drawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const hasDrawn = useRef(false);
+  const undoStack = useRef<HTMLCanvasElement[]>([]);
+  const strokeSnapshotPushed = useRef(false);
   const photoImages = useRef<Map<string, HTMLImageElement>>(new Map());
   const photoDrag = useRef<{
     kind: PhotoDragKind;
@@ -123,6 +126,7 @@ function DrawingCanvas({
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [stickerLayers, setStickerLayers] = useState<StickerLayer[]>([]);
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
+  const [canUndo, setCanUndo] = useState(false);
 
   const eraserWidth =
     ERASER_SIZES.find((s) => s.id === eraserSizeId)?.width ?? 24;
@@ -143,6 +147,42 @@ function DrawingCanvas({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
+  };
+
+  const clearUndoStack = () => {
+    undoStack.current = [];
+    setCanUndo(false);
+  };
+
+  const pushUndoSnapshot = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || canvas.width < 1 || canvas.height < 1) return;
+    const snap = document.createElement('canvas');
+    snap.width = canvas.width;
+    snap.height = canvas.height;
+    const sctx = snap.getContext('2d');
+    if (!sctx) return;
+    sctx.drawImage(canvas, 0, 0);
+    undoStack.current.push(snap);
+    while (undoStack.current.length > MAX_UNDO) undoStack.current.shift();
+    setCanUndo(true);
+  };
+
+  const handleUndo = () => {
+    const canvas = canvasRef.current;
+    const snap = undoStack.current.pop();
+    if (!canvas || !snap) {
+      setCanUndo(false);
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(snap, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    setCanUndo(undoStack.current.length > 0);
   };
 
   const drawImageOnCanvas = (src: string, replace: boolean): Promise<void> =>
@@ -413,6 +453,7 @@ function DrawingCanvas({
   useImperativeHandle(ref, () => ({
     toDataURL: exportDataUrl,
     clear: () => {
+      clearUndoStack();
       fillWhite();
       hasDrawn.current = false;
       photoImages.current.clear();
@@ -426,6 +467,7 @@ function DrawingCanvas({
     loadImage: async (src: string) => {
       bakeAllPhotos();
       bakeAllStickers();
+      pushUndoSnapshot();
       await drawImageOnCanvas(src, true);
     },
   }));
@@ -434,6 +476,7 @@ function DrawingCanvas({
     if (!activePhotoId) return;
     const layer = photoLayers.find((l) => l.id === activePhotoId);
     if (!layer) return;
+    pushUndoSnapshot();
     bakePhotoToCanvas(layer);
     photoImages.current.delete(layer.id);
     setPhotoLayers((prev) => prev.filter((l) => l.id !== layer.id));
@@ -444,6 +487,7 @@ function DrawingCanvas({
     if (!activeStickerId) return;
     const layer = stickerLayers.find((l) => l.id === activeStickerId);
     if (!layer) return;
+    pushUndoSnapshot();
     bakeStickerToCanvas(layer);
     setStickerLayers((prev) => prev.filter((l) => l.id !== layer.id));
     setActiveStickerId(null);
@@ -658,6 +702,7 @@ function DrawingCanvas({
 
     e.currentTarget.setPointerCapture(e.pointerId);
     drawing.current = true;
+    strokeSnapshotPushed.current = false;
     lastPos.current = getPos(e);
   };
 
@@ -665,6 +710,12 @@ function DrawingCanvas({
     if (mode === 'sticker' || !drawing.current) return;
     const ctx = e.currentTarget.getContext('2d');
     if (!ctx) return;
+
+    if (!strokeSnapshotPushed.current) {
+      pushUndoSnapshot();
+      strokeSnapshotPushed.current = true;
+    }
+
     const pos = getPos(e);
     const last = lastPos.current;
     const dist = Math.hypot(pos.x - last.x, pos.y - last.y);
@@ -702,10 +753,12 @@ function DrawingCanvas({
 
   const handleUp = () => {
     drawing.current = false;
+    strokeSnapshotPushed.current = false;
   };
 
   const handleClear = () => {
     if (confirm(t('canvas.confirm.clear'))) {
+      clearUndoStack();
       fillWhite();
       hasDrawn.current = false;
       photoImages.current.clear();
@@ -915,6 +968,30 @@ function DrawingCanvas({
           )}
 
           <div className="drawing__dock-bar">
+            <button
+              type="button"
+              className="drawing__dock-btn drawing__dock-btn--icon"
+              disabled={!canUndo}
+              aria-label={t('canvas.undo')}
+              title={t('canvas.undo')}
+              onClick={handleUndo}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M3 7v6h6" />
+                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6.36 2.64L3 13" />
+              </svg>
+            </button>
             <button
               type="button"
               className={`drawing__dock-btn ${mode === 'pen' && !fontOpen ? 'active' : ''}`}

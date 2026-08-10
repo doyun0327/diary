@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "Chưa có nhật ký.",
-      "line2": "Viết nhật ký đầu tiên của bạn!"
+      "line2": "Viết nhật ký đầu tiên của bạn!",
+      "cta": "Tạo nhân vật & vẽ bức đầu"
     },
     "writeFabAria": "Viết nhật ký",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "Không có ảnh trong phản hồi backend",
       "aiUrl": "Không tải được URL ảnh",
       "aiConvert": "Chuyển đổi ảnh thất bại"
+    },
+    "coach": {
+      "character": "Chọn nhân vật để AI vẽ đúng bạn",
+      "ai": "Viết nhật ký rồi để AI vẽ nhé"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "Bút dạ",
       "highlighter": "Bút dạ quang"
     },
-    "stickerRotate": "Xoay"
+    "stickerRotate": "Xoay",
+    "undo": "Hoàn tác"
   },
   "font": {
     "dialogAria": "Chọn phông chữ",

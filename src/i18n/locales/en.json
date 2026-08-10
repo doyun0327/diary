@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "No diaries yet.",
-      "line2": "Write your first diary!"
+      "line2": "Write your first diary!",
+      "cta": "Set my character & draw the first picture"
     },
     "writeFabAria": "Write diary",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "No image in backend response",
       "aiUrl": "Couldn't load image URL",
       "aiConvert": "Image conversion failed"
+    },
+    "coach": {
+      "character": "Set yourself so AI can draw you",
+      "ai": "Write a diary, then let AI draw it"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "Marker",
       "highlighter": "Highlighter"
     },
-    "stickerRotate": "Rotate"
+    "stickerRotate": "Rotate",
+    "undo": "Undo"
   },
   "font": {
     "dialogAria": "Choose font",

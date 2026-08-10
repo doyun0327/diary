@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "Pas encore de journaux.",
-      "line2": "Écrivez votre premier journal !"
+      "line2": "Écrivez votre premier journal !",
+      "cta": "Créer mon perso et dessiner"
     },
     "writeFabAria": "Écrire un journal",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "Pas d'image dans la réponse du backend",
       "aiUrl": "Impossible de charger l'URL de l'image",
       "aiConvert": "Échec de la conversion d'image"
+    },
+    "coach": {
+      "character": "Définis-toi pour que l’IA te dessine",
+      "ai": "Écris, puis laisse l’IA dessiner"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "Feutre",
       "highlighter": "Surligneur"
     },
-    "stickerRotate": "Pivoter"
+    "stickerRotate": "Pivoter",
+    "undo": "Annuler"
   },
   "font": {
     "dialogAria": "Choisir une police",

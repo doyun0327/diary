@@ -6,6 +6,7 @@ import {
   OUTFIT_OPTIONS,
   type CharacterProfile,
 } from '../types/character';
+import { markCharacterSetupDone } from '../utils/onboarding';
 import { HairStyleIcon } from './CharacterIcons';
 import './CharacterSetup.css';
 
@@ -13,6 +14,8 @@ interface CharacterSetupProps {
   character: CharacterProfile;
   onChange: (next: CharacterProfile) => void;
   onClose: () => void;
+  /** 완료(완료 버튼) 시 — 첫 온보딩에서 쓰기 화면으로 보낼 때 사용 */
+  onComplete?: () => void;
 }
 
 const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
@@ -20,8 +23,14 @@ const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
   girl: '👧',
 };
 
-function CharacterSetup({ character, onChange, onClose }: CharacterSetupProps) {
+function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterSetupProps) {
   const { t } = useTranslation();
+
+  const handleDone = () => {
+    markCharacterSetupDone();
+    onComplete?.();
+    onClose();
+  };
 
   return (
     <>
@@ -29,7 +38,7 @@ function CharacterSetup({ character, onChange, onClose }: CharacterSetupProps) {
       <div className="character-setup" role="dialog" aria-label={t('character.dialogAria')}>
         <header className="character-setup__head">
           <h2>{t('character.title')}</h2>
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={handleDone}>
             {t('character.done')}
           </button>
         </header>

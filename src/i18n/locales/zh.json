@@ -253,7 +253,8 @@
   "diary": {
     "empty": {
       "line1": "还没有日记。",
-      "line2": "写下第一篇日记吧！"
+      "line2": "写下第一篇日记吧！",
+      "cta": "设置角色并画第一张图"
     },
     "writeFabAria": "写日记",
     "list": {
@@ -305,6 +306,10 @@
       "aiNoImage": "后端响应中没有图片",
       "aiUrl": "无法加载图片链接",
       "aiConvert": "图片转换失败"
+    },
+    "coach": {
+      "character": "设定自己后，AI会按这个样子画画",
+      "ai": "写好日记后，用AI来画画吧"
     }
   },
   "detail": {
@@ -487,7 +492,8 @@
       "marker": "马克笔",
       "highlighter": "荧光笔"
     },
-    "stickerRotate": "旋转"
+    "stickerRotate": "旋转",
+    "undo": "撤销"
   },
   "font": {
     "dialogAria": "选择字体",
