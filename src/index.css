@@ -28,6 +28,10 @@
   --color-accent-hover: #000000;
   --color-accent-soft: #f0f0f0;
   --color-accent-text: #1a1a1a;
+  --color-chat-mine: #2a2a2a;
+  --color-chat-mine-text: #ffffff;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #1a1a1a;
   --color-lavender: #f0f0f0;
   --color-lavender-soft: #f5f5f5;
   --color-mint: #f2f2f2;
@@ -80,6 +84,10 @@
   --color-accent-hover: #649c82;
   --color-accent-soft: #d8f5e8;
   --color-accent-text: #4a8066;
+  --color-chat-mine: #9dcea8;
+  --color-chat-mine-text: #24392c;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #35403a;
   --color-overlay: rgba(36, 52, 44, 0.32);
   --sheet-bg: #fafdfb;
   --sheet-handle: #cfe0d6;
@@ -105,6 +113,10 @@
   --color-accent-hover: #7298bc;
   --color-accent-soft: #dceaf6;
   --color-accent-text: #5a7fa0;
+  --color-chat-mine: #a8c8e8;
+  --color-chat-mine-text: #243448;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #353c48;
   --color-overlay: rgba(36, 48, 64, 0.32);
   --sheet-bg: #fafcfe;
   --sheet-handle: #cfdceb;
@@ -130,6 +142,10 @@
   --color-accent-hover: #b086bc;
   --color-accent-soft: #ede0f5;
   --color-accent-text: #8f6a9c;
+  --color-chat-mine: #e0bce8;
+  --color-chat-mine-text: #3d2a42;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #403540;
   --color-lavender: #dccfff;
   --color-lavender-soft: #f0e8ff;
   --color-overlay: rgba(56, 40, 56, 0.32);
@@ -157,6 +173,10 @@
   --color-accent-hover: #716c68;
   --color-accent-soft: #ebe8e4;
   --color-accent-text: #5c5854;
+  --color-chat-mine: #c4bfb8;
+  --color-chat-mine-text: #2a2826;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #3a3a3a;
   --color-overlay: rgba(40, 40, 40, 0.36);
   --sheet-bg: #fbfaf8;
   --sheet-handle: #d6d2cd;
@@ -182,6 +202,10 @@
   --color-accent-hover: #c9a044;
   --color-accent-soft: #f5e8c4;
   --color-accent-text: #9a7a28;
+  --color-chat-mine: #f0d078;
+  --color-chat-mine-text: #3d3420;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #3d392e;
   --color-overlay: rgba(56, 48, 28, 0.32);
   --sheet-bg: #fffdf7;
   --sheet-handle: #e4d7b4;
