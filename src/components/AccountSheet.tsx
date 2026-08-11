@@ -59,17 +59,17 @@ function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | nul
   });
 }
 
-function formatSyncedAt(iso: string | null, locale: string, neverLabel: string): string {
-  if (!iso) return neverLabel;
-  try {
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
-}
+// function formatSyncedAt(iso: string | null, locale: string, neverLabel: string): string {
+//   if (!iso) return neverLabel;
+//   try {
+//     return new Intl.DateTimeFormat(locale, {
+//       dateStyle: 'medium',
+//       timeStyle: 'short',
+//     }).format(new Date(iso));
+//   } catch {
+//     return iso;
+//   }
+// }
 
 function AccountSheet({
   nickname,
@@ -80,7 +80,7 @@ function AccountSheet({
   onSyncDiaries,
   onClose,
 }: AccountSheetProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { session, signIn, signInWithGoogleIdToken, signOut, markSynced, ensureGuestSession } =
     useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
