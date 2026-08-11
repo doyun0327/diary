@@ -1,4 +1,6 @@
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
+const GIS_LOAD_TIMEOUT_MS = 12_000;
+const GIS_MAX_ATTEMPTS = 3;
 
 declare global {
   interface Window {
@@ -11,134 +13,182 @@ declare global {
             auto_select?: boolean;
             cancel_on_tap_outside?: boolean;
             use_fedcm_for_prompt?: boolean;
+            context?: string;
+            itp_support?: boolean;
           }) => void;
-          prompt: (momentListener?: (notification: {
-            isNotDisplayed: () => boolean;
-            isSkippedMoment: () => boolean;
-            isDismissedMoment: () => boolean;
-          }) => void) => void;
           renderButton: (
             parent: HTMLElement,
-            options: Record<string, string | number>,
+            options: Record<string, string | number | boolean>,
           ) => void;
           cancel: () => void;
         };
       };
     };
+    /** HMR/중복 mount에도 initialize 1회만 유지 */
+    __pagebyGoogleIdClient?: string;
+    __pagebyGoogleIdTokenHandler?: ((idToken: string) => void) | null;
   }
 }
 
 let gisLoading: Promise<void> | null = null;
 
-function loadGisScript(): Promise<void> {
-  if (window.google?.accounts?.id) {
-    return Promise.resolve();
-  }
-  if (gisLoading) return gisLoading;
-
-  gisLoading = new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`);
-    if (existing) {
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('Google 로그인 스크립트 로드 실패')));
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = GIS_SRC;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Google 로그인 스크립트 로드 실패'));
-    document.head.appendChild(script);
+function wait(ms: number) {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms);
   });
-
-  return gisLoading;
 }
 
-/**
- * Google Identity Services로 ID 토큰(JWT) 받기.
- * One Tap → 안 되면 임시 Google 버튼 모달.
- */
-export async function requestGoogleIdToken(clientId: string): Promise<string> {
-  if (!clientId) {
-    throw new Error('VITE_GOOGLE_CLIENT_ID 가 없습니다');
+function injectGisScript(src: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.defer = true;
+
+    const timer = window.setTimeout(() => {
+      cleanup();
+      script.remove();
+      reject(new Error('timeout'));
+    }, GIS_LOAD_TIMEOUT_MS);
+
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      script.onload = null;
+      script.onerror = null;
+    };
+
+    script.onload = () => {
+      cleanup();
+      if (window.google?.accounts?.id) resolve();
+      else reject(new Error('loaded-without-api'));
+    };
+    script.onerror = () => {
+      cleanup();
+      script.remove();
+      reject(new Error('network'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+async function loadGisScriptOnce(): Promise<void> {
+  if (window.google?.accounts?.id) return;
+
+  document
+    .querySelectorAll<HTMLScriptElement>(`script[src^="${GIS_SRC}"]`)
+    .forEach((el) => el.remove());
+
+  await injectGisScript(`${GIS_SRC}?v=${Date.now()}`);
+
+  if (!window.google?.accounts?.id) {
+    throw new Error('loaded-without-api');
   }
-  await loadGisScript();
+}
+
+export async function loadGisScript(): Promise<void> {
+  if (window.google?.accounts?.id) return;
+  if (gisLoading) return gisLoading;
+
+  gisLoading = (async () => {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= GIS_MAX_ATTEMPTS; attempt += 1) {
+      try {
+        await loadGisScriptOnce();
+        return;
+      } catch (err) {
+        lastError = err;
+        if (attempt < GIS_MAX_ATTEMPTS) await wait(400 * attempt);
+      }
+    }
+    const reason = lastError instanceof Error ? lastError.message : 'unknown';
+    throw new Error(
+      reason === 'timeout'
+        ? 'Google 로그인 연결이 지연되고 있어요. 네트워크를 확인한 뒤 다시 시도해 주세요'
+        : 'Google 로그인 버튼을 불러오지 못했어요. 광고차단을 끄거나 네트워크를 바꿔 주세요',
+    );
+  })();
+
+  try {
+    await gisLoading;
+  } catch (err) {
+    gisLoading = null;
+    throw err;
+  }
+}
+
+function ensureGoogleIdInitialized(clientId: string) {
   if (!window.google?.accounts?.id) {
     throw new Error('Google Identity Services를 사용할 수 없습니다');
   }
 
-  return new Promise<string>((resolve, reject) => {
-    let settled = false;
-    let host: HTMLDivElement | null = null;
+  if (window.__pagebyGoogleIdClient === clientId) return;
 
-    const finish = (err?: Error, token?: string) => {
-      if (settled) return;
-      settled = true;
-      try {
-        window.google?.accounts.id.cancel();
-      } catch {
-        // ignore
+  window.__pagebyGoogleIdClient = clientId;
+
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    /** One Tap / FedCM 프롬프트 사용 안 함 — 인라인 버튼만 */
+    use_fedcm_for_prompt: false,
+    context: 'signin',
+    itp_support: true,
+    callback: (response) => {
+      if (response.credential) {
+        window.__pagebyGoogleIdTokenHandler?.(response.credential);
       }
-      if (host?.parentNode) host.parentNode.removeChild(host);
-      if (err) reject(err);
-      else if (token) resolve(token);
-      else reject(new Error('Google 로그인에 실패했습니다'));
-    };
-
-    window.google!.accounts.id.initialize({
-      client_id: clientId,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-      use_fedcm_for_prompt: true,
-      callback: (response) => {
-        if (response.credential) finish(undefined, response.credential);
-        else finish(new Error('Google 인증 정보를 받지 못했습니다'));
-      },
-    });
-
-    const showButtonFallback = () => {
-      host = document.createElement('div');
-      host.setAttribute('role', 'dialog');
-      host.style.cssText =
-        'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
-      const box = document.createElement('div');
-      box.style.cssText =
-        'background:#fff;border-radius:16px;padding:20px 22px;max-width:320px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.2)';
-      box.innerHTML =
-        '<p style="margin:0 0 14px;font:600 15px/1.4 system-ui,sans-serif;color:#222">Google로 계속하기</p>';
-      const btnHost = document.createElement('div');
-      box.appendChild(btnHost);
-      const cancel = document.createElement('button');
-      cancel.type = 'button';
-      cancel.textContent = '닫기';
-      cancel.style.cssText =
-        'margin-top:14px;width:100%;border:0;background:#f3f3f3;border-radius:10px;padding:10px;font:14px system-ui;cursor:pointer';
-      cancel.onclick = () => finish(new Error('로그인을 취소했습니다'));
-      box.appendChild(cancel);
-      host.appendChild(box);
-      host.addEventListener('click', (e) => {
-        if (e.target === host) finish(new Error('로그인을 취소했습니다'));
-      });
-      document.body.appendChild(host);
-      window.google!.accounts.id.renderButton(btnHost, {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        text: 'continue_with',
-        shape: 'rectangular',
-        width: 280,
-      });
-    };
-
-    window.google!.accounts.id.prompt((notification) => {
-      if (
-        notification.isNotDisplayed() ||
-        notification.isSkippedMoment() ||
-        notification.isDismissedMoment()
-      ) {
-        showButtonFallback();
-      }
-    });
+    },
   });
+}
+
+/**
+ * 계정 시트에 Google 공식 버튼을 인라인으로 붙인다.
+ * One Tap / 커스텀 오버레이 / prompt() 는 호출하지 않는다.
+ */
+export async function mountGoogleSignInButton(
+  container: HTMLElement,
+  clientId: string,
+  onIdToken: (idToken: string) => void,
+  signal?: AbortSignal,
+): Promise<() => void> {
+  if (!clientId) {
+    throw new Error('VITE_GOOGLE_CLIENT_ID 가 없습니다');
+  }
+  if (signal?.aborted) {
+    return () => {};
+  }
+
+  await loadGisScript();
+  if (signal?.aborted) {
+    return () => {};
+  }
+
+  ensureGoogleIdInitialized(clientId);
+
+  const handler = (token: string) => onIdToken(token);
+  window.__pagebyGoogleIdTokenHandler = handler;
+
+  container.replaceChildren();
+  const fromLayout =
+    container.getBoundingClientRect().width ||
+    container.parentElement?.getBoundingClientRect().width ||
+    0;
+  const width = Math.max(240, Math.min(400, Math.floor(fromLayout || 320)));
+
+  window.google!.accounts.id.renderButton(container, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'continue_with',
+    shape: 'rectangular',
+    width,
+    logo_alignment: 'left',
+  });
+
+  return () => {
+    if (window.__pagebyGoogleIdTokenHandler === handler) {
+      window.__pagebyGoogleIdTokenHandler = null;
+    }
+    container.replaceChildren();
+  };
 }

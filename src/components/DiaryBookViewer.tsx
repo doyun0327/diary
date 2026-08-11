@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import {
   buildBookPages,
-  downloadDiaryBookPdf,
+  downloadBookPagesPdf,
   type BookPage,
 } from '../utils/diaryBook';
+import BackIcon from './BackIcon';
 import './DiaryBookViewer.css';
 
 interface DiaryBookViewerProps {
@@ -65,14 +66,14 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
   };
 
   const handleDownload = async () => {
-    if (downloading) return;
+    if (downloading || !pages) return;
     setDownloading(true);
     try {
       const name =
         entries.length === 1
           ? `diary_${entries[0].date}.pdf`
           : 'diary.pdf';
-      await downloadDiaryBookPdf(entries, name);
+      await downloadBookPagesPdf(pages, name);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('book.err.build'));
     } finally {
@@ -96,20 +97,7 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
             onClick={onClose}
             aria-label={t('common.close')}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
+            <BackIcon size={22} strokeWidth={2.2} />
           </button>
           <span className="diary-book__title">{subtitle || t('book.title')}</span>
           <button
@@ -143,7 +131,19 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
           </button>
         </header>
 
-        {busy && <p className="diary-book__status">{t('book.building')}</p>}
+        {busy && (
+          <div className="diary-book__status" role="status" aria-live="polite">
+            <img
+              className="diary-book__status-img"
+              src="/brand/sketch-book-writing.gif"
+              alt=""
+              width={120}
+              height={120}
+              draggable={false}
+            />
+            <p className="diary-book__status-text">{t('book.building')}</p>
+          </div>
+        )}
         {error && <p className="diary-book__error">{error}</p>}
 
         {pages && !busy && (

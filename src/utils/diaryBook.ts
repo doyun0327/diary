@@ -2,12 +2,9 @@ import { jsPDF } from 'jspdf';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { fontFamilyForEntry } from './fonts';
-import {
-  captureDiaryPaperBlob,
-  mountOffscreenDiaryPaper,
-} from './captureDiaryPaper';
+import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
 
-/** 책 페이지 비율 (세로) */
+/** 표지 페이지 비율 (세로) */
 export const BOOK_W = 900;
 export const BOOK_H = 1200;
 
@@ -117,39 +114,23 @@ export async function renderCoverPage(entries: DiaryEntry[]): Promise<HTMLCanvas
 }
 
 /**
- * 일기 한 편 — diary-detail__paper 를 DOM으로 렌더한 뒤 캡처해
- * 상세 화면과 동일한 색·글자·그림 비율로 PDF 페이지를 만든다.
+ * 일기 한 편 — 상세 PNG 다운로드와 동일한 paper 캡처.
+ * (여백·책 프레임 없이 paper 이미지 그대로)
  */
 export async function renderEntryPage(entry: DiaryEntry): Promise<HTMLCanvasElement> {
-  // 책 페이지 폭에 맞게 paper를 크게 그려 퀄리티 유지 (캡처 scale 2 포함)
-  const paperWidth = BOOK_W - 72;
-  const { paper, dispose } = mountOffscreenDiaryPaper(entry, paperWidth);
+  const blob = await captureDiaryEntryPaperBlob(entry);
+  const url = URL.createObjectURL(blob);
   try {
-    const blob = await captureDiaryPaperBlob(paper, entry.fontId);
-    const url = URL.createObjectURL(blob);
-    try {
-      const img = await loadImage(url);
-      const { canvas, ctx } = createPageCanvas();
-
-      ctx.fillStyle = themeColor('--color-bg', '#ffffff');
-      ctx.fillRect(0, 0, BOOK_W, BOOK_H);
-
-      const pad = 36;
-      const maxW = BOOK_W - pad * 2;
-      const maxH = BOOK_H - pad * 2;
-      const scale = Math.min(maxW / img.width, maxH / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      const dx = (BOOK_W - dw) / 2;
-      const dy = pad;
-
-      ctx.drawImage(img, dx, dy, dw, dh);
-      return canvas;
-    } finally {
-      URL.revokeObjectURL(url);
-    }
+    const img = await loadImage(url);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('일기장 페이지를 만들 수 없어요');
+    ctx.drawImage(img, 0, 0);
+    return canvas;
   } finally {
-    dispose();
+    URL.revokeObjectURL(url);
   }
 }
 
@@ -170,7 +151,7 @@ export async function buildBookPages(entries: DiaryEntry[]): Promise<BookPage[]>
   pages.push({
     label: '표지',
     canvas: cover,
-    dataUrl: cover.toDataURL('image/jpeg', 0.92),
+    dataUrl: cover.toDataURL('image/png'),
   });
 
   for (const entry of sorted) {
@@ -178,29 +159,40 @@ export async function buildBookPages(entries: DiaryEntry[]): Promise<BookPage[]>
     pages.push({
       label: entry.title || formatDate(entry.date),
       canvas: page,
-      dataUrl: page.toDataURL('image/jpeg', 0.92),
+      dataUrl: page.toDataURL('image/png'),
     });
   }
 
   return pages;
 }
 
-/** 페이지 이미지들로 PDF 생성 */
-export async function buildDiaryBookPdf(entries: DiaryEntry[]): Promise<Blob> {
-  const pages = await buildBookPages(entries);
+/** 이미 만든 책 페이지로 PDF 생성 (미리보기와 동일한 이미지) */
+export async function buildPdfFromBookPages(pages: BookPage[]): Promise<Blob> {
+  if (pages.length === 0) throw new Error('다운로드할 일기가 없어요');
+
+  const first = pages[0].canvas;
   const pdf = new jsPDF({
-    orientation: 'portrait',
+    orientation: first.width >= first.height ? 'landscape' : 'portrait',
     unit: 'px',
-    format: [BOOK_W, BOOK_H],
+    format: [first.width, first.height],
     hotfixes: ['px_scaling'],
   });
 
   pages.forEach((page, i) => {
-    if (i > 0) pdf.addPage([BOOK_W, BOOK_H], 'portrait');
-    pdf.addImage(page.dataUrl, 'JPEG', 0, 0, BOOK_W, BOOK_H);
+    const { width: w, height: h } = page.canvas;
+    if (i > 0) {
+      pdf.addPage([w, h], w >= h ? 'landscape' : 'portrait');
+    }
+    pdf.addImage(page.dataUrl, 'PNG', 0, 0, w, h);
   });
 
   return pdf.output('blob');
+}
+
+/** 페이지 이미지들로 PDF 생성 */
+export async function buildDiaryBookPdf(entries: DiaryEntry[]): Promise<Blob> {
+  const pages = await buildBookPages(entries);
+  return buildPdfFromBookPages(pages);
 }
 
 export function downloadBlob(blob: Blob, filename: string) {
@@ -217,5 +209,13 @@ export async function downloadDiaryBookPdf(
   filename = 'diary.pdf',
 ) {
   const blob = await buildDiaryBookPdf(entries);
+  downloadBlob(blob, filename);
+}
+
+export async function downloadBookPagesPdf(
+  pages: BookPage[],
+  filename = 'diary.pdf',
+) {
+  const blob = await buildPdfFromBookPages(pages);
   downloadBlob(blob, filename);
 }

@@ -8,6 +8,8 @@ import { shareDiaryTo } from '../utils/shareStory';
 import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
 import MoodIcon from '../components/MoodIcon';
+import BackIcon from '../components/BackIcon';
+import AppModal from '../components/AppModal';
 import DiaryBookViewer from '../components/DiaryBookViewer';
 import './DiaryDetailPage.css';
 
@@ -16,11 +18,23 @@ interface DiaryDetailPageProps {
   onBack: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
+  onOpenRooms: () => void;
 }
 
 type ShareStep = 'menu' | 'rooms';
 
-function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPageProps) {
+type FeedbackModal =
+  | { kind: 'info'; title: string }
+  | { kind: 'gotoRooms'; title: string }
+  | null;
+
+function DiaryDetailPage({
+  entry,
+  onBack,
+  onEdit,
+  onDelete,
+  onOpenRooms,
+}: DiaryDetailPageProps) {
   const { t } = useTranslation();
   const [shareOpen, setShareOpen] = useState(false);
   const [shareStep, setShareStep] = useState<ShareStep>('menu');
@@ -28,10 +42,11 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [roomsLoading, setRoomsLoading] = useState(false);
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+  const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
   const [bookOpen, setBookOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [downloadingPng, setDownloadingPng] = useState(false);
-  const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackModal>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -50,9 +65,10 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
   };
 
   const openShare = () => {
-    setShareMsg(null);
+    setFeedback(null);
     setShareStep('menu');
     setSelectedRoomIds([]);
+    setSharedRoomIds([]);
     setShareOpen(true);
   };
 
@@ -61,24 +77,35 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
     setShareOpen(false);
     setShareStep('menu');
     setSelectedRoomIds([]);
+    setSharedRoomIds([]);
   };
 
   const openRoomStep = async () => {
     setShareStep('rooms');
     setSelectedRoomIds([]);
+    setSharedRoomIds([]);
     setRoomsLoading(true);
     try {
-      const list = await roomsApi.listRooms();
+      const [list, already] = await Promise.all([
+        roomsApi.listRooms(),
+        roomsApi.listRoomsSharingDiary(entry.id).catch(() => [] as string[]),
+      ]);
       setRooms(list);
+      setSharedRoomIds(already);
     } catch (err) {
-      setShareMsg(err instanceof Error ? err.message : t('detail.err.roomsList'));
+      setFeedback({
+        kind: 'info',
+        title: err instanceof Error ? err.message : t('detail.err.roomsList'),
+      });
       setRooms([]);
+      setSharedRoomIds([]);
     } finally {
       setRoomsLoading(false);
     }
   };
 
   const toggleRoom = (roomId: string) => {
+    if (sharedRoomIds.includes(roomId)) return;
     setSelectedRoomIds((prev) =>
       prev.includes(roomId) ? prev.filter((id) => id !== roomId) : [...prev, roomId],
     );
@@ -86,11 +113,13 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
 
   const shareToSelectedRooms = async () => {
     if (sharing || selectedRoomIds.length === 0) return;
-    const targets = rooms.filter((r) => selectedRoomIds.includes(r.id));
+    const targets = rooms.filter(
+      (r) => selectedRoomIds.includes(r.id) && !sharedRoomIds.includes(r.id),
+    );
     if (targets.length === 0) return;
 
     setSharing(true);
-    setShareMsg(null);
+    setFeedback(null);
     const body = {
       diaryId: entry.id,
       title: entry.title,
@@ -116,17 +145,20 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       closeShare({ force: true });
 
       if (okNames.length > 0 && failNames.length === 0) {
-        setShareMsg(
-          okNames.length === 1
-            ? t('share.ok.oneRoom', { name: okNames[0] })
-            : t('share.ok.manyRooms', { n: okNames.length }),
-        );
+        setFeedback({
+          kind: 'gotoRooms',
+          title:
+            okNames.length === 1
+              ? t('share.ok.oneRoom', { name: okNames[0] })
+              : t('share.ok.manyRooms', { n: okNames.length }),
+        });
       } else if (okNames.length > 0) {
-        setShareMsg(
-          t('share.ok.partial', { n: okNames.length, fails: failNames.join(', ') }),
-        );
+        setFeedback({
+          kind: 'gotoRooms',
+          title: t('share.ok.partial', { n: okNames.length, fails: failNames.join(', ') }),
+        });
       } else {
-        setShareMsg(t('share.err.roomShare'));
+        setFeedback({ kind: 'info', title: t('share.err.roomShare') });
       }
     } finally {
       setSharing(false);
@@ -136,12 +168,15 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
   const handleDownloadPng = async () => {
     if (downloadingPng || !paperRef.current) return;
     setDownloadingPng(true);
-    setShareMsg(null);
+    setFeedback(null);
     try {
       await downloadDiaryPaperPng(paperRef.current, entry.date, entry.fontId);
-      setShareMsg(t('detail.ok.png'));
+      setFeedback({ kind: 'info', title: t('detail.ok.png') });
     } catch (err) {
-      setShareMsg(err instanceof Error ? err.message : t('detail.err.png'));
+      setFeedback({
+        kind: 'info',
+        title: err instanceof Error ? err.message : t('detail.err.png'),
+      });
     } finally {
       setDownloadingPng(false);
     }
@@ -149,7 +184,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
 
   const handlePickSns = async () => {
     if (sharing) return;
-    setShareMsg(null);
+    setFeedback(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
@@ -162,19 +197,22 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
       closeShare({ force: true });
 
       if (result === 'shared') {
-        setShareMsg(t('share.pick.sns'));
+        setFeedback({ kind: 'info', title: t('share.pick.sns') });
       } else if (isMobileShare) {
-        setShareMsg(t('share.saved.sns'));
+        setFeedback({ kind: 'info', title: t('share.saved.sns') });
         if (url) setPreviewUrl(url);
       } else {
-        setShareMsg(t('share.pcHint'));
+        setFeedback({ kind: 'info', title: t('share.pcHint') });
         if (url) setPreviewUrl(url);
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
         closeShare({ force: true });
       } else {
-        setShareMsg(err instanceof Error ? err.message : t('detail.err.share'));
+        setFeedback({
+          kind: 'info',
+          title: err instanceof Error ? err.message : t('detail.err.share'),
+        });
       }
     } finally {
       setSharing(false);
@@ -190,20 +228,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
           onClick={onBack}
           aria-label={t('detail.backAria')}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+          <BackIcon />
         </button>
 
         <div className="diary-detail__actions">
@@ -379,7 +404,28 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
         </section>
       </div>
 
-      {shareMsg && <p className="diary-detail__share-msg">{shareMsg}</p>}
+      {feedback && (
+        <AppModal
+          title={feedback.title}
+          lead={feedback.kind === 'gotoRooms' ? t('share.goToRoomsAsk') : undefined}
+          onDismiss={() => setFeedback(null)}
+          secondaryLabel={
+            feedback.kind === 'gotoRooms' ? t('common.cancel') : undefined
+          }
+          onSecondary={() => setFeedback(null)}
+          primaryLabel={
+            feedback.kind === 'gotoRooms' ? t('share.goToRooms') : t('common.close')
+          }
+          onPrimary={() => {
+            if (feedback.kind === 'gotoRooms') {
+              setFeedback(null);
+              onOpenRooms();
+              return;
+            }
+            setFeedback(null);
+          }}
+        />
+      )}
       {previewUrl && (
         <div className="diary-detail__share-preview">
           <img src={previewUrl} alt={t('detail.sharePreviewAlt')} />
@@ -440,20 +486,7 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                     onClick={() => setShareStep('menu')}
                     aria-label={t('share.backToMenuAria')}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden
-                    >
-                      <path d="M15 18l-6-6 6-6" />
-                    </svg>
+                    <BackIcon size={18} strokeWidth={2.2} />
                   </button>
                   <h3>{t('share.rooms')}</h3>
                   <span className="diary-detail__picker-head-spacer" />
@@ -467,13 +500,15 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                 )}
                 {rooms.map((room) => {
                   const selected = selectedRoomIds.includes(room.id);
+                  const alreadyShared = sharedRoomIds.includes(room.id);
                   return (
                     <button
                       key={room.id}
                       type="button"
-                      className={`diary-detail__picker-item diary-detail__room-option${selected ? ' is-selected' : ''}`}
-                      disabled={sharing}
+                      className={`diary-detail__picker-item diary-detail__room-option${selected ? ' is-selected' : ''}${alreadyShared ? ' is-shared' : ''}`}
+                      disabled={sharing || alreadyShared}
                       aria-pressed={selected}
+                      aria-disabled={alreadyShared}
                       onClick={() => toggleRoom(room.id)}
                     >
                       <span className="diary-detail__picker-icon" aria-hidden>
@@ -481,8 +516,13 @@ function DiaryDetailPage({ entry, onBack, onEdit, onDelete }: DiaryDetailPagePro
                       </span>
                       <span className="diary-detail__room-option-text">
                         <strong>{room.name}</strong>
+                        {alreadyShared ? (
+                          <small>{t('share.alreadyShared')}</small>
+                        ) : null}
                       </span>
-                      {selected && <span className="diary-detail__room-check" aria-hidden>✓</span>}
+                      {selected && !alreadyShared && (
+                        <span className="diary-detail__room-check" aria-hidden>✓</span>
+                      )}
                     </button>
                   );
                 })}

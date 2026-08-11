@@ -5,8 +5,8 @@ import type {
   RoomPost,
   RoomSummary,
 } from '../types/room';
-import { getClientHeaders } from '../hooks/useClientProfile';
 import { apiUrl, isRemoteApi } from './config';
+import { getAccessToken } from '../hooks/useAuthSession';
 
 async function parseError(res: Response): Promise<string> {
   try {
@@ -17,13 +17,21 @@ async function parseError(res: Response): Promise<string> {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const headers: HeadersInit = {
+function authHeaders(extra?: HeadersInit): HeadersInit {
+  const token = getAccessToken();
+  if (!token) {
+    throw new Error('로그인이 필요해요');
+  }
+  return {
+    Accept: 'application/json',
     'Content-Type': 'application/json',
-    ...getClientHeaders(),
-    ...(init?.headers ?? {}),
+    Authorization: `Bearer ${token}`,
+    ...(extra ?? {}),
   };
+}
 
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = authHeaders(init?.headers);
   let res: Response;
   try {
     res = await fetch(apiUrl(path), { ...init, headers });
@@ -33,6 +41,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'
         : '서버에 연결하지 못했어요. Spring(8080)이 켜져 있는지 확인해 주세요.',
     );
+  }
+  if (res.status === 401) {
+    throw new Error('로그인이 필요해요');
   }
   if (!res.ok) {
     throw new Error(await parseError(res));
@@ -47,6 +58,11 @@ export function listRooms(): Promise<RoomSummary[]> {
   return request<RoomSummary[]>('/api/rooms');
 }
 
+/** 해당 일기가 이미 공유된 방 id 목록 */
+export function listRoomsSharingDiary(diaryId: string): Promise<string[]> {
+  return request<string[]>(`/api/rooms/shared-diaries/${encodeURIComponent(diaryId)}`);
+}
+
 export function createRoom(
   name: string,
   nickname?: string,
@@ -56,7 +72,6 @@ export function createRoom(
     method: 'POST',
     body: JSON.stringify({
       name,
-      // 한글/기호 닉네임은 헤더 대신 body로 전달 (fetch 헤더 ASCII 제한 회피)
       nickname: nickname?.trim() || undefined,
       avatarUrl: avatarUrl || undefined,
     }),

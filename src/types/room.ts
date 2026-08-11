@@ -1,7 +1,7 @@
 import type { Mood } from './diary';
 
 export interface RoomMember {
-  clientId: string;
+  userId: string;
   nickname: string;
   /** 프로필 사진 data URL 또는 http(s) URL */
   avatarUrl?: string | null;
@@ -24,7 +24,7 @@ export interface RoomPost {
   id: string;
   roomId: string;
   diaryId: string;
-  authorClientId: string;
+  authorUserId: string;
   authorNickname: string;
   title: string;
   date: string;
@@ -37,7 +37,7 @@ export interface RoomPost {
 export interface RoomComment {
   id: string;
   postId: string;
-  authorClientId: string;
+  authorUserId: string;
   authorNickname: string;
   text: string;
   createdAt: string;

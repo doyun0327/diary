@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
 import WriteFab from './components/WriteFab';
 import CharacterSetup from './components/CharacterSetup';
+import ProfileSetup from './components/ProfileSetup';
 import AccountSheet from './components/AccountSheet';
 import LanguageSheet from './components/LanguageSheet';
 import ScreenLockGate from './components/ScreenLockGate';
@@ -34,7 +35,7 @@ export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
 function App() {
   const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry, syncWithCloud } = useDiary();
-  const { session, markSynced } = useAuthSession();
+  const { session, markSynced, ensureGuestSession } = useAuthSession();
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } = useClientProfile();
   const screenLock = useScreenLock();
@@ -58,9 +59,19 @@ function App() {
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
 
+  const needsProfileSetup = !nickname.trim() || !avatarUrl;
+
   useEffect(() => {
     applyStoredFont();
   }, []);
+
+  useEffect(() => {
+    if (needsProfileSetup) return;
+    if (getAccessToken()) return;
+    void ensureGuestSession(clientId, nickname.trim()).catch((err) => {
+      console.warn('[guest] auto session failed', err);
+    });
+  }, [needsProfileSetup, clientId, nickname, ensureGuestSession]);
 
   const selectedEntry = entries.find((e) => e.id === selectedId);
   const editingEntry = editingId
@@ -73,9 +84,8 @@ function App() {
     setPage('detail');
   };
 
-  /** 로그인된 경우 저장/삭제 후 백그라운드 동기화 */
   const syncInBackground = () => {
-    if (!getAccessToken()) return;
+    if (!getAccessToken() || session?.provider !== 'google') return;
     void syncWithCloud(session?.lastSyncedAt ?? null)
       .then((result) => markSynced(result.serverTime))
       .catch((err) => {
@@ -156,6 +166,24 @@ function App() {
     setCalMonth(d.getMonth());
   };
 
+  if (needsProfileSetup) {
+    return (
+      <div className="app">
+        <ProfileSetup
+          initialName={nickname}
+          initialAvatar={avatarUrl}
+          onComplete={({ nickname: nextName, avatarUrl: nextAvatar }) => {
+            setNickname(nextName);
+            setAvatarUrl(nextAvatar);
+            void ensureGuestSession(clientId, nextName).catch((err) => {
+              console.warn('[guest] session after profile setup failed', err);
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <Header
@@ -210,12 +238,20 @@ function App() {
             onBack={() => setPage('home')}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onOpenRooms={() => {
+              setActiveRoomId(null);
+              setActivePostId(null);
+              setPage('rooms');
+            }}
           />
         )}
         {page === 'rooms' && (
           <RoomsHubPage
             nickname={nickname}
             avatarUrl={avatarUrl}
+            clientId={clientId}
+            ensureGuestSession={ensureGuestSession}
+            onOpenAccount={() => setAccountOpen(true)}
             onBack={() => setPage('home')}
             onOpenRoom={(roomId) => {
               setActiveRoomId(roomId);
@@ -231,6 +267,11 @@ function App() {
               setActivePostId(null);
               setPage('rooms');
             }}
+            onGoHome={() => {
+              setActiveRoomId(null);
+              setActivePostId(null);
+              setPage('home');
+            }}
             onOpenPost={(postId) => {
               setActivePostId(postId);
               setPage('room-post');
@@ -241,7 +282,7 @@ function App() {
           <RoomPostPage
             roomId={activeRoomId}
             postId={activePostId}
-            clientId={clientId}
+            userId={session?.userId ?? ''}
             onBack={() => {
               setActivePostId(null);
               setPage('room');
@@ -255,6 +296,7 @@ function App() {
           <AccountSheet
             nickname={nickname}
             avatarUrl={avatarUrl}
+            clientId={clientId}
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
             onSyncDiaries={syncWithCloud}

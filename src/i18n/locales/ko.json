@@ -141,9 +141,13 @@
     "removePhoto": "삭제",
     "nameLabel": "이름",
     "nameHint": "친구 방에서 보일 이름이에요",
-    "nameHintLoggedIn": "계정 이름으로 채워졌고, 앱에서 언제든 바꿀 수 있어요",
+    "nameHintLoggedIn": "로그아웃해도 이름은 이 기기에 남아요",
     "namePlaceholder": "이름을 입력해 주세요",
     "save": "저장",
+    "profile": {
+      "label": "이 기기 프로필",
+      "hint": "로그인과 별개예요. 이 앱에서만 쓰는 이름과 사진입니다."
+    },
     "sync": {
       "label": "클라우드 동기화",
       "hint": "로그인하면 일기 저장·삭제 시 자동으로 계정에 백업돼요.",
@@ -224,26 +228,36 @@
     "joinSubmit": "입장하기",
     "noNickname": "닉네임 없음",
     "backToList": "← 목록",
+    "backToListAria": "목록으로",
     "refresh": "새로고침",
     "sharedDiaries": "공유된 일기",
-    "sharedEmpty": "아직 공유된 일기가 없어요. 내 일기에서 「방에 공유」를 눌러 보세요.",
+    "sharedEmpty": "아직 공유된 일기가 없어요. 일기를 열고 「공유 → 친구 방」을 눌러 보세요.",
+    "sharePrompt": "일기를 공유해볼까요?",
+    "goHome": "메인 화면으로",
     "openPostAria": "{{author}}의 일기 {{title}} 크게 보기",
     "coach": {
       "comment": "댓글을 남겨보세요!"
     },
     "backToRoom": "← 방으로",
+    "backToRoomAria": "방으로",
     "sharedDiary": "공유 일기",
     "comments": "댓글 {{n}}",
     "commentPlaceholder": "댓글을 남겨 보세요",
     "commentSubmit": "등록",
     "alert": {
+      "createdTitle": "방이 만들어졌어요!",
+      "createdLead": "친구에게 아래 초대코드를 알려 주세요.",
+      "copyCode": "코드 복사하기",
+      "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
     "confirm": {
       "deletePost": "이 공유 일기를 방에서 삭제할까요?"
     },
     "err": {
-      "needNickname": "햄버거 메뉴 → 계정에서 이름을 먼저 정해 주세요",
+      "needNickname": "이름과 프로필 사진을 먼저 정해 주세요",
+      "needProfile": "이름과 프로필 사진이 있어야 친구와 공유할 수 있어요",
+      "guestAuth": "친구 방 연결에 실패했어요. 잠시 후 다시 시도해 주세요",
       "list": "방 목록을 불러오지 못했어요",
       "nameRequired": "방 이름을 입력해 주세요",
       "create": "방을 만들지 못했어요",
@@ -255,6 +269,20 @@
       "comment": "댓글을 남기지 못했어요",
       "delete": "삭제에 실패했어요"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "나를 소개해 주세요",
+    "lead": "이름과 사진을 정하면 그림일기를 친구들과 공유할 수 있어요.",
+    "pickPhoto": "사진 고르기",
+    "pickPhotoAria": "프로필 사진 선택",
+    "nameLabel": "이름",
+    "namePlaceholder": "친구에게 보일 이름",
+    "start": "시작하기",
+    "errName": "이름을 입력해 주세요",
+    "errNeedPhoto": "프로필 사진을 넣어 주세요",
+    "errImage": "이미지 파일만 올릴 수 있어요",
+    "errPhoto": "사진을 처리하지 못했어요"
   },
   "diary": {
     "empty": {
@@ -365,8 +393,11 @@
     "roomsHint": "여러 방을 골라 한 번에 공유할 수 있어요",
     "roomsLoading": "방 목록 불러오는 중…",
     "roomsEmpty": "참여 중인 방이 없어요. 메뉴 → 친구 방에서 방을 만들거나 입장해 주세요.",
+    "alreadyShared": "이미 공유했어요",
     "submit": "공유",
     "sharing": "공유 중…",
+    "goToRoomsAsk": "방 목록으로 이동할까요?",
+    "goToRooms": "방 목록으로",
     "pcHint": "PC 웹에서는 앱으로 바로 공유가 안 돼요. 이미지가 다운로드됐으니, 폰에서 열거나 앱에 올려 주세요.",
     "ok": {
       "oneRoom": "「{{name}}」방에 공유했어요",
@@ -452,7 +483,7 @@
     "title": "일기장",
     "pdfAria": "PDF 저장",
     "pdfTitle": "PDF 저장",
-    "building": "일기장을 만드는 중…",
+    "building": "일기를 쓰고 있어요",
     "prevPage": "이전 페이지",
     "nextPage": "다음 페이지",
     "coverLabel": "표지",

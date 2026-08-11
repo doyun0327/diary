@@ -89,7 +89,50 @@
   gap: 10px;
 }
 
+.account-sheet__google-slot {
+  position: relative;
+  width: 100%;
+}
+
+.account-sheet__google-slot.is-busy {
+  opacity: 0.55;
+}
+
+.account-sheet__google-face {
+  pointer-events: none;
+  user-select: none;
+}
+
+.account-sheet__google-host {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0.02;
+}
+
+/* 로딩 중에도 얼굴 버튼은 그대로 두고, 히트만 막아서 깜빡임을 없앰 */
+.account-sheet__google-slot.is-busy .account-sheet__google-host,
+.account-sheet__google-slot.is-loading .account-sheet__google-host {
+  pointer-events: none;
+}
+
+.account-sheet__google-host > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.account-sheet__google-host iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100%;
+}
+
 .account-sheet__oauth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
   padding: 13px 16px;
   border-radius: 14px;
@@ -99,6 +142,23 @@
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.account-sheet__oauth-logo {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  line-height: 0;
+}
+
+.account-sheet__oauth-logo--apple {
+  width: 22px;
+  height: 22px;
+}
+
+.account-sheet__oauth-logo svg {
+  display: block;
 }
 
 .account-sheet__oauth-btn:disabled {
@@ -183,6 +243,29 @@
   font-size: 0.8rem;
   line-height: 1.4;
   color: var(--color-text-muted);
+}
+
+.account-sheet__hint--tight {
+  margin-bottom: 8px;
+}
+
+.account-sheet__profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.account-sheet__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-sheet__sublabel {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--color-text);
 }
 
 .account-sheet__avatar-row {
@@ -280,17 +363,6 @@
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 18%, transparent);
-}
-
-.account-sheet__msg {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-align: center;
 }
 
 .account-sheet__lang-row {

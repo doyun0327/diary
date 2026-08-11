@@ -2,17 +2,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
+import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
   roomId: string;
   postId: string;
-  clientId: string;
+  userId: string;
   onBack: () => void;
 }
 
-function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
+function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const { t } = useTranslation();
   const [post, setPost] = useState<RoomPost | null>(null);
   const [comments, setComments] = useState<RoomComment[]>([]);
@@ -59,7 +60,7 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
   };
 
   const handleDelete = async () => {
-    if (!post || post.authorClientId !== clientId) return;
+    if (!post || post.authorUserId !== userId) return;
     if (!confirm(t('rooms.confirm.deletePost'))) return;
     setBusy(true);
     try {
@@ -74,11 +75,16 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
   return (
     <div className="rooms rooms--post">
       <div className="rooms__toolbar">
-        <button type="button" onClick={onBack}>
-          {t('rooms.backToRoom')}
+        <button
+          type="button"
+          className="rooms__back"
+          onClick={onBack}
+          aria-label={t('rooms.backToRoomAria')}
+        >
+          <BackIcon />
         </button>
         <h2>{t('rooms.sharedDiary')}</h2>
-        {post?.authorClientId === clientId ? (
+        {post?.authorUserId === userId ? (
           <button type="button" className="rooms__danger" disabled={busy} onClick={() => void handleDelete()}>
             {t('common.delete')}
           </button>
@@ -102,8 +108,8 @@ function RoomPostPage({ roomId, postId, clientId, onBack }: RoomPostPageProps) {
         <ul className="rooms__comment-list">
           {comments.map((c, i) => {
             const prev = comments[i - 1];
-            const showName = !prev || prev.authorClientId !== c.authorClientId;
-            const isMine = c.authorClientId === clientId;
+            const showName = !prev || prev.authorUserId !== c.authorUserId;
+            const isMine = c.authorUserId === userId;
             return (
               <li
                 key={c.id}

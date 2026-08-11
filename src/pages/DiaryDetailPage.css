@@ -465,6 +465,23 @@
   color: var(--color-accent-text);
 }
 
+.diary-detail__room-option.is-shared {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.diary-detail__room-option.is-shared strong {
+  color: var(--color-text-muted);
+}
+
+.diary-detail__room-option.is-shared small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 .diary-detail__room-check {
   flex-shrink: 0;
   width: 22px;

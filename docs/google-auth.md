@@ -60,11 +60,12 @@ VITE_GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
 
 ### 2) 프론트: idToken 받기 (`googleAuth.ts`)
 
-1. `https://accounts.google.com/gsi/client` 스크립트 로드
-2. `google.accounts.id.initialize({ client_id, callback })`
-3. **One Tap** (`prompt`) 시도
-4. One Tap이 안 뜨거나 스킵되면 → 화면 중앙에 **Google 공식 버튼** 모달 (`renderButton`)
-5. 성공 시 callback의 `credential` = **Google ID Token (JWT 문자열)**
+1. 계정 시트에 Google Identity Services **공식 버튼**을 붙인다 (`renderButton`)
+2. 사용자가 그 버튼을 누르면 Google 계정 선택이 바로 열린다
+3. callback의 `credential` = **Google ID Token (JWT 문자열)**
+
+> 승인된 **JavaScript 원본**만 있으면 됩니다  
+> (예: `http://localhost:5173`). 리디렉션 URI는 필요 없습니다.
 
 ### 3) 프론트 → 백엔드 (`authApi.ts`)
 
@@ -119,6 +120,7 @@ Content-Type: application/json
    예: `http://localhost:5173`, 배포 도메인
 4. 발급된 클라이언트 ID를 `VITE_GOOGLE_CLIENT_ID`에 넣기
 
+> 공식 GIS 버튼 로그인이라 **승인된 리디렉션 URI는 필수가 아닙니다.**  
 > Spring Boot에서도 같은 Client ID로 idToken을 검증해야 합니다.  
 > (백엔드용 Client Secret은 **idToken 검증만** 할 때는 필수는 아니지만, 콘솔/프로젝트 설정은 맞춰 두는 게 좋습니다.)
 

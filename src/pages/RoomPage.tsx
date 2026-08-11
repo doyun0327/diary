@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
+import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import {
   isRoomCommentCoachSeen,
@@ -12,16 +13,16 @@ import './RoomsPages.css';
 interface RoomPageProps {
   roomId: string;
   onBack: () => void;
+  onGoHome: () => void;
   onOpenPost: (postId: string) => void;
 }
 
-function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
+function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
 
   const refresh = useCallback(async () => {
@@ -55,40 +56,19 @@ function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
     onOpenPost(postId);
   };
 
-  const copyCode = async () => {
-    if (!room) return;
-    try {
-      await navigator.clipboard.writeText(room.inviteCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setError(t('rooms.err.copy'));
-    }
-  };
-
   return (
     <div className="rooms">
       <div className="rooms__toolbar">
-        <button type="button" onClick={onBack}>
-          {t('rooms.backToList')}
+        <button
+          type="button"
+          className="rooms__back"
+          onClick={onBack}
+          aria-label={t('rooms.backToListAria')}
+        >
+          <BackIcon />
         </button>
         <h2>{room?.name ?? t('rooms.title')}</h2>
-        <div className="rooms__toolbar-actions">
-          {room && (
-            <button
-              type="button"
-              className="rooms__invite-quiet"
-              onClick={() => void copyCode()}
-              title={t('rooms.copyInviteTitle')}
-              aria-label={t('rooms.copyInviteAria')}
-            >
-              {copied ? t('rooms.copied') : t('rooms.copyInvite')}
-            </button>
-          )}
-          <button type="button" className="rooms__link" onClick={() => void refresh()} disabled={loading}>
-            {t('rooms.refresh')}
-          </button>
-        </div>
+        <span className="rooms__toolbar-balance" aria-hidden />
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
@@ -103,7 +83,13 @@ function RoomPage({ roomId, onBack, onOpenPost }: RoomPageProps) {
             )}
           </div>
           {posts.length === 0 && (
-            <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
+            <div className="rooms__empty rooms__empty--share-cta">
+              <p className="rooms__empty-title">{t('rooms.sharePrompt')}</p>
+              <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
+              <button type="button" className="rooms__btn primary" onClick={onGoHome}>
+                {t('rooms.goHome')}
+              </button>
+            </div>
           )}
           {posts.length > 0 && (
             <div className="rooms__coach-anchor">

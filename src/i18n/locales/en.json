@@ -141,9 +141,13 @@
     "removePhoto": "Remove",
     "nameLabel": "Name",
     "nameHint": "Name shown in friend rooms",
-    "nameHintLoggedIn": "Filled from your account — you can change it anytime",
+    "nameHintLoggedIn": "Your name stays on this device after sign-out",
     "namePlaceholder": "Enter your name",
     "save": "Save",
+    "profile": {
+      "label": "Profile on this device",
+      "hint": "Separate from sign-in. Name and photo used only in this app."
+    },
     "sync": {
       "label": "Cloud sync",
       "hint": "Sign in to auto-back up your diary when you save or delete.",
@@ -224,26 +228,36 @@
     "joinSubmit": "Join",
     "noNickname": "No nickname",
     "backToList": "← List",
+    "backToListAria": "Back to list",
     "refresh": "Refresh",
     "sharedDiaries": "Shared diaries",
-    "sharedEmpty": "No shared diaries yet. Try “Share to room” on your diary.",
+    "sharedEmpty": "No shared diaries yet. Open a diary and tap Share → Friend rooms.",
+    "sharePrompt": "Want to share a diary?",
+    "goHome": "Go to home",
     "openPostAria": "Open {{author}}’s diary {{title}}",
     "coach": {
       "comment": "Leave a comment!"
     },
     "backToRoom": "← To room",
+    "backToRoomAria": "Back to room",
     "sharedDiary": "Shared diary",
     "comments": "Comments ({{n}})",
     "commentPlaceholder": "Write a comment",
     "commentSubmit": "Post",
     "alert": {
+      "createdTitle": "Room created!",
+      "createdLead": "Share this invite code with your friends.",
+      "copyCode": "Copy code",
+      "enterRoom": "Enter room",
       "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
     },
     "confirm": {
       "deletePost": "Remove this shared diary from the room?"
     },
     "err": {
-      "needNickname": "Set your name in Menu → Account first",
+      "needNickname": "Set your name and profile photo first",
+      "needProfile": "Name and photo are required to share with friends",
+      "guestAuth": "Couldn't connect to friend rooms. Try again shortly",
       "list": "Couldn't load rooms",
       "nameRequired": "Please enter a room name",
       "create": "Couldn't create room",
@@ -255,6 +269,20 @@
       "comment": "Couldn't post comment",
       "delete": "Delete failed"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Introduce yourself",
+    "lead": "Pick a name and photo so you can share picture diaries with friends.",
+    "pickPhoto": "Choose photo",
+    "pickPhotoAria": "Choose profile photo",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name friends will see",
+    "start": "Get started",
+    "errName": "Please enter a name",
+    "errNeedPhoto": "Please add a profile photo",
+    "errImage": "Image files only",
+    "errPhoto": "Couldn't process the photo"
   },
   "diary": {
     "empty": {
@@ -365,8 +393,11 @@
     "roomsHint": "Pick several rooms to share at once",
     "roomsLoading": "Loading rooms…",
     "roomsEmpty": "No rooms yet. Create or join under Menu → Friend rooms.",
+    "alreadyShared": "Already shared",
     "submit": "Share",
     "sharing": "Sharing…",
+    "goToRoomsAsk": "Go to the rooms list?",
+    "goToRooms": "Open rooms",
     "pcHint": "Desktop web can't share to apps directly. Image downloaded—open on phone or upload in the app.",
     "ok": {
       "oneRoom": "Shared to “{{name}}”",
@@ -452,7 +483,7 @@
     "title": "Diary book",
     "pdfAria": "Save PDF",
     "pdfTitle": "Save PDF",
-    "building": "Building diary book…",
+    "building": "Writing your diary…",
     "prevPage": "Previous page",
     "nextPage": "Next page",
     "coverLabel": "Cover",

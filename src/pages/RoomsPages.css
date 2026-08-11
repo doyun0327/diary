@@ -22,7 +22,7 @@
   color: var(--color-text);
 }
 
-.rooms__toolbar > button,
+.rooms__toolbar > button:not(.rooms__back),
 .rooms__toolbar-actions,
 .rooms__link,
 .rooms__danger {
@@ -36,12 +36,47 @@
   padding: 6px 2px;
 }
 
+.rooms__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin: 0 0 0 -11px;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.rooms__back svg {
+  display: block;
+}
+
+.rooms__back:hover {
+  background: var(--color-bg-muted);
+}
+
+.rooms__back:active {
+  transform: scale(0.94);
+  background: var(--color-bg-muted);
+}
+
 .rooms__toolbar-actions {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0;
   cursor: default;
+}
+
+.rooms__toolbar-balance {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
 }
 
 .rooms__toolbar-actions > button {
@@ -152,6 +187,28 @@
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.5;
+}
+
+.rooms__empty--share-cta {
+  gap: 10px;
+  padding: 36px 16px 28px;
+}
+
+.rooms__empty-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.rooms__empty--share-cta .rooms__muted {
+  margin: 0 0 8px;
+  max-width: 22em;
+}
+
+.rooms__empty--share-cta .rooms__btn {
+  min-width: 180px;
 }
 
 .rooms-sheet {
@@ -516,6 +573,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px 10px;
+  align-items: stretch;
 }
 
 .rooms__gallery-item {
@@ -523,6 +581,7 @@
   flex-direction: column;
   gap: 6px;
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   border: none;
@@ -538,6 +597,8 @@
 }
 
 .rooms__gallery-author {
+  flex-shrink: 0;
+  height: 1.2em;
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--color-text-muted);
@@ -547,48 +608,66 @@
   padding: 0 2px;
 }
 
-/* PDF/상세와 같은 paper — 갤러리 축소 */
+/* PDF/상세와 같은 paper — 갤러리 축소 (칸마다 동일 3:4) */
 .rooms__paper {
   width: 100%;
   box-sizing: border-box;
 }
 
 .rooms__paper--compact {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   margin: 0;
   gap: 8px;
   padding: 10px;
-  max-height: 280px;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  max-height: none;
   overflow: hidden;
   pointer-events: none;
   transition: transform 0.15s;
 }
 
 .rooms__paper--compact .diary-detail__dateline {
+  flex-shrink: 0;
   font-size: 0.78rem;
   gap: 6px;
 }
 
 .rooms__paper--compact .diary-detail__title {
+  flex-shrink: 0;
   font-size: 0.82rem;
   padding: 7px 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .rooms__paper--compact .diary-detail__image {
+  flex: 1;
+  min-height: 0;
   border-radius: var(--radius-md);
   box-shadow: none;
 }
 
 .rooms__paper--compact .diary-detail__image img {
-  max-height: 110px;
-  object-fit: cover;
   width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+}
+
+.rooms__paper--compact .diary-detail__section {
+  flex-shrink: 0;
 }
 
 .rooms__paper--compact .diary-detail__content {
   font-size: 0.78rem;
   line-height: 22px;
-  min-height: 66px;
-  max-height: 66px;
+  min-height: 44px;
+  max-height: 44px;
   padding: 4px 2px;
   overflow: hidden;
   background-image: repeating-linear-gradient(
@@ -742,4 +821,66 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.rooms-created {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rooms-created__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.rooms-created__panel {
+  position: relative;
+  z-index: 1;
+  width: min(360px, 100%);
+  padding: 26px 22px 22px;
+  border-radius: 22px;
+  background: var(--sheet-bg, var(--color-surface));
+  box-shadow: 0 20px 50px rgba(90, 60, 40, 0.18);
+  text-align: center;
+  animation: rooms-sheet-up 0.28s var(--ease-out, ease-out);
+}
+
+.rooms-created__panel h3 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+}
+
+.rooms-created__lead {
+  margin: 0 0 18px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.rooms-created__code {
+  margin: 0 0 18px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  background: var(--color-bg-soft, var(--color-bg-muted));
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.rooms-created__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
