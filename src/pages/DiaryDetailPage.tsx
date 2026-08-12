@@ -9,6 +9,7 @@ import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
 import MoodIcon from '../components/MoodIcon';
 import BackIcon from '../components/BackIcon';
+import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
 import DiaryBookViewer from '../components/DiaryBookViewer';
 import './DiaryDetailPage.css';
@@ -550,32 +551,13 @@ function DiaryDetailPage({
                       })}
                     </div>
                     {rooms.length > SHARE_ROOMS_PAGE_SIZE && (
-                      <div className="diary-detail__room-pager">
-                        <button
-                          type="button"
-                          className="diary-detail__room-pager-btn"
-                          disabled={sharing || roomsPage <= 0}
-                          onClick={() => setRoomsPage((p) => Math.max(0, p - 1))}
-                        >
-                          {t('share.pagePrev')}
-                        </button>
-                        <span className="diary-detail__room-pager-status">
-                          {t('share.pageStatus', {
-                            page: roomsPage + 1,
-                            total: roomsPageCount,
-                          })}
-                        </span>
-                        <button
-                          type="button"
-                          className="diary-detail__room-pager-btn"
-                          disabled={sharing || roomsPage >= roomsPageCount - 1}
-                          onClick={() =>
-                            setRoomsPage((p) => Math.min(roomsPageCount - 1, p + 1))
-                          }
-                        >
-                          {t('share.pageNext')}
-                        </button>
-                      </div>
+                      <PagePager
+                        className="diary-detail__room-pager"
+                        page={roomsPage}
+                        pageCount={roomsPageCount}
+                        onPageChange={setRoomsPage}
+                        disabled={sharing}
+                      />
                     )}
                   </>
                 )}

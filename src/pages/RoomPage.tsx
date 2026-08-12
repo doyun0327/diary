@@ -1,14 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
 import BackIcon from '../components/BackIcon';
+import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import {
   isRoomCommentCoachSeen,
   markRoomCommentCoachSeen,
 } from '../utils/onboarding';
 import './RoomsPages.css';
+
+const ROOM_POSTS_PAGE_SIZE = 10;
 
 interface RoomPageProps {
   roomId: string;
@@ -24,6 +27,23 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
+  const [postsPage, setPostsPage] = useState(0);
+
+  const postsPageCount = Math.max(1, Math.ceil(posts.length / ROOM_POSTS_PAGE_SIZE));
+  const visiblePosts = useMemo(() => {
+    const start = postsPage * ROOM_POSTS_PAGE_SIZE;
+    return posts.slice(start, start + ROOM_POSTS_PAGE_SIZE);
+  }, [posts, postsPage]);
+
+  useEffect(() => {
+    setPostsPage(0);
+  }, [roomId]);
+
+  useEffect(() => {
+    if (postsPage > postsPageCount - 1) {
+      setPostsPage(Math.max(0, postsPageCount - 1));
+    }
+  }, [postsPage, postsPageCount]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -107,7 +127,7 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
                 </div>
               )}
               <ul className="rooms__gallery">
-                {posts.map((post) => (
+                {visiblePosts.map((post) => (
                   <li key={post.id}>
                     <button
                       type="button"
@@ -124,6 +144,13 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
                   </li>
                 ))}
               </ul>
+              {posts.length > ROOM_POSTS_PAGE_SIZE && (
+                <PagePager
+                  page={postsPage}
+                  pageCount={postsPageCount}
+                  onPageChange={setPostsPage}
+                />
+              )}
             </div>
           )}
         </section>

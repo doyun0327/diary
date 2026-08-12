@@ -6,6 +6,11 @@ import type {
   RoomSummary,
 } from '../types/room';
 import { apiUrl, isRemoteApi } from './config';
+import {
+  devMockRoomPosts,
+  getDevMockRoomPost,
+  isMockPagingPost,
+} from './mockRoomPosts';
 import { getAccessToken } from '../hooks/useAuthSession';
 
 async function parseError(res: Response): Promise<string> {
@@ -125,11 +130,14 @@ export function getRoom(roomId: string): Promise<RoomDetail> {
   return request<RoomDetail>(`/api/rooms/${roomId}`);
 }
 
-export function listRoomPosts(roomId: string): Promise<RoomPost[]> {
-  return request<RoomPost[]>(`/api/rooms/${roomId}/posts`);
+export async function listRoomPosts(roomId: string): Promise<RoomPost[]> {
+  const list = await request<RoomPost[]>(`/api/rooms/${roomId}/posts`);
+  return [...list, ...devMockRoomPosts(roomId)];
 }
 
-export function getRoomPost(roomId: string, postId: string): Promise<RoomPost> {
+export async function getRoomPost(roomId: string, postId: string): Promise<RoomPost> {
+  const mock = getDevMockRoomPost(roomId, postId);
+  if (mock) return mock;
   return request<RoomPost>(`/api/rooms/${roomId}/posts/${postId}`);
 }
 
@@ -153,6 +161,9 @@ export function listComments(
   roomId: string,
   postId: string,
 ): Promise<RoomComment[]> {
+  if (import.meta.env.DEV && isMockPagingPost(postId)) {
+    return Promise.resolve([]);
+  }
   return request<RoomComment[]>(`/api/rooms/${roomId}/posts/${postId}/comments`);
 }
 
