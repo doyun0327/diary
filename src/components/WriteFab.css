@@ -1,7 +1,11 @@
 .write-fab {
+  /* 하단 배너(~56px) + FAB 간격(16px) 여유 */
+  --write-fab-ad-slot: 56px;
   position: fixed;
   z-index: 10;
-  bottom: calc(28px + env(safe-area-inset-bottom));
+  bottom: calc(
+    var(--write-fab-ad-slot) + 16px + env(safe-area-inset-bottom)
+  );
   left: 50%;
   width: 60px;
   height: 60px;
