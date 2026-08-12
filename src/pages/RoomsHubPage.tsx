@@ -42,7 +42,6 @@ function RoomsHubPage({
   const [busy, setBusy] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [createdRoom, setCreatedRoom] = useState<{ id: string; inviteCode: string } | null>(null);
-  const [createdCopied, setCreatedCopied] = useState(false);
 
   const shareReady = canShare(nickname, avatarUrl);
 
@@ -111,7 +110,6 @@ function RoomsHubPage({
       const room = await roomsApi.createRoom(name, nickname.trim(), avatarUrl);
       setRoomName('');
       setSheet(null);
-      setCreatedCopied(false);
       setCreatedRoom({ id: room.id, inviteCode: room.inviteCode });
       await refresh();
     } catch (err) {
@@ -121,36 +119,36 @@ function RoomsHubPage({
     }
   };
 
-  const copyCreatedCode = async () => {
-    if (!createdRoom) return;
-    try {
-      await navigator.clipboard.writeText(createdRoom.inviteCode);
-      setCreatedCopied(true);
-      window.setTimeout(() => setCreatedCopied(false), 1600);
-    } catch {
-      setError(t('rooms.err.copy'));
-    }
-  };
-
   const shareCreatedCode = async () => {
     if (!createdRoom) return;
-    const text = t('rooms.alert.shareText', { code: createdRoom.inviteCode });
+    const code = createdRoom.inviteCode;
+    const text = t('rooms.alert.shareText');
+    const installUrl =
+      (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
+      window.location.origin;
+
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      // 클립보드 실패해도 공유는 진행
+    }
+
     try {
       if (typeof navigator.share === 'function') {
         await navigator.share({
           title: t('rooms.alert.shareTitle'),
           text,
+          url: installUrl,
         });
         return;
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
-      // 공유 실패 시 복사로 대체
+      // 공유 실패 시 아래 폴백
     }
+
     try {
-      await navigator.clipboard.writeText(text);
-      setCreatedCopied(true);
-      window.setTimeout(() => setCreatedCopied(false), 1600);
+      await navigator.clipboard.writeText(`${text}\n\n${installUrl}\n${code}`);
     } catch {
       setError(t('rooms.err.copy'));
     }
@@ -158,7 +156,6 @@ function RoomsHubPage({
 
   const dismissCreatedRoom = () => {
     setCreatedRoom(null);
-    setCreatedCopied(false);
   };
 
   const handleJoin = async () => {
@@ -352,8 +349,6 @@ function RoomsHubPage({
           lead={t('rooms.alert.createdLead')}
           onDismiss={dismissCreatedRoom}
           closeAriaLabel={t('common.close')}
-          secondaryLabel={createdCopied ? t('rooms.copied') : t('rooms.alert.copyCode')}
-          onSecondary={() => void copyCreatedCode()}
           primaryLabel={t('rooms.alert.share')}
           onPrimary={() => void shareCreatedCode()}
         >
