@@ -156,6 +156,11 @@
       "photoLoad": "Não foi possível carregar a foto"
     },
     "useAccountPhoto": "Usar foto da conta",
+    "replacePhoto": {
+      "title": "Usar a foto do Google?",
+      "lead": "Você pode trocar sua foto atual pela foto da conta Google.",
+      "confirm": "Trocar"
+    },
     "nameHintLoggedIn": "Preenchido da conta — você pode mudar quando quiser",
     "sync": {
       "label": "Sincronização na nuvem",

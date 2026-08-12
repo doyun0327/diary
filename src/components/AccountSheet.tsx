@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as roomsApi from '../api/roomsApi';
+import AppModal from './AppModal';
 import {
   useAuthSession,
   type AuthProvider,
@@ -90,6 +91,8 @@ function AccountSheet({
   const [busy, setBusy] = useState(false);
   const [authBusy, setAuthBusy] = useState<AuthProvider | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
+  /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
+  const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(null);
 
   /** Google 클라우드만 “로그인됨”으로 취급 (게스트는 친구 방용) */
   const cloudSignedIn = session?.provider === 'google';
@@ -171,7 +174,15 @@ function AccountSheet({
     };
   }, [cloudSignedIn]);
 
-  /** 로그인 성공후: 빈 이름만 채우고, 사진은 없을 때만 계정 사진 시드 */
+  const applyAuthPhoto = (photoUrl: string, nameHint?: string) => {
+    onAvatarChange(photoUrl);
+    syncProfileToRooms({
+      nickname: nameHint || nameDraft.trim() || nickname,
+      avatarUrl: photoUrl,
+    });
+  };
+
+  /** 로그인 성공후: 빈 이름만 채우고, 사진은 없을 때 시드 / 있으면 교체 확인 */
   const seedProfileFromAuth = (next: AuthSession) => {
     const name = next.displayName.trim();
     if (name && !nickname.trim()) {
@@ -179,12 +190,13 @@ function AccountSheet({
       setNameDraft(name);
       syncProfileToRooms({ nickname: name, avatarUrl: next.photoUrl ?? avatarUrl });
     }
-    if (next.photoUrl && !avatarUrl) {
-      onAvatarChange(next.photoUrl);
-      syncProfileToRooms({
-        nickname: name || nickname || nameDraft.trim(),
-        avatarUrl: next.photoUrl,
-      });
+    if (!next.photoUrl) return;
+    if (!avatarUrl) {
+      applyAuthPhoto(next.photoUrl, name || nickname || nameDraft.trim());
+      return;
+    }
+    if (next.photoUrl !== avatarUrl) {
+      setPendingGooglePhoto(next.photoUrl);
     }
   };
 
@@ -218,11 +230,17 @@ function AccountSheet({
 
   const useAccountPhoto = () => {
     if (!session?.photoUrl) return;
-    onAvatarChange(session.photoUrl);
-    syncProfileToRooms({
-      nickname: nameDraft.trim() || nickname,
-      avatarUrl: session.photoUrl,
-    });
+    applyAuthPhoto(session.photoUrl);
+  };
+
+  const confirmReplaceWithGooglePhoto = () => {
+    if (!pendingGooglePhoto) return;
+    applyAuthPhoto(pendingGooglePhoto);
+    setPendingGooglePhoto(null);
+  };
+
+  const cancelReplaceWithGooglePhoto = () => {
+    setPendingGooglePhoto(null);
   };
 
   const saveName = () => {
@@ -456,6 +474,30 @@ function AccountSheet({
         )}
 
       </div>
+
+      {pendingGooglePhoto ? (
+        <AppModal
+          title={t('account.replacePhoto.title')}
+          lead={t('account.replacePhoto.lead')}
+          onDismiss={cancelReplaceWithGooglePhoto}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={cancelReplaceWithGooglePhoto}
+          primaryLabel={t('account.replacePhoto.confirm')}
+          onPrimary={confirmReplaceWithGooglePhoto}
+        >
+          <div className="account-sheet__replace-preview" aria-hidden>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="account-sheet__replace-preview-img" />
+            ) : null}
+            <span className="account-sheet__replace-preview-arrow">→</span>
+            <img
+              src={pendingGooglePhoto}
+              alt=""
+              className="account-sheet__replace-preview-img"
+            />
+          </div>
+        </AppModal>
+      ) : null}
     </div>
   );
 }

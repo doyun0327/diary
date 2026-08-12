@@ -156,6 +156,11 @@
       "photoLoad": "Tidak bisa memuat foto"
     },
     "useAccountPhoto": "Pakai foto akun",
+    "replacePhoto": {
+      "title": "Pakai foto Google?",
+      "lead": "Anda bisa mengganti foto profil saat ini dengan foto akun Google.",
+      "confirm": "Ganti"
+    },
     "nameHintLoggedIn": "Terisi dari akun — bisa diubah kapan saja di aplikasi",
     "sync": {
       "label": "Sinkronisasi cloud",

@@ -402,3 +402,26 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+.account-sheet__replace-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 8px;
+}
+
+.account-sheet__replace-preview-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-bg-muted);
+  box-shadow: var(--shadow-card);
+}
+
+.account-sheet__replace-preview-arrow {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}

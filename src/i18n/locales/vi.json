@@ -156,6 +156,11 @@
       "photoLoad": "Không tải được ảnh"
     },
     "useAccountPhoto": "Dùng ảnh tài khoản",
+    "replacePhoto": {
+      "title": "Dùng ảnh Google?",
+      "lead": "Bạn có thể thay ảnh hồ sơ hiện tại bằng ảnh tài khoản Google.",
+      "confirm": "Đổi"
+    },
     "nameHintLoggedIn": "Đã điền từ tài khoản — bạn có thể đổi bất cứ lúc nào",
     "sync": {
       "label": "Đồng bộ đám mây",

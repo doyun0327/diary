@@ -138,6 +138,11 @@
     "changePhotoAria": "프로필 사진 변경",
     "pickPhoto": "사진 선택",
     "useAccountPhoto": "계정 사진 쓰기",
+    "replacePhoto": {
+      "title": "Google 사진으로 바꿀까요?",
+      "lead": "지금 쓰는 프로필 사진 대신 Google 계정 사진을 쓸 수 있어요.",
+      "confirm": "바꾸기"
+    },
     "removePhoto": "삭제",
     "nameLabel": "이름",
     "nameHint": "친구 방에서 보일 이름이에요",

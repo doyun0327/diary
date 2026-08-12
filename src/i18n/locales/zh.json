@@ -156,6 +156,11 @@
       "photoLoad": "无法加载照片"
     },
     "useAccountPhoto": "使用账号照片",
+    "replacePhoto": {
+      "title": "要换成 Google 照片吗？",
+      "lead": "可以用 Google 账号照片替换当前头像。",
+      "confirm": "更换"
+    },
     "nameHintLoggedIn": "已填入账号名称，可随时在应用中修改",
     "sync": {
       "label": "云同步",

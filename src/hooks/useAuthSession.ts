@@ -89,8 +89,14 @@ export function useAuthSession() {
   const [session, setSession] = useState<AuthSession | null>(loadSession);
 
   const signInWithGoogleIdToken = useCallback(async (idToken: string) => {
-    const auth = await loginWithGoogleIdToken(idToken);
-    const next = sessionFromAuth('google', auth, null);
+    const current = loadSession();
+    const currentToken = loadToken();
+    // 게스트 세션이면 Authorization 으로 보내 같은 users.id 승격
+    const guestToken =
+      current?.provider === 'guest' && currentToken ? currentToken : null;
+    const prevSynced = current?.lastSyncedAt ?? null;
+    const auth = await loginWithGoogleIdToken(idToken, guestToken);
+    const next = sessionFromAuth('google', auth, prevSynced);
     saveToken(auth.accessToken);
     saveSession(next);
     setSession(next);

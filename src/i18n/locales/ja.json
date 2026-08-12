@@ -156,6 +156,11 @@
       "photoLoad": "写真を読み込めませんでした"
     },
     "useAccountPhoto": "アカウントの写真を使う",
+    "replacePhoto": {
+      "title": "Googleの写真に替えますか？",
+      "lead": "今のプロフィール写真の代わりに、Googleアカウントの写真を使えます。",
+      "confirm": "替える"
+    },
     "nameHintLoggedIn": "アカウント名が入っています。アプリでいつでも変更できます",
     "sync": {
       "label": "クラウド同期",

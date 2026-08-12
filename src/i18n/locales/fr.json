@@ -156,6 +156,11 @@
       "photoLoad": "Impossible de charger la photo"
     },
     "useAccountPhoto": "Utiliser la photo du compte",
+    "replacePhoto": {
+      "title": "Utiliser la photo Google ?",
+      "lead": "Vous pouvez remplacer votre photo actuelle par celle de votre compte Google.",
+      "confirm": "Remplacer"
+    },
     "nameHintLoggedIn": "Rempli depuis votre compte — modifiable à tout moment",
     "sync": {
       "label": "Sync cloud",

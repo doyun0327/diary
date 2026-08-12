@@ -15,13 +15,22 @@ export interface AuthResponseDto {
   user: AuthUserDto;
 }
 
-export async function loginWithGoogleIdToken(idToken: string): Promise<AuthResponseDto> {
+export async function loginWithGoogleIdToken(
+  idToken: string,
+  guestAccessToken?: string | null,
+): Promise<AuthResponseDto> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  // 게스트 JWT를 같이 보내면 서버가 같은 users.id 로 Google 승격
+  if (guestAccessToken) {
+    headers.Authorization = `Bearer ${guestAccessToken}`;
+  }
+
   const res = await fetch(apiUrl('/api/auth/google'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+    headers,
     body: JSON.stringify({ idToken }),
   });
 

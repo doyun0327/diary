@@ -138,6 +138,11 @@
     "changePhotoAria": "Change profile photo",
     "pickPhoto": "Choose photo",
     "useAccountPhoto": "Use account photo",
+    "replacePhoto": {
+      "title": "Use your Google photo?",
+      "lead": "You can replace your current profile photo with your Google account photo.",
+      "confirm": "Replace"
+    },
     "removePhoto": "Remove",
     "nameLabel": "Name",
     "nameHint": "Name shown in friend rooms",
