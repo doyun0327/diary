@@ -72,25 +72,18 @@ function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | nul
 //   }
 // }
 
-/** 마지막 동기화: YYYY-MM-DD HH:MM:SS 오전/오후 */
-function formatLastSyncedAt(
-  iso: string | null,
-  amLabel: string,
-  pmLabel: string,
-  neverLabel: string,
-): string {
+/** 마지막 동기화: YYYY-MM-DD HH:MM:SS (24시간) */
+function formatLastSyncedAt(iso: string | null, neverLabel: string): string {
   if (!iso) return neverLabel;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return neverLabel;
   const y = d.getFullYear();
   const mo = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  const h24 = d.getHours();
+  const h = String(d.getHours()).padStart(2, '0');
   const mi = String(d.getMinutes()).padStart(2, '0');
   const se = String(d.getSeconds()).padStart(2, '0');
-  const ampm = h24 < 12 ? amLabel : pmLabel;
-  const h12 = h24 % 12 || 12;
-  return `${y}-${mo}-${day} ${String(h12).padStart(2, '0')}:${mi}:${se} ${ampm}`;
+  return `${y}-${mo}-${day} ${h}:${mi}:${se}`;
 }
 
 function AccountSheet({
@@ -413,8 +406,6 @@ function AccountSheet({
               {t('account.sync.lastSyncedAt', {
                 time: formatLastSyncedAt(
                   session?.lastSyncedAt ?? null,
-                  t('account.sync.am'),
-                  t('account.sync.pm'),
                   t('account.sync.never'),
                 ),
               })}
