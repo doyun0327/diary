@@ -13,6 +13,7 @@ import {
   type MoodPackId,
 } from '../utils/moodPack';
 import MoodIcon from './MoodIcon';
+import CloseIcon from './CloseIcon';
 import './DecorateSheet.css';
 
 interface DecorateSheetProps {
@@ -51,8 +52,13 @@ function DecorateSheet({ onClose }: DecorateSheetProps) {
       <div className="decorate-sheet__panel">
         <header className="decorate-sheet__head">
           <h2>{t('decorate.title')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.close')}>
-            {t('common.close')}
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
+            <CloseIcon />
           </button>
         </header>
 

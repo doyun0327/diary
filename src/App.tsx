@@ -231,6 +231,10 @@ function App() {
                 month: calMonth,
                 onPrev: () => moveCalendarMonth(-1),
                 onNext: () => moveCalendarMonth(1),
+                onSelectMonth: (year, month) => {
+                  setCalYear(year);
+                  setCalMonth(month);
+                },
               }
             : null
         }

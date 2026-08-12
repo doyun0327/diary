@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatYearMonth } from '../utils/date';
+import MonthYearPicker from './MonthYearPicker';
 import './Header.css';
 
 interface HeaderProps {
@@ -20,6 +21,7 @@ interface HeaderProps {
     month: number;
     onPrev: () => void;
     onNext: () => void;
+    onSelectMonth: (year: number, month: number) => void;
   } | null;
 }
 
@@ -192,6 +194,7 @@ function Header({
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -207,8 +210,13 @@ function Header({
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!calendarNav) setMonthPickerOpen(false);
+  }, [calendarNav]);
+
   const closeAnd = (fn?: () => void) => {
     setMenuOpen(false);
+    setMonthPickerOpen(false);
     fn?.();
   };
 
@@ -319,22 +327,45 @@ function Header({
           <button
             type="button"
             className="header__month-btn"
-            onClick={calendarNav.onPrev}
+            onClick={() => {
+              setMonthPickerOpen(false);
+              calendarNav.onPrev();
+            }}
             aria-label={t('calendar.prevMonth')}
           >
             <IconChevronLeft />
           </button>
-          <strong className="header__month-label">
+          <button
+            type="button"
+            className="header__month-label"
+            aria-label={t('calendar.pickYearMonthAria')}
+            aria-expanded={monthPickerOpen}
+            onClick={() => setMonthPickerOpen((open) => !open)}
+          >
             {formatYearMonth(calendarNav.year, calendarNav.month)}
-          </strong>
+          </button>
           <button
             type="button"
             className="header__month-btn"
-            onClick={calendarNav.onNext}
+            onClick={() => {
+              setMonthPickerOpen(false);
+              calendarNav.onNext();
+            }}
             aria-label={t('calendar.nextMonth')}
           >
             <IconChevronRight />
           </button>
+          {monthPickerOpen && (
+            <MonthYearPicker
+              year={calendarNav.year}
+              month={calendarNav.month}
+              onClose={() => setMonthPickerOpen(false)}
+              onSelect={(year, month) => {
+                calendarNav.onSelectMonth(year, month);
+                setMonthPickerOpen(false);
+              }}
+            />
+          )}
         </div>
       ) : (
         <span className="header__spacer" aria-hidden />

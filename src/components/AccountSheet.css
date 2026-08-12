@@ -68,7 +68,7 @@
   color: var(--color-text);
 }
 
-.account-sheet__head > button {
+.account-sheet__head > button:not(.sheet-close-btn) {
   border: none;
   background: none;
   font-family: inherit;

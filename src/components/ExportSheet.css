@@ -51,7 +51,7 @@
   color: var(--color-text);
 }
 
-.export-sheet__head button {
+.export-sheet__head button:not(.sheet-close-btn) {
   padding: 7px 12px;
   border: none;
   border-radius: 999px;

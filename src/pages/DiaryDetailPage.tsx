@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
@@ -12,6 +12,8 @@ import BackIcon from '../components/BackIcon';
 import AppModal from '../components/AppModal';
 import DiaryBookViewer from '../components/DiaryBookViewer';
 import './DiaryDetailPage.css';
+
+const SHARE_ROOMS_PAGE_SIZE = 10;
 
 interface DiaryDetailPageProps {
   entry: DiaryEntry;
@@ -41,6 +43,7 @@ function DiaryDetailPage({
   const [moreOpen, setMoreOpen] = useState(false);
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [roomsLoading, setRoomsLoading] = useState(false);
+  const [roomsPage, setRoomsPage] = useState(0);
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
   const [bookOpen, setBookOpen] = useState(false);
@@ -50,11 +53,23 @@ function DiaryDetailPage({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
 
+  const roomsPageCount = Math.max(1, Math.ceil(rooms.length / SHARE_ROOMS_PAGE_SIZE));
+  const pagedRooms = useMemo(() => {
+    const start = roomsPage * SHARE_ROOMS_PAGE_SIZE;
+    return rooms.slice(start, start + SHARE_ROOMS_PAGE_SIZE);
+  }, [rooms, roomsPage]);
+
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  useEffect(() => {
+    if (roomsPage > 0 && roomsPage >= roomsPageCount) {
+      setRoomsPage(Math.max(0, roomsPageCount - 1));
+    }
+  }, [roomsPage, roomsPageCount]);
 
   const handleDelete = () => {
     setMoreOpen(false);
@@ -84,6 +99,7 @@ function DiaryDetailPage({
     setShareStep('rooms');
     setSelectedRoomIds([]);
     setSharedRoomIds([]);
+    setRoomsPage(0);
     setRoomsLoading(true);
     try {
       const [list, already] = await Promise.all([
@@ -92,12 +108,14 @@ function DiaryDetailPage({
       ]);
       setRooms(list);
       setSharedRoomIds(already);
+      setRoomsPage(0);
     } catch (err) {
       setFeedback({
         kind: 'info',
         title: err instanceof Error ? err.message : t('detail.err.roomsList'),
       });
       setRooms([]);
+      setRoomsPage(0);
       setSharedRoomIds([]);
     } finally {
       setRoomsLoading(false);
@@ -498,34 +516,69 @@ function DiaryDetailPage({
                     {t('share.roomsEmpty')}
                   </p>
                 )}
-                {rooms.map((room) => {
-                  const selected = selectedRoomIds.includes(room.id);
-                  const alreadyShared = sharedRoomIds.includes(room.id);
-                  return (
-                    <button
-                      key={room.id}
-                      type="button"
-                      className={`diary-detail__picker-item diary-detail__room-option${selected ? ' is-selected' : ''}${alreadyShared ? ' is-shared' : ''}`}
-                      disabled={sharing || alreadyShared}
-                      aria-pressed={selected}
-                      aria-disabled={alreadyShared}
-                      onClick={() => toggleRoom(room.id)}
-                    >
-                      <span className="diary-detail__picker-icon" aria-hidden>
-                        {room.name.trim().charAt(0) || t('rooms.roomFallback')}
-                      </span>
-                      <span className="diary-detail__room-option-text">
-                        <strong>{room.name}</strong>
-                        {alreadyShared ? (
-                          <small>{t('share.alreadyShared')}</small>
-                        ) : null}
-                      </span>
-                      {selected && !alreadyShared && (
-                        <span className="diary-detail__room-check" aria-hidden>✓</span>
-                      )}
-                    </button>
-                  );
-                })}
+                {!roomsLoading && rooms.length > 0 && (
+                  <>
+                    <div className="diary-detail__room-grid" role="list">
+                      {pagedRooms.map((room) => {
+                        const selected = selectedRoomIds.includes(room.id);
+                        const alreadyShared = sharedRoomIds.includes(room.id);
+                        return (
+                          <button
+                            key={room.id}
+                            type="button"
+                            role="listitem"
+                            className={`diary-detail__picker-item diary-detail__room-option${selected ? ' is-selected' : ''}${alreadyShared ? ' is-shared' : ''}`}
+                            disabled={sharing || alreadyShared}
+                            aria-pressed={selected}
+                            aria-disabled={alreadyShared}
+                            onClick={() => toggleRoom(room.id)}
+                          >
+                            <span className="diary-detail__picker-icon" aria-hidden>
+                              {room.name.trim().charAt(0) || t('rooms.roomFallback')}
+                            </span>
+                            <span className="diary-detail__room-option-text">
+                              <strong>{room.name}</strong>
+                              {alreadyShared ? (
+                                <small>{t('share.alreadyShared')}</small>
+                              ) : null}
+                            </span>
+                            {selected && !alreadyShared && (
+                              <span className="diary-detail__room-check" aria-hidden>✓</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {rooms.length > SHARE_ROOMS_PAGE_SIZE && (
+                      <div className="diary-detail__room-pager">
+                        <button
+                          type="button"
+                          className="diary-detail__room-pager-btn"
+                          disabled={sharing || roomsPage <= 0}
+                          onClick={() => setRoomsPage((p) => Math.max(0, p - 1))}
+                        >
+                          {t('share.pagePrev')}
+                        </button>
+                        <span className="diary-detail__room-pager-status">
+                          {t('share.pageStatus', {
+                            page: roomsPage + 1,
+                            total: roomsPageCount,
+                          })}
+                        </span>
+                        <button
+                          type="button"
+                          className="diary-detail__room-pager-btn"
+                          disabled={sharing || roomsPage >= roomsPageCount - 1}
+                          onClick={() =>
+                            setRoomsPage((p) => Math.min(roomsPageCount - 1, p + 1))
+                          }
+                        >
+                          {t('share.pageNext')}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
                 <button
                   type="button"
                   className="diary-detail__room-share-btn"

@@ -14,6 +14,7 @@ import {
   saveOrShareBlob,
   type SaveBlobResult,
 } from '../utils/saveBlob';
+import CloseIcon from './CloseIcon';
 import './ExportSheet.css';
 
 type Preset = 'thisMonth' | 'lastMonth' | 'custom';
@@ -141,8 +142,13 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
       <div className="export-sheet__panel">
         <header className="export-sheet__head">
           <h2>{t('export.title')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.close')}>
-            {t('common.close')}
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
+            <CloseIcon />
           </button>
         </header>
 

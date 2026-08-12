@@ -4,6 +4,7 @@ import type { RoomSummary } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
 import { getAccessToken } from '../hooks/useAuthSession';
 import BackIcon from '../components/BackIcon';
+import CloseIcon from '../components/CloseIcon';
 import AppModal from '../components/AppModal';
 import './RoomsPages.css';
 
@@ -359,8 +360,14 @@ function RoomsHubPage({
           <div className="rooms-sheet__panel">
             <header className="rooms-sheet__head">
               <h3>{t('rooms.create')}</h3>
-              <button type="button" onClick={closeSheet} disabled={busy}>
-                {t('common.close')}
+              <button
+                type="button"
+                className="sheet-close-btn"
+                onClick={closeSheet}
+                disabled={busy}
+                aria-label={t('common.close')}
+              >
+                <CloseIcon />
               </button>
             </header>
             <div className="rooms-sheet__body">
@@ -391,8 +398,14 @@ function RoomsHubPage({
           <div className="rooms-sheet__panel">
             <header className="rooms-sheet__head">
               <h3>{t('rooms.joinWithCode')}</h3>
-              <button type="button" onClick={closeSheet} disabled={busy}>
-                {t('common.close')}
+              <button
+                type="button"
+                className="sheet-close-btn"
+                onClick={closeSheet}
+                disabled={busy}
+                aria-label={t('common.close')}
+              >
+                <CloseIcon />
               </button>
             </header>
             <div className="rooms-sheet__body">
@@ -448,6 +461,7 @@ function RoomsHubPage({
           onDismiss={() => {
             if (!actionBusy) setRoomAction(null);
           }}
+          showClose={roomAction.kind !== 'delete'}
           closeAriaLabel={t('common.close')}
           secondaryLabel={t('common.cancel')}
           onSecondary={() => {

@@ -360,7 +360,7 @@
   color: var(--color-text-muted);
 }
 
-.drawing__sticker-panel-head button {
+.drawing__sticker-panel-head button:not(.sheet-close-btn) {
   border: none;
   background: none;
   font-size: 0.78rem;

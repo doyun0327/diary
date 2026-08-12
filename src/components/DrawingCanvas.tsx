@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
 import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
+import CloseIcon from './CloseIcon';
 import './DrawingCanvas.css';
 
 export interface DrawingCanvasHandle {
@@ -1175,8 +1176,13 @@ function DrawingCanvas({
         <div className="drawing__font-panel">
           <div className="drawing__sticker-panel-head">
             <span>{t('canvas.fontPickerTitle')}</span>
-            <button type="button" onClick={() => setFontOpen(false)}>
-              {t('common.close')}
+            <button
+              type="button"
+              className="sheet-close-btn"
+              onClick={() => setFontOpen(false)}
+              aria-label={t('common.close')}
+            >
+              <CloseIcon />
             </button>
           </div>
           <div className="drawing__fonts">
@@ -1207,13 +1213,15 @@ function DrawingCanvas({
             <span>{t('canvas.stickerSheetTitle')}</span>
             <button
               type="button"
+              className="sheet-close-btn"
               onClick={() => {
                 setStickerOpen(false);
                 setMode('pen');
                 setColorsOpen(true);
               }}
+              aria-label={t('common.close')}
             >
-              {t('common.close')}
+              <CloseIcon />
             </button>
           </div>
 

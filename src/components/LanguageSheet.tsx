@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { APP_LANGUAGES, setStoredLanguage } from '../i18n';
+import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 
 interface LanguageSheetProps {
@@ -24,8 +25,13 @@ function LanguageSheet({ onClose }: LanguageSheetProps) {
       <div className="account-sheet__panel">
         <header className="account-sheet__head">
           <h2>{t('language.title')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.close')}>
-            {t('common.close')}
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
+            <CloseIcon />
           </button>
         </header>
 

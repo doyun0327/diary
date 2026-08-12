@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../constants/app';
 import { MOOD_ICON_CREDITS } from '../utils/moodPack';
+import CloseIcon from './CloseIcon';
 import './AppInfoSheet.css';
 
 interface AppInfoSheetProps {
@@ -44,8 +45,13 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
             <span className="app-info__back-spacer" />
           )}
           <h2>{title}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.close')}>
-            {t('common.close')}
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
+            <CloseIcon />
           </button>
         </header>
 

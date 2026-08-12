@@ -248,6 +248,34 @@ select {
   isolation: isolate;
 }
 
+/* 시트/메뉴 헤더 공통 닫기(X) */
+.sheet-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sheet-close-btn:hover,
+.sheet-close-btn:focus-visible {
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+  outline: none;
+}
+
+.sheet-close-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -6,6 +6,7 @@ import {
   getPreferredFontId,
   setPreferredFontId,
 } from '../utils/fonts';
+import CloseIcon from './CloseIcon';
 import './FontPicker.css';
 
 const CATEGORIES = ['cute', 'neat'] as const;
@@ -42,8 +43,13 @@ function FontPicker({ onClose }: FontPickerProps) {
       <div className="font-picker__sheet">
         <header className="font-picker__head">
           <h2>{t('font.title')}</h2>
-          <button type="button" onClick={onClose}>
-            {t('common.close')}
+          <button
+            type="button"
+            className="sheet-close-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
+            <CloseIcon />
           </button>
         </header>
         <div className="font-picker__list">
