@@ -122,7 +122,7 @@ function RoomsHubPage({
   const shareCreatedCode = async () => {
     if (!createdRoom) return;
     const code = createdRoom.inviteCode;
-    const text = t('rooms.alert.shareText');
+    const text = t('rooms.alert.shareText', { code });
     const installUrl =
       (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
       window.location.origin;

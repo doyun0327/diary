@@ -265,7 +265,7 @@
       "copyCode": "코드 복사하기",
       "share": "공유하기",
       "shareTitle": "PageBy 친구 방 초대",
-      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!",
+      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}",
       "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
@@ -564,6 +564,7 @@
       "highlighter": "형광펜"
     },
     "stickerRotate": "회전",
+    "removeOverlay": "삭제",
     "undo": "뒤로"
   },
   "font": {

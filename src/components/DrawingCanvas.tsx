@@ -62,6 +62,66 @@ const COLORS = [
 
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
 const PEN_KINDS: PenKind[] = ['ballpoint', 'gel', 'brush', 'marker', 'highlighter'];
+
+function PenKindIcon({ kind }: { kind: PenKind }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true as const,
+  };
+
+  switch (kind) {
+    case 'ballpoint':
+      return (
+        <svg {...common} strokeWidth="1.6">
+          <path d="M14.5 3.5 20.5 9.5" />
+          <path d="M13 5 19 11 10 20H4v-6z" />
+          <circle cx="6.2" cy="17.8" r="1.1" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 'gel':
+      return (
+        <svg {...common} strokeWidth="1.8">
+          <path d="M14.2 3.8 20.2 9.8" />
+          <path d="M12.8 5.2 18.8 11.2 9.5 20.5H4.5v-5z" />
+          <path d="M5.5 16.5c1.2 0 2.2 1 2.2 2.2" strokeWidth="2.2" />
+        </svg>
+      );
+    case 'brush':
+      return (
+        <svg {...common} strokeWidth="1.7">
+          <path d="M15 3.5c2.2 2.2 4.2 4.5 5.2 6.2-1.4.6-3.2.2-4.6-1.2" />
+          <path d="M14.2 5.2 8 14.5c-.6 1-.2 2.2.8 2.8 1 .6 2.2.2 2.8-.8L17.5 9" />
+          <path d="M7.2 16.8 4.5 20.5" strokeWidth="2" />
+        </svg>
+      );
+    case 'marker':
+      return (
+        <svg {...common} strokeWidth="1.7">
+          <path d="M14 3.5 20 9.5" />
+          <path d="M12.5 5 18.5 11 11 18.5H6.5V14z" />
+          <path d="M6.5 14 11 18.5" />
+          <path d="M7.2 18.8h4.2" strokeWidth="2.4" strokeLinecap="square" />
+        </svg>
+      );
+    case 'highlighter':
+      return (
+        <svg {...common} strokeWidth="1.7">
+          <path d="M13.5 4 19.5 10" />
+          <path d="M12 5.5 18 11.5 12.5 17H7v-5.5z" />
+          <path d="M5.5 18.2h8.5" strokeWidth="3.2" opacity="0.45" />
+          <path d="M5.5 18.2h8.5" strokeWidth="1.4" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
 const ERASER_SIZES = [
   { id: 's', width: 12 },
   { id: 'm', width: 24 },
@@ -490,30 +550,38 @@ function DrawingCanvas({
     },
   }));
 
+  /** ✓ / 도구 전환 — 합치지 않고 선택만 해제 (다시 탭하면 이동·확대 가능) */
   const confirmActivePhoto = () => {
-    if (!activePhotoId) return;
-    const layer = photoLayers.find((l) => l.id === activePhotoId);
-    if (!layer) return;
-    pushUndoSnapshot();
-    bakePhotoToCanvas(layer);
-    photoImages.current.delete(layer.id);
-    setPhotoLayers((prev) => prev.filter((l) => l.id !== layer.id));
     setActivePhotoId(null);
   };
 
   const confirmActiveSticker = () => {
-    if (!activeStickerId) return;
-    const layer = stickerLayers.find((l) => l.id === activeStickerId);
-    if (!layer) return;
-    pushUndoSnapshot();
-    bakeStickerToCanvas(layer);
-    setStickerLayers((prev) => prev.filter((l) => l.id !== layer.id));
     setActiveStickerId(null);
+    // ✓ 후엔 스티커 배치 종료 — 아무 데나 눌러도 더 이상 안 붙음
+    setMode('pen');
+    setStickerOpen(false);
+    setColorsOpen(true);
+  };
+
+  const removeActivePhoto = () => {
+    if (!activePhotoId) return;
+    photoImages.current.delete(activePhotoId);
+    setPhotoLayers((prev) => prev.filter((l) => l.id !== activePhotoId));
+    setActivePhotoId(null);
+  };
+
+  const removeActiveSticker = () => {
+    if (!activeStickerId) return;
+    setStickerLayers((prev) => prev.filter((l) => l.id !== activeStickerId));
+    setActiveStickerId(null);
+    setMode('pen');
+    setStickerOpen(false);
+    setColorsOpen(true);
   };
 
   const confirmActiveOverlay = () => {
-    if (activePhotoId) confirmActivePhoto();
-    if (activeStickerId) confirmActiveSticker();
+    setActivePhotoId(null);
+    setActiveStickerId(null);
   };
 
   const switchTool = (next: ToolMode, openColors: boolean) => {
@@ -643,7 +711,7 @@ function DrawingCanvas({
   ) => {
     e.stopPropagation();
     e.preventDefault();
-    if (activeStickerId) confirmActiveSticker();
+    if (activeStickerId) setActiveStickerId(null);
     setActivePhotoId(layer.id);
 
     const wrap = wrapRef.current?.getBoundingClientRect();
@@ -668,7 +736,7 @@ function DrawingCanvas({
   ) => {
     e.stopPropagation();
     e.preventDefault();
-    if (activePhotoId) confirmActivePhoto();
+    if (activePhotoId) setActivePhotoId(null);
     setActiveStickerId(layer.id);
 
     const wrap = wrapRef.current?.getBoundingClientRect();
@@ -709,14 +777,19 @@ function DrawingCanvas({
   };
 
   const handleDown = (e: PointerEvent<HTMLCanvasElement>) => {
-    confirmActiveOverlay();
-
     if (mode === 'sticker') {
       e.preventDefault();
+      // 편집 중이면 선택만 해제 (새 스티커 붙이지 않음)
+      if (activeStickerId) {
+        setActiveStickerId(null);
+        return;
+      }
       const pos = getPos(e);
       placeStickerLayer(selectedSticker, pos.x, pos.y);
       return;
     }
+
+    confirmActiveOverlay();
 
     e.currentTarget.setPointerCapture(e.pointerId);
     drawing.current = true;
@@ -838,7 +911,28 @@ function DrawingCanvas({
                   <>
                     <button
                       type="button"
+                      className="drawing__photo-remove"
+                      aria-label={t('canvas.removeOverlay')}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeActivePhoto();
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+                        <path
+                          d="M2 2l8 8M10 2L2 10"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
                       className="drawing__photo-confirm"
+                      aria-label={t('common.save')}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -886,7 +980,28 @@ function DrawingCanvas({
                   <>
                     <button
                       type="button"
+                      className="drawing__photo-remove"
+                      aria-label={t('canvas.removeOverlay')}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeActiveSticker();
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+                        <path
+                          d="M2 2l8 8M10 2L2 10"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
                       className="drawing__photo-confirm"
+                      aria-label={t('common.save')}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -920,9 +1035,11 @@ function DrawingCanvas({
                     key={kind}
                     type="button"
                     className={`drawing__pen-kind ${penKind === kind ? 'active' : ''}`}
+                    aria-label={t(`canvas.penKind.${kind}`)}
+                    title={t(`canvas.penKind.${kind}`)}
                     onClick={() => setPenKind(kind)}
                   >
-                    {t(`canvas.penKind.${kind}`)}
+                    <PenKindIcon kind={kind} />
                   </button>
                 ))}
               </div>
