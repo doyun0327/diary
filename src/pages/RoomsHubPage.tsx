@@ -132,11 +132,33 @@ function RoomsHubPage({
     }
   };
 
-  const enterCreatedRoom = () => {
+  const shareCreatedCode = async () => {
     if (!createdRoom) return;
-    const id = createdRoom.id;
+    const text = t('rooms.alert.shareText', { code: createdRoom.inviteCode });
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({
+          title: t('rooms.alert.shareTitle'),
+          text,
+        });
+        return;
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      // 공유 실패 시 복사로 대체
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCreatedCopied(true);
+      window.setTimeout(() => setCreatedCopied(false), 1600);
+    } catch {
+      setError(t('rooms.err.copy'));
+    }
+  };
+
+  const dismissCreatedRoom = () => {
     setCreatedRoom(null);
-    onOpenRoom(id);
+    setCreatedCopied(false);
   };
 
   const handleJoin = async () => {
@@ -270,7 +292,6 @@ function RoomsHubPage({
               </button>
             </header>
             <div className="rooms-sheet__body">
-              <p className="rooms__hint">{t('rooms.createHint')}</p>
               <input
                 type="text"
                 value={roomName}
@@ -329,11 +350,12 @@ function RoomsHubPage({
         <AppModal
           title={t('rooms.alert.createdTitle')}
           lead={t('rooms.alert.createdLead')}
-          onDismiss={enterCreatedRoom}
+          onDismiss={dismissCreatedRoom}
+          closeAriaLabel={t('common.close')}
           secondaryLabel={createdCopied ? t('rooms.copied') : t('rooms.alert.copyCode')}
           onSecondary={() => void copyCreatedCode()}
-          primaryLabel={t('rooms.alert.enterRoom')}
-          onPrimary={enterCreatedRoom}
+          primaryLabel={t('rooms.alert.share')}
+          onPrimary={() => void shareCreatedCode()}
         >
           <p className="rooms-created__code" aria-label={t('rooms.copyInviteAria')}>
             {createdRoom.inviteCode}

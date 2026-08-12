@@ -137,6 +137,7 @@
     "photoLabel": "Foto profil",
     "changePhotoAria": "Ubah foto profil",
     "pickPhoto": "Pilih foto",
+    "editPhoto": "Edit",
     "removePhoto": "Hapus",
     "nameLabel": "Nama",
     "nameHint": "Nama yang tampil di ruang teman",
@@ -161,6 +162,12 @@
       "lead": "Anda bisa mengganti foto profil saat ini dengan foto akun Google.",
       "confirm": "Ganti"
     },
+    "withdraw": {
+      "button": "Hapus akun",
+      "title": "Hapus akun?",
+      "lead": "Diary cloud dan aktivitas ruang akan dihapus, lalu Anda keluar. Diary di perangkat ini tetap ada.",
+      "confirm": "Hapus"
+    },
     "nameHintLoggedIn": "Terisi dari akun — bisa diubah kapan saja di aplikasi",
     "sync": {
       "label": "Sinkronisasi cloud",
@@ -172,6 +179,9 @@
       "syncNow": "Sinkronkan sekarang",
       "syncing": "Menyinkronkan…",
       "lastSynced": "Terakhir sinkron · {{time}}",
+      "lastSyncedAt": "Terakhir sinkron : {{time}}",
+      "am": "AM",
+      "pm": "PM",
       "never": "Belum pernah",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "Tidak bisa mengirim komentar",
       "delete": "Hapus gagal"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

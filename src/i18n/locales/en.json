@@ -137,11 +137,18 @@
     "photoLabel": "Profile photo",
     "changePhotoAria": "Change profile photo",
     "pickPhoto": "Choose photo",
+    "editPhoto": "Edit",
     "useAccountPhoto": "Use account photo",
     "replacePhoto": {
       "title": "Use your Google photo?",
       "lead": "You can replace your current profile photo with your Google account photo.",
       "confirm": "Replace"
+    },
+    "withdraw": {
+      "button": "Delete account",
+      "title": "Delete your account?",
+      "lead": "Cloud diaries and room activity will be removed, and you’ll be signed out. Diaries on this device stay.",
+      "confirm": "Delete"
     },
     "removePhoto": "Remove",
     "nameLabel": "Name",
@@ -163,6 +170,9 @@
       "syncNow": "Sync now",
       "syncing": "Syncing…",
       "lastSynced": "Last synced · {{time}}",
+      "lastSyncedAt": "Last synced : {{time}}",
+      "am": "AM",
+      "pm": "PM",
       "never": "Never",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -253,6 +263,9 @@
       "createdTitle": "Room created!",
       "createdLead": "Share this invite code with your friends.",
       "copyCode": "Copy code",
+      "share": "Share",
+      "shareTitle": "PageBy room invite",
+      "shareText": "PageBy friend room invite code: {{code}}",
       "enterRoom": "Enter room",
       "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
     },
@@ -278,16 +291,22 @@
   "profileSetup": {
     "eyebrow": "PageBy",
     "title": "Introduce yourself",
-    "lead": "Pick a name and photo so you can share picture diaries with friends.",
+    "lead": "You can change your name later. If you skip a photo, the first letter of your name becomes your profile.",
     "pickPhoto": "Choose photo",
     "pickPhotoAria": "Choose profile photo",
     "nameLabel": "Name",
-    "namePlaceholder": "Name friends will see",
-    "start": "Get started",
+    "namePlaceholder": "Name friends will see (optional)",
+    "start": "Next",
     "errName": "Please enter a name",
     "errNeedPhoto": "Please add a profile photo",
     "errImage": "Image files only",
     "errPhoto": "Couldn't process the photo"
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

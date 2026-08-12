@@ -137,6 +137,7 @@
     "photoLabel": "รูปโปรไฟล์",
     "changePhotoAria": "เปลี่ยนรูปโปรไฟล์",
     "pickPhoto": "เลือกรูป",
+    "editPhoto": "แก้ไข",
     "removePhoto": "ลบออก",
     "nameLabel": "ชื่อ",
     "nameHint": "ชื่อที่แสดงในห้องเพื่อน",
@@ -161,6 +162,12 @@
       "lead": "คุณสามารถเปลี่ยนรูปโปรไฟล์ปัจจุบันเป็นรูปจากบัญชี Google ได้",
       "confirm": "เปลี่ยน"
     },
+    "withdraw": {
+      "button": "ลบบัญชี",
+      "title": "ลบบัญชีไหม?",
+      "lead": "ไดอารี่บนคลาวด์และกิจกรรมในห้องจะถูกลบ และคุณจะออกจากระบบ ไดอารี่ในเครื่องนี้ยังคงอยู่",
+      "confirm": "ลบ"
+    },
     "nameHintLoggedIn": "ดึงชื่อจากบัญชีแล้ว แก้ไขในแอปได้ตลอด",
     "sync": {
       "label": "ซิงค์คลาวด์",
@@ -172,6 +179,9 @@
       "syncNow": "ซิงค์เลย",
       "syncing": "กำลังซิงค์…",
       "lastSynced": "ซิงค์ล่าสุด · {{time}}",
+      "lastSyncedAt": "ซิงค์ล่าสุด : {{time}}",
+      "am": "ก่อนเที่ยง",
+      "pm": "หลังเที่ยง",
       "never": "ยังไม่เคย",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "โพสต์ความคิดเห็นไม่ได้",
       "delete": "ลบล้มเหลว"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

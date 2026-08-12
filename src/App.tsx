@@ -5,6 +5,7 @@ import Header from './components/Header';
 import WriteFab from './components/WriteFab';
 import CharacterSetup from './components/CharacterSetup';
 import ProfileSetup from './components/ProfileSetup';
+import AppIntro from './components/AppIntro';
 import AccountSheet from './components/AccountSheet';
 import LanguageSheet from './components/LanguageSheet';
 import ScreenLockGate from './components/ScreenLockGate';
@@ -26,7 +27,13 @@ import { useCharacter } from './hooks/useCharacter';
 import { useClientProfile } from './hooks/useClientProfile';
 import { useScreenLock } from './hooks/useScreenLock';
 import { getAccessToken, useAuthSession } from './hooks/useAuthSession';
-import { isCharacterSetupDone } from './utils/onboarding';
+import {
+  isAppIntroDone,
+  isCharacterSetupDone,
+  isProfileSetupDone,
+  markAppIntroDone,
+  markProfileSetupDone,
+} from './utils/onboarding';
 import type { DiaryEntry } from './types/diary';
 import './App.css';
 
@@ -59,7 +66,10 @@ function App() {
   const [calYear, setCalYear] = useState(now.getFullYear());
   const [calMonth, setCalMonth] = useState(now.getMonth());
 
-  const needsProfileSetup = !nickname.trim() || !avatarUrl;
+  const [onboardingTick, setOnboardingTick] = useState(0);
+  const needsProfileSetup = !isProfileSetupDone();
+  const needsAppIntro = !needsProfileSetup && !isAppIntroDone();
+  void onboardingTick;
 
   useEffect(() => {
     applyStoredFont();
@@ -68,10 +78,11 @@ function App() {
   useEffect(() => {
     if (needsProfileSetup) return;
     if (getAccessToken()) return;
-    void ensureGuestSession(clientId, nickname.trim()).catch((err) => {
+    const nick = nickname.trim() || t('common.anonymous');
+    void ensureGuestSession(clientId, nick).catch((err) => {
       console.warn('[guest] auto session failed', err);
     });
-  }, [needsProfileSetup, clientId, nickname, ensureGuestSession]);
+  }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t]);
 
   const selectedEntry = entries.find((e) => e.id === selectedId);
   const editingEntry = editingId
@@ -175,9 +186,25 @@ function App() {
           onComplete={({ nickname: nextName, avatarUrl: nextAvatar }) => {
             setNickname(nextName);
             setAvatarUrl(nextAvatar);
+            markProfileSetupDone();
+            setOnboardingTick((n) => n + 1);
             void ensureGuestSession(clientId, nextName).catch((err) => {
               console.warn('[guest] session after profile setup failed', err);
             });
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (needsAppIntro) {
+    return (
+      <div className="app">
+        <AppIntro
+          onFinish={() => {
+            markAppIntroDone();
+            setOnboardingTick((n) => n + 1);
+            setPage('home');
           }}
         />
       </div>

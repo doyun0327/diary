@@ -137,6 +137,7 @@
     "photoLabel": "Foto de perfil",
     "changePhotoAria": "Mudar foto de perfil",
     "pickPhoto": "Escolher foto",
+    "editPhoto": "Editar",
     "removePhoto": "Remover",
     "nameLabel": "Nome",
     "nameHint": "Nome mostrado nas salas de amigos",
@@ -161,6 +162,12 @@
       "lead": "Você pode trocar sua foto atual pela foto da conta Google.",
       "confirm": "Trocar"
     },
+    "withdraw": {
+      "button": "Excluir conta",
+      "title": "Excluir a conta?",
+      "lead": "Diários na nuvem e atividade nas salas serão removidos e você sairá. Diários deste aparelho permanecem.",
+      "confirm": "Excluir"
+    },
     "nameHintLoggedIn": "Preenchido da conta — você pode mudar quando quiser",
     "sync": {
       "label": "Sincronização na nuvem",
@@ -172,6 +179,9 @@
       "syncNow": "Sincronizar agora",
       "syncing": "Sincronizando…",
       "lastSynced": "Última sync · {{time}}",
+      "lastSyncedAt": "Última sincronização : {{time}}",
+      "am": "AM",
+      "pm": "PM",
       "never": "Nunca",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "Não foi possível publicar o comentário",
       "delete": "Falha ao excluir"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

@@ -137,6 +137,7 @@
     "photoLabel": "Photo de profil",
     "changePhotoAria": "Changer la photo de profil",
     "pickPhoto": "Choisir une photo",
+    "editPhoto": "Modifier",
     "removePhoto": "Supprimer",
     "nameLabel": "Nom",
     "nameHint": "Nom affiché dans les salons d'amis",
@@ -161,6 +162,12 @@
       "lead": "Vous pouvez remplacer votre photo actuelle par celle de votre compte Google.",
       "confirm": "Remplacer"
     },
+    "withdraw": {
+      "button": "Supprimer le compte",
+      "title": "Supprimer le compte ?",
+      "lead": "Les journaux cloud et l’activité des salles seront supprimés, et vous serez déconnecté. Les journaux locaux restent.",
+      "confirm": "Supprimer"
+    },
     "nameHintLoggedIn": "Rempli depuis votre compte — modifiable à tout moment",
     "sync": {
       "label": "Sync cloud",
@@ -172,6 +179,9 @@
       "syncNow": "Synchroniser",
       "syncing": "Synchronisation…",
       "lastSynced": "Dernière sync · {{time}}",
+      "lastSyncedAt": "Dernière sync : {{time}}",
+      "am": "AM",
+      "pm": "PM",
       "never": "Jamais",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "Impossible de publier le commentaire",
       "delete": "Échec de la suppression"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

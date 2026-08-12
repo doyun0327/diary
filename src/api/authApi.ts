@@ -100,3 +100,24 @@ export async function logoutRemote(accessToken: string | null): Promise<void> {
     // ignore network errors on logout
   }
 }
+
+/** 클라우드 계정 탈퇴 (서버 users + 관련 데이터 삭제) */
+export async function deleteAccountRemote(accessToken: string): Promise<void> {
+  const res = await fetch(apiUrl('/api/me'), {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  if (!res.ok && res.status !== 204) {
+    let message = `회원 탈퇴 실패 (HTTP ${res.status})`;
+    try {
+      const err = (await res.json()) as { message?: string };
+      if (err.message) message = err.message;
+    } catch {
+      // ignore
+    }
+    throw new Error(message);
+  }
+}

@@ -137,11 +137,18 @@
     "photoLabel": "프로필 사진",
     "changePhotoAria": "프로필 사진 변경",
     "pickPhoto": "사진 선택",
+    "editPhoto": "수정",
     "useAccountPhoto": "계정 사진 쓰기",
     "replacePhoto": {
       "title": "Google 사진으로 바꿀까요?",
       "lead": "지금 쓰는 프로필 사진 대신 Google 계정 사진을 쓸 수 있어요.",
       "confirm": "바꾸기"
+    },
+    "withdraw": {
+      "button": "회원 탈퇴",
+      "title": "회원 탈퇴할까요?",
+      "lead": "클라우드에 저장된 일기·방 활동이 삭제되고 로그인 계정이 해제돼요. 이 기기의 로컬 일기는 남아요.",
+      "confirm": "탈퇴하기"
     },
     "removePhoto": "삭제",
     "nameLabel": "이름",
@@ -163,6 +170,9 @@
       "syncNow": "지금 동기화",
       "syncing": "동기화 중…",
       "lastSynced": "마지막 동기화 · {{time}}",
+      "lastSyncedAt": "마지막 동기화 시간 : {{time}}",
+      "am": "오전",
+      "pm": "오후",
       "never": "아직 없음",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -253,6 +263,9 @@
       "createdTitle": "방이 만들어졌어요!",
       "createdLead": "친구에게 아래 초대코드를 알려 주세요.",
       "copyCode": "코드 복사하기",
+      "share": "공유하기",
+      "shareTitle": "PageBy 친구 방 초대",
+      "shareText": "PageBy 친구 방 초대코드: {{code}}",
       "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
@@ -278,16 +291,22 @@
   "profileSetup": {
     "eyebrow": "PageBy",
     "title": "나를 소개해 주세요",
-    "lead": "이름과 사진을 정하면 그림일기를 친구들과 공유할 수 있어요.",
+    "lead": "이름은 나중에 바꿔도 돼요. 사진을 고르지 않으면 이름의 첫 글자가 프로필이 돼요.",
     "pickPhoto": "사진 고르기",
     "pickPhotoAria": "프로필 사진 선택",
     "nameLabel": "이름",
-    "namePlaceholder": "친구에게 보일 이름",
-    "start": "시작하기",
+    "namePlaceholder": "친구에게 보일 이름 (선택)",
+    "start": "다음",
     "errName": "이름을 입력해 주세요",
     "errNeedPhoto": "프로필 사진을 넣어 주세요",
     "errImage": "이미지 파일만 올릴 수 있어요",
     "errPhoto": "사진을 처리하지 못했어요"
+  },
+  "appIntro": {
+    "aria": "앱 소개",
+    "sample": "Sample {{n}}",
+    "prev": "이전",
+    "next": "다음"
   },
   "diary": {
     "empty": {

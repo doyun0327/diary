@@ -137,6 +137,7 @@
     "photoLabel": "头像",
     "changePhotoAria": "更换头像",
     "pickPhoto": "选择照片",
+    "editPhoto": "编辑",
     "removePhoto": "删除",
     "nameLabel": "昵称",
     "nameHint": "好友房中显示的名字",
@@ -161,6 +162,12 @@
       "lead": "可以用 Google 账号照片替换当前头像。",
       "confirm": "更换"
     },
+    "withdraw": {
+      "button": "注销账号",
+      "title": "要注销账号吗？",
+      "lead": "云端日记与房间活动将被删除并退出登录。本机本地日记会保留。",
+      "confirm": "注销"
+    },
     "nameHintLoggedIn": "已填入账号名称，可随时在应用中修改",
     "sync": {
       "label": "云同步",
@@ -172,6 +179,9 @@
       "syncNow": "立即同步",
       "syncing": "同步中…",
       "lastSynced": "上次同步 · {{time}}",
+      "lastSyncedAt": "上次同步时间 : {{time}}",
+      "am": "上午",
+      "pm": "下午",
       "never": "尚未同步",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "无法发送评论",
       "delete": "删除失败"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

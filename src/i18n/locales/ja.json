@@ -137,6 +137,7 @@
     "photoLabel": "プロフィール写真",
     "changePhotoAria": "プロフィール写真を変更",
     "pickPhoto": "写真を選ぶ",
+    "editPhoto": "編集",
     "removePhoto": "削除",
     "nameLabel": "ニックネーム",
     "nameHint": "フレンドルームに表示される名前",
@@ -161,6 +162,12 @@
       "lead": "今のプロフィール写真の代わりに、Googleアカウントの写真を使えます。",
       "confirm": "替える"
     },
+    "withdraw": {
+      "button": "退会",
+      "title": "退会しますか？",
+      "lead": "クラウドの日記・ルーム活動が削除され、ログインが解除されます。この端末のローカル日記は残ります。",
+      "confirm": "退会する"
+    },
     "nameHintLoggedIn": "アカウント名が入っています。アプリでいつでも変更できます",
     "sync": {
       "label": "クラウド同期",
@@ -172,6 +179,9 @@
       "syncNow": "今すぐ同期",
       "syncing": "同期中…",
       "lastSynced": "最終同期 · {{time}}",
+      "lastSyncedAt": "最終同期時間 : {{time}}",
+      "am": "午前",
+      "pm": "午後",
       "never": "まだなし",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "コメントを投稿できませんでした",
       "delete": "削除に失敗しました"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

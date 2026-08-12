@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { letterAvatarDataUrl } from '../utils/letterAvatar';
 import './ProfileSetup.css';
 
 const MAX_EDGE = 320;
@@ -40,7 +41,7 @@ type ProfileSetupProps = {
   onComplete: (profile: { nickname: string; avatarUrl: string }) => void;
 };
 
-/** 첫 실행: 닉네임 + 프로필 사진 (친구 공유 전제) */
+/** 첫 실행: 이름·사진은 선택. 없으면 익명 + 글자 아바타 */
 export default function ProfileSetup({
   initialName = '',
   initialAvatar = null,
@@ -74,19 +75,17 @@ export default function ProfileSetup({
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const nick = name.trim();
-    if (!nick) {
-      setError(t('profileSetup.errName'));
+    const nick = name.trim().slice(0, 20) || t('common.anonymous');
+    const photo = avatar || letterAvatarDataUrl(nick);
+    if (!photo) {
+      setError(t('profileSetup.errPhoto'));
       return;
     }
-    if (!avatar) {
-      setError(t('profileSetup.errNeedPhoto'));
-      return;
-    }
-    onComplete({ nickname: nick.slice(0, 20), avatarUrl: avatar });
+    setError(null);
+    onComplete({ nickname: nick, avatarUrl: photo });
   };
 
-  const initials = (name.trim() || '?').slice(0, 1).toUpperCase();
+  const initials = (name.trim() || t('common.anonymous')).slice(0, 1).toUpperCase();
 
   return (
     <div className="profile-setup" role="dialog" aria-labelledby="profile-setup-title">
@@ -95,7 +94,6 @@ export default function ProfileSetup({
         <h1 id="profile-setup-title" className="profile-setup__title">
           {t('profileSetup.title')}
         </h1>
-        <p className="profile-setup__lead">{t('profileSetup.lead')}</p>
 
         <form className="profile-setup__form" onSubmit={submit}>
           <button

@@ -72,6 +72,27 @@ function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | nul
 //   }
 // }
 
+/** 마지막 동기화: YYYY-MM-DD HH:MM:SS 오전/오후 */
+function formatLastSyncedAt(
+  iso: string | null,
+  amLabel: string,
+  pmLabel: string,
+  neverLabel: string,
+): string {
+  if (!iso) return neverLabel;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return neverLabel;
+  const y = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const h24 = d.getHours();
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  const se = String(d.getSeconds()).padStart(2, '0');
+  const ampm = h24 < 12 ? amLabel : pmLabel;
+  const h12 = h24 % 12 || 12;
+  return `${y}-${mo}-${day} ${String(h12).padStart(2, '0')}:${mi}:${se} ${ampm}`;
+}
+
 function AccountSheet({
   nickname,
   avatarUrl,
@@ -82,7 +103,7 @@ function AccountSheet({
   onClose,
 }: AccountSheetProps) {
   const { t } = useTranslation();
-  const { session, signIn, signInWithGoogleIdToken, signOut, markSynced, ensureGuestSession } =
+  const { session, signIn, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
     useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const googleHostRef = useRef<HTMLDivElement>(null);
@@ -93,6 +114,9 @@ function AccountSheet({
   const [googleReady, setGoogleReady] = useState(false);
   /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
   const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(null);
+  const [photoMenuOpen, setPhotoMenuOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const avatarWrapRef = useRef<HTMLDivElement>(null);
 
   /** Google 클라우드만 “로그인됨”으로 취급 (게스트는 친구 방용) */
   const cloudSignedIn = session?.provider === 'google';
@@ -103,11 +127,28 @@ function AccountSheet({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key !== 'Escape') return;
+      if (photoMenuOpen) {
+        setPhotoMenuOpen(false);
+        return;
+      }
+      onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, photoMenuOpen]);
+
+  useEffect(() => {
+    if (!photoMenuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const root = avatarWrapRef.current;
+      if (root && !root.contains(e.target as Node)) {
+        setPhotoMenuOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [photoMenuOpen]);
 
   const finishGoogleSignIn = async (idToken: string) => {
     setAuthBusy('google');
@@ -221,10 +262,27 @@ function AccountSheet({
   const handleSignOut = () => {
     signOut();
     // 친구 방용 게스트 세션 복구
-    if (nickname.trim() && avatarUrl) {
+    if (nickname.trim()) {
       void ensureGuestSession(clientId, nickname.trim()).catch(() => {
         // ignore
       });
+    }
+  };
+
+  const handleWithdraw = async () => {
+    setAuthBusy('google');
+    try {
+      await deleteAccount();
+      setWithdrawOpen(false);
+      if (nickname.trim()) {
+        void ensureGuestSession(clientId, nickname.trim()).catch(() => {
+          // ignore
+        });
+      }
+    } catch {
+      // 메시지 UI 없음
+    } finally {
+      setAuthBusy(null);
     }
   };
 
@@ -276,6 +334,12 @@ function AccountSheet({
       nickname: nameDraft.trim() || nickname,
       avatarUrl: null,
     });
+    setPhotoMenuOpen(false);
+  };
+
+  const openPhotoPicker = () => {
+    setPhotoMenuOpen(false);
+    fileRef.current?.click();
   };
 
   const showUseAccountPhoto =
@@ -285,51 +349,78 @@ function AccountSheet({
     <section className="account-sheet__block">
       <p className="account-sheet__label">{t('account.photoLabel')}</p>
       <div className="account-sheet__avatar-row">
-        <button
-          type="button"
-          className="account-sheet__avatar"
-          onClick={() => fileRef.current?.click()}
-          disabled={busy}
-          aria-label={t('account.changePhotoAria')}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" />
-          ) : (
-            <span className="account-sheet__avatar-placeholder" aria-hidden>
-              {nameDraft.trim().slice(0, 1) || '?'}
-            </span>
-          )}
-        </button>
-        <div className="account-sheet__avatar-actions">
+        <div className="account-sheet__avatar-wrap" ref={avatarWrapRef}>
           <button
             type="button"
-            className="account-sheet__btn"
+            className={`account-sheet__avatar${photoMenuOpen ? ' is-menu-open' : ''}`}
+            onClick={() => setPhotoMenuOpen((open) => !open)}
             disabled={busy}
-            onClick={() => fileRef.current?.click()}
+            aria-label={t('account.changePhotoAria')}
+            aria-expanded={photoMenuOpen}
+            aria-haspopup="menu"
           >
-            {busy ? t('common.processing') : t('account.pickPhoto')}
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" />
+            ) : (
+              <span className="account-sheet__avatar-placeholder" aria-hidden />
+            )}
           </button>
-          {showUseAccountPhoto && (
-            <button
-              type="button"
-              className="account-sheet__btn"
-              disabled={busy}
-              onClick={useAccountPhoto}
-            >
-              {t('account.useAccountPhoto')}
-            </button>
-          )}
-          {avatarUrl && (
-            <button
-              type="button"
-              className="account-sheet__btn account-sheet__btn--ghost"
-              disabled={busy}
-              onClick={removePhoto}
-            >
-              {t('account.removePhoto')}
-            </button>
-          )}
+          {photoMenuOpen ? (
+            <div className="account-sheet__photo-menu" role="menu">
+              <button
+                type="button"
+                className="account-sheet__btn"
+                role="menuitem"
+                disabled={busy}
+                onClick={openPhotoPicker}
+              >
+                {busy ? t('common.processing') : t('account.editPhoto')}
+              </button>
+              {avatarUrl ? (
+                <button
+                  type="button"
+                  className="account-sheet__btn account-sheet__btn--ghost"
+                  role="menuitem"
+                  disabled={busy}
+                  onClick={removePhoto}
+                >
+                  {t('account.removePhoto')}
+                </button>
+              ) : null}
+              {showUseAccountPhoto ? (
+                <button
+                  type="button"
+                  className="account-sheet__btn"
+                  role="menuitem"
+                  disabled={busy}
+                  onClick={() => {
+                    useAccountPhoto();
+                    setPhotoMenuOpen(false);
+                  }}
+                >
+                  {t('account.useAccountPhoto')}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
+        {cloudSignedIn ? (
+          <div className="account-sheet__avatar-actions">
+            {session?.email ? (
+              <p className="account-sheet__account-email">{session.email}</p>
+            ) : null}
+            <p className="account-sheet__account-synced">
+              {t('account.sync.lastSyncedAt', {
+                time: formatLastSyncedAt(
+                  session?.lastSyncedAt ?? null,
+                  t('account.sync.am'),
+                  t('account.sync.pm'),
+                  t('account.sync.never'),
+                ),
+              })}
+            </p>
+          </div>
+        ) : null}
       </div>
       <input
         ref={fileRef}
@@ -372,6 +463,26 @@ function AccountSheet({
           {t('account.save')}
         </button>
       </div>
+      {cloudSignedIn ? (
+        <div className="account-sheet__account-actions">
+          <button
+            type="button"
+            className="account-sheet__account-action"
+            disabled={authBusy !== null}
+            onClick={handleSignOut}
+          >
+            {t('account.sync.signOut')}
+          </button>
+          <button
+            type="button"
+            className="account-sheet__account-action"
+            disabled={authBusy !== null}
+            onClick={() => setWithdrawOpen(true)}
+          >
+            {t('account.withdraw.button')}
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 
@@ -390,22 +501,11 @@ function AccountSheet({
           <>
             {photoSection}
             {nameSection}
-            <section className="account-sheet__block">
-              <p className="account-sheet__label">{t('account.sync.label')}</p>
-              <div className="account-sheet__sync-actions">
-                <button
-                  type="button"
-                  className="account-sheet__btn account-sheet__btn--ghost"
-                  disabled={authBusy !== null}
-                  onClick={handleSignOut}
-                >
-                  {t('account.sync.signOut')}
-                </button>
-              </div>
-            </section>
           </>
         ) : (
           <>
+            {photoSection}
+            {nameSection}
             <section className="account-sheet__block">
               <p className="account-sheet__label">{t('account.sync.label')}</p>
               <div className="account-sheet__oauth">
@@ -468,8 +568,6 @@ function AccountSheet({
                 <p className="account-sheet__sync-note">{t('account.sync.autoNote')}</p>
               </div>
             </section>
-            {photoSection}
-            {nameSection}
           </>
         )}
 
@@ -497,6 +595,23 @@ function AccountSheet({
             />
           </div>
         </AppModal>
+      ) : null}
+
+      {withdrawOpen ? (
+        <AppModal
+          title={t('account.withdraw.title')}
+          lead={t('account.withdraw.lead')}
+          onDismiss={() => setWithdrawOpen(false)}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setWithdrawOpen(false)}
+          primaryLabel={
+            authBusy ? t('common.processing') : t('account.withdraw.confirm')
+          }
+          onPrimary={() => {
+            if (authBusy) return;
+            void handleWithdraw();
+          }}
+        />
       ) : null}
     </div>
   );

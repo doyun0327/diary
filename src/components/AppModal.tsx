@@ -5,13 +5,16 @@ type AppModalProps = {
   title: string;
   lead?: string;
   children?: ReactNode;
-  /** 배경 클릭 / Escape 기본 */
+  /** 배경 클릭 / X 닫기 */
   onDismiss?: () => void;
+  /** 우상단 X 버튼 표시 (onDismiss 있을 때 기본 true) */
+  showClose?: boolean;
   primaryLabel?: string;
   onPrimary?: () => void;
   secondaryLabel?: string;
   onSecondary?: () => void;
   ariaLabelledBy?: string;
+  closeAriaLabel?: string;
 };
 
 /** 앱 공통 중앙 모달 (방 생성·공유 결과 등) */
@@ -20,21 +23,50 @@ export default function AppModal({
   lead,
   children,
   onDismiss,
+  showClose,
   primaryLabel,
   onPrimary,
   secondaryLabel,
   onSecondary,
   ariaLabelledBy = 'app-modal-title',
+  closeAriaLabel = 'close',
 }: AppModalProps) {
+  const canClose = Boolean(onDismiss);
+  const showX = showClose ?? canClose;
+
   return (
     <div className="app-modal" role="dialog" aria-modal="true" aria-labelledby={ariaLabelledBy}>
       <button
         type="button"
         className="app-modal__backdrop"
-        aria-label="close"
-        onClick={onDismiss ?? onSecondary ?? onPrimary}
+        aria-label={closeAriaLabel}
+        onClick={onDismiss}
+        disabled={!canClose}
       />
       <div className="app-modal__panel">
+        {showX && onDismiss ? (
+          <button
+            type="button"
+            className="app-modal__close"
+            onClick={onDismiss}
+            aria-label={closeAriaLabel}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        ) : null}
         <h3 id={ariaLabelledBy}>{title}</h3>
         {lead ? <p className="app-modal__lead">{lead}</p> : null}
         {children}

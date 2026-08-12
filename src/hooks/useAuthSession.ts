@@ -4,6 +4,7 @@ import {
   loginAsGuest,
   loginWithGoogleIdToken,
   logoutRemote,
+  deleteAccountRemote,
 } from '../api/authApi';
 
 export type AuthProvider = 'google' | 'apple' | 'guest';
@@ -140,6 +141,15 @@ export function useAuthSession() {
     setSession(null);
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    const token = loadToken();
+    if (!token) throw new Error('로그인이 필요합니다');
+    await deleteAccountRemote(token);
+    saveToken(null);
+    saveSession(null);
+    setSession(null);
+  }, []);
+
   const markSynced = useCallback((serverTime?: string | null) => {
     setSession((prev) => {
       if (!prev) return prev;
@@ -184,6 +194,7 @@ export function useAuthSession() {
     signInWithGoogleIdToken,
     ensureGuestSession,
     signOut,
+    deleteAccount,
     markSynced,
     refreshMe,
     getAccessToken,

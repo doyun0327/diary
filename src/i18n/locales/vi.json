@@ -137,6 +137,7 @@
     "photoLabel": "Ảnh đại diện",
     "changePhotoAria": "Đổi ảnh đại diện",
     "pickPhoto": "Chọn ảnh",
+    "editPhoto": "Sửa",
     "removePhoto": "Xóa",
     "nameLabel": "Tên",
     "nameHint": "Tên hiển thị trong phòng bạn bè",
@@ -161,6 +162,12 @@
       "lead": "Bạn có thể thay ảnh hồ sơ hiện tại bằng ảnh tài khoản Google.",
       "confirm": "Đổi"
     },
+    "withdraw": {
+      "button": "Xóa tài khoản",
+      "title": "Xóa tài khoản?",
+      "lead": "Nhật ký đám mây và hoạt động phòng sẽ bị xóa, bạn sẽ đăng xuất. Nhật ký trên máy vẫn giữ.",
+      "confirm": "Xóa"
+    },
     "nameHintLoggedIn": "Đã điền từ tài khoản — bạn có thể đổi bất cứ lúc nào",
     "sync": {
       "label": "Đồng bộ đám mây",
@@ -172,6 +179,9 @@
       "syncNow": "Đồng bộ ngay",
       "syncing": "Đang đồng bộ…",
       "lastSynced": "Đồng bộ lần cuối · {{time}}",
+      "lastSyncedAt": "Đồng bộ lần cuối : {{time}}",
+      "am": "SA",
+      "pm": "CH",
       "never": "Chưa từng",
       "providerGoogle": "Google",
       "providerApple": "Apple",
@@ -257,6 +267,12 @@
       "comment": "Không đăng được bình luận",
       "delete": "Xóa thất bại"
     }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
   },
   "diary": {
     "empty": {

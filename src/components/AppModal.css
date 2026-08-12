@@ -31,8 +31,30 @@
   animation: app-modal-in 0.28s var(--ease-out, ease-out);
 }
 
+.app-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.app-modal__close:hover {
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+}
+
 .app-modal__panel h3 {
-  margin: 0 0 8px;
+  margin: 0 28px 8px;
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.03em;
