@@ -508,7 +508,11 @@
     "count": "{{n}}건의 일기",
     "empty": "이 기간에 작성한 일기가 없어요",
     "pdf": "PDF 저장",
-    "saving": "저장 중…",
+    "sharePdf": "PDF 공유",
+    "shareReady": "공유하기",
+    "shareHint": "PDF가 준비됐어요. 한 번 더 눌러 공유하거나 저장하세요.",
+    "shareText": "PageBy 일기장",
+    "saving": "준비 중…",
     "openBook": "일기장으로 보기",
     "err": {
       "pdf": "PDF 저장에 실패했어요"

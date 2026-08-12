@@ -7,7 +7,13 @@ import {
   lastMonthRange,
   thisMonthRange,
 } from '../utils/dateRange';
-import { downloadDiaryBookPdf } from '../utils/diaryBook';
+import { buildDiaryBookPdf } from '../utils/diaryBook';
+import {
+  canSharePdfFile,
+  isLikelyMobile,
+  saveOrShareBlob,
+  type SaveBlobResult,
+} from '../utils/saveBlob';
 import './ExportSheet.css';
 
 type Preset = 'thisMonth' | 'lastMonth' | 'custom';
@@ -26,10 +32,17 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
   const [end, setEnd] = useState(initial.end);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** 모바일: PDF 생성 후 제스처가 끊기면 한 번 더 탭해서 공유/열기 */
+  const [readyPdf, setReadyPdf] = useState<{ blob: Blob; filename: string } | null>(
+    null,
+  );
+
+  const mobileShare = canSharePdfFile() || isLikelyMobile();
 
   const applyPreset = (next: Preset) => {
     setPreset(next);
     setError(null);
+    setReadyPdf(null);
     if (next === 'thisMonth') {
       const r = thisMonthRange();
       setStart(r.start);
@@ -48,12 +61,60 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
 
   const canExport = filtered.length > 0 && !downloading;
 
+  const finishSave = (result: SaveBlobResult) => {
+    if (result === 'cancelled') return;
+    setReadyPdf(null);
+  };
+
   const handlePdf = async () => {
+    if (downloading) return;
+
+    // 2단계: 이미 만들어진 PDF를 유저 제스처로 공유/열기
+    if (readyPdf) {
+      setDownloading(true);
+      setError(null);
+      try {
+        const result = await saveOrShareBlob(readyPdf.blob, readyPdf.filename, {
+          title: readyPdf.filename,
+          text: t('export.shareText'),
+        });
+        finishSave(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t('export.err.pdf'));
+      } finally {
+        setDownloading(false);
+      }
+      return;
+    }
+
     if (!canExport) return;
     setDownloading(true);
     setError(null);
     try {
-      await downloadDiaryBookPdf(filtered, exportPdfFilename(start, end));
+      const filename = exportPdfFilename(start, end);
+      const blob = await buildDiaryBookPdf(filtered);
+
+      if (mobileShare) {
+        const result = await saveOrShareBlob(blob, filename, {
+          title: filename,
+          text: t('export.shareText'),
+          shareOnly: true,
+        });
+        if (result === 'shared') {
+          setReadyPdf(null);
+          return;
+        }
+        if (result === 'cancelled') return;
+        // 제스처 소실·공유 미지원 → 한 번 더 탭 유도
+        setReadyPdf({ blob, filename });
+        return;
+      }
+
+      const result = await saveOrShareBlob(blob, filename, {
+        title: filename,
+        text: t('export.shareText'),
+      });
+      finishSave(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('export.err.pdf'));
     } finally {
@@ -65,6 +126,14 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
     if (filtered.length === 0) return;
     onOpenBook(filtered);
   };
+
+  const pdfLabel = downloading
+    ? t('export.saving')
+    : readyPdf
+      ? t('export.shareReady')
+      : mobileShare
+        ? t('export.sharePdf')
+        : t('export.pdf');
 
   return (
     <div className="export-sheet" role="dialog" aria-label={t('export.aria')}>
@@ -110,6 +179,7 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
               value={start}
               onChange={(e) => {
                 setPreset('custom');
+                setReadyPdf(null);
                 setStart(e.target.value);
               }}
             />
@@ -121,6 +191,7 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
               value={end}
               onChange={(e) => {
                 setPreset('custom');
+                setReadyPdf(null);
                 setEnd(e.target.value);
               }}
             />
@@ -132,13 +203,26 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
             ? t('export.count', { n: filtered.length })
             : t('export.empty')}
         </p>
+        {readyPdf && !downloading && (
+          <p className="export-sheet__hint">{t('export.shareHint')}</p>
+        )}
         {error && <p className="export-sheet__error">{error}</p>}
 
         <div className="export-sheet__actions">
-          <button type="button" disabled={!canExport} onClick={handlePdf}>
-            {downloading ? t('export.saving') : t('export.pdf')}
+          <button
+            type="button"
+            className={readyPdf ? 'primary' : undefined}
+            disabled={(!canExport && !readyPdf) || downloading}
+            onClick={() => void handlePdf()}
+          >
+            {pdfLabel}
           </button>
-          <button type="button" className="primary" disabled={!canExport} onClick={handleBook}>
+          <button
+            type="button"
+            className={readyPdf ? undefined : 'primary'}
+            disabled={!canExport}
+            onClick={handleBook}
+          >
             {t('export.openBook')}
           </button>
         </div>

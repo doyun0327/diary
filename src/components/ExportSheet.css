@@ -130,6 +130,14 @@
   color: var(--color-text);
 }
 
+.export-sheet__hint {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 .export-sheet__error {
   margin: 0 0 8px;
   text-align: center;

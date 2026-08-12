@@ -3,9 +3,14 @@ import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import {
   buildBookPages,
-  downloadBookPagesPdf,
+  buildPdfFromBookPages,
   type BookPage,
 } from '../utils/diaryBook';
+import {
+  canSharePdfFile,
+  isLikelyMobile,
+  saveOrShareBlob,
+} from '../utils/saveBlob';
 import BackIcon from './BackIcon';
 import './DiaryBookViewer.css';
 
@@ -22,12 +27,17 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
   const [busy, setBusy] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [readyPdf, setReadyPdf] = useState<{ blob: Blob; filename: string } | null>(
+    null,
+  );
   const touchX = useRef<number | null>(null);
+  const mobileShare = canSharePdfFile() || isLikelyMobile();
 
   useEffect(() => {
     let cancelled = false;
     setBusy(true);
     setError(null);
+    setReadyPdf(null);
     void buildBookPages(entries)
       .then((built) => {
         if (!cancelled) {
@@ -66,14 +76,43 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
   };
 
   const handleDownload = async () => {
-    if (downloading || !pages) return;
+    if (downloading) return;
     setDownloading(true);
+    setError(null);
     try {
+      if (readyPdf) {
+        const result = await saveOrShareBlob(readyPdf.blob, readyPdf.filename, {
+          title: readyPdf.filename,
+          text: t('export.shareText'),
+        });
+        if (result !== 'cancelled') setReadyPdf(null);
+        return;
+      }
+
+      if (!pages) return;
       const name =
-        entries.length === 1
-          ? `diary_${entries[0].date}.pdf`
-          : 'diary.pdf';
-      await downloadBookPagesPdf(pages, name);
+        entries.length === 1 ? `diary_${entries[0].date}.pdf` : 'diary.pdf';
+      const blob = await buildPdfFromBookPages(pages);
+
+      if (mobileShare) {
+        const result = await saveOrShareBlob(blob, name, {
+          title: name,
+          text: t('export.shareText'),
+          shareOnly: true,
+        });
+        if (result === 'shared') {
+          setReadyPdf(null);
+          return;
+        }
+        if (result === 'cancelled') return;
+        setReadyPdf({ blob, filename: name });
+        return;
+      }
+
+      await saveOrShareBlob(blob, name, {
+        title: name,
+        text: t('export.shareText'),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : t('book.err.build'));
     } finally {
@@ -102,11 +141,11 @@ function DiaryBookViewer({ entries, onClose }: DiaryBookViewerProps) {
           <span className="diary-book__title">{subtitle || t('book.title')}</span>
           <button
             type="button"
-            className="diary-book__icon-btn diary-book__icon-btn--end"
-            onClick={handleDownload}
-            disabled={busy || downloading || !pages}
-            aria-label={t('book.pdfAria')}
-            title={t('book.pdfTitle')}
+            className={`diary-book__icon-btn diary-book__icon-btn--end${readyPdf ? ' is-ready' : ''}`}
+            onClick={() => void handleDownload()}
+            disabled={busy || downloading || (!pages && !readyPdf)}
+            aria-label={readyPdf ? t('export.shareReady') : t('book.pdfAria')}
+            title={readyPdf ? t('export.shareHint') : t('book.pdfTitle')}
           >
             {downloading ? (
               '…'

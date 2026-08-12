@@ -508,7 +508,11 @@
     "count": "{{n}} diaries",
     "empty": "No diaries in this period",
     "pdf": "Save PDF",
-    "saving": "Saving…",
+    "sharePdf": "Share PDF",
+    "shareReady": "Share now",
+    "shareHint": "PDF is ready. Tap again to share or save.",
+    "shareText": "PageBy diary book",
+    "saving": "Preparing…",
     "openBook": "View as diary book",
     "err": {
       "pdf": "PDF save failed"

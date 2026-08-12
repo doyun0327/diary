@@ -3,6 +3,9 @@ import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { fontFamilyForEntry } from './fonts';
 import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
+import { saveOrShareBlob } from './saveBlob';
+
+export { downloadViaAnchor as downloadBlob } from './saveBlob';
 
 /** 표지 페이지 비율 (세로) */
 export const BOOK_W = 900;
@@ -195,21 +198,15 @@ export async function buildDiaryBookPdf(entries: DiaryEntry[]): Promise<Blob> {
   return buildPdfFromBookPages(pages);
 }
 
-export function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 export async function downloadDiaryBookPdf(
   entries: DiaryEntry[],
   filename = 'diary.pdf',
 ) {
   const blob = await buildDiaryBookPdf(entries);
-  downloadBlob(blob, filename);
+  return saveOrShareBlob(blob, filename, {
+    title: filename,
+    text: 'PageBy 일기장',
+  });
 }
 
 export async function downloadBookPagesPdf(
@@ -217,5 +214,8 @@ export async function downloadBookPagesPdf(
   filename = 'diary.pdf',
 ) {
   const blob = await buildPdfFromBookPages(pages);
-  downloadBlob(blob, filename);
+  return saveOrShareBlob(blob, filename, {
+    title: filename,
+    text: 'PageBy 일기장',
+  });
 }
