@@ -11,6 +11,8 @@ type AppModalProps = {
   showClose?: boolean;
   primaryLabel?: string;
   onPrimary?: () => void;
+  /** true면 primary를 위험(삭제) 스타일로 */
+  primaryDanger?: boolean;
   secondaryLabel?: string;
   onSecondary?: () => void;
   ariaLabelledBy?: string;
@@ -26,6 +28,7 @@ export default function AppModal({
   showClose,
   primaryLabel,
   onPrimary,
+  primaryDanger,
   secondaryLabel,
   onSecondary,
   ariaLabelledBy = 'app-modal-title',
@@ -84,7 +87,7 @@ export default function AppModal({
             {primaryLabel ? (
               <button
                 type="button"
-                className="app-modal__btn app-modal__btn--primary"
+                className={`app-modal__btn app-modal__btn--primary${primaryDanger ? ' app-modal__btn--danger' : ''}`}
                 onClick={onPrimary ?? onDismiss}
               >
                 {primaryLabel}

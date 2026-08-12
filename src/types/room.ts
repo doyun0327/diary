@@ -14,6 +14,8 @@ export interface RoomSummary {
   inviteCode: string;
   createdAt: string;
   memberCount?: number;
+  /** 내가 방장(생성자)인지 */
+  owner?: boolean;
 }
 
 export interface RoomDetail extends RoomSummary {

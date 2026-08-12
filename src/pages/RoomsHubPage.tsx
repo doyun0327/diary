@@ -42,6 +42,12 @@ function RoomsHubPage({
   const [busy, setBusy] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [createdRoom, setCreatedRoom] = useState<{ id: string; inviteCode: string } | null>(null);
+  const [roomAction, setRoomAction] = useState<{
+    id: string;
+    name: string;
+    kind: 'leave' | 'delete';
+  } | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
 
   const shareReady = canShare(nickname, avatarUrl);
 
@@ -185,9 +191,33 @@ function RoomsHubPage({
     try {
       await navigator.clipboard.writeText(code);
       setCopiedId(roomId);
-      setTimeout(() => setCopiedId((id) => (id === roomId ? null : id)), 1500);
+      setTimeout(() => setCopiedId((id) => (id === roomId ? null : id)), 2000);
     } catch {
       setError(t('rooms.err.copy'));
+    }
+  };
+
+  const handleRoomAction = async () => {
+    if (!roomAction || actionBusy) return;
+    setActionBusy(true);
+    setError(null);
+    try {
+      await ensureAuth();
+      if (roomAction.kind === 'delete') {
+        await roomsApi.deleteRoom(roomAction.id);
+      } else {
+        await roomsApi.leaveRoom(roomAction.id);
+      }
+      setRoomAction(null);
+      await refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : t(roomAction.kind === 'delete' ? 'rooms.err.deleteRoom' : 'rooms.err.leave'),
+      );
+    } finally {
+      setActionBusy(false);
     }
   };
 
@@ -236,42 +266,87 @@ function RoomsHubPage({
 
           <ul className="rooms__list">
             {rooms.map((room) => (
-              <li key={room.id}>
+              <li key={room.id} className="rooms__room-item">
                 <button
                   type="button"
-                  className="rooms__room-item"
+                  className="rooms__room-main"
                   onClick={() => onOpenRoom(room.id)}
                 >
                   <span className="rooms__room-name">{room.name}</span>
-                  <span className="rooms__room-meta">
+                </button>
+                <div className="rooms__room-meta">
+                  <span className="rooms__room-meta-left">
                     {room.memberCount != null
                       ? t('rooms.memberCount', { n: room.memberCount })
                       : t('rooms.roomFallback')}
                     <span className="rooms__meta-sep" aria-hidden>
                       ·
                     </span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className="rooms__invite-quiet"
+                    <button
+                      type="button"
+                      className={`rooms__invite-quiet${copiedId === room.id ? ' is-copied' : ''}`}
                       title={t('rooms.copyInviteTitle')}
                       aria-label={t('rooms.copyInviteAria')}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void copyRoomCode(room.id, room.inviteCode);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          void copyRoomCode(room.id, room.inviteCode);
-                        }
-                      }}
+                      onClick={() => void copyRoomCode(room.id, room.inviteCode)}
                     >
-                      {copiedId === room.id ? t('rooms.copied') : t('rooms.copyInvite')}
-                    </span>
+                      {copiedId === room.id ? room.inviteCode : t('rooms.copyInvite')}
+                    </button>
                   </span>
-                </button>
+                  {room.owner ? (
+                    <button
+                      type="button"
+                      className="rooms__leave-btn rooms__leave-btn--danger"
+                      aria-label={t('rooms.deleteAria')}
+                      title={t('rooms.delete')}
+                      onClick={() =>
+                        setRoomAction({ id: room.id, name: room.name, kind: 'delete' })
+                      }
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="rooms__leave-btn"
+                      aria-label={t('rooms.leaveAria')}
+                      title={t('rooms.leave')}
+                      onClick={() =>
+                        setRoomAction({ id: room.id, name: room.name, kind: 'leave' })
+                      }
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
@@ -356,6 +431,42 @@ function RoomsHubPage({
             {createdRoom.inviteCode}
           </p>
         </AppModal>
+      )}
+
+      {roomAction && (
+        <AppModal
+          title={
+            roomAction.kind === 'delete'
+              ? t('rooms.deleteConfirmTitle')
+              : t('rooms.leaveConfirmTitle')
+          }
+          lead={
+            roomAction.kind === 'delete'
+              ? t('rooms.deleteConfirmLead', { name: roomAction.name })
+              : t('rooms.leaveConfirmLead', { name: roomAction.name })
+          }
+          onDismiss={() => {
+            if (!actionBusy) setRoomAction(null);
+          }}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => {
+            if (!actionBusy) setRoomAction(null);
+          }}
+          primaryDanger={roomAction.kind === 'delete'}
+          primaryLabel={
+            actionBusy
+              ? roomAction.kind === 'delete'
+                ? t('rooms.deleting')
+                : t('rooms.leaving')
+              : roomAction.kind === 'delete'
+                ? t('rooms.delete')
+                : t('rooms.leave')
+          }
+          onPrimary={() => {
+            if (!actionBusy) void handleRoomAction();
+          }}
+        />
       )}
     </div>
   );

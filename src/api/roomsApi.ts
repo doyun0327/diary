@@ -93,6 +93,20 @@ export function joinRoom(
   });
 }
 
+/** 방 나가기 */
+export function leaveRoom(roomId: string): Promise<void> {
+  return request<void>(`/api/rooms/${encodeURIComponent(roomId)}/members/me`, {
+    method: 'DELETE',
+  });
+}
+
+/** 방 삭제 (방장만) */
+export function deleteRoom(roomId: string): Promise<void> {
+  return request<void>(`/api/rooms/${encodeURIComponent(roomId)}`, {
+    method: 'DELETE',
+  });
+}
+
 /** 내가 속한 모든 방의 닉네임·프로필 사진 갱신 */
 export function updateMyProfile(body: {
   nickname?: string;

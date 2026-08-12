@@ -99,6 +99,11 @@
   color: #fff;
 }
 
+.app-modal__btn--primary.app-modal__btn--danger {
+  background: #c44b4b;
+  color: #fff;
+}
+
 @keyframes app-modal-in {
   from {
     transform: translateY(12px);

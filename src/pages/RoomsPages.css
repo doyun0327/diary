@@ -331,28 +331,31 @@
 
 .rooms__room-item {
   display: flex;
-  width: 100%;
+  flex-direction: column;
+  gap: 6px;
   margin-bottom: 10px;
-  padding: 16px;
+  padding: 14px 14px 12px;
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-xl);
   background: var(--color-surface);
+  color: var(--color-text);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.rooms__room-main {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   text-align: left;
   font-family: inherit;
+  color: inherit;
   cursor: pointer;
-  color: var(--color-text);
-  transition: border-color 0.15s, transform 0.15s, background 0.15s;
 }
 
-.rooms__room-item:active {
-  transform: scale(0.99);
-  background: var(--color-bg-soft);
-  border-color: var(--color-border);
-}
-
-.rooms__room-item {
-  flex-direction: column;
-  gap: 6px;
+.rooms__room-main:active .rooms__room-name {
+  opacity: 0.75;
 }
 
 .rooms__room-name {
@@ -362,12 +365,50 @@
 }
 
 .rooms__room-meta {
-  display: inline-flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.rooms__room-meta-left {
+  display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rooms__leave-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -4px -4px 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
   color: var(--color-text-muted);
-  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.rooms__leave-btn:hover,
+.rooms__leave-btn:focus-visible {
+  color: var(--color-danger, #e25555);
+  background: color-mix(in srgb, var(--color-danger, #e25555) 10%, transparent);
+  outline: none;
+}
+
+.rooms__leave-btn--danger:hover,
+.rooms__leave-btn--danger:focus-visible {
+  color: #c44b4b;
+  background: color-mix(in srgb, #c44b4b 12%, transparent);
 }
 
 .rooms__meta-sep {
@@ -410,17 +451,17 @@
   margin-bottom: 12px;
 }
 
-/* 초대코드 — 숫자는 숨기고 라벨만 (탭하면 복사) */
+/* 초대코드 — 숫자는 숨기고 라벨만 (탭하면 복사, 복사 시 숫자 표시) */
 .rooms__invite-quiet {
   margin: 0;
   padding: 0;
   border: none;
   background: none;
   font-family: inherit;
-  font-size: 0.72rem;
+  font-size: inherit;
   font-weight: 500;
   letter-spacing: 0;
-  color: var(--color-text-muted);
+  color: inherit;
   cursor: pointer;
 }
 
@@ -428,6 +469,13 @@
 .rooms__invite-quiet:focus-visible {
   color: var(--color-accent-text);
   outline: none;
+}
+
+.rooms__invite-quiet.is-copied {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: var(--color-accent-text);
 }
 
 .rooms__card-head .rooms__invite-quiet {
