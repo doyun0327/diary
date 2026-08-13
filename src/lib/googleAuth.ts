@@ -203,35 +203,39 @@ function diaryNative(): { postMessage: (message: string) => void } | undefined {
 /** Flutter WebView: 네이티브 Google 로그인 후 idToken */
 export function requestNativeGoogleSignIn(): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (!isFlutterApp()) {
+    const native = diaryNative();
+    if (!native?.postMessage) {
       reject(new Error('native-only'));
       return;
     }
     const timeout = window.setTimeout(() => {
       cleanup();
       reject(new Error('timeout'));
-    }, 120_000);
+    }, 45_000);
 
-    const onOk = (event: Event) => {
-      const token = String((event as CustomEvent<string>).detail ?? '').trim();
+    const onOk = (idToken: string) => {
+      const token = String(idToken ?? '').trim();
       cleanup();
       if (token) resolve(token);
       else reject(new Error('empty'));
     };
-    const onErr = (event: Event) => {
-      const reason = String((event as CustomEvent<string>).detail ?? 'cancelled');
+    const onErr = (reason: string) => {
       cleanup();
-      reject(new Error(reason));
+      reject(new Error(String(reason || 'cancelled')));
     };
     const cleanup = () => {
       window.clearTimeout(timeout);
-      window.removeEventListener('diary-google-id-token', onOk);
-      window.removeEventListener('diary-google-sign-in-error', onErr);
+      if (window.__onDiaryGoogleIdToken === onOk) {
+        window.__onDiaryGoogleIdToken = undefined;
+      }
+      if (window.__onDiaryGoogleSignInError === onErr) {
+        window.__onDiaryGoogleSignInError = undefined;
+      }
     };
 
-    window.addEventListener('diary-google-id-token', onOk);
-    window.addEventListener('diary-google-sign-in-error', onErr);
-    diaryNative()?.postMessage(JSON.stringify({ type: 'googleSignIn' }));
+    window.__onDiaryGoogleIdToken = onOk;
+    window.__onDiaryGoogleSignInError = onErr;
+    native.postMessage(JSON.stringify({ type: 'googleSignIn' }));
   });
 }
 

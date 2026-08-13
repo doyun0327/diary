@@ -107,6 +107,8 @@ function AccountSheet({
   const [busy, setBusy] = useState(false);
   const [authBusy, setAuthBusy] = useState<AuthProvider | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
   /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
   const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(null);
   const [photoMenuOpen, setPhotoMenuOpen] = useState(false);
@@ -147,6 +149,7 @@ function AccountSheet({
 
   const finishGoogleSignIn = async (idToken: string) => {
     setAuthBusy('google');
+    setAuthError(null);
     try {
       const next = await signInWithGoogleIdToken(idToken);
       seedProfileFromAuth(next);
@@ -156,8 +159,8 @@ function AccountSheet({
       } catch {
         // 로컬 로그인만 된 경우
       }
-    } catch {
-      // 메시지 UI 없음
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : t('account.sync.errSignIn'));
     } finally {
       setAuthBusy(null);
     }
@@ -168,11 +171,20 @@ function AccountSheet({
   };
 
   useEffect(() => {
+    const sync = () => {
+      if (isFlutterApp()) setFlutterNative(true);
+    };
+    sync();
+    const timer = window.setInterval(sync, 400);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     if (cloudSignedIn) {
       setGoogleReady(false);
       return;
     }
-    if (isFlutterApp()) {
+    if (flutterNative) {
       setGoogleReady(true);
       return;
     }
@@ -212,18 +224,31 @@ function AccountSheet({
       ac.abort();
       dispose?.();
     };
-  }, [cloudSignedIn]);
+  }, [cloudSignedIn, flutterNative]);
+
+  const googleErrorMessage = (reason: string) => {
+    if (reason === 'cancelled') return null;
+    if (reason === 'developer_error') return t('account.sync.errGoogleDeveloper');
+    if (reason === 'play_services') return t('account.sync.errGooglePlay');
+    if (reason === 'network') return t('account.sync.errGoogleNetwork');
+    if (reason === 'no_id_token') return t('account.sync.errGoogleToken');
+    if (reason === 'timeout') return t('account.sync.errGoogleNative');
+    return t('account.sync.errGoogleNative');
+  };
 
   const handleNativeGoogle = () => {
     if (authBusy) return;
     void (async () => {
       setAuthBusy('google');
+      setAuthError(null);
       try {
         const { requestNativeGoogleSignIn } = await import('../lib/googleAuth');
         const idToken = await requestNativeGoogleSignIn();
         await finishGoogleSignIn(idToken);
       } catch (err) {
-        if (err instanceof Error && err.message === 'cancelled') return;
+        const reason = err instanceof Error ? err.message : '';
+        const message = googleErrorMessage(reason);
+        if (message) setAuthError(message);
         console.warn('[google] native sign-in failed', err);
       } finally {
         setAuthBusy(null);
@@ -532,14 +557,14 @@ function AccountSheet({
               <p className="account-sheet__label">{t('account.sync.label')}</p>
               <div className="account-sheet__oauth">
                 <div
-                  className={`account-sheet__google-slot${authBusy === 'google' ? ' is-busy' : ''}${!googleReady ? ' is-loading' : ''}${isFlutterApp() ? ' is-native' : ''}`}
+                  className={`account-sheet__google-slot${authBusy === 'google' ? ' is-busy' : ''}${!googleReady ? ' is-loading' : ''}${flutterNative ? ' is-native' : ''}`}
                 >
                   <button
                     type="button"
                     className="account-sheet__oauth-btn account-sheet__oauth-btn--google account-sheet__google-face"
                     disabled={authBusy !== null || !googleReady}
-                    onClick={isFlutterApp() ? () => handleNativeGoogle() : undefined}
-                    tabIndex={isFlutterApp() ? 0 : -1}
+                    onClick={flutterNative ? () => handleNativeGoogle() : undefined}
+                    tabIndex={flutterNative ? 0 : -1}
                   >
                     <span className="account-sheet__oauth-logo">
                       <svg viewBox="0 0 24 24" width="18" height="18">
@@ -567,7 +592,7 @@ function AccountSheet({
                         : t('account.sync.continueGoogle')}
                     </span>
                   </button>
-                  {!isFlutterApp() ? (
+                  {!flutterNative ? (
                     <div
                       ref={googleHostRef}
                       className="account-sheet__google-host"
@@ -575,6 +600,7 @@ function AccountSheet({
                     />
                   ) : null}
                 </div>
+                {authError ? <p className="account-sheet__error">{authError}</p> : null}
                 <button
                   type="button"
                   className="account-sheet__oauth-btn account-sheet__oauth-btn--apple"

@@ -1,6 +1,9 @@
 declare global {
   interface Window {
     DiaryNative?: { postMessage: (message: string) => void };
+    __DIARY_FLUTTER__?: boolean;
+    __onDiaryGoogleIdToken?: (idToken: string) => void;
+    __onDiaryGoogleSignInError?: (reason: string) => void;
   }
 }
 
@@ -10,6 +13,8 @@ function diaryNative(): { postMessage: (message: string) => void } | undefined {
 }
 
 export function isFlutterApp(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.__DIARY_FLUTTER__ === true) return true;
   return typeof diaryNative()?.postMessage === 'function';
 }
 

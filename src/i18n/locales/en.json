@@ -188,6 +188,11 @@
       "okSignedOut": "Signed out",
       "okSynced": "Synced {{count}} diaries",
       "errSignIn": "Couldn't sign in",
+      "errGoogleNative": "Google sign-in failed",
+      "errGoogleDeveloper": "Add this app's SHA-1 to the Google Cloud Android OAuth client, then try again",
+      "errGooglePlay": "This emulator needs Google Play and a Google account",
+      "errGoogleNetwork": "Check your network and try again",
+      "errGoogleToken": "Didn't get a Google token. Check SHA-1 and the Web Client ID",
       "errSync": "Couldn't sync",
       "noAccountPhoto": "This account has no profile photo"
     },

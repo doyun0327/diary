@@ -188,6 +188,11 @@
       "okSignedOut": "로그아웃했어요",
       "okSynced": "일기 {{count}}편을 동기화했어요",
       "errSignIn": "로그인하지 못했어요",
+      "errGoogleNative": "Google 로그인에 실패했어요",
+      "errGoogleDeveloper": "앱 SHA-1이 Google Cloud Android 클라이언트에 없어요. SHA-1을 추가한 뒤 다시 시도해 주세요",
+      "errGooglePlay": "에뮬레이터에 Google Play / 계정이 필요해요",
+      "errGoogleNetwork": "네트워크를 확인한 뒤 다시 시도해 주세요",
+      "errGoogleToken": "Google 토큰을 받지 못했어요. SHA-1과 Web Client ID를 확인해 주세요",
       "errSync": "동기화하지 못했어요",
       "noAccountPhoto": "이 계정에는 프로필 사진이 없어요"
     },
