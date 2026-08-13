@@ -6,6 +6,7 @@ import { getAccessToken } from '../hooks/useAuthSession';
 import BackIcon from '../components/BackIcon';
 import CloseIcon from '../components/CloseIcon';
 import AppModal from '../components/AppModal';
+import { shareViaNative } from '../utils/nativeShare';
 import './RoomsPages.css';
 
 interface RoomsHubPageProps {
@@ -22,6 +23,28 @@ type SheetKind = 'create' | 'join' | null;
 
 function canShare(nickname: string, avatarUrl: string | null) {
   return Boolean(nickname.trim() && avatarUrl);
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return;
+  } catch {
+    // WebView/권한 없을 때 폴백
+  }
+  const el = document.createElement('textarea');
+  el.value = text;
+  el.setAttribute('readonly', '');
+  el.style.position = 'fixed';
+  el.style.left = '-9999px';
+  document.body.appendChild(el);
+  el.select();
+  el.setSelectionRange(0, text.length);
+  const ok = document.execCommand('copy');
+  document.body.removeChild(el);
+  if (!ok) {
+    throw new Error('copy failed');
+  }
 }
 
 function RoomsHubPage({
@@ -41,7 +64,6 @@ function RoomsHubPage({
   const [roomName, setRoomName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [busy, setBusy] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [createdRoom, setCreatedRoom] = useState<{ id: string; inviteCode: string } | null>(null);
   const [roomAction, setRoomAction] = useState<{
     id: string;
@@ -126,16 +148,21 @@ function RoomsHubPage({
     }
   };
 
-  const shareCreatedCode = async () => {
-    if (!createdRoom) return;
-    const code = createdRoom.inviteCode;
+  const shareInviteCode = async (code: string) => {
     const text = t('rooms.alert.shareText', { code });
     const installUrl =
       (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
       window.location.origin;
 
+    const nativeOk = await shareViaNative({
+      title: t('rooms.alert.shareTitle'),
+      text: `${text}\n${code}`,
+      url: installUrl,
+    });
+    if (nativeOk) return;
+
     try {
-      await navigator.clipboard.writeText(code);
+      await copyText(code);
     } catch {
       // 클립보드 실패해도 공유는 진행
     }
@@ -151,14 +178,18 @@ function RoomsHubPage({
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
-      // 공유 실패 시 아래 폴백
     }
 
     try {
-      await navigator.clipboard.writeText(`${text}\n\n${installUrl}\n${code}`);
+      await copyText(`${text}\n\n${installUrl}\n${code}`);
     } catch {
       setError(t('rooms.err.copy'));
     }
+  };
+
+  const shareCreatedCode = async () => {
+    if (!createdRoom) return;
+    await shareInviteCode(createdRoom.inviteCode);
   };
 
   const dismissCreatedRoom = () => {
@@ -185,16 +216,6 @@ function RoomsHubPage({
       setError(err instanceof Error ? err.message : t('rooms.err.join'));
     } finally {
       setBusy(false);
-    }
-  };
-
-  const copyRoomCode = async (roomId: string, code: string) => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedId(roomId);
-      setTimeout(() => setCopiedId((id) => (id === roomId ? null : id)), 2000);
-    } catch {
-      setError(t('rooms.err.copy'));
     }
   };
 
@@ -285,12 +306,12 @@ function RoomsHubPage({
                     </span>
                     <button
                       type="button"
-                      className={`rooms__invite-quiet${copiedId === room.id ? ' is-copied' : ''}`}
+                      className="rooms__invite-quiet"
                       title={t('rooms.copyInviteTitle')}
                       aria-label={t('rooms.copyInviteAria')}
-                      onClick={() => void copyRoomCode(room.id, room.inviteCode)}
+                      onClick={() => void shareInviteCode(room.inviteCode)}
                     >
-                      {copiedId === room.id ? room.inviteCode : t('rooms.copyInvite')}
+                      {t('rooms.copyInvite')}
                     </button>
                   </span>
                   {room.owner ? (

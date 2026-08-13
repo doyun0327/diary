@@ -1,3 +1,5 @@
+import { isFlutterApp, shareViaNative } from './nativeShare';
+
 export type SaveBlobResult =
   | 'shared'
   | 'downloaded'
@@ -22,6 +24,7 @@ export function isLikelyMobile(): boolean {
 }
 
 export function canShareFile(file: File): boolean {
+  if (isFlutterApp()) return true;
   if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
     return false;
   }
@@ -97,6 +100,16 @@ export async function saveOrShareBlob(
 
   if (!options?.forceOpen && canShareFile(file)) {
     try {
+      if (
+        await shareViaNative({
+          title: options?.title ?? filename,
+          text: options?.text ?? '',
+          file,
+          filename,
+        })
+      ) {
+        return 'shared';
+      }
       await navigator.share({
         files: [file],
         title: options?.title ?? filename,

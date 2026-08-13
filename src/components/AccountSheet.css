@@ -103,6 +103,11 @@
   user-select: none;
 }
 
+.account-sheet__google-slot.is-native .account-sheet__google-face {
+  pointer-events: auto;
+  width: 100%;
+}
+
 .account-sheet__google-host {
   position: absolute;
   inset: 0;

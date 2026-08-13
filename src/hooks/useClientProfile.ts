@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { createId } from '../utils/id';
 
 const CLIENT_ID_KEY = 'picture-diary-client-id';
 const NICKNAME_KEY = 'picture-diary-nickname';
@@ -11,7 +12,7 @@ function loadClientId(): string {
   } catch {
     // ignore
   }
-  const id = crypto.randomUUID();
+  const id = createId();
   try {
     localStorage.setItem(CLIENT_ID_KEY, id);
   } catch {

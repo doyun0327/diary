@@ -2,6 +2,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
+import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
 import CloseIcon from './CloseIcon';
@@ -651,7 +652,7 @@ function DrawingCanvas({
         width = height * aspect;
       }
 
-      const id = crypto.randomUUID();
+      const id = createId();
       const layer: PhotoLayer = {
         id,
         src: dataUrl,
@@ -677,7 +678,7 @@ function DrawingCanvas({
 
   const placeStickerLayer = (emoji: string, x: number, y: number) => {
     confirmActiveOverlay();
-    const id = crypto.randomUUID();
+    const id = createId();
     const layer: StickerLayer = {
       id,
       emoji,

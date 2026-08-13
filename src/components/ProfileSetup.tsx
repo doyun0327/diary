@@ -96,13 +96,7 @@ export default function ProfileSetup({
         </h1>
 
         <form className="profile-setup__form" onSubmit={submit}>
-          <button
-            type="button"
-            className="profile-setup__avatar"
-            onClick={() => fileRef.current?.click()}
-            disabled={busy}
-            aria-label={t('profileSetup.pickPhotoAria')}
-          >
+          <div className="profile-setup__avatar">
             {avatar ? (
               <img src={avatar} alt="" />
             ) : (
@@ -110,7 +104,16 @@ export default function ProfileSetup({
                 {initials}
               </span>
             )}
-          </button>
+            <input
+              ref={fileRef}
+              className="profile-setup__file"
+              type="file"
+              accept="image/*"
+              disabled={busy}
+              aria-label={t('profileSetup.pickPhotoAria')}
+              onChange={(e) => void onPick(e)}
+            />
+          </div>
           <button
             type="button"
             className="profile-setup__photo-btn"
@@ -119,13 +122,6 @@ export default function ProfileSetup({
           >
             {busy ? t('common.processing') : t('profileSetup.pickPhoto')}
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => void onPick(e)}
-          />
 
           <label className="profile-setup__field" htmlFor="profile-setup-name">
             <span>{t('profileSetup.nameLabel')}</span>

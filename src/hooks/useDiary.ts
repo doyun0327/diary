@@ -3,6 +3,7 @@ import { syncDiaries } from '../api/diariesApi';
 import { getAccessToken } from './useAuthSession';
 import type { DiaryEntry } from '../types/diary';
 import { mergeDiaryEntries } from '../utils/diarySync';
+import { createId } from '../utils/id';
 
 const STORAGE_KEY = 'picture-diary-entries';
 const DELETED_KEY = 'picture-diary-deleted-ids';
@@ -53,7 +54,7 @@ export function useDiary() {
       const now = new Date().toISOString();
       const newEntry: DiaryEntry = {
         ...entry,
-        id: crypto.randomUUID(),
+        id: createId(),
         createdAt: now,
         updatedAt: now,
       };

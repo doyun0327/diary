@@ -451,7 +451,7 @@
   margin-bottom: 12px;
 }
 
-/* 초대코드 — 숫자는 숨기고 라벨만 (탭하면 복사, 복사 시 숫자 표시) */
+/* 초대하기 — 탭하면 공유 시트 */
 .rooms__invite-quiet {
   margin: 0;
   padding: 0;
@@ -469,13 +469,6 @@
 .rooms__invite-quiet:focus-visible {
   color: var(--color-accent-text);
   outline: none;
-}
-
-.rooms__invite-quiet.is-copied {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  font-weight: 700;
-  color: var(--color-accent-text);
 }
 
 .rooms__card-head .rooms__invite-quiet {

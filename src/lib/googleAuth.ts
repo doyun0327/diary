@@ -1,3 +1,5 @@
+import { isFlutterApp } from '../utils/nativeShare';
+
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 const GIS_LOAD_TIMEOUT_MS = 12_000;
 const GIS_MAX_ATTEMPTS = 3;
@@ -191,4 +193,53 @@ export async function mountGoogleSignInButton(
     }
     container.replaceChildren();
   };
+}
+
+function diaryNative(): { postMessage: (message: string) => void } | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return window.DiaryNative;
+}
+
+/** Flutter WebView: 네이티브 Google 로그인 후 idToken */
+export function requestNativeGoogleSignIn(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!isFlutterApp()) {
+      reject(new Error('native-only'));
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      reject(new Error('timeout'));
+    }, 120_000);
+
+    const onOk = (event: Event) => {
+      const token = String((event as CustomEvent<string>).detail ?? '').trim();
+      cleanup();
+      if (token) resolve(token);
+      else reject(new Error('empty'));
+    };
+    const onErr = (event: Event) => {
+      const reason = String((event as CustomEvent<string>).detail ?? 'cancelled');
+      cleanup();
+      reject(new Error(reason));
+    };
+    const cleanup = () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener('diary-google-id-token', onOk);
+      window.removeEventListener('diary-google-sign-in-error', onErr);
+    };
+
+    window.addEventListener('diary-google-id-token', onOk);
+    window.addEventListener('diary-google-sign-in-error', onErr);
+    diaryNative()?.postMessage(JSON.stringify({ type: 'googleSignIn' }));
+  });
+}
+
+export function nativeGoogleSignOut() {
+  if (!isFlutterApp()) return;
+  try {
+    diaryNative()?.postMessage(JSON.stringify({ type: 'googleSignOut' }));
+  } catch {
+    // ignore
+  }
 }

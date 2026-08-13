@@ -1,5 +1,6 @@
 import type { DiaryEntry } from '../types/diary';
 import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
+import { isFlutterApp, shareViaNative } from './nativeShare';
 
 export type ShareTarget = 'sns';
 
@@ -20,6 +21,7 @@ function downloadBlob(blob: Blob, filename: string) {
 
 /** 모바일에서 파일 공유(Web Share) 지원 여부 — PC 웹은 보통 false */
 export function canShareImageFile(): boolean {
+  if (isFlutterApp()) return true;
   if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
     return false;
   }
@@ -37,6 +39,9 @@ export function canShareImageFile(): boolean {
 }
 
 async function tryNativeShare(file: File, title: string, text: string): Promise<boolean> {
+  if (await shareViaNative({ title, text, file, filename: file.name })) {
+    return true;
+  }
   if (typeof navigator.share !== 'function') return false;
 
   const payload = { files: [file], title, text };

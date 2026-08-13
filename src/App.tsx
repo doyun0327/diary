@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
@@ -27,6 +27,7 @@ import { useCharacter } from './hooks/useCharacter';
 import { useClientProfile } from './hooks/useClientProfile';
 import { useScreenLock } from './hooks/useScreenLock';
 import { getAccessToken, useAuthSession } from './hooks/useAuthSession';
+import { usePushOpenHandler, usePushRegistration } from './hooks/usePushRegistration';
 import {
   isAppIntroDone,
   isCharacterSetupDone,
@@ -83,6 +84,23 @@ function App() {
       console.warn('[guest] auto session failed', err);
     });
   }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t]);
+
+  usePushRegistration(!needsProfileSetup);
+
+  const openFromPush = useCallback(
+    (payload: { type?: string; roomId: string; postId?: string }) => {
+      setActiveRoomId(payload.roomId);
+      if (payload.postId) {
+        setActivePostId(payload.postId);
+        setPage('room-post');
+        return;
+      }
+      setActivePostId(null);
+      setPage('room');
+    },
+    [],
+  );
+  usePushOpenHandler(openFromPush);
 
   const selectedEntry = entries.find((e) => e.id === selectedId);
   const editingEntry = editingId
