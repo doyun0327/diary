@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLottie } from 'lottie-react';
 import type { DiaryEntry } from '../types/diary';
 import { exportPdfFilename } from '../utils/dateRange';
 import {
@@ -14,6 +15,22 @@ import {
 import { downloadToDevice } from '../utils/saveBlob';
 import BackIcon from './BackIcon';
 import './DiaryBookViewer.css';
+
+const PDF_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
+
+function pickRandomLottie(pool: object[]): object | null {
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)] ?? null;
+}
+
+function PdfLoadingLottie({ animationData }: { animationData: object }) {
+  const { View } = useLottie({
+    animationData,
+    loop: true,
+    autoplay: true,
+  });
+  return <div className="diary-book__pdf-lottie">{View}</div>;
+}
 
 interface DiaryBookViewerProps {
   entries: DiaryEntry[];
@@ -83,6 +100,9 @@ function DiaryBookViewer({
   const [index, setIndex] = useState(0);
   const [flip, setFlip] = useState<'none' | 'next' | 'prev'>('none');
   const [downloading, setDownloading] = useState(false);
+  const [pdfLottiePool, setPdfLottiePool] = useState<object[]>([]);
+  const [pdfLottie, setPdfLottie] = useState<object | null>(null);
+  const [pdfLottieKey, setPdfLottieKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const touchX = useRef<number | null>(null);
   const pagesRef = useRef(pages);
@@ -140,6 +160,22 @@ function DiaryBookViewer({
   }, [sorted, total]);
 
   useEffect(() => {
+    let cancelled = false;
+    void Promise.all(
+      PDF_LOTTIE_URLS.map((url) => fetch(url).then((res) => res.json() as Promise<object>)),
+    )
+      .then((pool) => {
+        if (!cancelled) setPdfLottiePool(pool);
+      })
+      .catch(() => {
+        if (!cancelled) setPdfLottiePool([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     void ensurePage(1);
     if (index > 0) void ensurePage(index);
   }, [ensurePage, index]);
@@ -180,6 +216,8 @@ function DiaryBookViewer({
   const handleDownload = async () => {
     if (downloading) return;
     setDownloading(true);
+    setPdfLottie(pickRandomLottie(pdfLottiePool));
+    setPdfLottieKey((key) => key + 1);
     setError(null);
     try {
       await Promise.all(Array.from({ length: total }, (_, i) => ensurePage(i)));
@@ -211,13 +249,14 @@ function DiaryBookViewer({
 
   return (
     <div className="diary-book" role="dialog" aria-label={t('book.dialogAria')}>
-      <div className="diary-book__backdrop" onClick={onClose} />
+      <div className="diary-book__backdrop" onClick={downloading ? undefined : onClose} />
       <div className="diary-book__panel">
         <header className="diary-book__head">
           <button
             type="button"
             className="diary-book__icon-btn diary-book__icon-btn--back"
             onClick={onClose}
+            disabled={downloading}
             aria-label={t('common.close')}
           >
             <BackIcon size={22} strokeWidth={2.2} />
@@ -322,6 +361,14 @@ function DiaryBookViewer({
 
         <p className="diary-book__hint"></p>
       </div>
+      {downloading && (
+        <div className="diary-book__pdf-overlay" role="status" aria-live="polite">
+          {pdfLottie ? (
+            <PdfLoadingLottie key={pdfLottieKey} animationData={pdfLottie} />
+          ) : null}
+          <p className="diary-book__pdf-overlay-text">{t('book.saving')}</p>
+        </div>
+      )}
     </div>
   );
 }

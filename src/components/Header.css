@@ -262,6 +262,11 @@
   background: var(--color-bg-muted);
 }
 
+.header-menu__crayon {
+  display: block;
+  overflow: visible;
+}
+
 .header-menu__avatar-img {
   display: block;
   width: 100%;

@@ -536,6 +536,7 @@
     "title": "일기장",
     "pdfAria": "PDF 저장",
     "pdfTitle": "PDF 저장",
+    "saving": "PDF를 만들고 있어요",
     "building": "일기를 쓰고 있어요",
     "prevPage": "이전 페이지",
     "nextPage": "다음 페이지",

@@ -462,6 +462,7 @@
     "title": "Libro de diario",
     "pdfAria": "Guardar PDF",
     "pdfTitle": "Guardar PDF",
+    "saving": "Creando el PDF…",
     "building": "Escribiendo el diario…",
     "prevPage": "Página anterior",
     "nextPage": "Página siguiente",

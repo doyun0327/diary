@@ -25,74 +25,202 @@ interface HeaderProps {
   } | null;
 }
 
+function CrayonSvg({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="header-menu__crayon"
+    >
+      {children}
+    </svg>
+  );
+}
+
 function IconUser() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function IconUsers() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconDownload() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" x2="12" y1="15" y2="3" />
-    </svg>
-  );
-}
-
-function IconPalette() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor" />
-      <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor" />
-      <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor" />
-      <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor" />
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-    </svg>
-  );
-}
-
-function IconLock() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
+    <CrayonSvg>
+      <ellipse cx="12.1" cy="11.2" rx="6.4" ry="6.6" fill="currentColor" fillOpacity="0.12" />
+      <path
+        d="M6.2 11.4c.3-3.6 2.6-6.4 5.9-6.6 3.5-.2 6.3 2.4 6.6 5.9.3 3.2-1.8 6.4-5.4 6.9-3.4.4-6.7-2-7.1-6.2Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <circle cx="9.7" cy="10.6" r="0.85" fill="currentColor" />
+      <circle cx="14.4" cy="10.4" r="0.85" fill="currentColor" />
+      <ellipse cx="8.6" cy="12.6" rx="1.15" ry="0.7" fill="currentColor" fillOpacity="0.22" />
+      <ellipse cx="15.5" cy="12.4" rx="1.15" ry="0.7" fill="currentColor" fillOpacity="0.22" />
+      <path
+        d="M9.6 14.4c.9 1.3 2.1 1.8 3.6 1.6 1.3-.2 2.3-.9 2.8-1.8"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </CrayonSvg>
   );
 }
 
 function IconGlobe() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-      <path d="M2 12h20" />
-    </svg>
+    <CrayonSvg>
+      <text
+        x="12"
+        y="16.8"
+        textAnchor="middle"
+        fill="currentColor"
+        fontFamily="Gaegu, Hi Melody, cursive"
+        fontSize="14"
+        fontWeight="800"
+        stroke="currentColor"
+        strokeWidth="0.45"
+        strokeLinejoin="round"
+        paintOrder="stroke fill"
+        letterSpacing="0.15"
+      >
+        ABC
+      </text>
+    </CrayonSvg>
+  );
+}
+
+function IconLock() {
+  return (
+    <CrayonSvg>
+      <path
+        d="M8.1 10.6V8.4c.1-2.1 1.6-3.9 3.8-4 2.3-.1 4.1 1.6 4.2 3.8v2.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.2 11.2c-.2-.2 0-1 1.1-1.2h9.2c1.2.1 1.6.9 1.5 1.8l-.5 7.1c-.1 1.2-.9 1.9-2.1 2H8.4c-1.3.1-2.1-.7-2.2-2l-.1-7.7Z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 14.1c.7 0 1.2.6 1.1 1.2 0 .4-.2.7-.5.9v1.2c0 .3-.3.5-.6.5s-.6-.2-.6-.5v-1.2c-.3-.2-.5-.5-.5-.9.1-.6.6-1.2 1.1-1.2Z"
+        fill="currentColor"
+      />
+    </CrayonSvg>
+  );
+}
+
+function IconUsers() {
+  return (
+    <CrayonSvg>
+      <ellipse cx="7.2" cy="7.3" rx="2.9" ry="3" fill="currentColor" fillOpacity="0.12" />
+      <path
+        d="M4.5 7.4c.2-1.7 1.4-3 2.9-3.1 1.6-.1 2.9 1.1 3 2.8.1 1.7-1.1 3.1-2.8 3.2-1.6.1-3.1-1.2-3.1-2.9Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3.6 19.5c-.2-3.2 1-5.5 3.8-5.7 2.7-.2 4.2 1.9 4.2 5.1 0 .7-.4 1.1-1.1 1.2H4.6c-.7 0-1-.4-1-.6Z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <ellipse cx="16.8" cy="7.3" rx="2.9" ry="3" fill="currentColor" fillOpacity="0.12" />
+      <path
+        d="M14.1 7.4c.2-1.7 1.4-3 2.9-3.1 1.6-.1 2.9 1.1 3 2.8.1 1.7-1.1 3.1-2.8 3.2-1.6.1-3.1-1.2-3.1-2.9Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13.2 19.5c-.2-3.2 1-5.5 3.8-5.7 2.7-.2 4.2 1.9 4.2 5.1 0 .7-.4 1.1-1.1 1.2h-5.8c-.7 0-1.1-.4-1.1-.6Z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </CrayonSvg>
+  );
+}
+
+function IconPalette() {
+  return (
+    <CrayonSvg>
+      <path
+        d="M8.2 16.6c-2.2.1-3.8-1.5-3.7-3.5.1-1.9 1.8-3.3 3.8-3.2 2 .1 3.4 1.8 3.3 3.6-.1 1.9-1.6 3-3.4 3.1Z"
+        fill="currentColor"
+        fillOpacity="0.16"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15.8 16.4c-2.1.2-3.6-1.3-3.6-3.3 0-1.9 1.6-3.5 3.6-3.5 2.1 0 3.6 1.6 3.6 3.5 0 2-1.5 3.2-3.6 3.3Z"
+        fill="currentColor"
+        fillOpacity="0.28"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 10.6c-2.2.1-3.7-1.5-3.6-3.4.1-2 1.8-3.5 3.8-3.5 2.1 0 3.6 1.6 3.5 3.6-.1 1.9-1.6 3.2-3.7 3.3Z"
+        fill="currentColor"
+        fillOpacity="0.4"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <circle cx="10.8" cy="6.6" r="0.7" fill="currentColor" fillOpacity="0.55" />
+      <circle cx="14.4" cy="12.2" r="0.55" fill="currentColor" fillOpacity="0.45" />
+    </CrayonSvg>
+  );
+}
+
+function IconDownload() {
+  return (
+    <CrayonSvg>
+      <path
+        d="M4.6 13.2c-.6-.2-.6-1.2.1-1.6L18.8 4.4c.8-.4 1.6.4 1.3 1.2l-4.8 14.2c-.3.8-1.4.9-1.8.1l-2.6-5.2-6.3-1.5Z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M11.2 13.1 19.4 5.4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </CrayonSvg>
   );
 }
 
 function IconInfo() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
+    <CrayonSvg>
+      <path
+        d="M12.1 3.4c.6-.2 1.3.2 1.5.8l1.6 4.8 5.1.3c.7 0 1.1.8.7 1.3l-3.8 3.5 1.2 5c.2.6-.5 1.2-1.1.9L12 17.6 7.7 20c-.6.3-1.3-.3-1.1-.9l1.2-5-3.8-3.5c-.4-.5 0-1.3.7-1.3l5.1-.3 1.6-4.8c.2-.6.9-1 1.5-.8Z"
+        fill="currentColor"
+        fillOpacity="0.12"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </CrayonSvg>
   );
 }
 
