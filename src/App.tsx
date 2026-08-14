@@ -36,6 +36,8 @@ import {
   markProfileSetupDone,
 } from './utils/onboarding';
 import type { DiaryEntry } from './types/diary';
+import { formatYearMonth } from './utils/date';
+import { isFlutterApp, postDiaryNative } from './utils/nativeShare';
 import './App.css';
 
 export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
@@ -254,9 +256,13 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
     const onStart = (clientX: number, clientY: number) => {
       const el = document.elementFromPoint(clientX, clientY);
-      if (el?.closest('[data-no-swipe], input, textarea, [contenteditable="true"]')) {
+      if (el?.closest('[data-no-swipe], input, textarea, button, a, [contenteditable="true"]')) {
         return;
       }
       tracking = true;
@@ -346,6 +352,18 @@ function App() {
     setCalMonth(d.getMonth());
   };
 
+  useEffect(() => {
+    if (!isFlutterApp()) return;
+    postDiaryNative({
+      type: 'headerState',
+      visible: !needsProfileSetup && !needsAppIntro,
+      showCalendar: page === 'home',
+      year: calYear,
+      month: calMonth,
+      label: formatYearMonth(calYear, calMonth),
+    });
+  }, [page, calYear, calMonth, needsProfileSetup, needsAppIntro]);
+
   if (needsProfileSetup) {
     return (
       <div className="app">
@@ -382,7 +400,9 @@ function App() {
 
   return (
     <div className="app">
+      {/* 웹 상단 헤더는 주석 처리. Flutter AppBar + hideBar로 메뉴만 유지 */}
       <Header
+        hideBar
         nickname={nickname}
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}

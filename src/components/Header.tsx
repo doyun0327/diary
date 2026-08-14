@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { formatYearMonth } from '../utils/date';
+// import { formatYearMonth } from '../utils/date';
 import MonthYearPicker from './MonthYearPicker';
 import './Header.css';
 
@@ -23,6 +23,8 @@ interface HeaderProps {
     onNext: () => void;
     onSelectMonth: (year: number, month: number) => void;
   } | null;
+  /** Flutter AppBar 사용 시 웹 상단 바만 숨기고 메뉴는 유지 */
+  hideBar?: boolean;
 }
 
 function CrayonSvg({ children }: { children: ReactNode }) {
@@ -224,6 +226,7 @@ function IconInfo() {
   );
 }
 
+/*
 function IconChevronLeft() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -239,6 +242,7 @@ function IconChevronRight() {
     </svg>
   );
 }
+*/
 
 function MenuItem({
   icon,
@@ -319,6 +323,7 @@ function Header({
   onOpenRooms,
   onOpenAppInfo,
   calendarNav = null,
+  hideBar: _hideBar = false,
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -340,6 +345,38 @@ function Header({
 
   useEffect(() => {
     if (!calendarNav) setMonthPickerOpen(false);
+  }, [calendarNav]);
+
+  useEffect(() => {
+    window.diaryHeaderAction = (action, payload) => {
+      if (action === 'openMenu') {
+        setMonthPickerOpen(false);
+        setMenuOpen((open) => !open);
+      }
+      if (action === 'closeMenu') setMenuOpen(false);
+      if (action === 'prevMonth') {
+        setMonthPickerOpen(false);
+        calendarNav?.onPrev();
+      }
+      if (action === 'nextMonth') {
+        setMonthPickerOpen(false);
+        calendarNav?.onNext();
+      }
+      if (action === 'openMonthPicker' && calendarNav) {
+        setMenuOpen(false);
+        setMonthPickerOpen((open) => !open);
+      }
+      if (action === 'selectMonth' && calendarNav && payload) {
+        const year = payload.year;
+        const month = payload.month;
+        if (typeof year === 'number' && typeof month === 'number') {
+          calendarNav.onSelectMonth(year, month);
+        }
+      }
+    };
+    return () => {
+      delete window.diaryHeaderAction;
+    };
   }, [calendarNav]);
 
   const closeAnd = (fn?: () => void) => {
@@ -438,6 +475,37 @@ function Header({
       document.getElementById('root') ?? document.body,
     );
 
+  const picker =
+    monthPickerOpen && calendarNav ? (
+      <MonthYearPicker
+        year={calendarNav.year}
+        month={calendarNav.month}
+        onClose={() => setMonthPickerOpen(false)}
+        onSelect={(year, month) => {
+          calendarNav.onSelectMonth(year, month);
+          setMonthPickerOpen(false);
+        }}
+      />
+    ) : null;
+
+  // 웹 상단 바는 Flutter AppBar로 이동. 메뉴/월 선택만 웹에서 유지.
+  return (
+    <>
+      {picker}
+      {menu}
+    </>
+  );
+
+  /*
+  if (hideBar) {
+    return (
+      <>
+        {picker}
+        {menu}
+      </>
+    );
+  }
+
   return (
     <header className="header">
       {calendarNav ? (
@@ -473,17 +541,7 @@ function Header({
           >
             <IconChevronRight />
           </button>
-          {monthPickerOpen && (
-            <MonthYearPicker
-              year={calendarNav.year}
-              month={calendarNav.month}
-              onClose={() => setMonthPickerOpen(false)}
-              onSelect={(year, month) => {
-                calendarNav.onSelectMonth(year, month);
-                setMonthPickerOpen(false);
-              }}
-            />
-          )}
+          {picker}
         </div>
       ) : (
         <span className="header__spacer" aria-hidden />
@@ -492,7 +550,6 @@ function Header({
         type="button"
         className="header__burger"
         aria-label={t('header.menu')}
-        aria-expanded={menuOpen}
         onClick={() => setMenuOpen(true)}
       >
         <svg
@@ -515,6 +572,7 @@ function Header({
       {menu}
     </header>
   );
+  */
 }
 
 export default Header;

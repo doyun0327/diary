@@ -5,6 +5,7 @@ declare global {
     __onDiaryGoogleIdToken?: (idToken: string) => void;
     __onDiaryGoogleSignInError?: (reason: string) => void;
     diaryGoBack?: () => boolean;
+    diaryHeaderAction?: (action: string, payload?: { year?: number; month?: number }) => void;
   }
 }
 
@@ -17,6 +18,12 @@ export function isFlutterApp(): boolean {
   if (typeof window === 'undefined') return false;
   if (window.__DIARY_FLUTTER__ === true) return true;
   return typeof diaryNative()?.postMessage === 'function';
+}
+
+export function postDiaryNative(data: Record<string, unknown>) {
+  const native = diaryNative();
+  if (!native) return;
+  native.postMessage(JSON.stringify(data));
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {

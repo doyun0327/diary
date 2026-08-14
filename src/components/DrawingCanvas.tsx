@@ -5,6 +5,7 @@ import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
 import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
+import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
 import './DrawingCanvas.css';
 
@@ -190,6 +191,7 @@ function DrawingCanvas({
   const [stickerLayers, setStickerLayers] = useState<StickerLayer[]>([]);
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const [canUndo, setCanUndo] = useState(false);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const eraserWidth =
     ERASER_SIZES.find((s) => s.id === eraserSizeId)?.width ?? 24;
@@ -849,17 +851,16 @@ function DrawingCanvas({
     strokeSnapshotPushed.current = false;
   };
 
-  const handleClear = () => {
-    if (confirm(t('canvas.confirm.clear'))) {
-      clearUndoStack();
-      fillWhite();
-      hasDrawn.current = false;
-      photoImages.current.clear();
-      setPhotoLayers([]);
-      setActivePhotoId(null);
-      setStickerLayers([]);
-      setActiveStickerId(null);
-    }
+  const applyClearAll = () => {
+    clearUndoStack();
+    fillWhite();
+    hasDrawn.current = false;
+    photoImages.current.clear();
+    setPhotoLayers([]);
+    setActivePhotoId(null);
+    setStickerLayers([]);
+    setActiveStickerId(null);
+    setClearConfirmOpen(false);
   };
 
   const canvasClass = [
@@ -1097,7 +1098,7 @@ function DrawingCanvas({
               <button
                 type="button"
                 className="drawing__clear-all"
-                onClick={handleClear}
+                onClick={() => setClearConfirmOpen(true)}
               >
                 {t('canvas.clearAll')}
               </button>
@@ -1258,6 +1259,21 @@ function DrawingCanvas({
             ))}
           </div>
         </div>
+      )}
+
+      {clearConfirmOpen && (
+        <AppModal
+          title={t('canvas.clearAll')}
+          lead={t('canvas.confirm.clear')}
+          onDismiss={() => setClearConfirmOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setClearConfirmOpen(false)}
+          primaryDanger
+          primaryLabel={t('canvas.clearAll')}
+          onPrimary={applyClearAll}
+        />
       )}
     </div>
   );
