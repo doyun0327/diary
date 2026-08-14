@@ -33,7 +33,7 @@
     "character": "Karakter",
     "characterHint": "Saya di gambar AI",
     "export": "Ekspor",
-    "exportHint": "PDF periode · buku diary",
+    "exportHint": "Pilih periode · buku diary",
     "decorate": "Hias",
     "decorateHint": "Tema · emoji",
     "appInfo": "Info aplikasi",
@@ -452,7 +452,7 @@
     "empty": "Tidak ada diary di periode ini",
     "pdf": "Simpan PDF",
     "saving": "Menyimpan…",
-    "openBook": "Lihat sebagai buku diary",
+    "openBook": "Lihat buku diary",
     "err": {
       "pdf": "Gagal menyimpan PDF"
     }

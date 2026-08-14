@@ -467,15 +467,25 @@
 }
 
 .account-sheet__lang-btn {
-  padding: 12px;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 46px;
+  min-width: 0;
+  padding: 0 10px;
   border: 1.5px solid var(--color-border-soft);
   border-radius: 14px;
   background: var(--color-bg-soft);
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 700;
+  line-height: 43px;
+  text-align: center;
   color: var(--color-text-muted);
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .account-sheet__lang-btn.is-active {

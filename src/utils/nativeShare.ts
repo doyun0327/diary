@@ -4,6 +4,7 @@ declare global {
     __DIARY_FLUTTER__?: boolean;
     __onDiaryGoogleIdToken?: (idToken: string) => void;
     __onDiaryGoogleSignInError?: (reason: string) => void;
+    diaryGoBack?: () => boolean;
   }
 }
 
@@ -71,6 +72,35 @@ export async function shareViaNative(payload: {
       title: payload.title ?? '',
       text: payload.text ?? '',
       url: payload.url ?? '',
+    }),
+  );
+  return true;
+}
+
+/** Flutter WebView면 네이티브 다운로드로 넘기고 true. 아니면 false. */
+export async function saveFileViaNative(payload: {
+  file: Blob;
+  filename?: string;
+}): Promise<boolean> {
+  if (!isFlutterApp()) return false;
+
+  const filename =
+    payload.filename ||
+    (payload.file instanceof File && payload.file.name) ||
+    'download.bin';
+  const mime =
+    payload.file.type ||
+    (filename.toLowerCase().endsWith('.png')
+      ? 'image/png'
+      : filename.toLowerCase().endsWith('.pdf')
+        ? 'application/pdf'
+        : 'application/octet-stream');
+  diaryNative()!.postMessage(
+    JSON.stringify({
+      type: 'saveFile',
+      name: filename,
+      mime,
+      base64: await blobToBase64(payload.file),
     }),
   );
   return true;

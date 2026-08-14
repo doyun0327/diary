@@ -33,7 +33,7 @@
     "character": "キャラクター",
     "characterHint": "AI絵のわたし",
     "export": "書き出し",
-    "exportHint": "期間PDF · 日記帳",
+    "exportHint": "期間を選んで日記帳",
     "decorate": "カスタム",
     "decorateHint": "テーマ · 絵文字",
     "appInfo": "アプリ情報",
@@ -452,7 +452,7 @@
     "empty": "この期間に日記がありません",
     "pdf": "PDFを保存",
     "saving": "保存中…",
-    "openBook": "日記帳として見る",
+    "openBook": "日記帳を見る",
     "err": {
       "pdf": "PDFの保存に失敗しました"
     }

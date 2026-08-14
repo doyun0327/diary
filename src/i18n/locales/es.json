@@ -33,7 +33,7 @@
     "character": "Personaje",
     "characterHint": "Yo en dibujos IA",
     "export": "Exportar",
-    "exportHint": "PDF por periodo · libro",
+    "exportHint": "Elige periodo · libro",
     "decorate": "Decorar",
     "decorateHint": "Tema · emoji",
     "appInfo": "Info de la app",
@@ -452,7 +452,7 @@
     "empty": "No hay diarios en este periodo",
     "pdf": "Guardar PDF",
     "saving": "Guardando…",
-    "openBook": "Ver como libro de diario",
+    "openBook": "Ver libro de diario",
     "err": {
       "pdf": "Error al guardar PDF"
     }

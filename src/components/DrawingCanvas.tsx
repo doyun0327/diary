@@ -873,7 +873,7 @@ function DrawingCanvas({
   const editingOverlay = Boolean(activePhotoId || activeStickerId);
 
   return (
-    <div className="drawing">
+      <div className="drawing" data-no-swipe>
       <input
         ref={fileInputRef}
         type="file"

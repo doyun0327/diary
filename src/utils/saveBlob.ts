@@ -1,4 +1,4 @@
-import { isFlutterApp, shareViaNative } from './nativeShare';
+import { isFlutterApp, saveFileViaNative, shareViaNative } from './nativeShare';
 
 export type SaveBlobResult =
   | 'shared'
@@ -132,6 +132,22 @@ export async function saveOrShareBlob(
     return 'opened';
   }
 
+  downloadViaAnchor(blob, filename);
+  return 'downloaded';
+}
+
+/**
+ * 기기 로컬에 저장 (공유 시트 없음)
+ * - Flutter: 네이티브 Downloads / Documents
+ * - 그 외: a[download]
+ */
+export async function downloadToDevice(
+  blob: Blob,
+  filename: string,
+): Promise<SaveBlobResult> {
+  if (await saveFileViaNative({ file: blob, filename })) {
+    return 'downloaded';
+  }
   downloadViaAnchor(blob, filename);
   return 'downloaded';
 }

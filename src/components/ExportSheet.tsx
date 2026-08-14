@@ -1,58 +1,53 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
+import { formatYearMonth } from '../utils/date';
 import {
-  exportPdfFilename,
   filterEntriesByDateRange,
   lastMonthRange,
+  monthEndYmd,
+  monthStartYmd,
   thisMonthRange,
+  yearMonthFromYmd,
 } from '../utils/dateRange';
-import { buildDiaryBookPdf } from '../utils/diaryBook';
-import {
-  canSharePdfFile,
-  isLikelyMobile,
-  saveOrShareBlob,
-  type SaveBlobResult,
-} from '../utils/saveBlob';
 import CloseIcon from './CloseIcon';
+import MonthYearPicker from './MonthYearPicker';
 import './ExportSheet.css';
 
 type Preset = 'thisMonth' | 'lastMonth' | 'custom';
+type MonthField = 'start' | 'end';
 
 interface ExportSheetProps {
   entries: DiaryEntry[];
   onClose: () => void;
-  onOpenBook: (filtered: DiaryEntry[]) => void;
+  onOpenBook: (filtered: DiaryEntry[], range: { start: string; end: string }) => void;
 }
 
 function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
   const { t } = useTranslation();
   const initial = thisMonthRange();
-  const [preset, setPreset] = useState<Preset>('thisMonth');
   const [start, setStart] = useState(initial.start);
   const [end, setEnd] = useState(initial.end);
-  const [downloading, setDownloading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  /** 모바일: PDF 생성 후 제스처가 끊기면 한 번 더 탭해서 공유/열기 */
-  const [readyPdf, setReadyPdf] = useState<{ blob: Blob; filename: string } | null>(
-    null,
-  );
+  const [choiceFor, setChoiceFor] = useState<MonthField | null>(null);
+  const [picker, setPicker] = useState<MonthField | null>(null);
 
-  const mobileShare = canSharePdfFile() || isLikelyMobile();
-
-  const applyPreset = (next: Preset) => {
-    setPreset(next);
-    setError(null);
-    setReadyPdf(null);
+  const applyPreset = (next: Preset, field: MonthField) => {
     if (next === 'thisMonth') {
       const r = thisMonthRange();
       setStart(r.start);
       setEnd(r.end);
-    } else if (next === 'lastMonth') {
+      setChoiceFor(null);
+      return;
+    }
+    if (next === 'lastMonth') {
       const r = lastMonthRange();
       setStart(r.start);
       setEnd(r.end);
+      setChoiceFor(null);
+      return;
     }
+    setChoiceFor(null);
+    setPicker(field);
   };
 
   const filtered = useMemo(
@@ -60,81 +55,13 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
     [entries, start, end],
   );
 
-  const canExport = filtered.length > 0 && !downloading;
-
-  const finishSave = (result: SaveBlobResult) => {
-    if (result === 'cancelled') return;
-    setReadyPdf(null);
-  };
-
-  const handlePdf = async () => {
-    if (downloading) return;
-
-    // 2단계: 이미 만들어진 PDF를 유저 제스처로 공유/열기
-    if (readyPdf) {
-      setDownloading(true);
-      setError(null);
-      try {
-        const result = await saveOrShareBlob(readyPdf.blob, readyPdf.filename, {
-          title: readyPdf.filename,
-          text: t('export.shareText'),
-        });
-        finishSave(result);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : t('export.err.pdf'));
-      } finally {
-        setDownloading(false);
-      }
-      return;
-    }
-
-    if (!canExport) return;
-    setDownloading(true);
-    setError(null);
-    try {
-      const filename = exportPdfFilename(start, end);
-      const blob = await buildDiaryBookPdf(filtered);
-
-      if (mobileShare) {
-        const result = await saveOrShareBlob(blob, filename, {
-          title: filename,
-          text: t('export.shareText'),
-          shareOnly: true,
-        });
-        if (result === 'shared') {
-          setReadyPdf(null);
-          return;
-        }
-        if (result === 'cancelled') return;
-        // 제스처 소실·공유 미지원 → 한 번 더 탭 유도
-        setReadyPdf({ blob, filename });
-        return;
-      }
-
-      const result = await saveOrShareBlob(blob, filename, {
-        title: filename,
-        text: t('export.shareText'),
-      });
-      finishSave(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('export.err.pdf'));
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   const handleBook = () => {
     if (filtered.length === 0) return;
-    onOpenBook(filtered);
+    onOpenBook(filtered, { start, end });
   };
 
-  const pdfLabel = downloading
-    ? t('export.saving')
-    : readyPdf
-      ? t('export.shareReady')
-      : mobileShare
-        ? t('export.sharePdf')
-        : t('export.pdf');
+  const startYm = yearMonthFromYmd(start);
+  const endYm = yearMonthFromYmd(end);
 
   return (
     <div className="export-sheet" role="dialog" aria-label={t('export.aria')}>
@@ -152,56 +79,29 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
           </button>
         </header>
 
-        <p className="export-sheet__label">{t('export.period')}</p>
-        <div className="export-sheet__presets" role="group" aria-label={t('export.presetsAria')}>
+        <p className="export-sheet__period-label">{t('export.period')}</p>
+        <div className="export-sheet__range" role="group" aria-label={t('export.period')}>
           <button
             type="button"
-            className={preset === 'thisMonth' ? 'is-active' : ''}
-            onClick={() => applyPreset('thisMonth')}
+            className="export-sheet__box"
+            aria-label={t('export.start')}
+            aria-expanded={choiceFor === 'start'}
+            onClick={() => setChoiceFor('start')}
           >
-            {t('export.thisMonth')}
+            {formatYearMonth(startYm.year, startYm.month)}
           </button>
+          <span className="export-sheet__tilde" aria-hidden>
+            ~
+          </span>
           <button
             type="button"
-            className={preset === 'lastMonth' ? 'is-active' : ''}
-            onClick={() => applyPreset('lastMonth')}
+            className="export-sheet__box"
+            aria-label={t('export.end')}
+            aria-expanded={choiceFor === 'end'}
+            onClick={() => setChoiceFor('end')}
           >
-            {t('export.lastMonth')}
+            {formatYearMonth(endYm.year, endYm.month)}
           </button>
-          <button
-            type="button"
-            className={preset === 'custom' ? 'is-active' : ''}
-            onClick={() => applyPreset('custom')}
-          >
-            {t('export.custom')}
-          </button>
-        </div>
-
-        <div className="export-sheet__dates">
-          <label>
-            {t('export.start')}
-            <input
-              type="date"
-              value={start}
-              onChange={(e) => {
-                setPreset('custom');
-                setReadyPdf(null);
-                setStart(e.target.value);
-              }}
-            />
-          </label>
-          <label>
-            {t('export.end')}
-            <input
-              type="date"
-              value={end}
-              onChange={(e) => {
-                setPreset('custom');
-                setReadyPdf(null);
-                setEnd(e.target.value);
-              }}
-            />
-          </label>
         </div>
 
         <p className="export-sheet__count">
@@ -209,30 +109,57 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
             ? t('export.count', { n: filtered.length })
             : t('export.empty')}
         </p>
-        {readyPdf && !downloading && (
-          <p className="export-sheet__hint">{t('export.shareHint')}</p>
-        )}
-        {error && <p className="export-sheet__error">{error}</p>}
 
         <div className="export-sheet__actions">
           <button
             type="button"
-            className={readyPdf ? 'primary' : undefined}
-            disabled={(!canExport && !readyPdf) || downloading}
-            onClick={() => void handlePdf()}
-          >
-            {pdfLabel}
-          </button>
-          <button
-            type="button"
-            className={readyPdf ? undefined : 'primary'}
-            disabled={!canExport}
+            className="primary"
+            disabled={filtered.length === 0}
             onClick={handleBook}
           >
             {t('export.openBook')}
           </button>
         </div>
       </div>
+
+      {choiceFor && (
+        <div className="export-sheet__choice">
+          <button
+            type="button"
+            className="export-sheet__choice-backdrop"
+            aria-label={t('common.close')}
+            onClick={() => setChoiceFor(null)}
+          />
+          <div
+            className="export-sheet__choice-panel"
+            role="dialog"
+            aria-label={t('export.presetsAria')}
+          >
+            <button type="button" onClick={() => applyPreset('thisMonth', choiceFor)}>
+              {t('export.thisMonth')}
+            </button>
+            <button type="button" onClick={() => applyPreset('lastMonth', choiceFor)}>
+              {t('export.lastMonth')}
+            </button>
+            <button type="button" onClick={() => applyPreset('custom', choiceFor)}>
+              {t('export.custom')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {picker && (
+        <MonthYearPicker
+          year={picker === 'start' ? startYm.year : endYm.year}
+          month={picker === 'start' ? startYm.month : endYm.month}
+          onClose={() => setPicker(null)}
+          onSelect={(year, month) => {
+            if (picker === 'start') setStart(monthStartYmd(year, month));
+            else setEnd(monthEndYmd(year, month));
+            setPicker(null);
+          }}
+        />
+      )}
     </div>
   );
 }

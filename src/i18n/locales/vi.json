@@ -33,7 +33,7 @@
     "character": "Nhân vật",
     "characterHint": "Tôi trong tranh AI",
     "export": "Xuất",
-    "exportHint": "PDF theo kỳ · sổ nhật ký",
+    "exportHint": "Chọn kỳ · sổ nhật ký",
     "decorate": "Trang trí",
     "decorateHint": "Chủ đề · emoji",
     "appInfo": "Thông tin app",
@@ -452,7 +452,7 @@
     "empty": "Không có nhật ký trong kỳ này",
     "pdf": "Lưu PDF",
     "saving": "Đang lưu…",
-    "openBook": "Xem dạng sổ nhật ký",
+    "openBook": "Xem sổ nhật ký",
     "err": {
       "pdf": "Lưu PDF thất bại"
     }

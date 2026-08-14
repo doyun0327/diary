@@ -63,63 +63,103 @@
   color: var(--color-text-muted);
 }
 
-.export-sheet__label {
+.export-sheet__period-label {
   margin: 0 0 8px;
-  font-size: 0.72rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
 }
 
-.export-sheet__presets {
-  display: flex;
-  flex-wrap: wrap;
+.export-sheet__range {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 8px;
   margin-bottom: 14px;
 }
 
-.export-sheet__presets button {
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: #fff;
-  font-family: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
-  color: var(--color-text);
-}
-
-.export-sheet__presets button.is-active {
-  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-text);
-  font-weight: 700;
-}
-
-.export-sheet__dates {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.export-sheet__dates label {
+.export-sheet__box {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-
-.export-sheet__dates input {
-  padding: 11px 12px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 8px;
   border: 1px solid var(--color-border);
   border-radius: 12px;
   background: #fff;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
   color: var(--color-text);
+  white-space: nowrap;
+}
+
+.export-sheet__box:active {
+  opacity: 0.75;
+}
+
+.export-sheet__tilde {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.export-sheet__choice {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.export-sheet__choice-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: var(--color-overlay);
+  cursor: pointer;
+}
+
+.export-sheet__choice-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px calc(18px + env(safe-area-inset-bottom));
+  border-radius: 22px 22px 0 0;
+  background: var(--sheet-bg);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.14);
+}
+
+.export-sheet__choice-panel button {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.export-sheet__choice-panel button:active {
+  background: var(--color-bg-muted);
 }
 
 .export-sheet__count {
@@ -147,7 +187,7 @@
 
 .export-sheet__actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 8px;
 }

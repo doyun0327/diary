@@ -101,45 +101,70 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-/** Google Fonts CSS를 data URL 폰트로 바꿔 캡처 SVG에 심음 */
-async function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
-  const name = primaryFontName(fontFamily);
-  if (!name || name === 'cursive' || name === 'sans-serif') return '';
+const fontCssCache = new Map<string, Promise<string>>();
+const loadedFontFaces = new Set<string>();
+let fontsReadyOnce: Promise<void> | null = null;
 
-  try {
-    const cssUrl =
-      `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@400;700&display=swap`;
-    let css = await fetch(cssUrl).then((r) => {
-      if (!r.ok) throw new Error(`font css ${r.status}`);
-      return r.text();
-    });
-
-    const urls = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) =>
-      m[1].replace(/['"]/g, ''),
-    );
-
-    await Promise.all(
-      urls.map(async (url) => {
-        const res = await fetch(url);
-        if (!res.ok) return;
-        const buf = await res.arrayBuffer();
-        const mime =
-          res.headers.get('content-type') ||
-          (url.includes('.woff2')
-            ? 'font/woff2'
-            : url.includes('.woff')
-              ? 'font/woff'
-              : 'font/ttf');
-        const dataUrl = `data:${mime};base64,${arrayBufferToBase64(buf)}`;
-        css = css.split(url).join(dataUrl);
-      }),
-    );
-
-    return css;
-  } catch {
-    return '';
+function waitDocumentFonts(): Promise<void> {
+  if (!fontsReadyOnce) {
+    fontsReadyOnce = document.fonts?.ready.then(() => undefined) ?? Promise.resolve();
   }
+  return fontsReadyOnce;
 }
+
+/** Google Fonts CSS를 data URL 폰트로 바꿔 캡처 SVG에 심음 (폰트별 1회) */
+function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
+  const name = primaryFontName(fontFamily);
+  if (!name || name === 'cursive' || name === 'sans-serif') return Promise.resolve('');
+
+  const cached = fontCssCache.get(name);
+  if (cached) return cached;
+
+  const pending = (async () => {
+    try {
+      const cssUrl =
+        `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@400;700&display=swap`;
+      let css = await fetch(cssUrl).then((r) => {
+        if (!r.ok) throw new Error(`font css ${r.status}`);
+        return r.text();
+      });
+
+      const urls = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) =>
+        m[1].replace(/['"]/g, ''),
+      );
+
+      await Promise.all(
+        urls.map(async (url) => {
+          const res = await fetch(url);
+          if (!res.ok) return;
+          const buf = await res.arrayBuffer();
+          const mime =
+            res.headers.get('content-type') ||
+            (url.includes('.woff2')
+              ? 'font/woff2'
+              : url.includes('.woff')
+                ? 'font/woff'
+                : 'font/ttf');
+          const dataUrl = `data:${mime};base64,${arrayBufferToBase64(buf)}`;
+          css = css.split(url).join(dataUrl);
+        }),
+      );
+
+      return css;
+    } catch {
+      return '';
+    }
+  })();
+
+  fontCssCache.set(name, pending);
+  return pending;
+}
+
+export type CapturePaperOptions = {
+  scale?: number;
+  type?: string;
+  quality?: number;
+};
 
 async function waitForImages(root: HTMLElement): Promise<void> {
   const imgs = Array.from(root.querySelectorAll('img'));
@@ -204,17 +229,21 @@ function applyCaptureStyles(source: Element, cloned: Element, diaryFont: string)
 export async function captureDiaryPaperBlob(
   element: HTMLElement,
   fontId?: string,
+  options?: CapturePaperOptions,
 ): Promise<Blob> {
   const diaryFont = getDiaryFontFamily(element, fontId);
   const fontName = primaryFontName(diaryFont);
 
   await waitForImages(element);
-  if (document.fonts?.ready) await document.fonts.ready;
-  try {
-    await document.fonts.load(`400 24px "${fontName}"`);
-    await document.fonts.load(`700 24px "${fontName}"`);
-  } catch {
-    // 시스템 폰트만 있는 경우 무시
+  await waitDocumentFonts();
+  if (!loadedFontFaces.has(fontName)) {
+    try {
+      await document.fonts.load(`400 24px "${fontName}"`);
+      await document.fonts.load(`700 24px "${fontName}"`);
+    } catch {
+      // 시스템 폰트만 있는 경우 무시
+    }
+    loadedFontFaces.add(fontName);
   }
 
   const fontCss = await buildEmbeddedFontCss(diaryFont);
@@ -224,7 +253,9 @@ export async function captureDiaryPaperBlob(
     '#ffffff';
 
   const blob = await domToBlob(element, {
-    scale: 2,
+    scale: options?.scale ?? 2,
+    ...(options?.type ? { type: options.type } : {}),
+    ...(options?.quality != null ? { quality: options.quality } : {}),
     backgroundColor,
     includeStyleProperties: [...CAPTURE_STYLE_PROPS],
     font: fontCss ? { cssText: fontCss } : undefined,
@@ -348,13 +379,14 @@ export function mountOffscreenDiaryPaper(
 export async function captureDiaryEntryPaperBlob(
   entry: DiaryEntry,
   paperElement?: HTMLElement | null,
+  options?: CapturePaperOptions,
 ): Promise<Blob> {
   if (paperElement) {
-    return captureDiaryPaperBlob(paperElement, entry.fontId);
+    return captureDiaryPaperBlob(paperElement, entry.fontId, options);
   }
   const { paper, dispose } = mountOffscreenDiaryPaper(entry);
   try {
-    return await captureDiaryPaperBlob(paper, entry.fontId);
+    return await captureDiaryPaperBlob(paper, entry.fontId, options);
   } finally {
     dispose();
   }

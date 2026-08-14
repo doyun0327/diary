@@ -38,7 +38,7 @@
     "character": "캐릭터",
     "characterHint": "AI 그림 속 나",
     "export": "내보내기",
-    "exportHint": "기간 PDF · 일기장",
+    "exportHint": "기간 골라 일기장 보기",
     "decorate": "꾸미기",
     "decorateHint": "테마 · 이모지",
     "appInfo": "앱 정보",
@@ -526,7 +526,7 @@
     "shareHint": "PDF가 준비됐어요. 한 번 더 눌러 공유하거나 저장하세요.",
     "shareText": "PageBy 일기장",
     "saving": "준비 중…",
-    "openBook": "일기장으로 보기",
+    "openBook": "일기장 보기",
     "err": {
       "pdf": "PDF 저장에 실패했어요"
     }

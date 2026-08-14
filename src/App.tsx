@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
@@ -60,6 +60,9 @@ function App() {
   const [decorateOpen, setDecorateOpen] = useState(false);
   const [appInfoOpen, setAppInfoOpen] = useState(false);
   const [bookEntries, setBookEntries] = useState<DiaryEntry[] | null>(null);
+  const [bookRange, setBookRange] = useState<{ start: string; end: string } | null>(
+    null,
+  );
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
 
@@ -156,6 +159,154 @@ function App() {
     }
     setPage('home');
   };
+
+  const goBack = useCallback((): boolean => {
+    if (screenLock.locked) return true;
+    if (bookEntries) {
+      setBookEntries(null);
+      setBookRange(null);
+      return true;
+    }
+    if (appInfoOpen) {
+      setAppInfoOpen(false);
+      return true;
+    }
+    if (decorateOpen) {
+      setDecorateOpen(false);
+      return true;
+    }
+    if (exportOpen) {
+      setExportOpen(false);
+      return true;
+    }
+    if (characterOpen) {
+      setCharacterOpen(false);
+      setWriteAfterCharacter(false);
+      return true;
+    }
+    if (lockDisableOpen) {
+      setLockDisableOpen(false);
+      return true;
+    }
+    if (lockSetupOpen) {
+      setLockSetupOpen(false);
+      return true;
+    }
+    if (languageOpen) {
+      setLanguageOpen(false);
+      return true;
+    }
+    if (accountOpen) {
+      setAccountOpen(false);
+      return true;
+    }
+    if (page === 'room-post') {
+      setActivePostId(null);
+      setPage('room');
+      return true;
+    }
+    if (page === 'room') {
+      setActivePostId(null);
+      setPage('rooms');
+      return true;
+    }
+    if (page === 'rooms') {
+      setPage('home');
+      return true;
+    }
+    if (page === 'detail') {
+      setPage('home');
+      return true;
+    }
+    if (page === 'write') {
+      handleWriteCancel();
+      return true;
+    }
+    return false;
+  }, [
+    accountOpen,
+    appInfoOpen,
+    bookEntries,
+    characterOpen,
+    decorateOpen,
+    editingId,
+    exportOpen,
+    languageOpen,
+    lockDisableOpen,
+    lockSetupOpen,
+    page,
+    screenLock.locked,
+  ]);
+
+  const goBackRef = useRef(goBack);
+  goBackRef.current = goBack;
+
+  useEffect(() => {
+    window.diaryGoBack = () => goBackRef.current();
+    const onNativeBack = () => {
+      goBackRef.current();
+    };
+    window.addEventListener('diary-native-back', onNativeBack);
+    return () => {
+      delete window.diaryGoBack;
+      window.removeEventListener('diary-native-back', onNativeBack);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onStart = (clientX: number, clientY: number) => {
+      const el = document.elementFromPoint(clientX, clientY);
+      if (el?.closest('[data-no-swipe], input, textarea, [contenteditable="true"]')) {
+        return;
+      }
+      tracking = true;
+      startX = clientX;
+      startY = clientY;
+    };
+
+    const onEnd = (clientX: number, clientY: number) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+      if (dx > 56 && Math.abs(dy) < 110 && dx > Math.abs(dy) * 1.15) {
+        goBackRef.current();
+      }
+    };
+
+    const onPointerStart = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      onStart(e.clientX, e.clientY);
+    };
+    const onPointerEnd = (e: PointerEvent) => onEnd(e.clientX, e.clientY);
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      onStart(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.changedTouches.length !== 1) return;
+      onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    };
+    const onCancel = () => {
+      tracking = false;
+    };
+
+    const opts: AddEventListenerOptions = { capture: true, passive: true };
+    window.addEventListener('pointerdown', onPointerStart, opts);
+    window.addEventListener('pointerup', onPointerEnd, opts);
+    window.addEventListener('pointercancel', onCancel, opts);
+    window.addEventListener('touchstart', onTouchStart, opts);
+    window.addEventListener('touchend', onTouchEnd, opts);
+    window.addEventListener('touchcancel', onCancel, opts);
+    return () => {
+      window.removeEventListener('pointerdown', onPointerStart, opts);
+      window.removeEventListener('pointerup', onPointerEnd, opts);
+      window.removeEventListener('pointercancel', onCancel, opts);
+      window.removeEventListener('touchstart', onTouchStart, opts);
+      window.removeEventListener('touchend', onTouchEnd, opts);
+      window.removeEventListener('touchcancel', onCancel, opts);
+    };
+  }, []);
 
   const handleNewWrite = () => {
     setEditingId(null);
@@ -405,16 +556,26 @@ function App() {
         <ExportSheet
           entries={entries}
           onClose={() => setExportOpen(false)}
-          onOpenBook={(filtered) => {
+          onOpenBook={(filtered, range) => {
             setExportOpen(false);
             setBookEntries(filtered);
+            setBookRange(range);
           }}
         />
       )}
       {decorateOpen && <DecorateSheet onClose={() => setDecorateOpen(false)} />}
       {appInfoOpen && <AppInfoSheet onClose={() => setAppInfoOpen(false)} />}
       {bookEntries && (
-        <DiaryBookViewer entries={bookEntries} onClose={() => setBookEntries(null)} />
+        <DiaryBookViewer
+          entries={bookEntries}
+          rangeStart={bookRange?.start}
+          rangeEnd={bookRange?.end}
+          avatarUrl={avatarUrl}
+          onClose={() => {
+            setBookEntries(null);
+            setBookRange(null);
+          }}
+        />
       )}
       {screenLock.locked &&
         createPortal(

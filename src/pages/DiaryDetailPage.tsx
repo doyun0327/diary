@@ -12,6 +12,7 @@ import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
 import DiaryBookViewer from '../components/DiaryBookViewer';
+import { useClientProfile } from '../hooks/useClientProfile';
 import './DiaryDetailPage.css';
 
 const SHARE_ROOMS_PAGE_SIZE = 10;
@@ -39,6 +40,7 @@ function DiaryDetailPage({
   onOpenRooms,
 }: DiaryDetailPageProps) {
   const { t } = useTranslation();
+  const { avatarUrl } = useClientProfile();
   const [shareOpen, setShareOpen] = useState(false);
   const [shareStep, setShareStep] = useState<ShareStep>('menu');
   const [moreOpen, setMoreOpen] = useState(false);
@@ -215,14 +217,14 @@ function DiaryDetailPage({
       });
       closeShare({ force: true });
 
-      if (result === 'shared') {
-        setFeedback({ kind: 'info', title: t('share.pick.sns') });
-      } else if (isMobileShare) {
-        setFeedback({ kind: 'info', title: t('share.saved.sns') });
-        if (url) setPreviewUrl(url);
-      } else {
-        setFeedback({ kind: 'info', title: t('share.pcHint') });
-        if (url) setPreviewUrl(url);
+      if (result !== 'shared') {
+        if (isMobileShare) {
+          setFeedback({ kind: 'info', title: t('share.saved.sns') });
+          if (url) setPreviewUrl(url);
+        } else {
+          setFeedback({ kind: 'info', title: t('share.pcHint') });
+          if (url) setPreviewUrl(url);
+        }
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -486,14 +488,6 @@ function DiaryDetailPage({
                     <small>{t('share.roomsDesc')}</small>
                   </span>
                 </button>
-                <button
-                  type="button"
-                  className="diary-detail__picker-cancel"
-                  disabled={sharing}
-                  onClick={() => closeShare()}
-                >
-                  {t('common.cancel')}
-                </button>
               </>
             ) : (
               <>
@@ -569,14 +563,6 @@ function DiaryDetailPage({
                 >
                   {sharing ? t('share.sharing') : t('share.submit')}
                 </button>
-                <button
-                  type="button"
-                  className="diary-detail__picker-cancel"
-                  disabled={sharing}
-                  onClick={() => closeShare()}
-                >
-                  {t('common.cancel')}
-                </button>
               </>
             )}
           </div>
@@ -584,7 +570,13 @@ function DiaryDetailPage({
       )}
 
       {bookOpen && (
-        <DiaryBookViewer entries={[entry]} onClose={() => setBookOpen(false)} />
+        <DiaryBookViewer
+          entries={[entry]}
+          rangeStart={entry.date}
+          rangeEnd={entry.date}
+          avatarUrl={avatarUrl}
+          onClose={() => setBookOpen(false)}
+        />
       )}
     </article>
   );

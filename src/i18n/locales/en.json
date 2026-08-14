@@ -38,7 +38,7 @@
     "character": "Character",
     "characterHint": "Me in AI drawings",
     "export": "Export",
-    "exportHint": "Period PDF · diary book",
+    "exportHint": "Pick a period · diary book",
     "decorate": "Decorate",
     "decorateHint": "Theme · emoji",
     "appInfo": "App info",
@@ -526,7 +526,7 @@
     "shareHint": "PDF is ready. Tap again to share or save.",
     "shareText": "PageBy diary book",
     "saving": "Preparing…",
-    "openBook": "View as diary book",
+    "openBook": "View diary book",
     "err": {
       "pdf": "PDF save failed"
     }

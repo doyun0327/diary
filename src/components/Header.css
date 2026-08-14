@@ -292,6 +292,12 @@
   color: var(--color-text);
 }
 
+.header-menu__hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
 .header-menu__item--toggle {
   cursor: pointer;
 }

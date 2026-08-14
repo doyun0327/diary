@@ -33,7 +33,7 @@
     "character": "角色",
     "characterHint": "AI 画里的我",
     "export": "导出",
-    "exportHint": "按日期 PDF · 日记本",
+    "exportHint": "选择期间查看日记本",
     "decorate": "装扮",
     "decorateHint": "主题 · 表情",
     "appInfo": "应用信息",
@@ -452,7 +452,7 @@
     "empty": "该期间没有日记",
     "pdf": "保存 PDF",
     "saving": "保存中…",
-    "openBook": "以日记本查看",
+    "openBook": "查看日记本",
     "err": {
       "pdf": "PDF 保存失败"
     }

@@ -33,7 +33,7 @@
     "character": "Personnage",
     "characterHint": "Moi dans les dessins IA",
     "export": "Exporter",
-    "exportHint": "PDF par période · carnet",
+    "exportHint": "Choisir une période · carnet",
     "decorate": "Décorer",
     "decorateHint": "Thème · emoji",
     "appInfo": "Infos de l'app",
@@ -452,7 +452,7 @@
     "empty": "Aucun journal sur cette période",
     "pdf": "Enregistrer PDF",
     "saving": "Enregistrement…",
-    "openBook": "Voir en carnet de journal",
+    "openBook": "Voir le carnet",
     "err": {
       "pdf": "Échec de l'enregistrement PDF"
     }

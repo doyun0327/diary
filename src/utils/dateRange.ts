@@ -49,19 +49,29 @@ export function filterEntriesByDateRange(
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/** PDF 파일명용 */
+export function monthStartYmd(year: number, monthIndex: number): string {
+  return toYmd(year, monthIndex + 1, 1);
+}
+
+export function monthEndYmd(year: number, monthIndex: number): string {
+  const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+  return toYmd(year, monthIndex + 1, lastDay);
+}
+
+export function yearMonthFromYmd(ymd: string): { year: number; month: number } {
+  return {
+    year: Number(ymd.slice(0, 4)),
+    month: Number(ymd.slice(5, 7)) - 1,
+  };
+}
+
+function ymdDigits(ymd: string): string {
+  return ymd.replace(/-/g, '');
+}
+
+/** PDF 파일명: pageByYYYYMMDD-YYYYMMDD.pdf */
 export function exportPdfFilename(start: string, end: string): string {
   const from = start <= end ? start : end;
   const to = start <= end ? end : start;
-  if (from.slice(0, 7) === to.slice(0, 7) && from.endsWith('-01')) {
-    const last = new Date(
-      Number(from.slice(0, 4)),
-      Number(from.slice(5, 7)),
-      0,
-    ).getDate();
-    if (to === `${from.slice(0, 8)}${pad(last)}`) {
-      return `diary_${from.slice(0, 7)}.pdf`;
-    }
-  }
-  return `diary_${from}_${to}.pdf`;
+  return `pageBy${ymdDigits(from)}-${ymdDigits(to)}.pdf`;
 }

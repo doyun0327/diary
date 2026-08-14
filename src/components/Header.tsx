@@ -121,7 +121,7 @@ function MenuItem({
 }: {
   icon: ReactNode;
   label: string;
-  hint: string;
+  hint?: string;
   tone?: 'peach' | 'mint' | 'lavender' | 'cream';
   onClick: () => void;
 }) {
@@ -135,7 +135,7 @@ function MenuItem({
         <span className="header-menu__icon">{icon}</span>
         <span className="header-menu__text">
           <span className="header-menu__label">{label}</span>
-          <span className="header-menu__hint">{hint}</span>
+          {hint ? <span className="header-menu__hint">{hint}</span> : null}
         </span>
       </button>
     </li>
@@ -152,7 +152,7 @@ function MenuToggleItem({
 }: {
   icon: ReactNode;
   label: string;
-  hint: string;
+  hint?: string;
   checked: boolean;
   tone?: 'peach' | 'mint' | 'lavender' | 'cream';
   onToggle: () => void;
@@ -169,7 +169,7 @@ function MenuToggleItem({
         <span className="header-menu__icon">{icon}</span>
         <span className="header-menu__text">
           <span className="header-menu__label">{label}</span>
-          <span className="header-menu__hint">{hint}</span>
+          {hint ? <span className="header-menu__hint">{hint}</span> : null}
         </span>
         <span className={`header-menu__switch${checked ? ' is-on' : ''}`} aria-hidden>
           <span className="header-menu__switch-knob" />
@@ -257,7 +257,6 @@ function Header({
               <MenuItem
                 icon={<IconGlobe />}
                 label={t('header.language')}
-                hint={t('header.languageHint')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenLanguage)}
               />
@@ -266,11 +265,6 @@ function Header({
               <MenuToggleItem
                 icon={<IconLock />}
                 label={t('header.screenLock')}
-                hint={
-                  screenLockEnabled
-                    ? t('header.screenLockHintOn')
-                    : t('header.screenLockHintOff')
-                }
                 checked={screenLockEnabled}
                 tone="lavender"
                 onToggle={() => closeAnd(onToggleScreenLock)}
@@ -280,7 +274,6 @@ function Header({
               <MenuItem
                 icon={<IconUsers />}
                 label={t('header.rooms')}
-                hint={t('header.roomsHint')}
                 tone="lavender"
                 onClick={() => closeAnd(onOpenRooms)}
               />
@@ -289,7 +282,6 @@ function Header({
               <MenuItem
                 icon={<IconPalette />}
                 label={t('header.decorate')}
-                hint={t('header.decorateHint')}
                 tone="peach"
                 onClick={() => closeAnd(onOpenDecorate)}
               />
@@ -298,7 +290,6 @@ function Header({
               <MenuItem
                 icon={<IconDownload />}
                 label={t('header.export')}
-                hint={t('header.exportHint')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenExport)}
               />
@@ -307,7 +298,6 @@ function Header({
               <MenuItem
                 icon={<IconInfo />}
                 label={t('header.appInfo')}
-                hint={t('header.appInfoHint')}
                 tone="cream"
                 onClick={() => closeAnd(onOpenAppInfo)}
               />
