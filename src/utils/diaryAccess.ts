@@ -2,8 +2,8 @@ export const FREE_ENTRY_GRANT = 5;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 3990;
 
-const STORAGE_KEY = 'picture-diary-access-v1';
-const ENTRIES_KEY = 'picture-diary-entries';
+const STORAGE_KEY = "picture-diary-access-v1";
+const ENTRIES_KEY = "picture-diary-entries";
 
 type AccessState = {
   adRewardBalance: number;
@@ -40,9 +40,11 @@ function loadAccessState(): AccessState {
     const parsed = JSON.parse(raw) as Partial<AccessState>;
     return {
       adRewardBalance: Number(parsed.adRewardBalance ?? 0),
-      premiumUntil: typeof parsed.premiumUntil === 'number' ? parsed.premiumUntil : null,
+      premiumUntil:
+        typeof parsed.premiumUntil === "number" ? parsed.premiumUntil : null,
       monthlyLimitUsed: Number(parsed.monthlyLimitUsed ?? 0),
-      monthKey: typeof parsed.monthKey === 'string' ? parsed.monthKey : getMonthKey(),
+      monthKey:
+        typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
     };
   } catch {
     return {
@@ -73,7 +75,9 @@ export function getStoredDiaryEntryCount() {
   }
 }
 
-export function getDiaryAccessState(entriesCount = getStoredDiaryEntryCount()): DiaryAccessStatus {
+export function getDiaryAccessState(
+  entriesCount = getStoredDiaryEntryCount(),
+): DiaryAccessStatus {
   const now = Date.now();
   const state = loadAccessState();
   const monthKey = getMonthKey(new Date(now));
@@ -84,7 +88,9 @@ export function getDiaryAccessState(entriesCount = getStoredDiaryEntryCount()): 
     saveAccessState(state);
   }
 
-  const isPremiumActive = Boolean(state.premiumUntil && state.premiumUntil > now);
+  const isPremiumActive = Boolean(
+    state.premiumUntil && state.premiumUntil > now,
+  );
 
   if (isPremiumActive) {
     const remaining = Math.max(0, MONTHLY_DIARY_LIMIT - state.monthlyLimitUsed);
@@ -96,13 +102,16 @@ export function getDiaryAccessState(entriesCount = getStoredDiaryEntryCount()): 
       monthlyRemaining: remaining,
       message:
         remaining > 0
-          ? '월 구독 플랜이 활성화되어 있어 추가 생성이 가능합니다.'
-          : '이번 달 50장 사용량을 모두 소진했습니다. 다음 달에 다시 이용할 수 있습니다.',
+          ? "월 구독 플랜이 활성화되어 있어 추가 생성이 가능합니다."
+          : "이번 달 50장 사용량을 모두 소진했습니다. 다음 달에 다시 이용할 수 있습니다.",
     };
   }
 
   const rewardBalance = Math.max(0, state.adRewardBalance);
-  const freeRemaining = Math.max(0, FREE_ENTRY_GRANT + rewardBalance - entriesCount);
+  const freeRemaining = Math.max(
+    0,
+    FREE_ENTRY_GRANT + rewardBalance - entriesCount,
+  );
 
   return {
     canCreate: freeRemaining > 0,
@@ -113,7 +122,7 @@ export function getDiaryAccessState(entriesCount = getStoredDiaryEntryCount()): 
     message:
       freeRemaining > 0
         ? `무료 생성 가능 횟수 ${freeRemaining}장 남았습니다.`
-        : '신규 5장 무료 혜택을 모두 사용했어요. 광고를 보고 1장을 무료로 받거나 월 구독을 이용해 주세요.',
+        : "신규 5장 무료 혜택을 모두 사용했어요. 광고를 보고 1장을 무료로 받거나 월 구독을 이용해 주세요.",
   };
 }
 
