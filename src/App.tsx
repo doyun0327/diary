@@ -81,6 +81,7 @@ function App() {
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const [writeLimitOpen, setWriteLimitOpen] = useState(false);
+  const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
 
   const accessStatus = getDiaryAccessState(entries.length);
 
@@ -246,7 +247,7 @@ function App() {
       return true;
     }
     if (page === "write") {
-      handleWriteCancel();
+      window.dispatchEvent(new Event("diary-write-cancel"));
       return true;
     }
     return false;
@@ -387,16 +388,45 @@ function App() {
   };
 
   useEffect(() => {
+    if (page !== "write") setWriteSaveEnabled(true);
+  }, [page]);
+
+  useEffect(() => {
     if (!isFlutterApp()) return;
+    const isWrite = page === "write";
+    const isRooms = page === "rooms";
     postDiaryNative({
       type: "headerState",
       visible: !needsProfileSetup && !needsAppIntro,
       showCalendar: page === "home",
+      showBack: isRooms || isWrite,
+      showSave: isWrite,
+      showMenu: !isWrite && !isRooms,
       year: calYear,
       month: calMonth,
-      label: formatYearMonth(calYear, calMonth),
+      label:
+        page === "home"
+          ? formatYearMonth(calYear, calMonth)
+          : isRooms
+            ? t("rooms.title")
+            : isWrite
+              ? editingId
+                ? t("write.title.edit")
+                : t("write.title.new")
+              : "",
+      saveLabel: editingId ? t("write.saveEdit") : t("write.save"),
+      saveEnabled: writeSaveEnabled,
     });
-  }, [page, calYear, calMonth, needsProfileSetup, needsAppIntro]);
+  }, [
+    page,
+    calYear,
+    calMonth,
+    needsProfileSetup,
+    needsAppIntro,
+    editingId,
+    writeSaveEnabled,
+    t,
+  ]);
 
   if (needsProfileSetup) {
     return (
@@ -446,6 +476,15 @@ function App() {
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
+        onNativeBack={() => {
+          if (page === "rooms") setPage("home");
+          if (page === "write") {
+            window.dispatchEvent(new Event("diary-write-cancel"));
+          }
+        }}
+        onNativeSave={() => {
+          window.dispatchEvent(new Event("diary-write-save"));
+        }}
         calendarNav={{
           year: calYear,
           month: calMonth,
@@ -479,6 +518,7 @@ function App() {
             onSave={handleSave}
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
+            onNativeSaveStateChange={setWriteSaveEnabled}
           />
         )}
         {page === "detail" && selectedEntry && (
@@ -542,14 +582,14 @@ function App() {
       {page === "home" && <WriteFab onClick={handleNewWrite} />}
       {writeLimitOpen && (
         <AppModal
-          title="그림일기 이용 제한"
+          title="?????? ??? ????"
           lead={
             accessStatus.isPremiumActive
-              ? `이번 달 ${accessStatus.monthlyRemaining}장 남았습니다.`
-              : "처음 5개는 무료로 제공되고, 이후에는 광고를 보고 1장 무료를 받거나 월 3,990원으로 50장 + 광고 제거를 이용할 수 있어요."
+              ? `??? ?? ${accessStatus.monthlyRemaining}?? ????????.`
+              : "??? 5???? ????? ???????, ??????? ?????? ???? 1?? ???? ???? ?? 3,990?????? 50?? + ???? ????? ????? ?? ????."
           }
           onDismiss={() => setWriteLimitOpen(false)}
-          primaryLabel="광고 보고 1장 무료 받기"
+          primaryLabel="???? ???? 1?? ???? ???"
           onPrimary={() => {
             watchAdForOneFreeEntry();
             setWriteLimitOpen(false);
@@ -557,7 +597,7 @@ function App() {
               handleNewWrite();
             }, 0);
           }}
-          secondaryLabel="월 3,990원 / 50장 + 광고 제거"
+          secondaryLabel="?? 3,990?? / 50?? + ???? ????"
           onSecondary={() => {
             buyMonthlyPlan();
             setWriteLimitOpen(false);
@@ -575,9 +615,9 @@ function App() {
               color: "#4b5563",
             }}
           >
-            <div>신규 사용자 무료 혜택: 5장</div>
-            <div>남은 무료 생성 수: {Math.max(0, accessStatus.remaining)}</div>
-            <div>포인트 보상: {accessStatus.rewardBalance}장</div>
+            <div>??? ????? ???? ????: 5??</div>
+            <div>???? ???? ???? ??: {Math.max(0, accessStatus.remaining)}</div>
+            <div>????? ????: {accessStatus.rewardBalance}??</div>
           </div>
         </AppModal>
       )}

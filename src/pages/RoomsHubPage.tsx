@@ -6,7 +6,7 @@ import { getAccessToken } from "../hooks/useAuthSession";
 import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
-import { shareViaNative } from "../utils/nativeShare";
+import { isFlutterApp, shareViaNative } from "../utils/nativeShare";
 import "./RoomsPages.css";
 
 interface RoomsHubPageProps {
@@ -252,18 +252,20 @@ function RoomsHubPage({
 
   return (
     <div className="rooms">
-      <div className="rooms__toolbar">
-        <button
-          type="button"
-          className="rooms__back"
-          onClick={onBack}
-          aria-label={t("common.back")}
-        >
-          <BackIcon />
-        </button>
-        <h2>{t("rooms.title")}</h2>
-        <span />
-      </div>
+      {!isFlutterApp() && (
+        <div className="rooms__toolbar">
+          <button
+            type="button"
+            className="rooms__back"
+            onClick={onBack}
+            aria-label={t("common.back")}
+          >
+            <BackIcon />
+          </button>
+          <h2>{t("rooms.title")}</h2>
+          <span />
+        </div>
+      )}
 
       {!shareReady ? (
         <div className="rooms__empty">

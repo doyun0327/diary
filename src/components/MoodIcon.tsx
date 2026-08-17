@@ -1,5 +1,5 @@
 import type { Mood } from '../types/diary';
-import { getMoodVisual, useMoodPackId } from '../utils/moodPack';
+import { getMoodVisual, MOOD_ICON_TRANSFORMS, useMoodPackId } from '../utils/moodPack';
 import './MoodIcon.css';
 
 interface MoodIconProps {
@@ -13,8 +13,13 @@ interface MoodIconProps {
 
 function MoodIcon({ mood, className = '', size, decorative = true, packId }: MoodIconProps) {
   const activePack = useMoodPackId();
-  const visual = getMoodVisual(mood, packId ?? activePack);
-  const style = size ? { width: size, height: size } : undefined;
+  const resolvedPack = packId ?? activePack;
+  const visual = getMoodVisual(mood, resolvedPack);
+  const transform = MOOD_ICON_TRANSFORMS[resolvedPack]?.[mood];
+  const style = {
+    ...(size ? { width: size, height: size } : {}),
+    ...(transform ? { transform } : {}),
+  };
 
   if (visual.icon) {
     return (
@@ -24,7 +29,7 @@ function MoodIcon({ mood, className = '', size, decorative = true, packId }: Moo
         alt={decorative ? '' : visual.label}
         aria-hidden={decorative || undefined}
         draggable={false}
-        style={style}
+        style={Object.keys(style).length > 0 ? style : undefined}
       />
     );
   }
@@ -32,7 +37,7 @@ function MoodIcon({ mood, className = '', size, decorative = true, packId }: Moo
   return (
     <span
       className={`mood-icon mood-icon--emoji ${className}`.trim()}
-      style={style}
+      style={Object.keys(style).length > 0 ? style : undefined}
       aria-hidden={decorative || undefined}
     >
       {visual.emoji}

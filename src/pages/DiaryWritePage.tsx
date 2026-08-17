@@ -26,6 +26,7 @@ import {
   saveWriteDraft,
   writeDraftHasContent,
 } from '../utils/writeDraft';
+import { isFlutterApp } from '../utils/nativeShare';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -50,6 +51,8 @@ interface DiaryWritePageProps {
   onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onOpenCharacter: () => void;
+  /** Flutter AppBar 저장 버튼 활성 상태 */
+  onNativeSaveStateChange?: (enabled: boolean) => void;
 }
 
 function DiaryWritePage({
@@ -58,6 +61,7 @@ function DiaryWritePage({
   onSave,
   onCancel,
   onOpenCharacter,
+  onNativeSaveStateChange,
 }: DiaryWritePageProps) {
   const { t } = useTranslation();
   const isEdit = Boolean(initialEntry);
@@ -83,7 +87,18 @@ function DiaryWritePage({
     return null;
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const imageLoadedRef = useRef(false);
+
+  useEffect(() => {
+    onNativeSaveStateChange?.(!aiLoading);
+  }, [aiLoading, onNativeSaveStateChange]);
+
+  useEffect(() => {
+    const onNativeSave = () => formRef.current?.requestSubmit();
+    window.addEventListener('diary-write-save', onNativeSave);
+    return () => window.removeEventListener('diary-write-save', onNativeSave);
+  }, []);
 
   useEffect(() => {
     if (isEdit) {
@@ -160,6 +175,15 @@ function DiaryWritePage({
     onCancel();
   };
 
+  const handleCancelRef = useRef(handleCancel);
+  handleCancelRef.current = handleCancel;
+
+  useEffect(() => {
+    const onNativeCancel = () => handleCancelRef.current();
+    window.addEventListener('diary-write-cancel', onNativeCancel);
+    return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
+  }, []);
+
   const handleAiDraw = async () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
@@ -218,20 +242,22 @@ function DiaryWritePage({
   const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
 
   return (
-    <form className="diary-write" onSubmit={handleSubmit}>
-      <nav className="diary-write__nav">
-        <button type="button" className="diary-write__nav-btn" onClick={handleCancel}>
-          {t('write.cancel')}
-        </button>
-        <span className="diary-write__nav-title">{isEdit ? t('write.title.edit') : t('write.title.new')}</span>
-        <button
-          type="submit"
-          className="diary-write__nav-btn diary-write__nav-btn--save"
-          disabled={aiLoading}
-        >
-          {isEdit ? t('write.saveEdit') : t('write.save')}
-        </button>
-      </nav>
+    <form ref={formRef} className="diary-write" onSubmit={handleSubmit}>
+      {!isFlutterApp() && (
+        <nav className="diary-write__nav">
+          <button type="button" className="diary-write__nav-btn" onClick={handleCancel}>
+            {t('write.cancel')}
+          </button>
+          <span className="diary-write__nav-title">{isEdit ? t('write.title.edit') : t('write.title.new')}</span>
+          <button
+            type="submit"
+            className="diary-write__nav-btn diary-write__nav-btn--save"
+            disabled={aiLoading}
+          >
+            {isEdit ? t('write.saveEdit') : t('write.save')}
+          </button>
+        </nav>
+      )}
 
       <div
         className="diary-write__paper"

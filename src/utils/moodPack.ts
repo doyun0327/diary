@@ -7,6 +7,15 @@ export type MoodPackId = 'classic' | 'smileys' | 'cat' | 'dog' | 'love' | 'ghost
 export const MOOD_PACK_STORAGE_KEY = 'picture-diary-mood-pack';
 export const MOOD_PACK_CHANGE_EVENT = 'mood-pack-change';
 
+/** 팩별 아이콘 보정 — 원본 GIF/PNG 기울어짐 */
+export const MOOD_ICON_TRANSFORMS: Partial<
+  Record<MoodPackId, Partial<Record<Mood, string>>>
+> = {
+  smileys: {
+    happy: 'rotate(-45deg)',
+  },
+};
+
 /** Magnific · Flat Emoji pack (emoji-6) — 정적 PNG */
 const CLASSIC_ICONS: Record<Mood, string> = {
   happy: '/moods/classic/happy.png',

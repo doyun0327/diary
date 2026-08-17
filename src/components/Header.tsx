@@ -23,8 +23,11 @@ interface HeaderProps {
     onNext: () => void;
     onSelectMonth: (year: number, month: number) => void;
   } | null;
-  /** Flutter AppBar ?‚¬?š© ?‹œ ?›¹ ?ƒ?‹¨ ë°”ë§Œ ?ˆ¨ê¸°ê³  ë©”ë‰´?Š” ?œ ì§? */
+  /** Flutter AppBar ?????? ??? ??? ?????? ?? ????? ????? ????? */
   hideBar?: boolean;
+  /** Flutter AppBar ???? */
+  onNativeBack?: () => void;
+  onNativeSave?: () => void;
 }
 
 function CrayonSvg({ children }: { children: ReactNode }) {
@@ -232,6 +235,8 @@ function Header({
   onOpenAppInfo,
   calendarNav = null,
   hideBar: _hideBar = false,
+  onNativeBack,
+  onNativeSave,
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -262,6 +267,16 @@ function Header({
         setMenuOpen((open) => !open);
       }
       if (action === 'closeMenu') setMenuOpen(false);
+      if (action === 'back') {
+        setMenuOpen(false);
+        setMonthPickerOpen(false);
+        onNativeBack?.();
+      }
+      if (action === 'save') {
+        setMenuOpen(false);
+        setMonthPickerOpen(false);
+        onNativeSave?.();
+      }
       if (action === 'prevMonth') {
         setMonthPickerOpen(false);
         calendarNav?.onPrev();
@@ -285,7 +300,7 @@ function Header({
     return () => {
       delete window.diaryHeaderAction;
     };
-  }, [calendarNav]);
+  }, [calendarNav, onNativeBack, onNativeSave]);
 
   const closeAnd = (fn?: () => void) => {
     setMenuOpen(false);
@@ -396,7 +411,7 @@ function Header({
       />
     ) : null;
 
-  // ?›¹ ?ƒ?‹¨ ë°”ëŠ” Flutter AppBarë¡? ?´?™. ë©”ë‰´/?›” ?„ ?ƒë§? ?›¹?—?„œ ?œ ì§?.
+  // ??? ?????? ?? Flutter AppBar?? ??????. ??/??? ???????? ????????? ?????.
   return (
     <>
       {picker}
