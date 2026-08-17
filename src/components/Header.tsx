@@ -23,7 +23,7 @@ interface HeaderProps {
     onNext: () => void;
     onSelectMonth: (year: number, month: number) => void;
   } | null;
-  /** Flutter AppBar ì‚¬ìš© ì‹œ ì›¹ ìƒë‹¨ ë°”ë§Œ ìˆ¨ê¸°ê³  ë©”ë‰´ëŠ” ìœ ì§€ */
+  /** Flutter AppBar ?‚¬?š© ?‹œ ?›¹ ?ƒ?‹¨ ë°”ë§Œ ?ˆ¨ê¸°ê³  ë©”ë‰´?Š” ?œ ì§? */
   hideBar?: boolean;
 }
 
@@ -31,8 +31,8 @@ function CrayonSvg({ children }: { children: ReactNode }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden
@@ -70,22 +70,9 @@ function IconUser() {
 function IconGlobe() {
   return (
     <CrayonSvg>
-      <text
-        x="12"
-        y="16.8"
-        textAnchor="middle"
-        fill="currentColor"
-        fontFamily="Gaegu, Hi Melody, cursive"
-        fontSize="14"
-        fontWeight="800"
-        stroke="currentColor"
-        strokeWidth="0.45"
-        strokeLinejoin="round"
-        paintOrder="stroke fill"
-        letterSpacing="0.15"
-      >
-        ABC
-      </text>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6" fill="none" />
+      <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </CrayonSvg>
   );
 }
@@ -93,25 +80,8 @@ function IconGlobe() {
 function IconLock() {
   return (
     <CrayonSvg>
-      <path
-        d="M8.1 10.6V8.4c.1-2.1 1.6-3.9 3.8-4 2.3-.1 4.1 1.6 4.2 3.8v2.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.2 11.2c-.2-.2 0-1 1.1-1.2h9.2c1.2.1 1.6.9 1.5 1.8l-.5 7.1c-.1 1.2-.9 1.9-2.1 2H8.4c-1.3.1-2.1-.7-2.2-2l-.1-7.7Z"
-        fill="currentColor"
-        fillOpacity="0.12"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 14.1c.7 0 1.2.6 1.1 1.2 0 .4-.2.7-.5.9v1.2c0 .3-.3.5-.6.5s-.6-.2-.6-.5v-1.2c-.3-.2-.5-.5-.5-.9.1-.6.6-1.2 1.1-1.2Z"
-        fill="currentColor"
-      />
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="1.6" fill="none" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </CrayonSvg>
   );
 }
@@ -119,38 +89,10 @@ function IconLock() {
 function IconUsers() {
   return (
     <CrayonSvg>
-      <ellipse cx="7.2" cy="7.3" rx="2.9" ry="3" fill="currentColor" fillOpacity="0.12" />
-      <path
-        d="M4.5 7.4c.2-1.7 1.4-3 2.9-3.1 1.6-.1 2.9 1.1 3 2.8.1 1.7-1.1 3.1-2.8 3.2-1.6.1-3.1-1.2-3.1-2.9Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M3.6 19.5c-.2-3.2 1-5.5 3.8-5.7 2.7-.2 4.2 1.9 4.2 5.1 0 .7-.4 1.1-1.1 1.2H4.6c-.7 0-1-.4-1-.6Z"
-        fill="currentColor"
-        fillOpacity="0.12"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <ellipse cx="16.8" cy="7.3" rx="2.9" ry="3" fill="currentColor" fillOpacity="0.12" />
-      <path
-        d="M14.1 7.4c.2-1.7 1.4-3 2.9-3.1 1.6-.1 2.9 1.1 3 2.8.1 1.7-1.1 3.1-2.8 3.2-1.6.1-3.1-1.2-3.1-2.9Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M13.2 19.5c-.2-3.2 1-5.5 3.8-5.7 2.7-.2 4.2 1.9 4.2 5.1 0 .7-.4 1.1-1.1 1.2h-5.8c-.7 0-1.1-.4-1.1-.6Z"
-        fill="currentColor"
-        fillOpacity="0.12"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.6" fill="none" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </CrayonSvg>
   );
 }
@@ -158,32 +100,12 @@ function IconUsers() {
 function IconPalette() {
   return (
     <CrayonSvg>
-      <path
-        d="M8.2 16.6c-2.2.1-3.8-1.5-3.7-3.5.1-1.9 1.8-3.3 3.8-3.2 2 .1 3.4 1.8 3.3 3.6-.1 1.9-1.6 3-3.4 3.1Z"
-        fill="currentColor"
-        fillOpacity="0.16"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M15.8 16.4c-2.1.2-3.6-1.3-3.6-3.3 0-1.9 1.6-3.5 3.6-3.5 2.1 0 3.6 1.6 3.6 3.5 0 2-1.5 3.2-3.6 3.3Z"
-        fill="currentColor"
-        fillOpacity="0.28"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M12 10.6c-2.2.1-3.7-1.5-3.6-3.4.1-2 1.8-3.5 3.8-3.5 2.1 0 3.6 1.6 3.5 3.6-.1 1.9-1.6 3.2-3.7 3.3Z"
-        fill="currentColor"
-        fillOpacity="0.4"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <circle cx="10.8" cy="6.6" r="0.7" fill="currentColor" fillOpacity="0.55" />
-      <circle cx="14.4" cy="12.2" r="0.55" fill="currentColor" fillOpacity="0.45" />
+      <g transform="translate(1.2 1.2) scale(0.85)">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6" fill="none" />
+        <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="9" y1="9" x2="9.01" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="15" y1="9" x2="15.01" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
     </CrayonSvg>
   );
 }
@@ -191,21 +113,11 @@ function IconPalette() {
 function IconDownload() {
   return (
     <CrayonSvg>
-      <path
-        d="M4.6 13.2c-.6-.2-.6-1.2.1-1.6L18.8 4.4c.8-.4 1.6.4 1.3 1.2l-4.8 14.2c-.3.8-1.4.9-1.8.1l-2.6-5.2-6.3-1.5Z"
-        fill="currentColor"
-        fillOpacity="0.12"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11.2 13.1 19.4 5.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.6" />
+      <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.6" />
+      <polyline points="10 9 9 9 8 9" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
     </CrayonSvg>
   );
 }
@@ -213,15 +125,11 @@ function IconDownload() {
 function IconInfo() {
   return (
     <CrayonSvg>
-      <path
-        d="M12.1 3.4c.6-.2 1.3.2 1.5.8l1.6 4.8 5.1.3c.7 0 1.1.8.7 1.3l-3.8 3.5 1.2 5c.2.6-.5 1.2-1.1.9L12 17.6 7.7 20c-.6.3-1.3-.3-1.1-.9l1.2-5-3.8-3.5c-.4-.5 0-1.3.7-1.3l5.1-.3 1.6-4.8c.2-.6.9-1 1.5-.8Z"
-        fill="currentColor"
-        fillOpacity="0.12"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+      <g transform="translate(1.2 1.2) scale(0.85)">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6" fill="none" />
+        <line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
     </CrayonSvg>
   );
 }
@@ -488,7 +396,7 @@ function Header({
       />
     ) : null;
 
-  // ì›¹ ìƒë‹¨ ë°”ëŠ” Flutter AppBarë¡œ ì´ë™. ë©”ë‰´/ì›” ì„ íƒë§Œ ì›¹ì—ì„œ ìœ ì§€.
+  // ?›¹ ?ƒ?‹¨ ë°”ëŠ” Flutter AppBarë¡? ?´?™. ë©”ë‰´/?›” ?„ ?ƒë§? ?›¹?—?„œ ?œ ì§?.
   return (
     <>
       {picker}
