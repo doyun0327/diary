@@ -418,9 +418,10 @@
       "girl": "Nữ"
     },
     "hair": {
-      "short": "Tóc ngắn",
-      "medium": "Bob",
-      "curly": "Tóc xoăn"
+      "short": "Tóc nam",
+      "medium": "Tóc ngắn nữ",
+      "curly": "Tóc uốn nữ",
+      "bald": "Hói"
     },
     "outfit": {
       "short-sleeve": "Áo ngắn tay",

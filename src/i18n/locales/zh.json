@@ -418,9 +418,10 @@
       "girl": "女孩"
     },
     "hair": {
-      "short": "短发",
-      "medium": "齐肩",
-      "curly": "卷发"
+      "short": "男士发型",
+      "medium": "女士短发",
+      "curly": "女士烫发",
+      "bald": "光头"
     },
     "outfit": {
       "short-sleeve": "短袖",

@@ -418,9 +418,10 @@
       "girl": "Chica"
     },
     "hair": {
-      "short": "Pelo corto",
-      "medium": "Bob",
-      "curly": "Rizado"
+      "short": "Pelo masculino",
+      "medium": "Bob femenino",
+      "curly": "Permanente femenino",
+      "bald": "Calvo"
     },
     "outfit": {
       "short-sleeve": "Manga corta",

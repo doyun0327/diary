@@ -488,9 +488,10 @@
       "girl": "여자아이"
     },
     "hair": {
-      "short": "짧은 머리",
-      "medium": "단발",
-      "curly": "뽀글머리"
+      "short": "남자머리",
+      "medium": "여자머리 단발",
+      "curly": "여자머리 파마",
+      "bald": "대머리"
     },
     "outfit": {
       "short-sleeve": "반팔",

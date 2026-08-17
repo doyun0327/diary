@@ -9,7 +9,7 @@ import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
-import { HairStyleIcon } from '../components/CharacterIcons';
+import { HAIR_STYLE_OPTIONS } from '../types/character';
 import { generateDiaryImage } from '../api/aiImage';
 import { formatDate, today } from '../utils/date';
 import { findFont, getPreferredFontId } from '../utils/fonts';
@@ -84,7 +84,6 @@ function DiaryWritePage({
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const imageLoadedRef = useRef(false);
-  const draftImageUrl = draft?.imageUrl;
 
   useEffect(() => {
     if (isEdit) {
@@ -134,27 +133,20 @@ function DiaryWritePage({
   }, []);
 
   useEffect(() => {
-    const src = initialEntry?.imageUrl || draftImageUrl;
+    const src = initialEntry?.imageUrl;
     if (!src || imageLoadedRef.current) return;
     imageLoadedRef.current = true;
     void canvasRef.current?.loadImage(src);
-  }, [initialEntry?.imageUrl, draftImageUrl]);
+  }, [initialEntry?.imageUrl]);
 
   const persistDraftIfNeeded = () => {
     if (isEdit) return;
-    let imageUrl: string | undefined;
-    try {
-      imageUrl = canvasRef.current?.toDataURL();
-    } catch {
-      imageUrl = draftImageUrl;
-    }
     const next = {
       date,
       title,
       content,
       mood,
       fontId,
-      imageUrl,
     };
     if (writeDraftHasContent(next)) {
       saveWriteDraft(next);
@@ -334,7 +326,9 @@ function DiaryWritePage({
                       aria-label={t('write.ai.characterAria')}
                       title={t('write.ai.characterTitle')}
                     >
-                      <HairStyleIcon style={character.hairStyle} />
+                      <span className="diary-write__ai-char-emoji" aria-hidden>
+                        {HAIR_STYLE_OPTIONS.find((o) => o.value === character.hairStyle)?.emoji ?? '👤'}
+                      </span>
                     </button>
                     {coach === 'character' && (
                       <div className="diary-write__coach" role="status">

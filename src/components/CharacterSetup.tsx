@@ -7,7 +7,6 @@ import {
   type CharacterProfile,
 } from '../types/character';
 import { markCharacterSetupDone } from '../utils/onboarding';
-import { HairStyleIcon } from './CharacterIcons';
 import './CharacterSetup.css';
 
 interface CharacterSetupProps {
@@ -67,19 +66,19 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
 
         <section>
           <h3>{t('character.hairLabel')}</h3>
-          <div className="character-setup__visual-grid">
+          <div className="character-setup__emoji-row character-setup__emoji-row--wrap">
             {HAIR_STYLE_OPTIONS.map((opt) => {
               const label = t(`character.hair.${opt.value}`);
               return (
                 <button
                   key={opt.value}
                   type="button"
-                  className={`character-setup__visual ${character.hairStyle === opt.value ? 'selected' : ''}`}
+                  className={`character-setup__emoji-btn ${character.hairStyle === opt.value ? 'selected' : ''}`}
                   onClick={() => onChange({ ...character, hairStyle: opt.value })}
                   aria-label={label}
                   title={label}
                 >
-                  <HairStyleIcon style={opt.value} />
+                  <span className="character-setup__emoji">{opt.emoji}</span>
                 </button>
               );
             })}

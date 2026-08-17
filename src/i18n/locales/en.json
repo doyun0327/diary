@@ -488,9 +488,10 @@
       "girl": "Girl"
     },
     "hair": {
-      "short": "Short hair",
-      "medium": "Bob",
-      "curly": "Curly hair"
+      "short": "Men's hair",
+      "medium": "Women's bob",
+      "curly": "Women's perm",
+      "bald": "Bald"
     },
     "outfit": {
       "short-sleeve": "Short sleeves",

@@ -418,9 +418,10 @@
       "girl": "女の子"
     },
     "hair": {
-      "short": "ショート",
-      "medium": "ボブ",
-      "curly": "カーリー"
+      "short": "男性の髪",
+      "medium": "女性ボブ",
+      "curly": "女性パーマ",
+      "bald": "ハゲ"
     },
     "outfit": {
       "short-sleeve": "半袖",

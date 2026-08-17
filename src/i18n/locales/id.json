@@ -418,9 +418,10 @@
       "girl": "Anak perempuan"
     },
     "hair": {
-      "short": "Rambut pendek",
-      "medium": "Bob",
-      "curly": "Rambut keriting"
+      "short": "Rambut pria",
+      "medium": "Bob wanita",
+      "curly": "Perm wanita",
+      "bald": "Botak"
     },
     "outfit": {
       "short-sleeve": "Lengan pendek",

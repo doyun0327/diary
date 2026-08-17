@@ -418,9 +418,10 @@
       "girl": "Menina"
     },
     "hair": {
-      "short": "Cabelo curto",
-      "medium": "Chanel",
-      "curly": "Cabelo cacheado"
+      "short": "Cabelo masculino",
+      "medium": "Chanel feminino",
+      "curly": "Permanente feminino",
+      "bald": "Careca"
     },
     "outfit": {
       "short-sleeve": "Manga curta",

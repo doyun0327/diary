@@ -418,9 +418,10 @@
       "girl": "Fille"
     },
     "hair": {
-      "short": "Cheveux courts",
-      "medium": "Bob",
-      "curly": "Cheveux bouclés"
+      "short": "Cheveux homme",
+      "medium": "Carré femme",
+      "curly": "Permanente femme",
+      "bald": "Chauve"
     },
     "outfit": {
       "short-sleeve": "Manches courtes",
