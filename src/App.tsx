@@ -666,7 +666,7 @@ function App() {
           />,
           document.getElementById("root") ?? document.body,
         )}
-      {page === "home" && !screenLock.locked && (
+      {page === "home" && screenLock.locked && (
         <ScreenLockGate
           onUnlock={async (password) => screenLock.unlock(password)}
         />
