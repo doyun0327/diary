@@ -12,6 +12,7 @@
     "deploy:preview": "npm run build && wrangler versions upload"
   },
   "dependencies": {
+    "@rolldown/binding-win32-x64-msvc": "^1.2.4",
     "i18next": "^26.3.6",
     "jspdf": "^4.2.1",
     "lottie-react": "^2.4.1",

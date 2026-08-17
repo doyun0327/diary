@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { RoomSummary } from '../types/room';
-import * as roomsApi from '../api/roomsApi';
-import { getAccessToken } from '../hooks/useAuthSession';
-import BackIcon from '../components/BackIcon';
-import CloseIcon from '../components/CloseIcon';
-import AppModal from '../components/AppModal';
-import { shareViaNative } from '../utils/nativeShare';
-import './RoomsPages.css';
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { RoomSummary } from "../types/room";
+import * as roomsApi from "../api/roomsApi";
+import { getAccessToken } from "../hooks/useAuthSession";
+import BackIcon from "../components/BackIcon";
+import CloseIcon from "../components/CloseIcon";
+import AppModal from "../components/AppModal";
+import { shareViaNative } from "../utils/nativeShare";
+import "./RoomsPages.css";
 
 interface RoomsHubPageProps {
   nickname: string;
@@ -19,7 +19,7 @@ interface RoomsHubPageProps {
   onBack: () => void;
 }
 
-type SheetKind = 'create' | 'join' | null;
+type SheetKind = "create" | "join" | null;
 
 function canShare(nickname: string, avatarUrl: string | null) {
   return Boolean(nickname.trim() && avatarUrl);
@@ -30,20 +30,20 @@ async function copyText(text: string) {
     await navigator.clipboard.writeText(text);
     return;
   } catch {
-    // WebView/권한 없을 때 폴백
+    // WebView/권한 ?��?�� ?�� ?���?
   }
-  const el = document.createElement('textarea');
+  const el = document.createElement("textarea");
   el.value = text;
-  el.setAttribute('readonly', '');
-  el.style.position = 'fixed';
-  el.style.left = '-9999px';
+  el.setAttribute("readonly", "");
+  el.style.position = "fixed";
+  el.style.left = "-9999px";
   document.body.appendChild(el);
   el.select();
   el.setSelectionRange(0, text.length);
-  const ok = document.execCommand('copy');
+  const ok = document.execCommand("copy");
   document.body.removeChild(el);
   if (!ok) {
-    throw new Error('copy failed');
+    throw new Error("copy failed");
   }
 }
 
@@ -61,14 +61,17 @@ function RoomsHubPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetKind>(null);
-  const [roomName, setRoomName] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+  const [roomName, setRoomName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [busy, setBusy] = useState(false);
-  const [createdRoom, setCreatedRoom] = useState<{ id: string; inviteCode: string } | null>(null);
+  const [createdRoom, setCreatedRoom] = useState<{
+    id: string;
+    inviteCode: string;
+  } | null>(null);
   const [roomAction, setRoomAction] = useState<{
     id: string;
     name: string;
-    kind: 'leave' | 'delete';
+    kind: "leave" | "delete";
   } | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
 
@@ -76,13 +79,13 @@ function RoomsHubPage({
 
   const ensureAuth = async () => {
     if (!shareReady) {
-      throw new Error(t('rooms.err.needProfile'));
+      throw new Error(t("rooms.err.needProfile"));
     }
     if (getAccessToken()) return;
     try {
       await ensureGuestSession(clientId, nickname.trim());
     } catch {
-      throw new Error(t('rooms.err.guestAuth'));
+      throw new Error(t("rooms.err.guestAuth"));
     }
   };
 
@@ -98,7 +101,7 @@ function RoomsHubPage({
       const list = await roomsApi.listRooms();
       setRooms(list);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('rooms.err.list'));
+      setError(err instanceof Error ? err.message : t("rooms.err.list"));
       setRooms([]);
     } finally {
       setLoading(false);
@@ -107,13 +110,13 @@ function RoomsHubPage({
 
   useEffect(() => {
     void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 프로필 준비될 때 다시 로드
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ?��로필 �?비될 ?�� ?��?�� 로드
   }, [shareReady, nickname, clientId]);
 
   const openSheet = (kind: Exclude<SheetKind, null>) => {
     setError(null);
     if (!shareReady) {
-      setError(t('rooms.err.needProfile'));
+      setError(t("rooms.err.needProfile"));
       return;
     }
     setSheet(kind);
@@ -129,7 +132,7 @@ function RoomsHubPage({
     if (!shareReady || busy) return;
     const name = roomName.trim();
     if (!name) {
-      setError(t('rooms.err.nameRequired'));
+      setError(t("rooms.err.nameRequired"));
       return;
     }
     setBusy(true);
@@ -137,53 +140,53 @@ function RoomsHubPage({
     try {
       await ensureAuth();
       const room = await roomsApi.createRoom(name, nickname.trim(), avatarUrl);
-      setRoomName('');
+      setRoomName("");
       setSheet(null);
       setCreatedRoom({ id: room.id, inviteCode: room.inviteCode });
       await refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('rooms.err.create'));
+      setError(err instanceof Error ? err.message : t("rooms.err.create"));
     } finally {
       setBusy(false);
     }
   };
 
   const shareInviteCode = async (code: string) => {
-    const text = t('rooms.alert.shareText', { code });
+    const text = t("rooms.alert.shareText", { code });
     const installUrl =
       (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
       window.location.origin;
 
     const nativeOk = await shareViaNative({
-      title: t('rooms.alert.shareTitle'),
-      text: `${text}\n${code}`,
+      title: t("rooms.alert.shareTitle"),
+      text,
       url: installUrl,
     });
     if (nativeOk) return;
 
     try {
-      await copyText(code);
+      await copyText(text);
     } catch {
-      // 클립보드 실패해도 공유는 진행
+      // ?��립보?�� ?��?��?��?�� 공유?�� 진행
     }
 
     try {
-      if (typeof navigator.share === 'function') {
+      if (typeof navigator.share === "function") {
         await navigator.share({
-          title: t('rooms.alert.shareTitle'),
+          title: t("rooms.alert.shareTitle"),
           text,
           url: installUrl,
         });
         return;
       }
     } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (err instanceof DOMException && err.name === "AbortError") return;
     }
 
     try {
-      await copyText(`${text}\n\n${installUrl}\n${code}`);
+      await copyText(`${text}\n\n${installUrl}`);
     } catch {
-      setError(t('rooms.err.copy'));
+      setError(t("rooms.err.copy"));
     }
   };
 
@@ -198,9 +201,9 @@ function RoomsHubPage({
 
   const handleJoin = async () => {
     if (!shareReady || busy) return;
-    const code = inviteCode.replace(/\D/g, '').slice(0, 6);
+    const code = inviteCode.replace(/\D/g, "").slice(0, 6);
     if (code.length !== 6) {
-      setError(t('rooms.err.codeRequired'));
+      setError(t("rooms.err.codeRequired"));
       return;
     }
     setBusy(true);
@@ -208,12 +211,12 @@ function RoomsHubPage({
     try {
       await ensureAuth();
       const room = await roomsApi.joinRoom(code, nickname.trim(), avatarUrl);
-      setInviteCode('');
+      setInviteCode("");
       setSheet(null);
       await refresh();
       onOpenRoom(room.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('rooms.err.join'));
+      setError(err instanceof Error ? err.message : t("rooms.err.join"));
     } finally {
       setBusy(false);
     }
@@ -225,7 +228,7 @@ function RoomsHubPage({
     setError(null);
     try {
       await ensureAuth();
-      if (roomAction.kind === 'delete') {
+      if (roomAction.kind === "delete") {
         await roomsApi.deleteRoom(roomAction.id);
       } else {
         await roomsApi.leaveRoom(roomAction.id);
@@ -236,7 +239,11 @@ function RoomsHubPage({
       setError(
         err instanceof Error
           ? err.message
-          : t(roomAction.kind === 'delete' ? 'rooms.err.deleteRoom' : 'rooms.err.leave'),
+          : t(
+              roomAction.kind === "delete"
+                ? "rooms.err.deleteRoom"
+                : "rooms.err.leave",
+            ),
       );
     } finally {
       setActionBusy(false);
@@ -250,39 +257,51 @@ function RoomsHubPage({
           type="button"
           className="rooms__back"
           onClick={onBack}
-          aria-label={t('common.back')}
+          aria-label={t("common.back")}
         >
           <BackIcon />
         </button>
-        <h2>{t('rooms.title')}</h2>
+        <h2>{t("rooms.title")}</h2>
         <span />
       </div>
 
       {!shareReady ? (
         <div className="rooms__empty">
-          <p>{t('rooms.err.needProfile')}</p>
-          <button type="button" className="rooms__btn primary" onClick={onOpenAccount}>
-            {t('account.title')}
+          <p>{t("rooms.err.needProfile")}</p>
+          <button
+            type="button"
+            className="rooms__btn primary"
+            onClick={onOpenAccount}
+          >
+            {t("account.title")}
           </button>
         </div>
       ) : (
         <>
           <div className="rooms__actions">
-            <button type="button" className="rooms__btn" onClick={() => openSheet('join')}>
-              {t('rooms.joinWithCode')}
+            <button
+              type="button"
+              className="rooms__btn"
+              onClick={() => openSheet("join")}
+            >
+              {t("rooms.joinWithCode")}
             </button>
-            <button type="button" className="rooms__btn primary" onClick={() => openSheet('create')}>
-              {t('rooms.create')}
+            <button
+              type="button"
+              className="rooms__btn primary"
+              onClick={() => openSheet("create")}
+            >
+              {t("rooms.create")}
             </button>
           </div>
 
           {!sheet && error && <p className="rooms__error">{error}</p>}
 
-          {loading && <p className="rooms__muted">{t('common.loading')}</p>}
+          {loading && <p className="rooms__muted">{t("common.loading")}</p>}
 
           {!loading && rooms.length === 0 && (
             <div className="rooms__empty">
-              <p>{t('rooms.empty')}</p>
+              <p>{t("rooms.empty")}</p>
             </div>
           )}
 
@@ -299,29 +318,33 @@ function RoomsHubPage({
                 <div className="rooms__room-meta">
                   <span className="rooms__room-meta-left">
                     {room.memberCount != null
-                      ? t('rooms.memberCount', { n: room.memberCount })
-                      : t('rooms.roomFallback')}
+                      ? t("rooms.memberCount", { n: room.memberCount })
+                      : t("rooms.roomFallback")}
                     <span className="rooms__meta-sep" aria-hidden>
                       ·
                     </span>
                     <button
                       type="button"
                       className="rooms__invite-quiet"
-                      title={t('rooms.copyInviteTitle')}
-                      aria-label={t('rooms.copyInviteAria')}
+                      title={t("rooms.copyInviteTitle")}
+                      aria-label={t("rooms.copyInviteAria")}
                       onClick={() => void shareInviteCode(room.inviteCode)}
                     >
-                      {t('rooms.copyInvite')}
+                      {t("rooms.copyInvite")}
                     </button>
                   </span>
                   {room.owner ? (
                     <button
                       type="button"
                       className="rooms__leave-btn rooms__leave-btn--danger"
-                      aria-label={t('rooms.deleteAria')}
-                      title={t('rooms.delete')}
+                      aria-label={t("rooms.deleteAria")}
+                      title={t("rooms.delete")}
                       onClick={() =>
-                        setRoomAction({ id: room.id, name: room.name, kind: 'delete' })
+                        setRoomAction({
+                          id: room.id,
+                          name: room.name,
+                          kind: "delete",
+                        })
                       }
                     >
                       <svg
@@ -345,10 +368,14 @@ function RoomsHubPage({
                     <button
                       type="button"
                       className="rooms__leave-btn"
-                      aria-label={t('rooms.leaveAria')}
-                      title={t('rooms.leave')}
+                      aria-label={t("rooms.leaveAria")}
+                      title={t("rooms.leave")}
                       onClick={() =>
-                        setRoomAction({ id: room.id, name: room.name, kind: 'leave' })
+                        setRoomAction({
+                          id: room.id,
+                          name: room.name,
+                          kind: "leave",
+                        })
                       }
                     >
                       <svg
@@ -375,18 +402,22 @@ function RoomsHubPage({
         </>
       )}
 
-      {sheet === 'create' && (
-        <div className="rooms-sheet" role="dialog" aria-label={t('rooms.createSheetAria')}>
+      {sheet === "create" && (
+        <div
+          className="rooms-sheet"
+          role="dialog"
+          aria-label={t("rooms.createSheetAria")}
+        >
           <div className="rooms-sheet__backdrop" onClick={closeSheet} />
           <div className="rooms-sheet__panel">
             <header className="rooms-sheet__head">
-              <h3>{t('rooms.create')}</h3>
+              <h3>{t("rooms.create")}</h3>
               <button
                 type="button"
                 className="sheet-close-btn"
                 onClick={closeSheet}
                 disabled={busy}
-                aria-label={t('common.close')}
+                aria-label={t("common.close")}
               >
                 <CloseIcon />
               </button>
@@ -396,7 +427,7 @@ function RoomsHubPage({
                 type="text"
                 value={roomName}
                 maxLength={30}
-                placeholder={t('rooms.roomNamePlaceholder')}
+                placeholder={t("rooms.roomNamePlaceholder")}
                 onChange={(e) => setRoomName(e.target.value)}
               />
               <button
@@ -405,7 +436,7 @@ function RoomsHubPage({
                 disabled={busy}
                 onClick={() => void handleCreate()}
               >
-                {busy ? t('rooms.creating') : t('rooms.create')}
+                {busy ? t("rooms.creating") : t("rooms.create")}
               </button>
             </div>
             {error && <p className="rooms__error">{error}</p>}
@@ -413,18 +444,22 @@ function RoomsHubPage({
         </div>
       )}
 
-      {sheet === 'join' && (
-        <div className="rooms-sheet" role="dialog" aria-label={t('rooms.joinSheetAria')}>
+      {sheet === "join" && (
+        <div
+          className="rooms-sheet"
+          role="dialog"
+          aria-label={t("rooms.joinSheetAria")}
+        >
           <div className="rooms-sheet__backdrop" onClick={closeSheet} />
           <div className="rooms-sheet__panel">
             <header className="rooms-sheet__head">
-              <h3>{t('rooms.joinWithCode')}</h3>
+              <h3>{t("rooms.joinWithCode")}</h3>
               <button
                 type="button"
                 className="sheet-close-btn"
                 onClick={closeSheet}
                 disabled={busy}
-                aria-label={t('common.close')}
+                aria-label={t("common.close")}
               >
                 <CloseIcon />
               </button>
@@ -435,8 +470,10 @@ function RoomsHubPage({
                 inputMode="numeric"
                 value={inviteCode}
                 maxLength={6}
-                placeholder={t('rooms.invitePlaceholder')}
-                onChange={(e) => setInviteCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder={t("rooms.invitePlaceholder")}
+                onChange={(e) =>
+                  setInviteCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
               />
               <button
                 type="button"
@@ -444,7 +481,7 @@ function RoomsHubPage({
                 disabled={busy}
                 onClick={() => void handleJoin()}
               >
-                {busy ? t('rooms.joining') : t('rooms.joinSubmit')}
+                {busy ? t("rooms.joining") : t("rooms.joinSubmit")}
               </button>
             </div>
             {error && <p className="rooms__error">{error}</p>}
@@ -454,14 +491,17 @@ function RoomsHubPage({
 
       {createdRoom && (
         <AppModal
-          title={t('rooms.alert.createdTitle')}
-          lead={t('rooms.alert.createdLead')}
+          title={t("rooms.alert.createdTitle")}
+          lead={t("rooms.alert.createdLead")}
           onDismiss={dismissCreatedRoom}
-          closeAriaLabel={t('common.close')}
-          primaryLabel={t('rooms.alert.share')}
+          closeAriaLabel={t("common.close")}
+          primaryLabel={t("rooms.alert.share")}
           onPrimary={() => void shareCreatedCode()}
         >
-          <p className="rooms-created__code" aria-label={t('rooms.copyInviteAria')}>
+          <p
+            className="rooms-created__code"
+            aria-label={t("rooms.copyInviteAria")}
+          >
             {createdRoom.inviteCode}
           </p>
         </AppModal>
@@ -470,33 +510,33 @@ function RoomsHubPage({
       {roomAction && (
         <AppModal
           title={
-            roomAction.kind === 'delete'
-              ? t('rooms.deleteConfirmTitle')
-              : t('rooms.leaveConfirmTitle')
+            roomAction.kind === "delete"
+              ? t("rooms.deleteConfirmTitle")
+              : t("rooms.leaveConfirmTitle")
           }
           lead={
-            roomAction.kind === 'delete'
-              ? t('rooms.deleteConfirmLead', { name: roomAction.name })
-              : t('rooms.leaveConfirmLead', { name: roomAction.name })
+            roomAction.kind === "delete"
+              ? t("rooms.deleteConfirmLead", { name: roomAction.name })
+              : t("rooms.leaveConfirmLead", { name: roomAction.name })
           }
           onDismiss={() => {
             if (!actionBusy) setRoomAction(null);
           }}
-          showClose={roomAction.kind !== 'delete'}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
+          showClose={roomAction.kind !== "delete"}
+          closeAriaLabel={t("common.close")}
+          secondaryLabel={t("common.cancel")}
           onSecondary={() => {
             if (!actionBusy) setRoomAction(null);
           }}
-          primaryDanger={roomAction.kind === 'delete'}
+          primaryDanger={roomAction.kind === "delete"}
           primaryLabel={
             actionBusy
-              ? roomAction.kind === 'delete'
-                ? t('rooms.deleting')
-                : t('rooms.leaving')
-              : roomAction.kind === 'delete'
-                ? t('rooms.delete')
-                : t('rooms.leave')
+              ? roomAction.kind === "delete"
+                ? t("rooms.deleting")
+                : t("rooms.leaving")
+              : roomAction.kind === "delete"
+                ? t("rooms.delete")
+                : t("rooms.leave")
           }
           onPrimary={() => {
             if (!actionBusy) void handleRoomAction();
