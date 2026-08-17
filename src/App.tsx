@@ -14,6 +14,7 @@ import PinVerifyScreen from './components/PinVerifyScreen';
 import ExportSheet from './components/ExportSheet';
 import DecorateSheet from './components/DecorateSheet';
 import AppInfoSheet from './components/AppInfoSheet';
+import AppModal from './components/AppModal';
 import { applyStoredFont } from './components/FontPicker';
 import DiaryBookViewer from './components/DiaryBookViewer';
 import DiaryListPage from './pages/DiaryListPage';
@@ -38,6 +39,12 @@ import {
 import type { DiaryEntry } from './types/diary';
 import { formatYearMonth } from './utils/date';
 import { isFlutterApp, postDiaryNative } from './utils/nativeShare';
+import {
+  buyMonthlyPlan,
+  consumeDiaryUsage,
+  getDiaryAccessState,
+  watchAdForOneFreeEntry,
+} from './utils/diaryAccess';
 import './App.css';
 
 export type Page = 'home' | 'write' | 'detail' | 'rooms' | 'room' | 'room-post';
@@ -67,6 +74,9 @@ function App() {
   );
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
+  const [writeLimitOpen, setWriteLimitOpen] = useState(false);
+
+  const accessStatus = getDiaryAccessState(entries.length);
 
   const now = new Date();
   const [calYear, setCalYear] = useState(now.getFullYear());
@@ -137,7 +147,14 @@ function App() {
       return;
     }
 
+    const status = getDiaryAccessState(entries.length);
+    if (!status.canCreate) {
+      setWriteLimitOpen(true);
+      return;
+    }
+
     addEntry(entry);
+    consumeDiaryUsage();
     setPage('home');
     syncInBackground();
   };
@@ -315,6 +332,11 @@ function App() {
   }, []);
 
   const handleNewWrite = () => {
+    const status = getDiaryAccessState(entries.length);
+    if (!status.canCreate) {
+      setWriteLimitOpen(true);
+      return;
+    }
     setEditingId(null);
     setPage('write');
   };
@@ -400,7 +422,6 @@ function App() {
 
   return (
     <div className="app">
-      {/* Ïõπ ÏÉÅÎã® Ìó§ÎçîÎäî Ï£ºÏÑù Ï≤òÎ¶¨. Flutter AppBar + hideBarÎ°ú Î©îÎâ¥Îßå Ïú†ÏßÄ */}
       <Header
         hideBar
         nickname={nickname}
@@ -413,20 +434,16 @@ function App() {
         onOpenExport={() => setExportOpen(true)}
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
-        calendarNav={
-          page === 'home'
-            ? {
-                year: calYear,
-                month: calMonth,
-                onPrev: () => moveCalendarMonth(-1),
-                onNext: () => moveCalendarMonth(1),
-                onSelectMonth: (year, month) => {
-                  setCalYear(year);
-                  setCalMonth(month);
-                },
-              }
-            : null
-        }
+        calendarNav={{
+          year: calYear,
+          month: calMonth,
+          onPrev: () => moveCalendarMonth(-1),
+          onNext: () => moveCalendarMonth(1),
+          onSelectMonth: (year, month) => {
+            setCalYear(year);
+            setCalMonth(month);
+          },
+        }}
       />
       <main>
         {page === 'home' && (
@@ -511,6 +528,40 @@ function App() {
         )}
       </main>
       {page === 'home' && <WriteFab onClick={handleNewWrite} />}
+      {writeLimitOpen && (
+        <AppModal
+          title="±◊∏≤¿œ±‚ ¿ÃøÎ ¡¶«—"
+          lead={
+            accessStatus.isPremiumActive
+              ? `¿Ãπ¯ ¥ﬁ ${accessStatus.monthlyRemaining}¿Â ≥≤æ“Ω¿¥œ¥Ÿ.`
+              : '√≥¿Ω 5∞≥¥¬ π´∑·∑Œ ¡¶∞¯µ«∞Ì, ¿Ã»ƒø°¥¬ ±§∞Ì∏¶ ∫∏∞Ì 1¿Â π´∑·∏¶ πﬁ∞≈≥™ ø˘ 3,990ø¯¿∏∑Œ 50¿Â + ±§∞Ì ¡¶∞≈∏¶ ¿ÃøÎ«“ ºˆ ¿÷æÓø‰.'
+          }
+          onDismiss={() => setWriteLimitOpen(false)}
+          primaryLabel="±§∞Ì ∫∏∞Ì 1¿Â π´∑· πﬁ±‚"
+          onPrimary={() => {
+            watchAdForOneFreeEntry();
+            setWriteLimitOpen(false);
+            setTimeout(() => {
+              handleNewWrite();
+            }, 0);
+          }}
+          secondaryLabel="ø˘ 3,990ø¯ / 50¿Â + ±§∞Ì ¡¶∞≈"
+          onSecondary={() => {
+            buyMonthlyPlan();
+            setWriteLimitOpen(false);
+            setTimeout(() => {
+              handleNewWrite();
+            }, 0);
+          }}
+          closeAriaLabel="close"
+        >
+          <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.6, color: '#4b5563' }}>
+            <div>Ω≈±‘ ªÁøÎ¿⁄ π´∑· «˝≈√: 5¿Â</div>
+            <div>≥≤¿∫ π´∑· ª˝º∫ ºˆ: {Math.max(0, accessStatus.remaining)}</div>
+            <div>∆˜¿Œ∆Æ ∫∏ªÛ: {accessStatus.rewardBalance}¿Â</div>
+          </div>
+        </AppModal>
+      )}
       {accountOpen &&
         createPortal(
           <AccountSheet
@@ -554,52 +605,64 @@ function App() {
           />,
           document.getElementById('root') ?? document.body,
         )}
-      {characterOpen && (
-        <CharacterSetup
-          character={character}
-          onChange={setCharacter}
-          onClose={() => {
-            setCharacterOpen(false);
-            if (writeAfterCharacter) {
-              setWriteAfterCharacter(false);
-            }
-          }}
-          onComplete={() => {
-            if (writeAfterCharacter) {
-              setWriteAfterCharacter(false);
-              handleNewWrite();
-            }
-          }}
-        />
-      )}
-      {exportOpen && (
-        <ExportSheet
-          entries={entries}
-          onClose={() => setExportOpen(false)}
-          onOpenBook={(filtered, range) => {
-            setExportOpen(false);
-            setBookEntries(filtered);
-            setBookRange(range);
-          }}
-        />
-      )}
-      {decorateOpen && <DecorateSheet onClose={() => setDecorateOpen(false)} />}
-      {appInfoOpen && <AppInfoSheet onClose={() => setAppInfoOpen(false)} />}
-      {bookEntries && (
-        <DiaryBookViewer
-          entries={bookEntries}
-          rangeStart={bookRange?.start}
-          rangeEnd={bookRange?.end}
-          avatarUrl={avatarUrl}
-          onClose={() => {
-            setBookEntries(null);
-            setBookRange(null);
-          }}
-        />
-      )}
-      {screenLock.locked &&
+      {decorateOpen &&
         createPortal(
-          <ScreenLockGate onUnlock={screenLock.unlock} />,
+          <DecorateSheet onClose={() => setDecorateOpen(false)} />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {exportOpen &&
+        createPortal(
+          <ExportSheet
+            entries={entries}
+            onClose={() => setExportOpen(false)}
+            onOpenBook={(filtered, range) => {
+              setBookEntries(filtered);
+              setBookRange(range);
+              setExportOpen(false);
+            }}
+          />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {appInfoOpen &&
+        createPortal(
+          <AppInfoSheet onClose={() => setAppInfoOpen(false)} />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {characterOpen &&
+        createPortal(
+          <CharacterSetup
+            character={character}
+            onChange={setCharacter}
+            onClose={() => {
+              setCharacterOpen(false);
+              setWriteAfterCharacter(false);
+            }}
+            onComplete={() => {
+              setCharacterOpen(false);
+              if (writeAfterCharacter) {
+                setWriteAfterCharacter(false);
+                handleNewWrite();
+              }
+            }}
+          />,
+          document.getElementById('root') ?? document.body,
+        )}
+      {page === 'home' && !screenLock.locked && (
+        <ScreenLockGate
+          onUnlock={async (password) => screenLock.unlock(password)}
+        />
+      )}
+      {bookEntries &&
+        createPortal(
+          <DiaryBookViewer
+            entries={bookEntries}
+            rangeStart={bookRange?.start}
+            rangeEnd={bookRange?.end}
+            onClose={() => {
+              setBookEntries(null);
+              setBookRange(null);
+            }}
+          />,
           document.getElementById('root') ?? document.body,
         )}
     </div>
