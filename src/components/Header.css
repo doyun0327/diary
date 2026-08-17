@@ -9,7 +9,11 @@
   padding: 10px 16px 12px 12px;
   padding-top: calc(10px + env(safe-area-inset-top));
   border-bottom: 1px solid var(--color-border-soft);
-  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-soft) 76%, var(--color-bg) 24%) 0%,
+    color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
+  );
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -18,6 +22,7 @@
   flex: 1;
   min-width: 0;
 }
+\\\\\
 
 .header__month-btn {
   flex-shrink: 0;
@@ -30,7 +35,7 @@
   border: none;
   border-radius: 0;
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-accent-text);
   cursor: pointer;
   box-shadow: none;
   transition: transform 0.16s var(--ease-out), color 0.15s, opacity 0.15s;
@@ -71,7 +76,7 @@
   font-size: 1.28rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--color-text);
+  color: var(--color-accent-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -104,7 +109,7 @@
   border: none;
   border-radius: 0;
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-accent-text);
   cursor: pointer;
   transition: transform 0.16s var(--ease-out), color 0.15s, opacity 0.15s;
 }
@@ -144,19 +149,15 @@
   flex-direction: column;
   overflow: auto;
   padding: 8px 16px calc(24px + env(safe-area-inset-bottom));
-  background: var(--sheet-bg);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-soft) 42%, var(--sheet-bg) 58%) 0%,
+    var(--sheet-bg) 100%
+  );
   border-left: 1px solid var(--color-border-soft);
   border-radius: 22px 0 0 22px;
   box-shadow: -12px 0 36px rgba(0, 0, 0, 0.1);
   animation: header-menu-in 0.3s var(--ease-out);
-}
-
-.header-menu__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
 }
 
 .header-menu__brand-title {
@@ -185,8 +186,8 @@
   height: 36px;
   border: none;
   border-radius: 50%;
-  background: var(--color-bg-muted);
-  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent-soft) 80%, transparent);
+  color: var(--color-accent-text);
   cursor: pointer;
 }
 
@@ -375,4 +376,17 @@
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.header__month-btn,
+.header__month-label,
+.header__burger {
+  color: #111111 !important;
+}
+
+.header__month-btn svg,
+.header__month-label svg,
+.header__burger svg {
+  color: #111111 !important;
+  stroke: #111111 !important;
 }

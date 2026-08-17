@@ -13,6 +13,15 @@ export const THEMES: { id: ThemeId; swatch: string[] }[] = [
 
 const THEME_IDS = new Set<string>(THEMES.map((t) => t.id));
 
+const THEME_ACCENTS: Record<ThemeId, { accent: string; background: string }> = {
+  paper: { accent: '#2a2a2a', background: '#ffffff' },
+  matcha: { accent: '#7cb89a', background: '#f5fbf7' },
+  sky: { accent: '#8bb0d4', background: '#f5f8fc' },
+  blossom: { accent: '#c9a0d4', background: '#fbf6fa' },
+  ink: { accent: '#8a8580', background: '#f7f6f4' },
+  lemon: { accent: '#e0b85a', background: '#fffaf0' },
+};
+
 export function getStoredThemeId(): ThemeId {
   try {
     const raw = localStorage.getItem(THEME_STORAGE_KEY);
@@ -21,6 +30,24 @@ export function getStoredThemeId(): ThemeId {
     // ignore
   }
   return 'paper';
+}
+
+function syncThemeToNative(id: ThemeId) {
+  if (typeof window === 'undefined') return;
+  const native = (window as Window & {
+    DiaryNative?: { postMessage: (message: string) => void };
+  }).DiaryNative;
+  if (!native?.postMessage) return;
+
+  const colors = THEME_ACCENTS[id] ?? THEME_ACCENTS.paper;
+  native.postMessage(
+    JSON.stringify({
+      type: 'theme',
+      themeId: id,
+      accent: colors.accent,
+      background: colors.background,
+    }),
+  );
 }
 
 export function applyTheme(id: ThemeId) {
@@ -35,6 +62,8 @@ export function applyTheme(id: ThemeId) {
   } catch {
     // ignore
   }
+
+  syncThemeToNative(id);
 }
 
 export function applyStoredTheme() {

@@ -55,7 +55,7 @@
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: #111111; /* always black regardless of theme */
   cursor: pointer;
 }
 
@@ -130,14 +130,14 @@
   font-size: 1.08rem;
   font-weight: 600;
   line-height: 1;
-  color: var(--color-text-muted);
+  color: #111111; /* always black */
   cursor: pointer;
   user-select: none;
   font-variant-numeric: tabular-nums;
 }
 
 .month-year-picker__item.is-selected {
-  color: var(--color-text);
+  color: #111111; /* always black */
   font-weight: 800;
   font-size: 1.2rem;
 }
@@ -151,7 +151,7 @@
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--color-accent-text);
+  color: #111111; /* keep today button label black */
   cursor: pointer;
 }
 
