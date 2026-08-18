@@ -11,6 +11,7 @@ declare global {
       expiresAt: number | null;
       productId?: string;
     }) => void;
+    __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
   }
 }
 
@@ -29,6 +30,34 @@ export function postDiaryNative(data: Record<string, unknown>) {
   const native = diaryNative();
   if (!native) return;
   native.postMessage(JSON.stringify(data));
+}
+
+export async function requestAiRewardedAd(): Promise<boolean> {
+  if (!isFlutterApp()) return false;
+
+  return new Promise<boolean>((resolve) => {
+    let done = false;
+    const prev = window.__onDiaryRewardedAd;
+    const timer = window.setTimeout(() => finish(false), 90000);
+
+    const onCustom = (event: Event) => {
+      const detail = (event as CustomEvent<{ ok?: boolean }>).detail;
+      finish(Boolean(detail?.ok));
+    };
+
+    function finish(ok: boolean) {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timer);
+      window.removeEventListener("diary-rewarded-ad-result", onCustom);
+      window.__onDiaryRewardedAd = prev;
+      resolve(ok);
+    }
+
+    window.__onDiaryRewardedAd = (payload) => finish(Boolean(payload?.ok));
+    window.addEventListener("diary-rewarded-ad-result", onCustom);
+    postDiaryNative({ type: "rewardedAdShow", reason: "aiDraw" });
+  });
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {

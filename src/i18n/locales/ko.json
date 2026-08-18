@@ -383,7 +383,10 @@
       "exBad": "아쉬운 예: 오늘 기분이 좋았어요",
       "sceneUnderstood": "AI가 이해한 장면: {{scene}}",
       "characterAria": "AI 그림에 쓸 캐릭터 설정",
-      "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요"
+      "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요",
+      "rewardTitle": "광고 보고 AI 그림 1회",
+      "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
+      "rewardCta": "광고 보기"
     },
     "confirm": {
       "replaceTitle": "AI 그림",
@@ -399,7 +402,10 @@
       "aiUrl": "이미지 URL을 불러오지 못했습니다",
       "aiConvert": "이미지 변환에 실패했습니다",
       "saveImage": "그림을 저장 파일로 만들지 못했어요",
-      "empty": "제목, 내용, 그림 중 하나는 넣어 주세요"
+      "empty": "제목, 내용, 그림 중 하나는 넣어 주세요",
+      "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 받을 수 있어요",
+      "adAppOnly": "앱에서만 광고를 볼 수 있어요",
+      "aiDailyLimit": "미구독자는 하루에 AI 그림을 2번까지 그릴 수 있어요"
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",

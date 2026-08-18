@@ -383,7 +383,10 @@
       "exBad": "Weak: I felt good today",
       "sceneUnderstood": "Scene AI understood: {{scene}}",
       "characterAria": "Character for AI drawing",
-      "characterTitle": "This character becomes the protagonist"
+      "characterTitle": "This character becomes the protagonist",
+      "rewardTitle": "Watch an ad for 1 AI draw",
+      "rewardLead": "Watch the ad to the end to unlock one AI drawing.",
+      "rewardCta": "Watch ad"
     },
     "confirm": {
       "replaceTitle": "AI drawing",
@@ -399,7 +402,10 @@
       "aiUrl": "Couldn't load image URL",
       "aiConvert": "Image conversion failed",
       "saveImage": "Couldn't export the drawing",
-      "empty": "Add a title, text, or drawing"
+      "empty": "Add a title, text, or drawing",
+      "adNotCompleted": "Finish the ad to get one AI drawing",
+      "adAppOnly": "Ads are available in the app only",
+      "aiDailyLimit": "Non-subscribers can create up to 2 AI drawings per day"
     },
     "coach": {
       "character": "Set yourself so AI can draw you",

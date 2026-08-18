@@ -1,5 +1,5 @@
 import type { DiaryEntry } from '../types/diary';
-import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
+import { renderEntryBookPage, revokeBookPage } from './diaryBook';
 import { isFlutterApp, shareViaNative } from './nativeShare';
 
 export type ShareTarget = 'sns';
@@ -67,23 +67,28 @@ async function tryNativeShare(file: File, title: string, text: string): Promise<
 export async function shareDiaryTo(
   entry: DiaryEntry,
   _target: ShareTarget = 'sns',
-  options?: { paperElement?: HTMLElement | null },
+  _options?: { paperElement?: HTMLElement | null },
 ): Promise<{ result: 'shared' | 'downloaded'; previewUrl?: string; isMobileShare: boolean }> {
-  const blob = await captureDiaryEntryPaperBlob(entry, options?.paperElement);
-  const filename = `diary-${entry.date}.png`;
-  const file = new File([blob], filename, { type: 'image/png' });
-  const title = entry.title || 'diary';
-  const text = '내 diary를 SNS로 공유해요';
+  const bookPage = await renderEntryBookPage(entry);
+  try {
+    const blob = bookPage.blob;
+    const filename = `diary-${entry.date}.jpg`;
+    const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+    const title = entry.title || 'diary';
+    const text = '내 diary를 SNS로 공유해요';
 
-  const isMobileShare = canShareImageFile();
+    const isMobileShare = canShareImageFile();
 
-  if (isMobileShare) {
-    const shared = await tryNativeShare(file, title, text);
-    if (shared) {
-      return { result: 'shared', isMobileShare: true };
+    if (isMobileShare) {
+      const shared = await tryNativeShare(file, title, text);
+      if (shared) {
+        return { result: 'shared', isMobileShare: true };
+      }
     }
-  }
 
-  const previewUrl = downloadBlob(blob, filename);
-  return { result: 'downloaded', previewUrl, isMobileShare };
+    const previewUrl = downloadBlob(blob, filename);
+    return { result: 'downloaded', previewUrl, isMobileShare };
+  } finally {
+    revokeBookPage(bookPage);
+  }
 }

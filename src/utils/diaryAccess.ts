@@ -1,6 +1,7 @@
 export const FREE_ENTRY_GRANT = 5;
 export const MONTHLY_DIARY_LIMIT = 50;
-export const MONTHLY_PRICE_KRW = 3300;
+export const MONTHLY_PRICE_KRW = 2900;
+export const FREE_AI_DRAWS_PER_DAY = 2;
 
 const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";
@@ -11,6 +12,9 @@ type AccessState = {
   premiumUntil: number | null;
   monthlyLimitUsed: number;
   monthKey: string | null;
+  aiDrawCredits: number;
+  aiCreditDayKey: string | null;
+  aiDrawUsedToday: number;
 };
 
 export type DiaryAccessStatus = {
@@ -25,6 +29,10 @@ function getMonthKey(date = new Date()) {
   return `${date.getFullYear()}-${date.getMonth()}`;
 }
 
+function getDayKey(date = new Date()) {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
 function loadAccessState(): AccessState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -33,6 +41,9 @@ function loadAccessState(): AccessState {
         premiumUntil: null,
         monthlyLimitUsed: 0,
         monthKey: getMonthKey(),
+        aiDrawCredits: 0,
+        aiCreditDayKey: getDayKey(),
+        aiDrawUsedToday: 0,
       };
     }
 
@@ -45,12 +56,21 @@ function loadAccessState(): AccessState {
       monthlyLimitUsed: Number(parsed.monthlyLimitUsed ?? 0),
       monthKey:
         typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
+      aiDrawCredits: Math.max(0, Number(parsed.aiDrawCredits ?? 0)),
+      aiCreditDayKey:
+        typeof parsed.aiCreditDayKey === "string"
+          ? parsed.aiCreditDayKey
+          : getDayKey(),
+      aiDrawUsedToday: Math.max(0, Number(parsed.aiDrawUsedToday ?? 0)),
     };
   } catch {
     return {
       premiumUntil: null,
       monthlyLimitUsed: 0,
       monthKey: getMonthKey(),
+      aiDrawCredits: 0,
+      aiCreditDayKey: getDayKey(),
+      aiDrawUsedToday: 0,
     };
   }
 }
@@ -69,7 +89,7 @@ export function subscribeDiaryAccess(onStoreChange: () => void) {
     window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onStoreChange);
 }
 
-/** RevenueCat → Flutter → WebView 구독 상태 반영 */
+/** RevenueCat ?? Flutter ?? WebView ???? ???? ??? */
 export function applySubscriptionStatus(
   active: boolean,
   expiresAt: number | null,
@@ -124,8 +144,8 @@ export function getDiaryAccessState(
       monthlyRemaining: remaining,
       message:
         remaining > 0
-          ? "월 구독이 활성화되어 있어 일기를 더 쓸 수 있어요."
-          : "이번 달 50장 사용량을 모두 소진했어요. 다음 달에 다시 이용할 수 있어요.",
+          ? "?? ?????? ??????? ??? ??? ?? ?? ?? ????."
+          : "??? ?? 50?? ???X?? ??? ????????. ???? ??? ??? ????? ?? ????.",
     };
   }
 
@@ -138,8 +158,8 @@ export function getDiaryAccessState(
     monthlyRemaining: 0,
     message:
       freeRemaining > 0
-        ? `무료 일기 ${freeRemaining}장을 더 쓸 수 있어요.`
-        : "무료 5장을 모두 사용했어요. 월 구독 후 계속 작성할 수 있어요.",
+        ? `???? ??? ${freeRemaining}???? ?? ?? ?? ????.`
+        : "???? 5???? ??? ???????. ?? ???? ?? ??? ????? ?? ????.",
   };
 }
 
@@ -161,7 +181,59 @@ export function consumeDiaryUsage() {
   return true;
 }
 
-/** @deprecated RevenueCat 구독으로 대체. 개발용 mock만 필요할 때 사용 */
+function normalizeAiCreditDay(state: AccessState) {
+  const dayKey = getDayKey();
+  if (state.aiCreditDayKey !== dayKey) {
+    state.aiCreditDayKey = dayKey;
+    state.aiDrawCredits = 0;
+    state.aiDrawUsedToday = 0;
+  }
+}
+
+export function getRemainingFreeAiDrawsToday() {
+  const state = loadAccessState();
+  normalizeAiCreditDay(state);
+  saveAccessState(state);
+  return Math.max(0, FREE_AI_DRAWS_PER_DAY - state.aiDrawUsedToday);
+}
+
+export function consumeFreeAiDrawChance() {
+  const state = loadAccessState();
+  normalizeAiCreditDay(state);
+  if (state.aiDrawUsedToday >= FREE_AI_DRAWS_PER_DAY) return false;
+  state.aiDrawUsedToday += 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+export function getAiDrawCredits() {
+  const state = loadAccessState();
+  normalizeAiCreditDay(state);
+  saveAccessState(state);
+  return state.aiDrawCredits;
+}
+
+export function grantAiDrawCredits(count = 1) {
+  const state = loadAccessState();
+  normalizeAiCreditDay(state);
+  state.aiDrawCredits = Math.max(0, state.aiDrawCredits + Math.max(0, count));
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return state.aiDrawCredits;
+}
+
+export function consumeAiDrawCredit() {
+  const state = loadAccessState();
+  normalizeAiCreditDay(state);
+  if (state.aiDrawCredits <= 0) return false;
+  state.aiDrawCredits -= 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** @deprecated RevenueCat ???????? ???. ????? mock?? ????? ?? ??? */
 export function buyMonthlyPlan() {
   applySubscriptionStatus(true, Date.now() + 30 * 24 * 60 * 60 * 1000);
   return true;

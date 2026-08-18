@@ -15,6 +15,15 @@ import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, getPreferredFontId } from '../utils/fonts';
 import {
+  MONTHLY_PRICE_KRW,
+  consumeAiDrawCredit,
+  consumeFreeAiDrawChance,
+  getAiDrawCredits,
+  getDiaryAccessState,
+  getRemainingFreeAiDrawsToday,
+  grantAiDrawCredits,
+} from '../utils/diaryAccess';
+import {
   isAiCoachSeen,
   isCharacterCoachSeen,
   isCharacterSetupDone,
@@ -22,7 +31,8 @@ import {
   markCharacterCoachSeen,
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
-import { isFlutterApp } from '../utils/nativeShare';
+import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
+import { requestSubscriptionPurchase } from '../utils/subscription';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -76,6 +86,7 @@ function DiaryWritePage({
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
+  const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
     if (isEdit) return null;
     if (!isCharacterCoachSeen() && !isCharacterSetupDone()) return 'character';
@@ -173,11 +184,31 @@ function DiaryWritePage({
       setReplaceConfirmOpen(true);
       return;
     }
+    const access = getDiaryAccessState();
+    if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
+      setRewardPromptOpen(true);
+      return;
+    }
     void runAiDraw();
   };
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
+    const access = getDiaryAccessState();
+    if (!access.isPremiumActive) {
+      if (getRemainingFreeAiDrawsToday() <= 0) {
+        setAiError(t('write.err.aiDailyLimit'));
+        return;
+      }
+      if (!consumeAiDrawCredit()) {
+        setRewardPromptOpen(true);
+        return;
+      }
+      if (!consumeFreeAiDrawChance()) {
+        setAiError(t('write.err.aiDailyLimit'));
+        return;
+      }
+    }
     setAiError(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
@@ -195,6 +226,27 @@ function DiaryWritePage({
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const handleWatchAd = async () => {
+    if (!isFlutterApp()) {
+      setAiError(t('write.err.adAppOnly'));
+      return;
+    }
+    if (getRemainingFreeAiDrawsToday() <= 0) {
+      setRewardPromptOpen(false);
+      setAiError(t('write.err.aiDailyLimit'));
+      return;
+    }
+    setRewardPromptOpen(false);
+    setAiError(null);
+    const ok = await requestAiRewardedAd();
+    if (!ok) {
+      setAiError(t('write.err.adNotCompleted'));
+      return;
+    }
+    grantAiDrawCredits(1);
+    void runAiDraw();
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -417,6 +469,22 @@ function DiaryWritePage({
           onSecondary={() => setReplaceConfirmOpen(false)}
           primaryLabel={t('write.confirm.replaceOk')}
           onPrimary={() => void runAiDraw()}
+        />
+      )}
+      {rewardPromptOpen && (
+        <AppModal
+          title={t('write.ai.rewardTitle')}
+          lead={t('write.ai.rewardLead')}
+          onDismiss={() => setRewardPromptOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('subscription.subscribeCta', { price: MONTHLY_PRICE_KRW })}
+          onSecondary={() => {
+            setRewardPromptOpen(false);
+            requestSubscriptionPurchase();
+          }}
+          primaryLabel={t('write.ai.rewardCta')}
+          onPrimary={() => void handleWatchAd()}
         />
       )}
     </form>
