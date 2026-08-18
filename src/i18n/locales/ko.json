@@ -386,7 +386,9 @@
       "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요"
     },
     "confirm": {
-      "replaceWithAi": "그림판 내용을 AI 그림으로 바꿀까요?"
+      "replaceTitle": "AI 그림",
+      "replaceWithAi": "그림판 내용을 AI 그림으로 바꿀까요?",
+      "replaceOk": "바꾸기"
     },
     "err": {
       "needContent": "일기 내용을 먼저 적어 주세요",

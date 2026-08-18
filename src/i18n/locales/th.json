@@ -320,7 +320,9 @@
       "characterTitle": "ตัวละครนี้จะเป็นตัวเอก"
     },
     "confirm": {
-      "replaceWithAi": "แทนที่แคนวาสด้วยภาพวาด AI?"
+      "replaceTitle": "ภาพวาด AI",
+      "replaceWithAi": "แทนที่แคนวาสด้วยภาพวาด AI?",
+      "replaceOk": "แทนที่"
     },
     "err": {
       "needContent": "เขียนไดอารี่ก่อน",

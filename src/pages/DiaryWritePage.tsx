@@ -11,8 +11,9 @@ import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { HAIR_STYLE_OPTIONS } from '../types/character';
 import { generateDiaryImage } from '../api/aiImage';
+import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
-import { findFont, getPreferredFontId } from '../utils/fonts';
+import { diaryFontStack, findFont, getPreferredFontId } from '../utils/fonts';
 import {
   isAiCoachSeen,
   isCharacterCoachSeen,
@@ -20,12 +21,7 @@ import {
   markAiCoachSeen,
   markCharacterCoachSeen,
 } from '../utils/onboarding';
-import {
-  clearWriteDraft,
-  loadWriteDraft,
-  saveWriteDraft,
-  writeDraftHasContent,
-} from '../utils/writeDraft';
+import { clearWriteDraft } from '../utils/writeDraft';
 import { isFlutterApp } from '../utils/nativeShare';
 import './DiaryWritePage.css';
 
@@ -65,13 +61,12 @@ function DiaryWritePage({
 }: DiaryWritePageProps) {
   const { t } = useTranslation();
   const isEdit = Boolean(initialEntry);
-  const draft = !initialEntry ? loadWriteDraft() : null;
-  const [date, setDate] = useState(initialEntry?.date ?? draft?.date ?? today());
-  const [title, setTitle] = useState(initialEntry?.title ?? draft?.title ?? '');
-  const [content, setContent] = useState(initialEntry?.content ?? draft?.content ?? '');
-  const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? draft?.mood ?? 'happy');
+  const [date, setDate] = useState(initialEntry?.date ?? today());
+  const [title, setTitle] = useState(initialEntry?.title ?? '');
+  const [content, setContent] = useState(initialEntry?.content ?? '');
+  const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? 'happy');
   const [fontId, setFontId] = useState(
-    () => initialEntry?.fontId ?? draft?.fontId ?? getPreferredFontId(),
+    () => initialEntry?.fontId ?? getPreferredFontId(),
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -80,6 +75,7 @@ function DiaryWritePage({
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
+  const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
     if (isEdit) return null;
     if (!isCharacterCoachSeen() && !isCharacterSetupDone()) return 'character';
@@ -154,24 +150,8 @@ function DiaryWritePage({
     void canvasRef.current?.loadImage(src);
   }, [initialEntry?.imageUrl]);
 
-  const persistDraftIfNeeded = () => {
-    if (isEdit) return;
-    const next = {
-      date,
-      title,
-      content,
-      mood,
-      fontId,
-    };
-    if (writeDraftHasContent(next)) {
-      saveWriteDraft(next);
-    } else {
-      clearWriteDraft();
-    }
-  };
-
   const handleCancel = () => {
-    persistDraftIfNeeded();
+    if (!isEdit) clearWriteDraft();
     onCancel();
   };
 
@@ -184,16 +164,20 @@ function DiaryWritePage({
     return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
   }, []);
 
-  const handleAiDraw = async () => {
+  const handleAiDraw = () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
     if (canvasRef.current?.hasContent()) {
-      const ok = confirm(t('write.confirm.replaceWithAi'));
-      if (!ok) return;
+      setReplaceConfirmOpen(true);
+      return;
     }
+    void runAiDraw();
+  };
 
+  const runAiDraw = async () => {
+    setReplaceConfirmOpen(false);
     setAiError(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
@@ -260,7 +244,7 @@ function DiaryWritePage({
 
       <div
         className="diary-write__paper"
-        style={{ ['--diary-font' as string]: findFont(fontId).family }}
+        style={{ ['--diary-font' as string]: diaryFontStack(findFont(fontId).family) }}
       >
         <div className="diary-write__meta">
           <button
@@ -422,6 +406,19 @@ function DiaryWritePage({
           {aiError && <p className="diary-write__ai-error">{aiError}</p>}
         </section>
       </div>
+      {replaceConfirmOpen && (
+        <AppModal
+          title={t('write.confirm.replaceTitle')}
+          lead={t('write.confirm.replaceWithAi')}
+          onDismiss={() => setReplaceConfirmOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setReplaceConfirmOpen(false)}
+          primaryLabel={t('write.confirm.replaceOk')}
+          onPrimary={() => void runAiDraw()}
+        />
+      )}
     </form>
   );
 }

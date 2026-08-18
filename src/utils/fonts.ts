@@ -80,6 +80,26 @@ export const FONTS: FontOption[] = [
 
 export const DEFAULT_FONT_ID = 'gaegu';
 
+/** 한·중·일·태·라틴 등 선택한 손글씨에 없는 글자용 */
+export const DIARY_FONT_FALLBACKS =
+  "'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans Thai', 'Noto Sans', sans-serif";
+
+export function diaryFontStack(primaryFamily: string): string {
+  const primary = primaryFamily
+    .split(',')
+    .map((part) => part.trim())
+    .filter(
+      (part) =>
+        part &&
+        part !== 'cursive' &&
+        part !== 'sans-serif' &&
+        part !== 'serif' &&
+        !DIARY_FONT_FALLBACKS.includes(part),
+    )
+    .join(', ');
+  return primary ? `${primary}, ${DIARY_FONT_FALLBACKS}` : DIARY_FONT_FALLBACKS;
+}
+
 /** 새 일기 기본 글씨체 (헤더/작성 도구에서 고른 마지막 값) */
 export const FONT_PREFERENCE_KEY = 'picture-diary-font';
 
@@ -106,5 +126,5 @@ export function setPreferredFontId(id: string) {
 
 /** 일기 엔트리에 저장된 글씨체 (구버전 일기는 기본값) */
 export function fontFamilyForEntry(fontId?: string): string {
-  return findFont(fontId).family;
+  return diaryFontStack(findFont(fontId).family);
 }

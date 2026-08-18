@@ -320,7 +320,9 @@
       "characterTitle": "Este personaje será el protagonista"
     },
     "confirm": {
-      "replaceWithAi": "¿Reemplazar el lienzo con el dibujo IA?"
+      "replaceTitle": "Dibujo IA",
+      "replaceWithAi": "¿Reemplazar el lienzo con el dibujo IA?",
+      "replaceOk": "Reemplazar"
     },
     "err": {
       "needContent": "Escribe el diario primero",

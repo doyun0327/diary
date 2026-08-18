@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
-import { findFont } from '../utils/fonts';
+import { diaryFontStack, findFont } from '../utils/fonts';
 import { shareDiaryTo } from '../utils/shareStory';
 import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
@@ -403,7 +403,7 @@ function DiaryDetailPage({
       <div
         className="diary-detail__paper"
         ref={paperRef}
-        style={{ ['--diary-font' as string]: findFont(entry.fontId).family }}
+        style={{ ['--diary-font' as string]: diaryFontStack(findFont(entry.fontId).family) }}
       >
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>

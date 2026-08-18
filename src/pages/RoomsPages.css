@@ -706,17 +706,10 @@
 
 .rooms__paper--compact .diary-detail__content {
   font-size: 0.78rem;
-  line-height: 22px;
-  min-height: 44px;
-  max-height: 44px;
-  padding: 4px 2px;
+  min-height: calc(var(--diary-ruled-lh) * 2);
+  max-height: calc(var(--diary-ruled-lh) * 2);
+  padding: 2px 2px 4px;
   overflow: hidden;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 21px,
-    color-mix(in srgb, var(--color-border) 70%, transparent) 21px,
-    color-mix(in srgb, var(--color-border) 70%, transparent) 22px
-  );
 }
 
 .rooms__post-expand {

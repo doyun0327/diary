@@ -320,7 +320,9 @@
       "characterTitle": "这个角色会成为画中的主角"
     },
     "confirm": {
-      "replaceWithAi": "用 AI 画替换画布内容吗？"
+      "replaceTitle": "AI 画",
+      "replaceWithAi": "用 AI 画替换画布内容吗？",
+      "replaceOk": "替换"
     },
     "err": {
       "needContent": "请先写日记",

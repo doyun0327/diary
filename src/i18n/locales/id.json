@@ -320,7 +320,9 @@
       "characterTitle": "Karakter ini menjadi tokoh utama"
     },
     "confirm": {
-      "replaceWithAi": "Ganti kanvas dengan gambar AI?"
+      "replaceTitle": "Gambar AI",
+      "replaceWithAi": "Ganti kanvas dengan gambar AI?",
+      "replaceOk": "Ganti"
     },
     "err": {
       "needContent": "Tulis diary dulu",

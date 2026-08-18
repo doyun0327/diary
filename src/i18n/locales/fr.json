@@ -320,7 +320,9 @@
       "characterTitle": "Ce personnage devient le protagoniste"
     },
     "confirm": {
-      "replaceWithAi": "Remplacer le canevas par le dessin IA ?"
+      "replaceTitle": "Dessin IA",
+      "replaceWithAi": "Remplacer le canevas par le dessin IA ?",
+      "replaceOk": "Remplacer"
     },
     "err": {
       "needContent": "Écrivez d'abord le journal",

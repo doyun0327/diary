@@ -320,7 +320,9 @@
       "characterTitle": "Nhân vật này sẽ thành nhân vật chính"
     },
     "confirm": {
-      "replaceWithAi": "Thay canvas bằng tranh AI?"
+      "replaceTitle": "Tranh AI",
+      "replaceWithAi": "Thay canvas bằng tranh AI?",
+      "replaceOk": "Thay"
     },
     "err": {
       "needContent": "Hãy viết nhật ký trước",

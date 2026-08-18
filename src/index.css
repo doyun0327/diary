@@ -4,7 +4,9 @@
 
 :root {
   /* 일기 글씨체. FontPicker에서 사용자가 바꿀 수 있음 */
-  --diary-font: 'Gaegu', cursive;
+  --diary-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans Thai',
+    'Noto Sans', sans-serif;
+  --diary-ruled-lh: 2.15em;
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
   /* Mono — white / gray / black */
@@ -274,6 +276,24 @@ select {
 .sheet-close-btn:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+/* 일기 본문 가로줄 — 언어·폰트와 무관하게 em 기준으로 줄 위에 글자가 앉음 */
+.diary-write__content,
+.diary-detail__content {
+  line-height: var(--diary-ruled-lh);
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--diary-ruled-lh) - 1px),
+    color-mix(in srgb, var(--color-border) 70%, transparent) 0
+  );
+  background-size: 100% var(--diary-ruled-lh);
+  background-repeat: repeat-y;
+  background-origin: content-box;
+  background-clip: content-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @media (prefers-reduced-motion: reduce) {

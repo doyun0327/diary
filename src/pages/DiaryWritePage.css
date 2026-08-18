@@ -421,20 +421,13 @@
 .diary-write__content {
   flex: 1;
   min-height: 140px;
-  padding: 8px 4px;
+  padding: 4px 4px 8px;
   border: none;
   border-radius: 0;
   font-family: var(--diary-font);
   font-size: 1.2rem;
-  line-height: 32px;
   color: var(--color-text);
-  background-color: transparent;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 31px,
-    color-mix(in srgb, var(--color-border) 70%, transparent) 31px,
-    color-mix(in srgb, var(--color-border) 70%, transparent) 32px
-  );
+  background-attachment: local;
   resize: none;
 }
 

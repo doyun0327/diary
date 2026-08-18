@@ -320,7 +320,9 @@
       "characterTitle": "このキャラクターが主人公になります"
     },
     "confirm": {
-      "replaceWithAi": "キャンバスをAIの絵で置き換えますか？"
+      "replaceTitle": "AIの絵",
+      "replaceWithAi": "キャンバスをAIの絵で置き換えますか？",
+      "replaceOk": "置き換える"
     },
     "err": {
       "needContent": "先に日記を書いてください",

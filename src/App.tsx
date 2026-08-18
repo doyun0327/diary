@@ -42,6 +42,7 @@ import {
 import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
+import { clearWriteDraft } from "./utils/writeDraft";
 import {
   consumeDiaryUsage,
   getDiaryAccessState,
@@ -397,6 +398,7 @@ function App() {
       return;
     }
     setEditingId(null);
+    clearWriteDraft();
     setPage("write");
   };
 

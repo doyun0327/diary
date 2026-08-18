@@ -386,7 +386,9 @@
       "characterTitle": "This character becomes the protagonist"
     },
     "confirm": {
-      "replaceWithAi": "Replace the canvas with the AI drawing?"
+      "replaceTitle": "AI drawing",
+      "replaceWithAi": "Replace the canvas with the AI drawing?",
+      "replaceOk": "Replace"
     },
     "err": {
       "needContent": "Write the diary first",

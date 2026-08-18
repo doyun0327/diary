@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FONTS,
+  diaryFontStack,
   findFont,
   getPreferredFontId,
   setPreferredFontId,
@@ -14,7 +15,7 @@ const CATEGORIES = ['cute', 'neat'] as const;
 /** 앱 시작 시 — 새 일기용 기본 글씨체만 루트에 적용 */
 export function applyStoredFont() {
   const font = findFont(getPreferredFontId());
-  document.documentElement.style.setProperty('--diary-font', font.family);
+  document.documentElement.style.setProperty('--diary-font', diaryFontStack(font.family));
 }
 
 interface FontPickerProps {
@@ -28,7 +29,7 @@ function FontPicker({ onClose }: FontPickerProps) {
 
   useEffect(() => {
     const font = findFont(fontId);
-    document.documentElement.style.setProperty('--diary-font', font.family);
+    document.documentElement.style.setProperty('--diary-font', diaryFontStack(font.family));
     setPreferredFontId(fontId);
   }, [fontId]);
 

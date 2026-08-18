@@ -1,7 +1,7 @@
 import { domToBlob } from 'modern-screenshot';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
-import { findFont } from './fonts';
+import { diaryFontStack, findFont } from './fonts';
 import { getMoodVisual, getStoredMoodPackId, MOOD_ICON_TRANSFORMS } from './moodPack';
 /** PDF/공유 offscreen 렌더 시 상세 paper 스타일 필요 (상세 페이지를 안 거친 경우 대비) */
 import '../pages/DiaryDetailPage.css';
@@ -39,6 +39,8 @@ const CAPTURE_STYLE_PROPS = [
   'background-size',
   'background-position',
   'background-repeat',
+  'background-origin',
+  'background-clip',
   'box-shadow',
   'overflow',
   'overflow-x',
@@ -73,7 +75,7 @@ export const OFFSCREEN_PAPER_WIDTH = 420;
 
 function getDiaryFontFamily(from?: HTMLElement, fontId?: string): string {
   if (fontId) {
-    return findFont(fontId).family;
+    return diaryFontStack(findFont(fontId).family);
   }
   if (from) {
     const fromEl = getComputedStyle(from).getPropertyValue('--diary-font').trim();
@@ -82,7 +84,7 @@ function getDiaryFontFamily(from?: HTMLElement, fontId?: string): string {
   const raw = getComputedStyle(document.documentElement)
     .getPropertyValue('--diary-font')
     .trim();
-  return raw || "'Gaegu', cursive";
+  return raw || diaryFontStack("'Gaegu', cursive");
 }
 
 /** "'Gaegu', cursive" → Gaegu */
@@ -290,7 +292,7 @@ export function mountOffscreenDiaryPaper(
   entry: DiaryEntry,
   width = OFFSCREEN_PAPER_WIDTH,
 ): { paper: HTMLElement; dispose: () => void } {
-  const font = findFont(entry.fontId).family;
+  const font = diaryFontStack(findFont(entry.fontId).family);
   const visual = getMoodVisual(entry.mood);
 
   const host = document.createElement('div');
