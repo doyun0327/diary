@@ -6,6 +6,11 @@ declare global {
     __onDiaryGoogleSignInError?: (reason: string) => void;
     diaryGoBack?: () => boolean;
     diaryHeaderAction?: (action: string, payload?: { year?: number; month?: number }) => void;
+    __onDiarySubscriptionStatus?: (payload: {
+      active: boolean;
+      expiresAt: number | null;
+      productId?: string;
+    }) => void;
   }
 }
 

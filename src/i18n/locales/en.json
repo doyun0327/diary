@@ -348,6 +348,16 @@
       "imageAlt": "Drawing for {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "Diary limit",
+    "limitFreeLead": "You've used all 5 free entries. Subscribe for {{price}} KRW/month to keep writing.",
+    "limitPremiumLead": "You can write {{n}} more entries this month.",
+    "subscribeCta": "Subscribe · {{price}} KRW/mo",
+    "appOnly": "Subscribe in the app",
+    "restore": "Restore purchases",
+    "freeGrant": "Free on signup: {{n}} entries",
+    "freeRemaining": "Free remaining: {{n}}"
+  },
   "write": {
     "title": {
       "new": "Today's diary",

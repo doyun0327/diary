@@ -18,10 +18,10 @@ export const GENDER_OPTIONS: { value: CharacterProfile['gender']; label: string 
 ];
 
 export const HAIR_STYLE_OPTIONS: { value: CharacterProfile['hairStyle']; label: string; emoji: string }[] = [
-  { value: 'short', label: '남자머리', emoji: '👦' },
-  { value: 'medium', label: '여자머리 단발', emoji: '👩' },
-  { value: 'curly', label: '여자머리 파마', emoji: '👩‍🦱' },
-  { value: 'bald', label: '대머리', emoji: '🧑‍🦲' },
+  { value: 'short', label: '남자머리', emoji: '👦🏻' },
+  { value: 'medium', label: '여자머리 단발', emoji: '👩🏻' },
+  { value: 'curly', label: '여자머리 파마', emoji: '👩🏻‍🦱' },
+  { value: 'bald', label: '대머리', emoji: '🧑🏻‍🦲' },
 ];
 
 export const OUTFIT_OPTIONS: { value: CharacterProfile['outfit']; label: string; emoji: string }[] = [

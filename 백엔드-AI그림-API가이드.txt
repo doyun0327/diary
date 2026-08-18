@@ -17,7 +17,7 @@
          { diaryLine, title?, character? }
 
   백엔드
-    ① 스타일 템플릿 + diaryLine (+ character) → prompt 조립
+    ① 크레용 스타일 템플릿 + diaryLine (+ character) → prompt 조립
     ② stabilityai/stable-diffusion-3.5-large 호출
     ③ { imageBase64 } 반환  (scene/prompt는 선택)
 
@@ -32,12 +32,15 @@
 }
 
 
-■ 프롬프트 조립 (분기 없이 고정)
+■ 프롬프트 조립
 ----------------------------------------------------------
 
+크레용 스타일 prefix:
 Children's crayon diary art style, wax crayon texture, handmade drawing on paper,
 soft pastel colors, warm cozy atmosphere, imperfect childlike strokes,
 cute and emotional storybook illustration, simple and heartwarming.
+
+공통 suffix:
 Scene: {diaryLine 또는 이를 바탕으로 만든 영문 장면}
 Character look (brief): {character}   ← 있을 때만
 exactly one child, two arms, two legs, no extra limbs, no text, no watermark, no photorealism
@@ -87,7 +90,7 @@ provider 필드 불필요.
 draw(req):
   if blank(req.diaryLine): 400
 
-  prompt = STYLE
+  prompt = CRAYON_STYLE_PREFIX
          + "\nScene: " + req.diaryLine   // 또는 간단 영문화
          + (character ? "\nCharacter look (brief): " + character : "")
          + "\nexactly one child, ..."

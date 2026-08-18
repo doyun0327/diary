@@ -18,8 +18,8 @@ interface CharacterSetupProps {
 }
 
 const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
-  boy: '👦',
-  girl: '👧',
+  boy: '👦🏻',
+  girl: '👧🏻',
 };
 
 function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterSetupProps) {

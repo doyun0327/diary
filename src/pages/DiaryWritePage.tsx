@@ -189,7 +189,6 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-
     if (canvasRef.current?.hasContent()) {
       const ok = confirm(t('write.confirm.replaceWithAi'));
       if (!ok) return;

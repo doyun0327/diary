@@ -1,12 +1,13 @@
 export const FREE_ENTRY_GRANT = 5;
 export const MONTHLY_DIARY_LIMIT = 50;
-export const MONTHLY_PRICE_KRW = 3990;
+export const MONTHLY_PRICE_KRW = 3300;
 
 const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";
 
+export const SUBSCRIPTION_CHANGE_EVENT = "diary-subscription-change";
+
 type AccessState = {
-  adRewardBalance: number;
   premiumUntil: number | null;
   monthlyLimitUsed: number;
   monthKey: string | null;
@@ -16,7 +17,6 @@ export type DiaryAccessStatus = {
   canCreate: boolean;
   remaining: number;
   isPremiumActive: boolean;
-  rewardBalance: number;
   monthlyRemaining: number;
   message: string;
 };
@@ -30,16 +30,16 @@ function loadAccessState(): AccessState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       return {
-        adRewardBalance: 0,
         premiumUntil: null,
         monthlyLimitUsed: 0,
         monthKey: getMonthKey(),
       };
     }
 
-    const parsed = JSON.parse(raw) as Partial<AccessState>;
+    const parsed = JSON.parse(raw) as Partial<
+      AccessState & { adRewardBalance?: number }
+    >;
     return {
-      adRewardBalance: Number(parsed.adRewardBalance ?? 0),
       premiumUntil:
         typeof parsed.premiumUntil === "number" ? parsed.premiumUntil : null,
       monthlyLimitUsed: Number(parsed.monthlyLimitUsed ?? 0),
@@ -48,7 +48,6 @@ function loadAccessState(): AccessState {
     };
   } catch {
     return {
-      adRewardBalance: 0,
       premiumUntil: null,
       monthlyLimitUsed: 0,
       monthKey: getMonthKey(),
@@ -62,6 +61,30 @@ function saveAccessState(state: AccessState) {
   } catch {
     // ignore
   }
+}
+
+export function subscribeDiaryAccess(onStoreChange: () => void) {
+  window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, onStoreChange);
+  return () =>
+    window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onStoreChange);
+}
+
+/** RevenueCat → Flutter → WebView 구독 상태 반영 */
+export function applySubscriptionStatus(
+  active: boolean,
+  expiresAt: number | null,
+) {
+  const state = loadAccessState();
+  if (active) {
+    state.premiumUntil =
+      expiresAt && expiresAt > Date.now()
+        ? expiresAt
+        : Date.now() + 30 * 24 * 60 * 60 * 1000;
+  } else {
+    state.premiumUntil = null;
+  }
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
 export function getStoredDiaryEntryCount() {
@@ -98,48 +121,26 @@ export function getDiaryAccessState(
       canCreate: remaining > 0,
       remaining,
       isPremiumActive: true,
-      rewardBalance: state.adRewardBalance,
       monthlyRemaining: remaining,
       message:
         remaining > 0
-          ? "월 구독 플랜이 활성화되어 있어 추가 생성이 가능합니다."
-          : "이번 달 50장 사용량을 모두 소진했습니다. 다음 달에 다시 이용할 수 있습니다.",
+          ? "월 구독이 활성화되어 있어 일기를 더 쓸 수 있어요."
+          : "이번 달 50장 사용량을 모두 소진했어요. 다음 달에 다시 이용할 수 있어요.",
     };
   }
 
-  const rewardBalance = Math.max(0, state.adRewardBalance);
-  const freeRemaining = Math.max(
-    0,
-    FREE_ENTRY_GRANT + rewardBalance - entriesCount,
-  );
+  const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
 
   return {
     canCreate: freeRemaining > 0,
     remaining: freeRemaining,
     isPremiumActive: false,
-    rewardBalance,
     monthlyRemaining: 0,
     message:
       freeRemaining > 0
-        ? `무료 생성 가능 횟수 ${freeRemaining}장 남았습니다.`
-        : "신규 5장 무료 혜택을 모두 사용했어요. 광고를 보고 1장을 무료로 받거나 월 구독을 이용해 주세요.",
+        ? `무료 일기 ${freeRemaining}장을 더 쓸 수 있어요.`
+        : "무료 5장을 모두 사용했어요. 월 구독 후 계속 작성할 수 있어요.",
   };
-}
-
-export function watchAdForOneFreeEntry() {
-  const state = loadAccessState();
-  state.adRewardBalance = Math.max(0, state.adRewardBalance + 1);
-  saveAccessState(state);
-  return true;
-}
-
-export function buyMonthlyPlan() {
-  const state = loadAccessState();
-  state.premiumUntil = Date.now() + 30 * 24 * 60 * 60 * 1000;
-  state.monthKey = getMonthKey();
-  state.monthlyLimitUsed = 0;
-  saveAccessState(state);
-  return true;
 }
 
 export function consumeDiaryUsage() {
@@ -155,15 +156,13 @@ export function consumeDiaryUsage() {
   if (state.premiumUntil && state.premiumUntil > now) {
     state.monthlyLimitUsed = Math.max(0, state.monthlyLimitUsed + 1);
     saveAccessState(state);
-    return true;
   }
 
-  if (state.adRewardBalance > 0) {
-    state.adRewardBalance = Math.max(0, state.adRewardBalance - 1);
-    saveAccessState(state);
-    return true;
-  }
+  return true;
+}
 
-  saveAccessState(state);
+/** @deprecated RevenueCat 구독으로 대체. 개발용 mock만 필요할 때 사용 */
+export function buyMonthlyPlan() {
+  applySubscriptionStatus(true, Date.now() + 30 * 24 * 60 * 60 * 1000);
   return true;
 }

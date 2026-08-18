@@ -43,11 +43,19 @@ import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import {
-  buyMonthlyPlan,
   consumeDiaryUsage,
   getDiaryAccessState,
-  watchAdForOneFreeEntry,
+  MONTHLY_PRICE_KRW,
+  subscribeDiaryAccess,
+  SUBSCRIPTION_CHANGE_EVENT,
 } from "./utils/diaryAccess";
+import {
+  identifySubscriptionUser,
+  installSubscriptionBridge,
+  requestSubscriptionPurchase,
+  requestSubscriptionRestore,
+  syncSubscriptionFromNative,
+} from "./utils/subscription";
 import "./App.css";
 
 export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
@@ -82,6 +90,9 @@ function App() {
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const [writeLimitOpen, setWriteLimitOpen] = useState(false);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
+  const [subscribing, setSubscribing] = useState(false);
+  const [accessTick, setAccessTick] = useState(0);
+  void accessTick;
 
   const accessStatus = getDiaryAccessState(entries.length);
 
@@ -96,7 +107,42 @@ function App() {
 
   useEffect(() => {
     applyStoredFont();
+    const cleanupBridge = installSubscriptionBridge();
+    const unsubAccess = subscribeDiaryAccess(() =>
+      setAccessTick((n) => n + 1),
+    );
+    return () => {
+      cleanupBridge();
+      unsubAccess();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isFlutterApp()) return;
+    syncSubscriptionFromNative();
+  }, []);
+
+  useEffect(() => {
+    if (!isFlutterApp()) return;
+    const userId = session?.userId ?? clientId;
+    if (userId) identifySubscriptionUser(userId);
+  }, [session?.userId, clientId]);
+
+  useEffect(() => {
+    if (!writeLimitOpen) return;
+    const onSubscriptionChange = () => {
+      const next = getDiaryAccessState(entries.length);
+      if (next.canCreate) {
+        setWriteLimitOpen(false);
+        setSubscribing(false);
+        setEditingId(null);
+        setPage("write");
+      }
+    };
+    window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
+    return () =>
+      window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
+  }, [writeLimitOpen, entries.length]);
 
   useEffect(() => {
     if (needsProfileSetup) return;
@@ -582,42 +628,52 @@ function App() {
       {page === "home" && <WriteFab onClick={handleNewWrite} />}
       {writeLimitOpen && (
         <AppModal
-          title="?????? ??? ????"
+          title={t("subscription.limitTitle")}
           lead={
             accessStatus.isPremiumActive
-              ? `??? ?? ${accessStatus.monthlyRemaining}?? ????????.`
-              : "??? 5???? ????? ???????, ??????? ?????? ???? 1?? ???? ???? ?? 3,990?????? 50?? + ???? ????? ????? ?? ????."
+              ? t("subscription.limitPremiumLead", {
+                  n: accessStatus.monthlyRemaining,
+                })
+              : t("subscription.limitFreeLead", { price: MONTHLY_PRICE_KRW })
           }
-          onDismiss={() => setWriteLimitOpen(false)}
-          primaryLabel="???? ???? 1?? ???? ???"
-          onPrimary={() => {
-            watchAdForOneFreeEntry();
+          onDismiss={() => {
             setWriteLimitOpen(false);
-            setTimeout(() => {
-              handleNewWrite();
-            }, 0);
+            setSubscribing(false);
           }}
-          secondaryLabel="?? 3,990?? / 50?? + ???? ????"
+          secondaryLabel={t("common.cancel")}
           onSecondary={() => {
-            buyMonthlyPlan();
             setWriteLimitOpen(false);
-            setTimeout(() => {
-              handleNewWrite();
-            }, 0);
+            setSubscribing(false);
           }}
-          closeAriaLabel="close"
+          primaryLabel={
+            subscribing
+              ? t("common.processing")
+              : isFlutterApp()
+                ? t("subscription.subscribeCta", { price: MONTHLY_PRICE_KRW })
+                : t("subscription.appOnly")
+          }
+          onPrimary={() => {
+            if (!isFlutterApp()) return;
+            if (subscribing) return;
+            setSubscribing(true);
+            requestSubscriptionPurchase();
+          }}
+          closeAriaLabel={t("common.close")}
         >
-          <div
-            style={{
-              marginTop: 12,
-              fontSize: 14,
-              lineHeight: 1.6,
-              color: "#4b5563",
-            }}
-          >
-            <div>??? ????? ???? ????: 5??</div>
-            <div>???? ???? ???? ??: {Math.max(0, accessStatus.remaining)}</div>
-            <div>????? ????: {accessStatus.rewardBalance}??</div>
+          <div className="subscription-modal__body">
+            <p>{t("subscription.freeGrant", { n: 5 })}</p>
+            <p>{t("subscription.freeRemaining", { n: accessStatus.remaining })}</p>
+            <button
+              type="button"
+              className="subscription-modal__restore"
+              disabled={!isFlutterApp() || subscribing}
+              onClick={() => {
+                setSubscribing(true);
+                requestSubscriptionRestore();
+              }}
+            >
+              {t("subscription.restore")}
+            </button>
           </div>
         </AppModal>
       )}
