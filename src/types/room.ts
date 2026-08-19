@@ -1,4 +1,4 @@
-import type { Mood } from './diary';
+import type { DiarySticker, MoodPackId } from './diary';
 
 export interface RoomMember {
   userId: string;
@@ -31,7 +31,8 @@ export interface RoomPost {
   title: string;
   date: string;
   content: string;
-  mood: Mood;
+  mood: DiarySticker;
+  moodPack?: MoodPackId;
   imageUrl?: string;
   createdAt: string;
 }
@@ -50,6 +51,7 @@ export interface CreateRoomPostBody {
   title: string;
   date: string;
   content: string;
-  mood: Mood;
+  mood: DiarySticker;
+  moodPack?: MoodPackId;
   imageUrl?: string;
 }

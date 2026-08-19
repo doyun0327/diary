@@ -1,21 +1,26 @@
-import type { Mood } from '../types/diary';
-import { getMoodVisual, MOOD_ICON_TRANSFORMS, useMoodPackId } from '../utils/moodPack';
+import type { DiarySticker } from '../types/diary';
+import {
+  getMoodIconTransform,
+  getMoodVisual,
+  useMoodPackId,
+  type MoodPackId,
+} from '../utils/moodPack';
 import './MoodIcon.css';
 
 interface MoodIconProps {
-  mood: Mood;
+  mood: DiarySticker;
   className?: string;
   size?: number;
   decorative?: boolean;
-  /** 미리보기용: 특정 팩 강제 (선택 UI) */
-  packId?: import('../utils/moodPack').MoodPackId;
+  /** 미리보기·저장된 일기용: 특정 팩 강제 */
+  packId?: MoodPackId;
 }
 
 function MoodIcon({ mood, className = '', size, decorative = true, packId }: MoodIconProps) {
   const activePack = useMoodPackId();
   const resolvedPack = packId ?? activePack;
   const visual = getMoodVisual(mood, resolvedPack);
-  const transform = MOOD_ICON_TRANSFORMS[resolvedPack]?.[mood];
+  const transform = getMoodIconTransform(mood, resolvedPack);
   const style = {
     ...(size ? { width: size, height: size } : {}),
     ...(transform ? { transform } : {}),

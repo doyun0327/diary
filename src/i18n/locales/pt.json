@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "Menu",
+    "search": "Buscar",
+    "searchHint": "Buscar no diário",
     "tagline": "registre o meu dia",
     "footer": "Devagar, dia após dia",
     "account": "Conta",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "Fantasma",
       "desc": "Emojis de fantasma (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "Ícones de clima flat (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "Ícones de números (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "Ícones de números 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "Criar personagem e desenhar"
     },
     "writeFabAria": "Escrever diário",
+    "search": {
+      "title": "Buscar diários",
+      "aria": "Buscar diários",
+      "placeholder": "Buscar título ou conteúdo",
+      "empty": "Digite para buscar",
+      "noResults": "Nenhum diário encontrado",
+      "count": "{{n}} encontrado(s)"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Nenhum diário neste mês.",
@@ -557,10 +579,10 @@
     "prevMonth": "Mês anterior",
     "nextMonth": "Próximo mês",
     "goToday": "Ir para hoje",
-    "displayLabel": "Calendário",
-    "displayAria": "Exibição do calendário",
-    "displayEmoji": "Emoji",
-    "displayDrawing": "Desenho"
+    "displayLabel": "Início",
+    "displayAria": "Visualização inicial",
+    "displayLatest": "Recente",
+    "displayCalendar": "Calendário"
   },
   "mood": {
     "happy": "Feliz",

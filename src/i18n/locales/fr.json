@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "Menu",
+    "search": "Rechercher",
+    "searchHint": "Rechercher dans le journal",
     "tagline": "Capturer ma journée",
     "footer": "Doucement, jour après jour",
     "account": "Compte",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "Fantôme",
       "desc": "Emojis fantôme (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "Icônes météo plates (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "Icônes de nombres (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "Icônes de nombres 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "Créer mon perso et dessiner"
     },
     "writeFabAria": "Écrire un journal",
+    "search": {
+      "title": "Rechercher",
+      "aria": "Rechercher un journal",
+      "placeholder": "Rechercher titre ou contenu",
+      "empty": "Saisissez un mot",
+      "noResults": "Aucun journal trouvé",
+      "count": "{{n}} résultat(s)"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Aucun journal ce mois-ci.",
@@ -557,10 +579,10 @@
     "prevMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
     "goToday": "Aller à aujourd'hui",
-    "displayLabel": "Calendrier",
-    "displayAria": "Affichage du calendrier",
-    "displayEmoji": "Emoji",
-    "displayDrawing": "Dessin"
+    "displayLabel": "Accueil",
+    "displayAria": "Affichage de l'accueil",
+    "displayLatest": "Récent",
+    "displayCalendar": "Calendrier"
   },
   "mood": {
     "happy": "Heureux",

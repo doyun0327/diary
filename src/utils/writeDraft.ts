@@ -1,4 +1,4 @@
-import type { Mood } from '../types/diary';
+import type { DiarySticker } from '../types/diary';
 
 const DRAFT_KEY = 'picture-diary-write-draft';
 
@@ -6,7 +6,7 @@ export interface WriteDraft {
   date: string;
   title: string;
   content: string;
-  mood: Mood;
+  mood: DiarySticker;
   fontId?: string;
   /** @deprecated 그림은 임시저장하지 않음 — 기존 데이터 호환용 */
   imageUrl?: string;

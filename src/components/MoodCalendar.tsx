@@ -1,10 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import type { DiaryEntry, Mood } from '../types/diary';
-import { MOOD_MAP } from '../types/diary';
-import {
-  applyCalendarDisplayMode,
-  useCalendarDisplayMode,
-} from '../utils/calendarDisplay';
+import type { DiaryEntry, DiarySticker } from '../types/diary';
+import { isMood } from '../types/diary';
 import { formatYearMonth } from '../utils/date';
 import MoodIcon from './MoodIcon';
 import './MoodCalendar.css';
@@ -19,7 +15,8 @@ interface MoodCalendarProps {
 }
 
 interface DayMark {
-  mood?: Mood;
+  sticker?: DiarySticker;
+  moodPack?: DiaryEntry['moodPack'];
   imageUrl?: string;
 }
 
@@ -38,7 +35,6 @@ function MoodCalendar({
   hideHeader = false,
 }: MoodCalendarProps) {
   const { t } = useTranslation();
-  const displayMode = useCalendarDisplayMode();
   const now = new Date();
 
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
@@ -54,10 +50,10 @@ function MoodCalendar({
   const markByDate = new Map<string, DayMark>();
   for (const entry of entries) {
     if (markByDate.has(entry.date)) continue;
-    const mood = MOOD_MAP[entry.mood] ? entry.mood : undefined;
+    const sticker = entry.mood;
     const imageUrl = entry.imageUrl?.trim() ? entry.imageUrl : undefined;
-    if (mood || imageUrl) {
-      markByDate.set(entry.date, { mood, imageUrl });
+    if (sticker || imageUrl) {
+      markByDate.set(entry.date, { sticker, moodPack: entry.moodPack, imageUrl });
     }
   }
 
@@ -69,17 +65,9 @@ function MoodCalendar({
   const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6].map((i) => t(`common.weekday.${i}`));
 
   return (
-    <div
-      className={[
-        'mood-cal',
-        hideHeader ? 'mood-cal--no-header' : '',
-        displayMode === 'drawing' ? 'mood-cal--drawing' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <div className="mood-cal__toolbar">
-        {!hideHeader ? (
+    <div className={`mood-cal mood-cal--drawing${hideHeader ? ' mood-cal--no-header' : ''}`}>
+      {!hideHeader && (
+        <div className="mood-cal__toolbar">
           <div className="mood-cal__header">
             <button type="button" onClick={() => moveMonth(-1)} aria-label={t('calendar.prevMonth')}>
               ‹
@@ -89,27 +77,8 @@ function MoodCalendar({
               ›
             </button>
           </div>
-        ) : (
-          <span className="mood-cal__display-label"></span>
-        )}
-
-        <div className="mood-cal__display" role="group" aria-label={t('calendar.displayAria')}>
-          <button
-            type="button"
-            className={`mood-cal__display-btn ${displayMode === 'emoji' ? 'is-active' : ''}`}
-            onClick={() => applyCalendarDisplayMode('emoji')}
-          >
-            {t('calendar.displayEmoji')}
-          </button>
-          <button
-            type="button"
-            className={`mood-cal__display-btn ${displayMode === 'drawing' ? 'is-active' : ''}`}
-            onClick={() => applyCalendarDisplayMode('drawing')}
-          >
-            {t('calendar.displayDrawing')}
-          </button>
         </div>
-      </div>
+      )}
 
       <div className="mood-cal__weekdays">
         {WEEKDAYS.map((w, i) => (
@@ -124,11 +93,16 @@ function MoodCalendar({
           }
           const dateStr = toDateString(viewYear, viewMonth, day);
           const mark = markByDate.get(dateStr);
-          const mood = mark?.mood;
+          const sticker = mark?.sticker;
           const imageUrl = mark?.imageUrl;
-          const showDrawing = displayMode === 'drawing' && Boolean(imageUrl);
-          const showMood = Boolean(mood) && !showDrawing;
+          const showDrawing = Boolean(imageUrl);
+          const showMood = Boolean(sticker) && !showDrawing;
           const isToday = dateStr === todayStr;
+          const moodLabel = sticker
+            ? isMood(sticker)
+              ? t(`mood.${sticker}`)
+              : sticker
+            : '';
 
           return (
             <button
@@ -141,7 +115,7 @@ function MoodCalendar({
                 isToday ? 'today' : '',
               ].filter(Boolean).join(' ')}
               onClick={() => onSelectDate?.(dateStr)}
-              aria-label={`${day}${mood ? ` ${t(`mood.${mood}`)}` : ''}`}
+              aria-label={`${day}${moodLabel ? ` ${moodLabel}` : ''}`}
             >
               {showDrawing && imageUrl ? (
                 <img
@@ -150,8 +124,8 @@ function MoodCalendar({
                   alt=""
                   draggable={false}
                 />
-              ) : showMood && mood ? (
-                <MoodIcon mood={mood} />
+              ) : showMood && sticker ? (
+                <MoodIcon mood={sticker} packId={mark?.moodPack} />
               ) : (
                 day
               )}

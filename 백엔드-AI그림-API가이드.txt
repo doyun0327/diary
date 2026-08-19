@@ -67,8 +67,8 @@ ugly, nsfw, multiple people
       model: stabilityai/stable-diffusion-3.5-large
       api-url: ${SD_API_URL}
       api-key: ${SD_API_KEY}
-      width: 768
-      height: 512
+      width: 640
+      height: 992
 
 Gemini / Flux 설정·코드는 넣지 말 것.
 

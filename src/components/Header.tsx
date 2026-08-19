@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-// import { formatYearMonth } from '../utils/date';
+import { formatYearMonth } from '../utils/date';
 import MonthYearPicker from './MonthYearPicker';
 import './Header.css';
 
@@ -16,6 +16,7 @@ interface HeaderProps {
   onOpenExport?: () => void;
   onOpenRooms?: () => void;
   onOpenAppInfo?: () => void;
+  onOpenSearch?: () => void;
   calendarNav?: {
     year: number;
     month: number;
@@ -137,7 +138,6 @@ function IconInfo() {
   );
 }
 
-/*
 function IconChevronLeft() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -153,7 +153,6 @@ function IconChevronRight() {
     </svg>
   );
 }
-*/
 
 function MenuItem({
   icon,
@@ -234,9 +233,10 @@ function Header({
   onOpenRooms,
   onOpenAppInfo,
   calendarNav = null,
-  hideBar: _hideBar = false,
+  hideBar = false,
   onNativeBack,
   onNativeSave,
+  onOpenSearch,
 }: HeaderProps) {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -265,6 +265,11 @@ function Header({
       if (action === 'openMenu') {
         setMonthPickerOpen(false);
         setMenuOpen((open) => !open);
+      }
+      if (action === 'openSearch') {
+        setMenuOpen(false);
+        setMonthPickerOpen(false);
+        onOpenSearch?.();
       }
       if (action === 'closeMenu') setMenuOpen(false);
       if (action === 'back') {
@@ -300,7 +305,7 @@ function Header({
     return () => {
       delete window.diaryHeaderAction;
     };
-  }, [calendarNav, onNativeBack, onNativeSave]);
+  }, [calendarNav, onNativeBack, onNativeSave, onOpenSearch]);
 
   const closeAnd = (fn?: () => void) => {
     setMenuOpen(false);
@@ -411,15 +416,6 @@ function Header({
       />
     ) : null;
 
-  // ??? ?????? ?? Flutter AppBar?? ??????. ??/??? ???????? ????????? ?????.
-  return (
-    <>
-      {picker}
-      {menu}
-    </>
-  );
-
-  /*
   if (hideBar) {
     return (
       <>
@@ -469,33 +465,63 @@ function Header({
       ) : (
         <span className="header__spacer" aria-hidden />
       )}
-      <button
-        type="button"
-        className="header__burger"
-        aria-label={t('header.menu')}
-        onClick={() => setMenuOpen(true)}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
+      <div className="header__actions">
+        {onOpenSearch && (
+          <button
+            type="button"
+            className="header__burger"
+            aria-label={t('header.search')}
+            title={t('header.searchHint')}
+            onClick={() => {
+              setMenuOpen(false);
+              setMonthPickerOpen(false);
+              onOpenSearch();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </button>
+        )}
+        <button
+          type="button"
+          className="header__burger"
+          aria-label={t('header.menu')}
+          onClick={() => setMenuOpen(true)}
         >
-          <path d="M4 5h16" />
-          <path d="M4 12h16" />
-          <path d="M4 19h16" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M4 5h16" />
+            <path d="M4 12h16" />
+            <path d="M4 19h16" />
+          </svg>
+        </button>
+      </div>
       {menu}
     </header>
   );
-  */
 }
 
 export default Header;

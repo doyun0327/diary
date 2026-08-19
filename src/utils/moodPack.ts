@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react';
-import type { Mood } from '../types/diary';
-import { MOODS } from '../types/diary';
+import type { DiarySticker, Mood, MoodPackId, NumberSticker } from '../types/diary';
+import { isMood, isNumberSticker, MOODS, NUMBER_STICKERS } from '../types/diary';
 
-export type MoodPackId = 'classic' | 'smileys' | 'cat' | 'dog' | 'love' | 'ghost';
+export type { MoodPackId };
 
 export const MOOD_PACK_STORAGE_KEY = 'picture-diary-mood-pack';
 export const MOOD_PACK_CHANGE_EVENT = 'mood-pack-change';
@@ -96,6 +96,22 @@ const LOVE_ICONS: Record<Mood, string> = {
   sick: '/moods/love/sick.png',
 };
 
+/** iconixar · Weather Flat pack — 정적 PNG */
+const WEATHER_ICONS: Record<Mood, string> = {
+  happy: '/moods/weather/happy.png',
+  excited: '/moods/weather/excited.png',
+  love: '/moods/weather/love.png',
+  proud: '/moods/weather/proud.png',
+  calm: '/moods/weather/calm.png',
+  sleepy: '/moods/weather/sleepy.png',
+  soso: '/moods/weather/soso.png',
+  surprised: '/moods/weather/surprised.png',
+  sad: '/moods/weather/sad.png',
+  angry: '/moods/weather/angry.png',
+  anxious: '/moods/weather/anxious.png',
+  sick: '/moods/weather/sick.png',
+};
+
 /** muhammad atho' · Ghost pack — 정적 PNG */
 const GHOST_ICONS: Record<Mood, string> = {
   happy: '/moods/ghost/happy.png',
@@ -112,10 +128,42 @@ const GHOST_ICONS: Record<Mood, string> = {
   sick: '/moods/ghost/sick.png',
 };
 
+/** Md Tanvirul Haque · Numbers 0 to 100 — 기분과 매핑하지 않음 */
+const NUMBER_ICONS: Record<NumberSticker, string> = {
+  '10': '/moods/numbers/10.png',
+  '20': '/moods/numbers/20.png',
+  '30': '/moods/numbers/30.png',
+  '40': '/moods/numbers/40.png',
+  '50': '/moods/numbers/50.png',
+  '60': '/moods/numbers/60.png',
+  '70': '/moods/numbers/70.png',
+  '80': '/moods/numbers/80.png',
+  '90': '/moods/numbers/90.png',
+  '100': '/moods/numbers/100.png',
+};
+
+/** Md Tanvirul Haque · number 10 / 20 스타일 — 기분과 매핑하지 않음 */
+const NUMBER2_ICONS: Record<NumberSticker, string> = {
+  '10': '/moods/numbers2/10.png',
+  '20': '/moods/numbers2/20.png',
+  '30': '/moods/numbers2/30.png',
+  '40': '/moods/numbers2/40.png',
+  '50': '/moods/numbers2/50.png',
+  '60': '/moods/numbers2/60.png',
+  '70': '/moods/numbers2/70.png',
+  '80': '/moods/numbers2/80.png',
+  '90': '/moods/numbers2/90.png',
+  '100': '/moods/numbers2/100.png',
+};
+
+export function isNumberPack(packId: MoodPackId): boolean {
+  return packId === 'numbers' || packId === 'numbers2';
+}
+
 export const MOOD_PACKS: {
   id: MoodPackId;
-  preview: Mood[];
-  icons?: Partial<Record<Mood, string>>;
+  preview: DiarySticker[];
+  icons?: Partial<Record<DiarySticker, string>>;
   attribution?: { author: string; href: string };
 }[] = [
   {
@@ -172,6 +220,33 @@ export const MOOD_PACKS: {
       href: 'https://www.flaticon.com/packs/ghost-8',
     },
   },
+  {
+    id: 'weather',
+    preview: ['happy', 'soso', 'sad', 'angry'],
+    icons: WEATHER_ICONS,
+    attribution: {
+      author: 'iconixar',
+      href: 'https://www.flaticon.com/packs/weather-161',
+    },
+  },
+  {
+    id: 'numbers',
+    preview: ['10', '30','50', '100'],
+    icons: NUMBER_ICONS,
+    attribution: {
+      author: 'Md Tanvirul Haque',
+      href: 'https://www.flaticon.com/packs/numbers-0-to-100',
+    },
+  },
+  {
+    id: 'numbers2',
+    preview: ['10', '30','50', '100'],
+    icons: NUMBER2_ICONS,
+    attribution: {
+      author: 'Md Tanvirul Haque',
+      href: 'https://www.flaticon.com/free-icons/number-10',
+    },
+  },
 ];
 
 /** 앱 정보 · 라이선스에 표시할 출처 목록 */
@@ -180,23 +255,31 @@ export const MOOD_ICON_CREDITS = MOOD_PACKS.filter((p) => p.attribution).map((p)
   ...p.attribution!,
 }));
 
+export function isValidMoodPackId(id: unknown): id is MoodPackId {
+  return typeof id === 'string' && MOOD_PACKS.some((p) => p.id === id);
+}
+
+export function parseMoodPackId(id: unknown): MoodPackId | undefined {
+  if (isValidMoodPackId(id)) return id;
+  if (id === 'weatherAnimated' || id === 'weatherStatic') return 'weather';
+  return undefined;
+}
+
 export function getStoredMoodPackId(): MoodPackId {
   try {
-    const raw = localStorage.getItem(MOOD_PACK_STORAGE_KEY);
-    if (
-      raw === 'classic' ||
-      raw === 'smileys' ||
-      raw === 'cat' ||
-      raw === 'dog' ||
-      raw === 'love' ||
-      raw === 'ghost'
-    ) {
-      return raw;
-    }
+    return parseMoodPackId(localStorage.getItem(MOOD_PACK_STORAGE_KEY)) ?? 'smileys';
   } catch {
-    // ignore
+    return 'smileys';
   }
-  return 'smileys';
+}
+
+export function defaultStickerForPack(packId: MoodPackId): DiarySticker {
+  return isNumberPack(packId) ? NUMBER_STICKERS[0] : 'happy';
+}
+
+/** 일기에 저장된 팩. 없으면 현재 선택 팩(기존 일기 마이그레이션 전) */
+export function entryMoodPack(entry: { moodPack?: string } | null | undefined): MoodPackId {
+  return parseMoodPackId(entry?.moodPack) ?? getStoredMoodPackId();
 }
 
 export function applyMoodPack(id: MoodPackId) {
@@ -216,16 +299,36 @@ export function getMoodPack(id: MoodPackId = getStoredMoodPackId()) {
   return MOOD_PACKS.find((p) => p.id === id) ?? MOOD_PACKS[0];
 }
 
-/** 현재 팩 기준 표시용: 아이콘 URL 또는 유니코드 이모지 */
-export function getMoodVisual(mood: Mood, packId: MoodPackId = getStoredMoodPackId()) {
-  const base = MOODS.find((m) => m.value === mood);
+/** 숫자 스티커는 해당 숫자 팩 아이콘. 기분은 해당 팩 아이콘 */
+export function getMoodVisual(sticker: DiarySticker, packId: MoodPackId = getStoredMoodPackId()) {
+  if (isNumberSticker(sticker)) {
+    const icons = packId === 'numbers2' ? NUMBER2_ICONS : NUMBER_ICONS;
+    return {
+      emoji: sticker,
+      label: sticker,
+      icon: icons[sticker],
+    };
+  }
+  const base = MOODS.find((m) => m.value === sticker);
+  if (isNumberPack(packId)) {
+    return {
+      emoji: base?.emoji ?? '☺️',
+      label: base?.label ?? sticker,
+      icon: undefined,
+    };
+  }
   const pack = getMoodPack(packId);
-  const icon = pack.icons?.[mood];
+  const icon = pack.icons?.[sticker];
   return {
     emoji: base?.emoji ?? '☺️',
-    label: base?.label ?? mood,
+    label: base?.label ?? sticker,
     icon,
   };
+}
+
+export function getMoodIconTransform(sticker: DiarySticker, packId: MoodPackId) {
+  if (!isMood(sticker)) return undefined;
+  return MOOD_ICON_TRANSFORMS[packId]?.[sticker];
 }
 
 function subscribeMoodPack(onStoreChange: () => void) {

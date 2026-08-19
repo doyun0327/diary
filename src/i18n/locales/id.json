@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "Menu",
+    "search": "Cari",
+    "searchHint": "Cari isi diary",
     "tagline": "abadikan hariku",
     "footer": "Pelan-pelan, hari demi hari",
     "account": "Akun",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "Hantu",
       "desc": "Emoji hantu (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "Ikon cuaca datar (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "Ikon angka (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "Ikon angka 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "Buat karakter & gambar pertama"
     },
     "writeFabAria": "Tulis diary",
+    "search": {
+      "title": "Cari diary",
+      "aria": "Cari diary",
+      "placeholder": "Cari judul atau isi",
+      "empty": "Ketik kata untuk mencari",
+      "noResults": "Tidak ada diary yang cocok",
+      "count": "{{n}} ditemukan"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Tidak ada diary bulan ini.",
@@ -557,10 +579,10 @@
     "prevMonth": "Bulan sebelumnya",
     "nextMonth": "Bulan berikutnya",
     "goToday": "Ke hari ini",
-    "displayLabel": "Kalender",
-    "displayAria": "Tampilan kalender",
-    "displayEmoji": "Emoji",
-    "displayDrawing": "Gambar"
+    "displayLabel": "Tampilan beranda",
+    "displayAria": "Tampilan beranda",
+    "displayLatest": "Terbaru",
+    "displayCalendar": "Kalender"
   },
   "mood": {
     "happy": "Bahagia",

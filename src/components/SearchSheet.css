@@ -1,0 +1,122 @@
+.search-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.search-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay);
+  backdrop-filter: blur(8px);
+}
+
+.search-sheet__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: min(88dvh, 720px);
+  padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: var(--sheet-bg);
+  box-shadow: 0 -20px 50px rgba(90, 60, 40, 0.14);
+  animation: search-sheet-up 0.3s var(--ease-out);
+}
+
+.search-sheet__panel::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 4px auto 12px;
+  border-radius: 999px;
+  background: var(--sheet-handle);
+}
+
+.search-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.search-sheet__head h2 {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.search-sheet__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-bg-input);
+}
+
+.search-sheet__field-icon {
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.search-sheet__field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+  outline: none;
+}
+
+.search-sheet__field input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.search-sheet__hint {
+  margin: 28px 8px 12px;
+  text-align: center;
+  font-family: 'Gaegu', 'Hi Melody', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.search-sheet__results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.search-sheet__count {
+  margin: 0 2px 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+@keyframes search-sheet-up {
+  from {
+    transform: translateY(18px);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

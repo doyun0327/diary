@@ -1,7 +1,11 @@
 export const FREE_ENTRY_GRANT = 5;
+/** ???: ???? 5?? ??? ????. ??? ???? ?? true?? ??????? ?? */
+export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 2900;
 export const FREE_AI_DRAWS_PER_DAY = 2;
+/** 임시: 광고 보고 AI 그림 1회 비활성. 다시 켤 때 true */
+export const AI_REWARD_AD_ENABLED = false;
 
 const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";
@@ -149,6 +153,16 @@ export function getDiaryAccessState(
     };
   }
 
+  if (!FREE_ENTRY_LIMIT_ENABLED) {
+    return {
+      canCreate: true,
+      remaining: Number.MAX_SAFE_INTEGER,
+      isPremiumActive: false,
+      monthlyRemaining: 0,
+      message: "Free diary limit is temporarily disabled.",
+    };
+  }
+
   const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
 
   return {
@@ -158,8 +172,8 @@ export function getDiaryAccessState(
     monthlyRemaining: 0,
     message:
       freeRemaining > 0
-        ? `???? ??? ${freeRemaining}???? ?? ?? ?? ????.`
-        : "???? 5???? ??? ???????. ?? ???? ?? ??? ????? ?? ????.",
+        ? `Free diaries remaining: ${freeRemaining}.`
+        : "Free 5 diaries used. Subscribe to keep writing.",
   };
 }
 

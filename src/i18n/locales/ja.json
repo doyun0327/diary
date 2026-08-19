@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "メニュー",
+    "search": "検索",
+    "searchHint": "日記を検索",
     "tagline": "わたしの一日を残す",
     "footer": "ゆっくり、一日ずつ",
     "account": "アカウント",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "ゴースト",
       "desc": "ゴースト絵文字（Flaticon）"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "フラット天気アイコン (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "数字アイコン (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "数字アイコン 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "キャラを作って最初の絵を描く"
     },
     "writeFabAria": "日記を書く",
+    "search": {
+      "title": "日記検索",
+      "aria": "日記検索",
+      "placeholder": "タイトルや本文を検索",
+      "empty": "検索語を入力してください",
+      "noResults": "一致する日記がありません",
+      "count": "{{n}}件"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "今月の日記はまだありません。",
@@ -557,10 +579,10 @@
     "prevMonth": "前月",
     "nextMonth": "翌月",
     "goToday": "今日へ",
-    "displayLabel": "カレンダー表示",
-    "displayAria": "カレンダーの表示",
-    "displayEmoji": "絵文字",
-    "displayDrawing": "絵"
+    "displayLabel": "ホーム表示",
+    "displayAria": "ホームの表示",
+    "displayLatest": "最新",
+    "displayCalendar": "カレンダー"
   },
   "mood": {
     "happy": "うれしい",

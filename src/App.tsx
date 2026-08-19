@@ -14,6 +14,7 @@ import PinVerifyScreen from "./components/PinVerifyScreen";
 import ExportSheet from "./components/ExportSheet";
 import DecorateSheet from "./components/DecorateSheet";
 import AppInfoSheet from "./components/AppInfoSheet";
+import SearchSheet from "./components/SearchSheet";
 import AppModal from "./components/AppModal";
 import { applyStoredFont } from "./components/FontPicker";
 import DiaryBookViewer from "./components/DiaryBookViewer";
@@ -80,6 +81,7 @@ function App() {
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
   const [lockDisableOpen, setLockDisableOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [decorateOpen, setDecorateOpen] = useState(false);
   const [appInfoOpen, setAppInfoOpen] = useState(false);
   const [bookEntries, setBookEntries] = useState<DiaryEntry[] | null>(null);
@@ -177,6 +179,7 @@ function App() {
     : undefined;
 
   const handleSelect = (id: string) => {
+    setSearchOpen(false);
     setSelectedId(id);
     setEditingId(null);
     setPage("detail");
@@ -254,6 +257,10 @@ function App() {
       setExportOpen(false);
       return true;
     }
+    if (searchOpen) {
+      setSearchOpen(false);
+      return true;
+    }
     if (characterOpen) {
       setCharacterOpen(false);
       setWriteAfterCharacter(false);
@@ -306,6 +313,7 @@ function App() {
     decorateOpen,
     editingId,
     exportOpen,
+    searchOpen,
     languageOpen,
     lockDisableOpen,
     lockSetupOpen,
@@ -450,6 +458,7 @@ function App() {
       showBack: isRooms || isWrite,
       showSave: isWrite,
       showMenu: !isWrite && !isRooms,
+      showSearch: !isWrite && !isRooms,
       year: calYear,
       month: calMonth,
       label:
@@ -513,7 +522,7 @@ function App() {
   return (
     <div className="app">
       <Header
-        hideBar
+        hideBar={isFlutterApp()}
         nickname={nickname}
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}
@@ -522,6 +531,7 @@ function App() {
         onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
         onOpenExport={() => setExportOpen(true)}
+        onOpenSearch={() => setSearchOpen(true)}
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
         onNativeBack={() => {
@@ -737,6 +747,15 @@ function App() {
               setBookRange(range);
               setExportOpen(false);
             }}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {searchOpen &&
+        createPortal(
+          <SearchSheet
+            entries={entries}
+            onClose={() => setSearchOpen(false)}
+            onSelect={handleSelect}
           />,
           document.getElementById("root") ?? document.body,
         )}

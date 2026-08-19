@@ -147,6 +147,7 @@ function DiaryDetailPage({
       date: entry.date,
       content: entry.content,
       mood: entry.mood,
+      moodPack: entry.moodPack,
       imageUrl: entry.imageUrl,
     };
 
@@ -408,7 +409,7 @@ function DiaryDetailPage({
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>
           <span className="diary-detail__mood">
-            <MoodIcon mood={entry.mood} size={22} />
+            <MoodIcon mood={entry.mood} packId={entry.moodPack} size={22} />
           </span>
         </div>
 

@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "菜单",
+    "search": "搜索",
+    "searchHint": "搜索日记内容",
     "tagline": "记录我的一天",
     "footer": "慢慢地，一天一天",
     "account": "账号",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "幽灵",
       "desc": "幽灵表情（Flaticon）"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "扁平天气图标 (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "数字图标 (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "数字图标 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "设置角色并画第一张图"
     },
     "writeFabAria": "写日记",
+    "search": {
+      "title": "搜索日记",
+      "aria": "搜索日记",
+      "placeholder": "搜索标题或内容",
+      "empty": "请输入搜索词",
+      "noResults": "没有匹配的日记",
+      "count": "{{n}}条"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "这个月还没有日记。",
@@ -557,10 +579,10 @@
     "prevMonth": "上个月",
     "nextMonth": "下个月",
     "goToday": "回到今天",
-    "displayLabel": "日历显示",
-    "displayAria": "日历显示方式",
-    "displayEmoji": "表情",
-    "displayDrawing": "图画"
+    "displayLabel": "首页显示",
+    "displayAria": "首页显示方式",
+    "displayLatest": "最近",
+    "displayCalendar": "日历"
   },
   "mood": {
     "happy": "开心",

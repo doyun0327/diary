@@ -5,7 +5,7 @@ import MoodIcon from './MoodIcon';
 import '../pages/DiaryDetailPage.css';
 
 interface RoomDiaryPaperProps {
-  post: Pick<RoomPost, 'date' | 'title' | 'content' | 'mood' | 'imageUrl'>;
+  post: Pick<RoomPost, 'date' | 'title' | 'content' | 'mood' | 'moodPack' | 'imageUrl'>;
   /** 갤러리용 축소 paper */
   compact?: boolean;
   className?: string;
@@ -23,7 +23,7 @@ function RoomDiaryPaper({ post, compact = false, className = '' }: RoomDiaryPape
       <div className="diary-detail__dateline">
         <span>{formatDate(post.date)}</span>
         <span className="diary-detail__mood">
-          <MoodIcon mood={post.mood} size={compact ? 16 : 22} />
+          <MoodIcon mood={post.mood} packId={post.moodPack} size={compact ? 16 : 22} />
         </span>
       </div>
 

@@ -2,8 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLottie } from 'lottie-react';
-import type { DiaryEntry, Mood } from '../types/diary';
-import { MOODS } from '../types/diary';
+import type { DiaryEntry, DiarySticker } from '../types/diary';
+import { isMood, isNumberSticker, MOODS, NUMBER_STICKERS } from '../types/diary';
+import {
+  defaultStickerForPack,
+  entryMoodPack,
+  getStoredMoodPackId,
+  isNumberPack,
+  useMoodPackId,
+} from '../utils/moodPack';
 import type { CharacterProfile } from '../types/character';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
@@ -15,6 +22,7 @@ import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, getPreferredFontId } from '../utils/fonts';
 import {
+  AI_REWARD_AD_ENABLED,
   MONTHLY_PRICE_KRW,
   consumeAiDrawCredit,
   consumeFreeAiDrawChance,
@@ -71,10 +79,14 @@ function DiaryWritePage({
 }: DiaryWritePageProps) {
   const { t } = useTranslation();
   const isEdit = Boolean(initialEntry);
+  const globalPack = useMoodPackId();
+  const writePackId = isEdit ? entryMoodPack(initialEntry) : globalPack;
   const [date, setDate] = useState(initialEntry?.date ?? today());
   const [title, setTitle] = useState(initialEntry?.title ?? '');
   const [content, setContent] = useState(initialEntry?.content ?? '');
-  const [mood, setMood] = useState<Mood>(initialEntry?.mood ?? 'happy');
+  const [mood, setMood] = useState<DiarySticker>(
+    () => initialEntry?.mood ?? defaultStickerForPack(getStoredMoodPackId()),
+  );
   const [fontId, setFontId] = useState(
     () => initialEntry?.fontId ?? getPreferredFontId(),
   );
@@ -100,6 +112,14 @@ function DiaryWritePage({
   useEffect(() => {
     onNativeSaveStateChange?.(!aiLoading);
   }, [aiLoading, onNativeSaveStateChange]);
+
+  useEffect(() => {
+    if (isEdit) return;
+    setMood((prev) => {
+      if (isNumberPack(writePackId)) return isNumberSticker(prev) ? prev : '10';
+      return isMood(prev) ? prev : 'happy';
+    });
+  }, [writePackId, isEdit]);
 
   useEffect(() => {
     const onNativeSave = () => formRef.current?.requestSubmit();
@@ -184,29 +204,33 @@ function DiaryWritePage({
       setReplaceConfirmOpen(true);
       return;
     }
-    const access = getDiaryAccessState();
-    if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
-      setRewardPromptOpen(true);
-      return;
+    if (AI_REWARD_AD_ENABLED) {
+      const access = getDiaryAccessState();
+      if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
+        setRewardPromptOpen(true);
+        return;
+      }
     }
     void runAiDraw();
   };
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
-    const access = getDiaryAccessState();
-    if (!access.isPremiumActive) {
-      if (getRemainingFreeAiDrawsToday() <= 0) {
-        setAiError(t('write.err.aiDailyLimit'));
-        return;
-      }
-      if (!consumeAiDrawCredit()) {
-        setRewardPromptOpen(true);
-        return;
-      }
-      if (!consumeFreeAiDrawChance()) {
-        setAiError(t('write.err.aiDailyLimit'));
-        return;
+    if (AI_REWARD_AD_ENABLED) {
+      const access = getDiaryAccessState();
+      if (!access.isPremiumActive) {
+        if (getRemainingFreeAiDrawsToday() <= 0) {
+          setAiError(t('write.err.aiDailyLimit'));
+          return;
+        }
+        if (!consumeAiDrawCredit()) {
+          setRewardPromptOpen(true);
+          return;
+        }
+        if (!consumeFreeAiDrawChance()) {
+          setAiError(t('write.err.aiDailyLimit'));
+          return;
+        }
       }
     }
     setAiError(null);
@@ -269,6 +293,7 @@ function DiaryWritePage({
       title: title.trim(),
       content: content.trim(),
       mood,
+      moodPack: writePackId,
       fontId,
       imageUrl,
     });
@@ -318,17 +343,29 @@ function DiaryWritePage({
           )}
 
           <div className="diary-write__moods">
-            {MOODS.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                className={mood === m.value ? 'selected' : ''}
-                title={t(`mood.${m.value}`)}
-                onClick={() => setMood(m.value)}
-              >
-                <MoodIcon mood={m.value} />
-              </button>
-            ))}
+            {isNumberPack(writePackId)
+              ? NUMBER_STICKERS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={mood === n ? 'selected' : ''}
+                    title={n}
+                    onClick={() => setMood(n)}
+                  >
+                    <MoodIcon mood={n} packId={writePackId} />
+                  </button>
+                ))
+              : MOODS.map((m) => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    className={mood === m.value ? 'selected' : ''}
+                    title={t(`mood.${m.value}`)}
+                    onClick={() => setMood(m.value)}
+                  >
+                    <MoodIcon mood={m.value} packId={writePackId} />
+                  </button>
+                ))}
           </div>
         </div>
 

@@ -4,14 +4,29 @@ import { getAccessToken } from './useAuthSession';
 import type { DiaryEntry } from '../types/diary';
 import { mergeDiaryEntries } from '../utils/diarySync';
 import { createId } from '../utils/id';
+import { getStoredMoodPackId, parseMoodPackId } from '../utils/moodPack';
 
 const STORAGE_KEY = 'picture-diary-entries';
 const DELETED_KEY = 'picture-diary-deleted-ids';
 
+function stampMissingMoodPack(entries: DiaryEntry[]): DiaryEntry[] {
+  const fallback = getStoredMoodPackId();
+  let changed = false;
+  const next = entries.map((entry) => {
+    const pack = parseMoodPackId(entry.moodPack);
+    if (pack && pack === entry.moodPack) return entry;
+    changed = true;
+    return { ...entry, moodPack: pack ?? fallback };
+  });
+  if (changed) persistEntries(next);
+  return next;
+}
+
 function loadEntries(): DiaryEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as DiaryEntry[]) : [];
+    const parsed = raw ? (JSON.parse(raw) as DiaryEntry[]) : [];
+    return stampMissingMoodPack(Array.isArray(parsed) ? parsed : []);
   } catch {
     return [];
   }

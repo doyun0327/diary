@@ -22,7 +22,7 @@ function DiaryCard({ entry, onClick }: DiaryCardProps) {
       </div>
       <div className="diary-card__body">
         <h3>
-          <MoodIcon mood={entry.mood} size={18} /> {entry.title || entry.date}
+          <MoodIcon mood={entry.mood} packId={entry.moodPack} size={18} /> {entry.title || entry.date}
         </h3>
         <p className="diary-card__meta">
           {entry.content || entry.date}

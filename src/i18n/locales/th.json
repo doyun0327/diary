@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "เมนู",
+    "search": "ค้นหา",
+    "searchHint": "ค้นหาเนื้อหาไดอารี่",
     "tagline": "บันทึกวันของฉัน",
     "footer": "ช้า ๆ วันแล้ววันเล่า",
     "account": "บัญชี",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "ผี",
       "desc": "อีโมจิผี (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "ไอคอนอากาศแบบแฟลต (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "ไอคอนตัวเลข (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "ไอคอนตัวเลข 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "สร้างตัวละครแล้ววาดภาพแรก"
     },
     "writeFabAria": "เขียนไดอารี่",
+    "search": {
+      "title": "ค้นหาไดอารี่",
+      "aria": "ค้นหาไดอารี่",
+      "placeholder": "ค้นหาชื่อหรือเนื้อหา",
+      "empty": "พิมพ์คำค้นหา",
+      "noResults": "ไม่พบไดอารี่ที่ตรงกัน",
+      "count": "พบ {{n}} รายการ"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "ไม่มีไดอารี่ในเดือนนี้",
@@ -557,10 +579,10 @@
     "prevMonth": "เดือนก่อน",
     "nextMonth": "เดือนถัดไป",
     "goToday": "ไปวันนี้",
-    "displayLabel": "ปฏิทิน",
-    "displayAria": "การแสดงปฏิทิน",
-    "displayEmoji": "อีโมจิ",
-    "displayDrawing": "รูป"
+    "displayLabel": "หน้าหลัก",
+    "displayAria": "มุมมองหน้าหลัก",
+    "displayLatest": "ล่าสุด",
+    "displayCalendar": "ปฏิทิน"
   },
   "mood": {
     "happy": "มีความสุข",

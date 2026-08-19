@@ -18,7 +18,9 @@ export function mergeDiaryEntries(
     if (!entry?.id || deleted.has(entry.id)) continue;
     const prev = map.get(entry.id);
     if (!prev || isSameOrNewer(entry.updatedAt, prev.updatedAt)) {
-      map.set(entry.id, normalizeEntry(entry));
+      const next = normalizeEntry(entry);
+      if (!next.moodPack && prev?.moodPack) next.moodPack = prev.moodPack;
+      map.set(entry.id, next);
     }
   }
 
@@ -45,6 +47,7 @@ function normalizeEntry(entry: DiaryEntry): DiaryEntry {
     content: entry.content ?? '',
     imageUrl: entry.imageUrl || undefined,
     mood: entry.mood,
+    moodPack: entry.moodPack,
     fontId: entry.fontId || undefined,
     createdAt: entry.createdAt,
     updatedAt: entry.updatedAt,

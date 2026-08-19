@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "Menú",
+    "search": "Buscar",
+    "searchHint": "Buscar en el diario",
     "tagline": "Captura mi día",
     "footer": "Despacio, día a día",
     "account": "Cuenta",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "Fantasma",
       "desc": "Emojis de fantasma (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "Iconos de clima planos (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "Iconos de números (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "Iconos de números 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "Crear personaje y dibujar"
     },
     "writeFabAria": "Escribir diario",
+    "search": {
+      "title": "Buscar diarios",
+      "aria": "Buscar diarios",
+      "placeholder": "Buscar título o contenido",
+      "empty": "Escribe para buscar",
+      "noResults": "No hay diarios coincidentes",
+      "count": "{{n}} encontrado(s)"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "No hay diarios este mes.",
@@ -557,10 +579,10 @@
     "prevMonth": "Mes anterior",
     "nextMonth": "Mes siguiente",
     "goToday": "Ir a hoy",
-    "displayLabel": "Calendario",
-    "displayAria": "Vista del calendario",
-    "displayEmoji": "Emoji",
-    "displayDrawing": "Dibujo"
+    "displayLabel": "Inicio",
+    "displayAria": "Vista de inicio",
+    "displayLatest": "Reciente",
+    "displayCalendar": "Calendario"
   },
   "mood": {
     "happy": "Feliz",

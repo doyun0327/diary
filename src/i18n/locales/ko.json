@@ -29,6 +29,8 @@
   },
   "header": {
     "menu": "메뉴",
+    "search": "검색",
+    "searchHint": "일기 내용 검색",
     "tagline": "나의 하루를 남기다",
     "footer": "천천히, 하루씩",
     "account": "계정",
@@ -84,6 +86,18 @@
     "ghost": {
       "name": "Ghost",
       "desc": "유령 이모지 (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "플랫 날씨 아이콘 (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "숫자 아이콘 (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "숫자 아이콘 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -337,6 +351,14 @@
       "cta": "내 캐릭터 만들고 첫 그림 그리기"
     },
     "writeFabAria": "일기 쓰기",
+    "search": {
+      "title": "일기 검색",
+      "aria": "일기 검색",
+      "placeholder": "제목이나 내용을 검색해 보세요",
+      "empty": "검색어를 입력해 주세요",
+      "noResults": "일치하는 일기가 없어요",
+      "count": "{{n}}건"
+    },
     "list": {
       "monthTitle": "{{month}} 일기",
       "emptyMonth": "이 달에 쓴 일기가 없어요.",
@@ -676,10 +698,10 @@
     },
     "thisMonth": "이번 달",
     "goToday": "오늘로 이동",
-    "displayLabel": "달력 표시",
-    "displayAria": "달력 표시 방식",
-    "displayEmoji": "이모지",
-    "displayDrawing": "그림"
+    "displayLabel": "홈 보기",
+    "displayAria": "홈 보기 방식",
+    "displayLatest": "최근",
+    "displayCalendar": "달력"
   },
   "mood": {
     "happy": "행복해요",

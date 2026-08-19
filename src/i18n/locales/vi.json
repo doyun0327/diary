@@ -24,6 +24,8 @@
   },
   "header": {
     "menu": "Menu",
+    "search": "Tìm",
+    "searchHint": "Tìm nội dung nhật ký",
     "tagline": "Ghi lại một ngày của tôi",
     "footer": "Thong thả, từng ngày một",
     "account": "Tài khoản",
@@ -79,6 +81,18 @@
     "ghost": {
       "name": "Ma",
       "desc": "Emoji ma (Flaticon)"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "Icon thời tiết phẳng (Flaticon)"
+    },
+    "numbers": {
+      "name": "Numbers",
+      "desc": "Icon số (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Numbers2",
+      "desc": "Icon số 2 (Flaticon)"
     }
   },
   "appInfo": {
@@ -281,6 +295,14 @@
       "cta": "Tạo nhân vật & vẽ bức đầu"
     },
     "writeFabAria": "Viết nhật ký",
+    "search": {
+      "title": "Tìm nhật ký",
+      "aria": "Tìm nhật ký",
+      "placeholder": "Tìm tiêu đề hoặc nội dung",
+      "empty": "Nhập từ khóa để tìm",
+      "noResults": "Không có nhật ký phù hợp",
+      "count": "{{n}} kết quả"
+    },
     "list": {
       "monthTitle": "{{month}}",
       "emptyMonth": "Không có nhật ký tháng này.",
@@ -557,10 +579,10 @@
     "prevMonth": "Tháng trước",
     "nextMonth": "Tháng sau",
     "goToday": "Về hôm nay",
-    "displayLabel": "Lịch",
-    "displayAria": "Hiển thị lịch",
-    "displayEmoji": "Emoji",
-    "displayDrawing": "Tranh"
+    "displayLabel": "Trang chính",
+    "displayAria": "Cách xem trang chính",
+    "displayLatest": "Mới nhất",
+    "displayCalendar": "Lịch"
   },
   "mood": {
     "happy": "Vui",

@@ -7,7 +7,9 @@
 
 .drawing__canvas-wrap {
   position: relative;
-  height: 280px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--diary-drawing-ratio);
   border-radius: var(--radius-lg);
   overflow: hidden;
   background:

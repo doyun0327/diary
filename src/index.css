@@ -7,6 +7,7 @@
   --diary-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans Thai',
     'Noto Sans', sans-serif;
   --diary-ruled-lh: 2.15em;
+  --diary-drawing-ratio: 1 / 1.55;
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
   /* Mono — white / gray / black */

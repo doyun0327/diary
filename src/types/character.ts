@@ -1,6 +1,6 @@
 export interface CharacterProfile {
   gender: 'boy' | 'girl';
-  hairStyle: 'short' | 'medium' | 'curly' | 'bald';
+  hairStyle: 'short' | 'medium' | 'curly';
   outfit: 'short-sleeve' | 'dress' | 'hoodie' | 'school-uniform' | 'swimsuit' | 'ski-suit';
   accessory: 'none' | 'glasses' | 'hat' | 'ribbon';
 }
@@ -21,7 +21,6 @@ export const HAIR_STYLE_OPTIONS: { value: CharacterProfile['hairStyle']; label: 
   { value: 'short', label: '남자머리', emoji: '👦🏻' },
   { value: 'medium', label: '여자머리 단발', emoji: '👩🏻' },
   { value: 'curly', label: '여자머리 파마', emoji: '👩🏻‍🦱' },
-  { value: 'bald', label: '대머리', emoji: '🧑🏻‍🦲' },
 ];
 
 export const OUTFIT_OPTIONS: { value: CharacterProfile['outfit']; label: string; emoji: string }[] = [
@@ -53,7 +52,6 @@ const HAIR_STYLE_EN: Record<CharacterProfile['hairStyle'], string> = {
   short: "short men's haircut",
   medium: "women's bob haircut",
   curly: "women's permed curly hair",
-  bald: 'bald head',
 };
 
 const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
@@ -76,7 +74,7 @@ const HAIR_STYLE_FALLBACK: Record<string, CharacterProfile['hairStyle']> = {
   short: 'short',
   medium: 'medium',
   curly: 'curly',
-  bald: 'bald',
+  bald: 'short',
   long: 'medium',
   pigtails: 'curly',
   spiky: 'short',

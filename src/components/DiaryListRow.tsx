@@ -16,7 +16,7 @@ function DiaryListRow({ entry, onClick }: DiaryListRowProps) {
   return (
     <button type="button" className="diary-row" onClick={onClick}>
       <span className="diary-row__mood" aria-hidden>
-        <MoodIcon mood={entry.mood} />
+        <MoodIcon mood={entry.mood} packId={entry.moodPack} />
       </span>
       <span className="diary-row__body">
         <strong className="diary-row__date">{formatDate(entry.date)}</strong>

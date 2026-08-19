@@ -2,7 +2,7 @@ import { domToBlob } from 'modern-screenshot';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { diaryFontStack, findFont } from './fonts';
-import { getMoodVisual, getStoredMoodPackId, MOOD_ICON_TRANSFORMS } from './moodPack';
+import { entryMoodPack, getMoodIconTransform, getMoodVisual } from './moodPack';
 /** PDF/공유 offscreen 렌더 시 상세 paper 스타일 필요 (상세 페이지를 안 거친 경우 대비) */
 import '../pages/DiaryDetailPage.css';
 import '../components/MoodIcon.css';
@@ -293,7 +293,8 @@ export function mountOffscreenDiaryPaper(
   width = OFFSCREEN_PAPER_WIDTH,
 ): { paper: HTMLElement; dispose: () => void } {
   const font = diaryFontStack(findFont(entry.fontId).family);
-  const visual = getMoodVisual(entry.mood);
+  const packId = entryMoodPack(entry);
+  const visual = getMoodVisual(entry.mood, packId);
 
   const host = document.createElement('div');
   host.setAttribute('aria-hidden', 'true');
@@ -329,7 +330,7 @@ export function mountOffscreenDiaryPaper(
     img.draggable = false;
     img.style.width = '22px';
     img.style.height = '22px';
-    const transform = MOOD_ICON_TRANSFORMS[getStoredMoodPackId()]?.[entry.mood];
+    const transform = getMoodIconTransform(entry.mood, packId);
     if (transform) img.style.transform = transform;
     moodSpan.appendChild(img);
   } else {
