@@ -20,7 +20,7 @@ import { HAIR_STYLE_OPTIONS } from '../types/character';
 import { generateDiaryImage } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
-import { diaryFontStack, findFont, getPreferredFontId } from '../utils/fonts';
+import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
   MONTHLY_PRICE_KRW,
@@ -77,7 +77,7 @@ function DiaryWritePage({
   onOpenCharacter,
   onNativeSaveStateChange,
 }: DiaryWritePageProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isEdit = Boolean(initialEntry);
   const globalPack = useMoodPackId();
   const writePackId = isEdit ? entryMoodPack(initialEntry) : globalPack;
@@ -90,6 +90,10 @@ function DiaryWritePage({
   const [fontId, setFontId] = useState(
     () => initialEntry?.fontId ?? getPreferredFontId(),
   );
+  const [fontSizeId, setFontSizeId] = useState(
+    () => parseFontSizeId(initialEntry?.fontSize ?? getPreferredFontSizeId()),
+  );
+  const [canvasCollapsed, setCanvasCollapsed] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -112,6 +116,11 @@ function DiaryWritePage({
   useEffect(() => {
     onNativeSaveStateChange?.(!aiLoading);
   }, [aiLoading, onNativeSaveStateChange]);
+
+  useEffect(() => {
+    if (isEdit) return;
+    setFontId(getPreferredFontId());
+  }, [i18n.language, isEdit]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -295,6 +304,7 @@ function DiaryWritePage({
       mood,
       moodPack: writePackId,
       fontId,
+      fontSize: fontSizeId,
       imageUrl,
     });
   };
@@ -320,8 +330,11 @@ function DiaryWritePage({
       )}
 
       <div
-        className="diary-write__paper"
-        style={{ ['--diary-font' as string]: diaryFontStack(findFont(fontId).family) }}
+        className={`diary-write__paper${canvasCollapsed ? ' diary-write__paper--canvas-collapsed' : ''}`}
+        style={{
+          ['--diary-font' as string]: diaryFontStack(findFont(fontId).family),
+          ['--diary-font-size' as string]: fontSizeCss(fontSizeId),
+        }}
       >
         <div className="diary-write__meta">
           <button
@@ -381,13 +394,45 @@ function DiaryWritePage({
               placeholder={t('write.titlePlaceholder')}
               maxLength={40}
             />
+            <button
+              type="button"
+              className="diary-write__canvas-fold"
+              onClick={() => {
+                setCanvasCollapsed((open) => !open);
+                if (!canvasCollapsed) setTipOpen(false);
+              }}
+              aria-expanded={!canvasCollapsed}
+              aria-label={canvasCollapsed ? t('write.expandCanvas') : t('write.collapseCanvas')}
+              title={canvasCollapsed ? t('write.expandCanvas') : t('write.collapseCanvas')}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                {canvasCollapsed ? (
+                  <polyline points="6 9 12 15 18 9" />
+                ) : (
+                  <polyline points="6 15 12 9 18 15" />
+                )}
+              </svg>
+            </button>
           </div>
 
-          <div className="diary-write__canvas-wrap">
+          <div className="diary-write__draw">
+            <div className="diary-write__canvas-wrap">
             <DrawingCanvas
               ref={canvasRef}
               fontId={fontId}
               onFontIdChange={setFontId}
+              fontSizeId={fontSizeId}
+              onFontSizeChange={setFontSizeId}
             />
             {aiLoading && (
               <div className="diary-write__ai-loading" aria-busy="true" aria-label={t('write.ai.drawStep')}>
@@ -397,6 +442,7 @@ function DiaryWritePage({
                 <p className="diary-write__ai-loading-text">{t('write.ai.statusDraw')}</p>
               </div>
             )}
+            </div>
           </div>
         </section>
 

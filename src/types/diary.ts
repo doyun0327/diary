@@ -26,6 +26,8 @@ export interface DiaryEntry {
   moodPack?: MoodPackId;
   /** 이 일기에 쓴 글씨체 id (fonts.ts). 없으면 기본 폰트 */
   fontId?: string;
+  /** 이 일기에 쓴 글씨 크기 (sm/md/lg/xl). 없으면 보통 */
+  fontSize?: string;
   createdAt: string;
   updatedAt: string;
 }

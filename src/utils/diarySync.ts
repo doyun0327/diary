@@ -20,6 +20,7 @@ export function mergeDiaryEntries(
     if (!prev || isSameOrNewer(entry.updatedAt, prev.updatedAt)) {
       const next = normalizeEntry(entry);
       if (!next.moodPack && prev?.moodPack) next.moodPack = prev.moodPack;
+      if (!next.fontSize && prev?.fontSize) next.fontSize = prev.fontSize;
       map.set(entry.id, next);
     }
   }
@@ -49,6 +50,7 @@ function normalizeEntry(entry: DiaryEntry): DiaryEntry {
     mood: entry.mood,
     moodPack: entry.moodPack,
     fontId: entry.fontId || undefined,
+    fontSize: entry.fontSize || undefined,
     createdAt: entry.createdAt,
     updatedAt: entry.updatedAt,
   };

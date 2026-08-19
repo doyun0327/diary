@@ -87,11 +87,11 @@
       "desc": "Iconos de clima planos (Flaticon)"
     },
     "numbers": {
-      "name": "Numbers",
+      "name": "Number1",
       "desc": "Iconos de números (Flaticon)"
     },
     "numbers2": {
-      "name": "Numbers2",
+      "name": "Number2",
       "desc": "Iconos de números 2 (Flaticon)"
     }
   },
@@ -143,6 +143,10 @@
     "lemon": {
       "name": "Lemon",
       "desc": "Brillo cítrico suave"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "Rosa suave"
     }
   },
   "account": {
@@ -213,7 +217,7 @@
     "hint": "Idioma de la app",
     "ko": "한국어",
     "en": "English",
-    "zh": "中文",
+    "zh": "简体中文",
     "id": "Bahasa Indonesia",
     "ja": "日本語",
     "vi": "Tiếng Việt",
@@ -222,7 +226,8 @@
     "es": "Español",
     "th": "ไทย",
     "title": "Idioma",
-    "aria": "Idioma"
+    "aria": "Idioma",
+    "zh-TW": "繁體中文"
   },
   "credits": {
     "moodIcons": "Iconos de ánimo: designed by {{author}} from Flaticon"
@@ -324,6 +329,8 @@
     "cancel": "Cancelar",
     "titlePlaceholder": "Escribe un título",
     "contentPlaceholder": "p. ej. Hoy fui a nadar. Hoy hice ejercicio.",
+    "collapseCanvas": "Ocultar dibujo",
+    "expandCanvas": "Mostrar dibujo",
     "ai": {
       "button": "✨ Dibujo IA",
       "sceneStep": "Escribiendo el prompt…",
@@ -549,6 +556,14 @@
     "dialogAria": "Elegir fuente",
     "title": "Fuente",
     "sample": "Diario de hoy",
+    "size": "Tamaño",
+    "sizeAria": "Elegir tamaño de texto",
+    "sizes": {
+      "sm": "Pequeña",
+      "md": "Mediana",
+      "lg": "Grande",
+      "xl": "Extra"
+    },
     "cat": {
       "cute": "Fuentes cute",
       "neat": "Fuentes limpias"

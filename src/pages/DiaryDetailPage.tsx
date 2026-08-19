@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
-import { diaryFontStack, findFont } from '../utils/fonts';
+import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
 import { shareDiaryTo } from '../utils/shareStory';
-import { downloadDiaryPaperPng } from '../utils/downloadDiaryPaper';
 import * as roomsApi from '../api/roomsApi';
 import MoodIcon from '../components/MoodIcon';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
-import DiaryBookViewer from '../components/DiaryBookViewer';
-import { useClientProfile } from '../hooks/useClientProfile';
 import './DiaryDetailPage.css';
 
 const SHARE_ROOMS_PAGE_SIZE = 10;
@@ -40,7 +38,6 @@ function DiaryDetailPage({
   onOpenRooms,
 }: DiaryDetailPageProps) {
   const { t } = useTranslation();
-  const { avatarUrl } = useClientProfile();
   const [shareOpen, setShareOpen] = useState(false);
   const [shareStep, setShareStep] = useState<ShareStep>('menu');
   const [moreOpen, setMoreOpen] = useState(false);
@@ -49,9 +46,7 @@ function DiaryDetailPage({
   const [roomsPage, setRoomsPage] = useState(0);
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
-  const [bookOpen, setBookOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
-  const [downloadingPng, setDownloadingPng] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackModal>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
@@ -187,23 +182,6 @@ function DiaryDetailPage({
     }
   };
 
-  const handleDownloadPng = async () => {
-    if (downloadingPng || !paperRef.current) return;
-    setDownloadingPng(true);
-    setFeedback(null);
-    try {
-      await downloadDiaryPaperPng(paperRef.current, entry.date, entry.fontId);
-      setFeedback({ kind: 'info', title: t('detail.ok.png') });
-    } catch (err) {
-      setFeedback({
-        kind: 'info',
-        title: err instanceof Error ? err.message : t('detail.err.png'),
-      });
-    } finally {
-      setDownloadingPng(false);
-    }
-  };
-
   const handlePickSns = async () => {
     if (sharing) return;
     setFeedback(null);
@@ -241,7 +219,7 @@ function DiaryDetailPage({
     }
   };
 
-  return (
+  return createPortal(
     <article className="diary-detail">
       <div className="diary-detail__toolbar">
         <button
@@ -254,61 +232,6 @@ function DiaryDetailPage({
         </button>
 
         <div className="diary-detail__actions">
-          <button
-            type="button"
-            className="diary-detail__icon-btn"
-            onClick={() => setBookOpen(true)}
-            aria-label={t('detail.bookAria')}
-            title={t('detail.bookTitle')}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" />
-              <path d="M8 7h8" />
-              <path d="M8 11h8" />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            className="diary-detail__icon-btn"
-            onClick={() => void handleDownloadPng()}
-            disabled={downloadingPng}
-            aria-label={t('detail.pngAria')}
-            title={t('detail.pngTitle')}
-          >
-            {downloadingPng ? (
-              '…'
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" x2="12" y1="15" y2="3" />
-              </svg>
-            )}
-          </button>
-
           <button
             type="button"
             className="diary-detail__icon-btn"
@@ -404,7 +327,10 @@ function DiaryDetailPage({
       <div
         className="diary-detail__paper"
         ref={paperRef}
-        style={{ ['--diary-font' as string]: diaryFontStack(findFont(entry.fontId).family) }}
+        style={{
+          ['--diary-font' as string]: diaryFontStack(findFont(entry.fontId).family),
+          ['--diary-font-size' as string]: fontSizeCss(entry.fontSize),
+        }}
       >
         <div className="diary-detail__dateline">
           <span>{formatDate(entry.date)}</span>
@@ -415,9 +341,13 @@ function DiaryDetailPage({
 
         {entry.title && <h2 className="diary-detail__title">{entry.title}</h2>}
 
-        {entry.imageUrl && (
+        {entry.imageUrl ? (
           <div className="diary-detail__image">
             <img src={entry.imageUrl} alt={entry.title ? t('detail.imageAltTitle', { title: entry.title }) : t('detail.imageAlt', { date: entry.date })} />
+          </div>
+        ) : (
+          <div className="diary-detail__image diary-detail__image--emoji">
+            <MoodIcon mood={entry.mood} packId={entry.moodPack} size={80} />
           </div>
         )}
 
@@ -569,17 +499,8 @@ function DiaryDetailPage({
           </div>
         </>
       )}
-
-      {bookOpen && (
-        <DiaryBookViewer
-          entries={[entry]}
-          rangeStart={entry.date}
-          rangeEnd={entry.date}
-          avatarUrl={avatarUrl}
-          onClose={() => setBookOpen(false)}
-        />
-      )}
-    </article>
+    </article>,
+    document.getElementById('root') ?? document.body,
   );
 }
 

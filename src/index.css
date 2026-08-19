@@ -3,9 +3,13 @@
 }
 
 :root {
-  /* 일기 글씨체. FontPicker에서 사용자가 바꿀 수 있음 */
-  --diary-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans Thai',
+  /* 앱 화면용 손글씨. 언어 기본 귀여운 폰트. 일기 글씨체와 무관 */
+  --brand-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans Thai',
     'Noto Sans', sans-serif;
+  /* 일기 본문. 엔트리마다 사용자가 고른 글씨체 */
+  --diary-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans Thai',
+    'Noto Sans', sans-serif;
+  --diary-font-size: 1.2rem;
   --diary-ruled-lh: 2.15em;
   --diary-drawing-ratio: 1 / 1.55;
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -158,6 +162,37 @@
   --shadow-card: 0 6px 24px rgba(70, 40, 70, 0.06);
   --shadow-float: 0 12px 32px rgba(70, 40, 70, 0.12);
   --shadow: rgba(70, 40, 70, 0.07);
+}
+
+/* Pink — soft rose */
+[data-theme='pink'] {
+  --color-bg: #fff7f8;
+  --color-bg-outer: #f2d8dc;
+  --color-bg-muted: #fceef0;
+  --color-bg-soft: #fdf3f5;
+  --color-bg-input: #ffffff;
+  --color-surface: #fffbfc;
+  --color-border: #f0cdd2;
+  --color-border-soft: #f7dfe3;
+  --color-text: #402830;
+  --color-text-muted: #725860;
+  --color-accent: #e88a9a;
+  --color-accent-hover: #d46e80;
+  --color-accent-soft: #fce0e4;
+  --color-accent-text: #b85568;
+  --color-chat-mine: #f5b0bc;
+  --color-chat-mine-text: #3d2028;
+  --color-chat-other: #ffffff;
+  --color-chat-other-text: #402830;
+  --color-lavender: #ffd0d8;
+  --color-lavender-soft: #ffe8ec;
+  --color-overlay: rgba(56, 28, 36, 0.32);
+  --sheet-bg: #fffbfc;
+  --sheet-handle: #ebc8ce;
+  --shadow-soft: 0 14px 40px rgba(70, 30, 40, 0.08);
+  --shadow-card: 0 6px 24px rgba(70, 30, 40, 0.06);
+  --shadow-float: 0 12px 32px rgba(70, 30, 40, 0.12);
+  --shadow: rgba(70, 30, 40, 0.07);
 }
 
 /* Ink — soft warm graphite */

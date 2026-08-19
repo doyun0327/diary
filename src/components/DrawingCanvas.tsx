@@ -1,7 +1,17 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_FONT_ID, FONTS, setPreferredFontId } from '../utils/fonts';
+import { resolveAppLanguage } from '../i18n';
+import {
+  DEFAULT_FONT_ID,
+  DEFAULT_FONT_SIZE_ID,
+  fontsForLanguage,
+  parseFontSizeId,
+  setPreferredFontId,
+  setPreferredFontSizeId,
+  type FontSizeId,
+} from '../utils/fonts';
+import { FontSizePicker } from './FontPicker';
 import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
@@ -21,6 +31,8 @@ interface DrawingCanvasProps {
   /** 이 일기에 쓸 글씨체 (엔트리별) */
   fontId?: string;
   onFontIdChange?: (fontId: string) => void;
+  fontSizeId?: FontSizeId;
+  onFontSizeChange?: (fontSizeId: FontSizeId) => void;
 }
 
 interface PhotoLayer {
@@ -47,7 +59,7 @@ interface StickerLayer {
   rotation: number;
 }
 
-type ToolMode = 'pen' | 'eraser' | 'sticker';
+type ToolMode = 'none' | 'pen' | 'eraser' | 'sticker';
 type PenKind = 'ballpoint' | 'gel' | 'brush' | 'marker' | 'highlighter';
 type PhotoDragKind = 'move' | 'resize' | 'rotate';
 type StickerDragKind = 'move' | 'resize' | 'rotate';
@@ -125,6 +137,84 @@ function PenKindIcon({ kind }: { kind: PenKind }) {
       return null;
   }
 }
+
+function DockToolIcon({ name }: { name: 'pen' | 'photo' | 'font' | 'sticker' | 'eraser' }) {
+  const common = {
+    xmlns: 'http://www.w3.org/2000/svg',
+    width: 18,
+    height: 18,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    overflow: 'visible' as const,
+    'aria-hidden': true as const,
+  };
+
+  switch (name) {
+    case 'pen':
+      return (
+        <svg {...common}>
+          <path d="M14.2 4.6 19.4 9.8" />
+          <path d="M12.7 6.1 17.9 11.3 8.4 20.8H4.2v-4.2z" />
+          <path d="M7.4 16.6 11.4 20.6" />
+        </svg>
+      );
+    case 'photo':
+      return (
+        <svg {...common}>
+          <rect x="3" y="6" width="18" height="14" rx="2" />
+          <circle cx="9" cy="12" r="2.2" />
+          <path d="m21 16-4.2-4.2a1.2 1.2 0 0 0-1.7 0L9 18" />
+        </svg>
+      );
+    case 'font':
+      return (
+        <svg {...common} fill="currentColor" stroke="none">
+          <text
+            x="3.2"
+            y="17.5"
+            fontSize="14"
+            fontWeight="700"
+            fontFamily="Georgia, 'Times New Roman', serif"
+          >
+            F
+          </text>
+          <text
+            x="12.4"
+            y="17.5"
+            fontSize="14"
+            fontWeight="600"
+            fontStyle="italic"
+            fontFamily="Georgia, 'Times New Roman', serif"
+          >
+            f
+          </text>
+        </svg>
+      );
+    case 'sticker':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8.5" />
+          <circle cx="9" cy="10.2" r="1.05" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="10.2" r="1.05" fill="currentColor" stroke="none" />
+          <path d="M8.6 14.2c1 .9 2.2 1.4 3.4 1.4s2.4-.5 3.4-1.4" />
+        </svg>
+      );
+    case 'eraser':
+      return (
+        <svg {...common}>
+          <path d="m7 21-4-4 10-10 8 8-4 4H11z" />
+          <path d="m13 21 8-8" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 const ERASER_SIZES = [
   { id: 's', width: 12 },
   { id: 'm', width: 24 },
@@ -142,10 +232,14 @@ function DrawingCanvas({
   ref,
   fontId: fontIdProp,
   onFontIdChange,
+  fontSizeId: fontSizeIdProp,
+  onFontSizeChange,
 }: DrawingCanvasProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const langFonts = fontsForLanguage(resolveAppLanguage(i18n.language));
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const drawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -172,7 +266,7 @@ function DrawingCanvas({
 
   const [color, setColor] = useState(COLORS[0]);
   const [customColor, setCustomColor] = useState('#e91e63');
-  const [mode, setMode] = useState<ToolMode>('pen');
+  const [mode, setMode] = useState<ToolMode>('none');
   const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
   const [colorsOpen, setColorsOpen] = useState(false);
@@ -186,6 +280,8 @@ function DrawingCanvas({
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
   const [internalFontId, setInternalFontId] = useState(DEFAULT_FONT_ID);
   const fontId = fontIdProp ?? internalFontId;
+  const [internalFontSizeId, setInternalFontSizeId] = useState(DEFAULT_FONT_SIZE_ID);
+  const fontSizeId = parseFontSizeId(fontSizeIdProp ?? internalFontSizeId);
   const [photoLayers, setPhotoLayers] = useState<PhotoLayer[]>([]);
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [stickerLayers, setStickerLayers] = useState<StickerLayer[]>([]);
@@ -200,6 +296,12 @@ function DrawingCanvas({
     onFontIdChange?.(id);
     if (fontIdProp === undefined) setInternalFontId(id);
     setPreferredFontId(id);
+  };
+
+  const selectFontSize = (id: FontSizeId) => {
+    onFontSizeChange?.(id);
+    if (fontSizeIdProp === undefined) setInternalFontSizeId(id);
+    setPreferredFontSizeId(id);
   };
 
   const fillWhite = () => {
@@ -596,8 +698,26 @@ function DrawingCanvas({
     setColorsOpen(openColors);
   };
 
-  const selectPen = () => switchTool('pen', true);
+  const selectPen = () => {
+    if (mode === 'pen' && !fontOpen) {
+      switchTool('none', false);
+      return;
+    }
+    switchTool('pen', true);
+  };
   const selectEraser = () => switchTool('eraser', false);
+
+  useEffect(() => {
+    if (mode !== 'pen' && mode !== 'eraser') return;
+    const onPointerDown = (e: globalThis.PointerEvent) => {
+      const root = rootRef.current;
+      if (!root) return;
+      if (e.target instanceof Node && root.contains(e.target)) return;
+      switchTool('none', false);
+    };
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [mode]);
 
   const toggleFontPanel = () => {
     confirmActiveOverlay();
@@ -794,6 +914,7 @@ function DrawingCanvas({
     }
 
     confirmActiveOverlay();
+    if (mode === 'none') return;
 
     e.currentTarget.setPointerCapture(e.pointerId);
     drawing.current = true;
@@ -865,6 +986,7 @@ function DrawingCanvas({
 
   const canvasClass = [
     'drawing__canvas',
+    mode === 'none' ? 'drawing__canvas--idle' : '',
     mode === 'eraser' ? 'drawing__canvas--eraser' : '',
     mode === 'sticker' ? 'drawing__canvas--sticker' : '',
   ]
@@ -874,7 +996,7 @@ function DrawingCanvas({
   const editingOverlay = Boolean(activePhotoId || activeStickerId);
 
   return (
-      <div className="drawing" data-no-swipe>
+      <div className="drawing" data-no-swipe ref={rootRef}>
       <input
         ref={fileInputRef}
         type="file"
@@ -1132,14 +1254,18 @@ function DrawingCanvas({
             </button>
             <button
               type="button"
-              className={`drawing__dock-btn ${mode === 'pen' && !fontOpen ? 'active' : ''}`}
+              className={`drawing__dock-btn drawing__dock-btn--tool ${mode === 'pen' && !fontOpen ? 'active' : ''}`}
+              aria-label={t('canvas.pen')}
+              title={t('canvas.pen')}
               onClick={selectPen}
             >
-              {t('canvas.pen')}
+              <DockToolIcon name="pen" />
             </button>
             <button
               type="button"
-              className="drawing__dock-btn"
+              className="drawing__dock-btn drawing__dock-btn--tool"
+              aria-label={t('canvas.photo')}
+              title={t('canvas.photo')}
               onClick={() => {
                 confirmActiveOverlay();
                 setFontOpen(false);
@@ -1147,28 +1273,34 @@ function DrawingCanvas({
                 fileInputRef.current?.click();
               }}
             >
-              {t('canvas.photo')}
+              <DockToolIcon name="photo" />
             </button>
             <button
               type="button"
-              className={`drawing__dock-btn ${fontOpen ? 'active' : ''}`}
+              className={`drawing__dock-btn drawing__dock-btn--tool ${fontOpen ? 'active' : ''}`}
+              aria-label={t('canvas.font')}
+              title={t('canvas.font')}
               onClick={toggleFontPanel}
             >
-              {t('canvas.font')}
+              <DockToolIcon name="font" />
             </button>
             <button
               type="button"
-              className={`drawing__dock-btn ${mode === 'sticker' || stickerOpen ? 'active' : ''}`}
+              className={`drawing__dock-btn drawing__dock-btn--tool ${mode === 'sticker' || stickerOpen ? 'active' : ''}`}
+              aria-label={t('canvas.sticker')}
+              title={t('canvas.sticker')}
               onClick={toggleStickerPanel}
             >
-              {t('canvas.sticker')}
+              <DockToolIcon name="sticker" />
             </button>
             <button
               type="button"
-              className={`drawing__dock-btn ${mode === 'eraser' ? 'active' : ''}`}
+              className={`drawing__dock-btn drawing__dock-btn--tool ${mode === 'eraser' ? 'active' : ''}`}
+              aria-label={t('canvas.eraser')}
+              title={t('canvas.eraser')}
               onClick={selectEraser}
             >
-              {t('canvas.eraser')}
+              <DockToolIcon name="eraser" />
             </button>
           </div>
         </div>
@@ -1187,24 +1319,29 @@ function DrawingCanvas({
               <CloseIcon />
             </button>
           </div>
+          <FontSizePicker value={fontSizeId} onChange={selectFontSize} />
           <div className="drawing__fonts">
-            {FONT_CATEGORIES.map((category) => (
-              <div key={category} className="drawing__font-group">
-                <p className="drawing__font-category">{t(`font.cat.${category}`)}</p>
-                {FONTS.filter((f) => f.category === category).map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    className={`drawing__font-item ${fontId === f.id ? 'selected' : ''}`}
-                    style={{ fontFamily: f.family }}
-                    onClick={() => pickFont(f.id)}
-                  >
-                    <span>{f.label}</span>
-                    <span className="drawing__font-sample">{t('canvas.sample')}</span>
-                  </button>
-                ))}
-              </div>
-            ))}
+            {FONT_CATEGORIES.map((category) => {
+              const items = langFonts.filter((f) => f.category === category);
+              if (items.length === 0) return null;
+              return (
+                <div key={category} className="drawing__font-group">
+                  <p className="drawing__font-category">{t(`font.cat.${category}`)}</p>
+                  {items.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      className={`drawing__font-item ${fontId === f.id ? 'selected' : ''}`}
+                      style={{ fontFamily: f.family }}
+                      onClick={() => pickFont(f.id)}
+                    >
+                      <span>{f.label}</span>
+                      <span className="drawing__font-sample">{t('canvas.sample')}</span>
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

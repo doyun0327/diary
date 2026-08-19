@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { APP_LANGUAGES, setStoredLanguage } from '../i18n';
+import { APP_LANGUAGES, resolveAppLanguage, setStoredLanguage } from '../i18n';
+import { applyLanguageFonts } from '../utils/fonts';
 import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 
@@ -42,10 +43,11 @@ function LanguageSheet({ onClose }: LanguageSheetProps) {
               <button
                 key={lang}
                 type="button"
-                className={`account-sheet__lang-btn ${i18n.language?.startsWith(lang) ? 'is-active' : ''}`}
+                className={`account-sheet__lang-btn ${resolveAppLanguage(i18n.language) === lang ? 'is-active' : ''}`}
                 onClick={() => {
-                  void i18n.changeLanguage(lang);
                   setStoredLanguage(lang);
+                  applyLanguageFonts(lang);
+                  void i18n.changeLanguage(lang);
                 }}
               >
                 {t(`language.${lang}`)}

@@ -194,3 +194,40 @@
   font-weight: 700;
   color: var(--color-accent);
 }
+
+.decorate-sheet__emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.decorate-sheet__emoji-btn {
+  padding: 8px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-family: var(--ui-font);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+
+.decorate-sheet__emoji-btn:hover {
+  background: var(--color-bg-muted);
+}
+
+.decorate-sheet__emoji-btn:active {
+  transform: scale(0.95);
+}
+
+.decorate-sheet__emoji-btn.is-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}

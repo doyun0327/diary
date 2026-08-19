@@ -87,11 +87,11 @@
       "desc": "Icon thời tiết phẳng (Flaticon)"
     },
     "numbers": {
-      "name": "Numbers",
+      "name": "Number1",
       "desc": "Icon số (Flaticon)"
     },
     "numbers2": {
-      "name": "Numbers2",
+      "name": "Number2",
       "desc": "Icon số 2 (Flaticon)"
     }
   },
@@ -143,6 +143,10 @@
     "lemon": {
       "name": "Lemon",
       "desc": "Ánh cam quýt mềm"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "Hồng nhẹ nhàng"
     }
   },
   "account": {
@@ -213,7 +217,7 @@
     "hint": "Ngôn ngữ hiển thị của app",
     "ko": "한국어",
     "en": "English",
-    "zh": "中文",
+    "zh": "简体中文",
     "id": "Bahasa Indonesia",
     "ja": "日本語",
     "vi": "Tiếng Việt",
@@ -222,7 +226,8 @@
     "es": "Español",
     "th": "ไทย",
     "title": "Ngôn ngữ",
-    "aria": "Ngôn ngữ"
+    "aria": "Ngôn ngữ",
+    "zh-TW": "繁體中文"
   },
   "credits": {
     "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"
@@ -324,6 +329,8 @@
     "cancel": "Hủy",
     "titlePlaceholder": "Nhập tiêu đề",
     "contentPlaceholder": "vd. Hôm nay tôi đi bơi. Hôm nay tôi tập thể dục.",
+    "collapseCanvas": "Thu gọn tranh",
+    "expandCanvas": "Mở tranh",
     "ai": {
       "button": "✨ Vẽ AI",
       "sceneStep": "Đang viết prompt…",
@@ -549,6 +556,14 @@
     "dialogAria": "Chọn phông chữ",
     "title": "Phông chữ",
     "sample": "Nhật ký hôm nay",
+    "size": "Cỡ chữ",
+    "sizeAria": "Chọn cỡ chữ",
+    "sizes": {
+      "sm": "Nhỏ",
+      "md": "Vừa",
+      "lg": "Lớn",
+      "xl": "Rất lớn"
+    },
     "cat": {
       "cute": "Phông dễ thương",
       "neat": "Phông gọn gàng"

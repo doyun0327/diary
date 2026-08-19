@@ -453,7 +453,7 @@ function App() {
     const isRooms = page === "rooms";
     postDiaryNative({
       type: "headerState",
-      visible: !needsProfileSetup && !needsAppIntro,
+      visible: !needsProfileSetup && !needsAppIntro && page !== "detail",
       showCalendar: page === "home",
       showBack: isRooms || isWrite,
       showSave: isWrite,

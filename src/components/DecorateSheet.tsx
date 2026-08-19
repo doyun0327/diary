@@ -16,6 +16,10 @@ import MoodIcon from './MoodIcon';
 import CloseIcon from './CloseIcon';
 import './DecorateSheet.css';
 
+const EMOJI_PACK_ORDER: MoodPackId[] = [
+  'classic', 'weather', 'smileys', 'love', 'dog', 'cat', 'ghost', 'numbers', 'numbers2',
+];
+
 interface DecorateSheetProps {
   onClose: () => void;
 }
@@ -121,24 +125,25 @@ function DecorateSheet({ onClose }: DecorateSheetProps) {
           <>
             <p className="decorate-sheet__hint">{t('emojiPack.hint')}</p>
             <ul className="decorate-sheet__list">
-              {MOOD_PACKS.map((pack) => {
-                const active = packId === pack.id;
+              {EMOJI_PACK_ORDER.map((id) => {
+                const pack = MOOD_PACKS.find((p) => p.id === id);
+                if (!pack) return null;
+                const active = packId === id;
                 return (
-                  <li key={pack.id}>
+                  <li key={id}>
                     <button
                       type="button"
                       className={`decorate-sheet__option${active ? ' is-active' : ''}`}
-                      onClick={() => pickPack(pack.id)}
+                      onClick={() => pickPack(id)}
                       aria-pressed={active}
                     >
                       <span className="decorate-sheet__mood-preview" aria-hidden>
                         {pack.preview.map((mood) => (
-                          <MoodIcon key={mood} mood={mood} packId={pack.id} size={22} />
+                          <MoodIcon key={mood} mood={mood} packId={id} size={22} />
                         ))}
                       </span>
                       <span className="decorate-sheet__text">
-                        <strong>{t(`emojiPack.${pack.id}.name`)}</strong>
-                        <span>{t(`emojiPack.${pack.id}.desc`)}</span>
+                        <strong>{t(`emojiPack.${id}.name`)}</strong>
                       </span>
                       <span className="decorate-sheet__check" aria-hidden>
                         {active ? '✓' : ''}

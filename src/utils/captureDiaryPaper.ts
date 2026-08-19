@@ -1,7 +1,7 @@
 import { domToBlob } from 'modern-screenshot';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
-import { diaryFontStack, findFont } from './fonts';
+import { diaryFontStack, findFont, fontSizeCss } from './fonts';
 import { entryMoodPack, getMoodIconTransform, getMoodVisual } from './moodPack';
 /** PDF/공유 offscreen 렌더 시 상세 paper 스타일 필요 (상세 페이지를 안 거친 경우 대비) */
 import '../pages/DiaryDetailPage.css';
@@ -310,6 +310,7 @@ export function mountOffscreenDiaryPaper(
   const paper = document.createElement('div');
   paper.className = 'diary-detail__paper';
   paper.style.setProperty('--diary-font', font);
+  paper.style.setProperty('--diary-font-size', fontSizeCss(entry.fontSize));
   paper.style.margin = '0';
   paper.style.width = '100%';
   paper.style.boxSizing = 'border-box';

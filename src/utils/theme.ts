@@ -1,4 +1,4 @@
-export type ThemeId = 'paper' | 'matcha' | 'sky' | 'blossom' | 'ink' | 'lemon';
+export type ThemeId = 'paper' | 'matcha' | 'sky' | 'blossom' | 'pink' | 'ink' | 'lemon';
 
 export const THEME_STORAGE_KEY = 'picture-diary-theme';
 
@@ -7,6 +7,7 @@ export const THEMES: { id: ThemeId; swatch: string[] }[] = [
   { id: 'matcha', swatch: ['#f5fbf7', '#7cb89a', '#d8f5e8'] },
   { id: 'sky', swatch: ['#f5f8fc', '#8bb0d4', '#dceaf6'] },
   { id: 'blossom', swatch: ['#fbf6fa', '#c9a0d4', '#ebe3f7'] },
+  { id: 'pink', swatch: ['#fff7f8', '#e88a9a', '#fce0e4'] },
   { id: 'ink', swatch: ['#f7f6f4', '#8a8580', '#ebe8e4'] },
   { id: 'lemon', swatch: ['#fffaf0', '#e0b85a', '#f5e8c4'] },
 ];
@@ -18,6 +19,7 @@ const THEME_ACCENTS: Record<ThemeId, { accent: string; background: string }> = {
   matcha: { accent: '#7cb89a', background: '#f5fbf7' },
   sky: { accent: '#8bb0d4', background: '#f5f8fc' },
   blossom: { accent: '#c9a0d4', background: '#fbf6fa' },
+  pink: { accent: '#e88a9a', background: '#fff7f8' },
   ink: { accent: '#8a8580', background: '#f7f6f4' },
   lemon: { accent: '#e0b85a', background: '#fffaf0' },
 };

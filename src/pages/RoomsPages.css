@@ -16,6 +16,7 @@
 .rooms__toolbar h2 {
   margin: 0;
   text-align: center;
+  font-family: var(--brand-font);
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -258,6 +259,7 @@
 
 .rooms-sheet__head h3 {
   margin: 0;
+  font-family: var(--brand-font);
   font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -359,6 +361,7 @@
 }
 
 .rooms__room-name {
+  font-family: var(--brand-font);
   font-weight: 700;
   font-size: 1.02rem;
   letter-spacing: -0.02em;

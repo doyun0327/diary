@@ -1,0 +1,791 @@
+{
+  "common": {
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "loading": "Wird geladen…",
+    "anonymous": "Anonym",
+    "back": "Zurück",
+    "pagerAria": "Seitennummerierung",
+    "pagerPagesAria": "Seitennummern",
+    "pagePrevAria": "Vorherige Seite",
+    "pageNextAria": "Nächste Seite",
+    "pageGoAria": "Seite {{page}}",
+    "processing": "Wird verarbeitet…",
+    "requestFailed": "Anfrage fehlgeschlagen ({{status}})",
+    "serverUnreachable": "Verbindung zum Server fehlgeschlagen. Prüfe, ob Spring (8080) läuft.",
+    "weekday": {
+      "0": "So",
+      "1": "Mo",
+      "2": "Di",
+      "3": "Mi",
+      "4": "Do",
+      "5": "Fr",
+      "6": "Sa"
+    },
+    "dateFull": "{{weekday}}, {{d}}.{{m}}.{{y}}",
+    "yearMonth": "{{y}}/{{m}}"
+  },
+  "header": {
+    "menu": "Menü",
+    "search": "Suchen",
+    "searchHint": "Tagebucheinträge durchsuchen",
+    "tagline": "Meinen Tag festhalten",
+    "footer": "Langsam, Tag für Tag",
+    "account": "Konto",
+    "accountHintEmpty": "Foto · Sync",
+    "rooms": "Freundesräume",
+    "roomsHint": "Meine Räume",
+    "character": "Charakter",
+    "characterHint": "Ich in KI-Zeichnungen",
+    "export": "Exportieren",
+    "exportHint": "Zeitraum wählen · Tagebuchbuch",
+    "decorate": "Gestalten",
+    "decorateHint": "Thema · Emoji",
+    "appInfo": "App-Info",
+    "appInfoHint": "Version · AGB · Credits",
+    "language": "Sprache",
+    "languageHint": "Anzeigesprache",
+    "screenLock": "Bildschirmsperre",
+    "screenLockHint": "Mit Passwort sperren",
+    "screenLockHintOn": "An · tippen zum Deaktivieren",
+    "screenLockHintOff": "Aus · tippen zum Aktivieren"
+  },
+  "decorate": {
+    "title": "Gestalten",
+    "aria": "Gestalten",
+    "tabsAria": "Gestalten-Tabs",
+    "tab": {
+      "theme": "Thema",
+      "emoji": "Emoji"
+    }
+  },
+  "emojiPack": {
+    "hint": "Stimmungssymbol-Stil ändern",
+    "classic": {
+      "name": "Klassisch",
+      "desc": "Flache Icons (Flaticon)"
+    },
+    "smileys": {
+      "name": "Smileys",
+      "desc": "Animierte Icons (Flaticon)"
+    },
+    "cat": {
+      "name": "Katze",
+      "desc": "Katzen-Emojis (Flaticon)"
+    },
+    "dog": {
+      "name": "Hund",
+      "desc": "Hunde-Emojis (Flaticon)"
+    },
+    "love": {
+      "name": "Liebe",
+      "desc": "Liebes-Emoticons (Flaticon)"
+    },
+    "ghost": {
+      "name": "Geist",
+      "desc": "Geister-Emojis (Flaticon)"
+    },
+    "weather": {
+      "name": "Wetter",
+      "desc": "Flache Wetter-Icons (Flaticon)"
+    },
+    "numbers": {
+      "name": "Number1",
+      "desc": "Zahlen-Icons (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Number2",
+      "desc": "Zahlen-Icons 2 (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "App-Info",
+    "aria": "App-Info",
+    "back": "Zurück",
+    "version": "Aktuelle Version",
+    "legal": {
+      "menu": "AGB & Datenschutz",
+      "title": "AGB · Datenschutz",
+      "termsHeading": "Nutzungsbedingungen",
+      "termsBody": "PageBy ist eine persönliche Tagebuch-App. Bitte halte dich bei der Nutzung an geltendes Recht. Du bist für dein Konto, deinen Nicknamen und deine Tagebuchinhalte verantwortlich. Inhalte zu posten oder zu teilen, die Rechte anderer verletzen, ist nicht erlaubt. Funktionen können ohne Vorankündigung geändert werden.",
+      "privacyHeading": "Datenschutzerklärung",
+      "privacyBody": "Tagebucheinträge, Zeichnungen und Profildaten können auf deinem Gerät gespeichert werden und bei Nutzung von Freundesräumen mit dem Server synchronisiert werden. Wir verwenden diese Daten nur für Tagebuchspeicherung, Teilen und App-Funktionen. Wir verkaufen keine personenbezogenen Daten und geben sie nur weiter, wenn das Gesetz es verlangt. Datenschutzanfragen kannst du über die In-App-Kanäle stellen."
+    },
+    "licenses": {
+      "menu": "Open-Source-Lizenzen & Credits",
+      "title": "Lizenzen · Credits",
+      "iconsHeading": "Icon-Credits",
+      "libsHeading": "Open-Source-Bibliotheken",
+      "note": "Kostenlose Flaticon-Icons erfordern eine Nennung. Der Link oben ist diese Nennung."
+    }
+  },
+  "theme": {
+    "title": "Thema",
+    "aria": "Thema wählen",
+    "hint": "Das Aussehen der gesamten App ändern",
+    "paper": {
+      "name": "Mono",
+      "desc": "Weiß, Grau & Schwarz"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "Sanftes Minzgrün"
+    },
+    "sky": {
+      "name": "Himmel",
+      "desc": "Zartes Himmelblau"
+    },
+    "blossom": {
+      "name": "Blüte",
+      "desc": "Lavendel-Pfirsichblüte"
+    },
+    "ink": {
+      "name": "Tinte",
+      "desc": "Warmes Sanftgrau"
+    },
+    "lemon": {
+      "name": "Zitrone",
+      "desc": "Sanfter Zitrusglanz"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "Zartes Rosenrosa"
+    }
+  },
+  "account": {
+    "title": "Konto",
+    "aria": "Konto",
+    "photoLabel": "Profilfoto",
+    "changePhotoAria": "Profilfoto ändern",
+    "pickPhoto": "Foto wählen",
+    "editPhoto": "Bearbeiten",
+    "useAccountPhoto": "Kontofoto verwenden",
+    "replacePhoto": {
+      "title": "Dein Google-Foto verwenden?",
+      "lead": "Du kannst dein aktuelles Profilfoto durch das Foto deines Google-Kontos ersetzen.",
+      "confirm": "Ersetzen"
+    },
+    "withdraw": {
+      "button": "Konto löschen",
+      "title": "Konto löschen?",
+      "lead": "Cloud-Tagebücher und Raumaktivitäten werden entfernt, und du wirst abgemeldet. Tagebücher auf diesem Gerät bleiben erhalten.",
+      "confirm": "Löschen"
+    },
+    "removePhoto": "Entfernen",
+    "nameLabel": "Name",
+    "nameHint": "Name, der in Freundesräumen angezeigt wird",
+    "nameHintLoggedIn": "Dein Name bleibt nach dem Abmelden auf diesem Gerät",
+    "namePlaceholder": "Gib deinen Namen ein",
+    "save": "Speichern",
+    "profile": {
+      "label": "Profil auf diesem Gerät",
+      "hint": "Getrennt vom Login. Name und Foto nur in dieser App."
+    },
+    "sync": {
+      "label": "Cloud-Sync",
+      "hint": "Melde dich an, um dein Tagebuch beim Speichern oder Löschen automatisch zu sichern.",
+      "continueGoogle": "Weiter mit Google",
+      "continueApple": "Weiter mit Apple",
+      "signingIn": "Anmeldung…",
+      "signOut": "Abmelden",
+      "syncNow": "Jetzt synchronisieren",
+      "syncing": "Synchronisierung…",
+      "lastSynced": "Zuletzt synchronisiert · {{time}}",
+      "lastSyncedAt": "Zuletzt synchronisiert: {{time}}",
+      "am": "vorm.",
+      "pm": "nachm.",
+      "never": "Nie",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "Nach der Google-Anmeldung werden Tagebücher beim Speichern automatisch synchronisiert.",
+      "autoNote": "Beim Speichern oder Löschen eines Tagebuchs wird automatisch synchronisiert.",
+      "okSignedIn": "Angemeldet. Tagebücher werden beim Speichern synchronisiert.",
+      "okSignedInSynced": "Angemeldet und Tagebuch synchronisiert",
+      "okSignedOut": "Abgemeldet",
+      "okSynced": "{{count}} Tagebücher synchronisiert",
+      "errSignIn": "Anmeldung fehlgeschlagen",
+      "errGoogleNative": "Google-Anmeldung fehlgeschlagen",
+      "errGoogleDeveloper": "Füge den SHA-1 dieser App zum Google Cloud Android OAuth-Client hinzu und versuche es erneut",
+      "errGooglePlay": "Dieser Emulator braucht Google Play und ein Google-Konto",
+      "errGoogleNetwork": "Prüfe deine Netzwerkverbindung und versuche es erneut",
+      "errGoogleToken": "Kein Google-Token erhalten. Prüfe SHA-1 und die Web-Client-ID",
+      "errSync": "Synchronisierung fehlgeschlagen",
+      "noAccountPhoto": "Dieses Konto hat kein Profilfoto"
+    },
+    "ok": {
+      "nameSaved": "Name gespeichert",
+      "photoSaved": "Profilfoto gespeichert",
+      "photoRemoved": "Profilfoto entfernt"
+    },
+    "err": {
+      "nameRequired": "Bitte gib einen Namen ein",
+      "imageOnly": "Nur Bilddateien erlaubt",
+      "photoSave": "Foto konnte nicht gespeichert werden",
+      "photoRead": "Foto konnte nicht gelesen werden",
+      "photoProcess": "Foto konnte nicht verarbeitet werden",
+      "photoLoad": "Foto konnte nicht geladen werden"
+    }
+  },
+  "language": {
+    "label": "Sprache",
+    "hint": "Anzeigesprache der App",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "简体中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย",
+    "de": "Deutsch",
+    "title": "Sprache",
+    "aria": "Sprache",
+    "zh-TW": "繁體中文"
+  },
+  "credits": {
+    "moodIcons": "Stimmungs-Icons: entworfen von {{author}} von Flaticon"
+  },
+  "rooms": {
+    "title": "Freundesräume",
+    "joinWithCode": "Mit Code beitreten",
+    "create": "Raum erstellen",
+    "empty": "Du bist noch in keinem Raum",
+    "memberCount": "{{n}} Mitglieder",
+    "roomFallback": "Raum",
+    "copyInvite": "Einladen",
+    "copied": "Kopiert",
+    "copyInviteTitle": "Freunde einladen",
+    "copyInviteAria": "Einladungscode teilen",
+    "leave": "Verlassen",
+    "leaveAria": "Raum verlassen",
+    "leaving": "Verlassen…",
+    "leaveConfirmTitle": "Diesen Raum verlassen?",
+    "leaveConfirmLead": "Du verlässt 「{{name}}」.",
+    "delete": "Raum löschen",
+    "deleteAria": "Raum löschen",
+    "deleting": "Löschen…",
+    "deleteConfirmTitle": "Diesen Raum löschen?",
+    "deleteConfirmLead": "「{{name}}」 wird gelöscht. Alle verlassen den Raum und geteilte Tagebücher werden entfernt.",
+    "createSheetAria": "Raum erstellen",
+    "createHint": "Gib einen Raumnamen ein; ein 6-stelliger Einladungscode wird automatisch erstellt.",
+    "asChipCreate": "Erstellen als {{name}}",
+    "roomNamePlaceholder": "Raumname",
+    "creating": "Erstellen…",
+    "joinSheetAria": "Mit Code beitreten",
+    "joinHint": "Gib den 6-stelligen Code von einem Freund ein.",
+    "asChipJoin": "Beitreten als {{name}}",
+    "invitePlaceholder": "z. B. 482913",
+    "joining": "Beitreten…",
+    "joinSubmit": "Beitreten",
+    "noNickname": "Kein Spitzname",
+    "backToList": "← Liste",
+    "backToListAria": "Zurück zur Liste",
+    "refresh": "Aktualisieren",
+    "sharedDiaries": "Geteilte Tagebücher",
+    "sharedEmpty": "Noch keine geteilten Tagebücher. Öffne ein Tagebuch und tippe auf Teilen → Freundesräume.",
+    "sharePrompt": "Möchtest du ein Tagebuch teilen?",
+    "goHome": "Zur Startseite",
+    "openPostAria": "Tagebuch von {{author}} öffnen: {{title}}",
+    "coach": {
+      "comment": "Hinterlasse einen Kommentar!"
+    },
+    "backToRoom": "← Zum Raum",
+    "backToRoomAria": "Zurück zum Raum",
+    "sharedDiary": "Geteiltes Tagebuch",
+    "comments": "Kommentare ({{n}})",
+    "commentPlaceholder": "Kommentar schreiben",
+    "commentSubmit": "Posten",
+    "alert": {
+      "createdTitle": "Raum erstellt!",
+      "createdLead": "Teile diesen Einladungscode mit deinen Freunden.",
+      "copyCode": "Code kopieren",
+      "share": "Teilen",
+      "shareTitle": "PageBy-Raumeinladung",
+      "shareText": "Lust auf ein Bildertagebuch? 🖍️\nLass uns jeden Tag zusammen malen!\n\nEinladungscode: {{code}}",
+      "enterRoom": "Raum betreten",
+      "created": "Raum erstellt!\n\nEinladungscode: {{code}}\n\nTeile diesen Code mit Freunden."
+    },
+    "confirm": {
+      "deletePost": "Dieses geteilte Tagebuch aus dem Raum entfernen?"
+    },
+    "err": {
+      "needNickname": "Lege zuerst Name und Profilfoto fest",
+      "needProfile": "Name und Foto sind nötig, um mit Freunden zu teilen",
+      "guestAuth": "Verbindung zu Freundesräumen fehlgeschlagen. Versuche es gleich noch einmal",
+      "list": "Räume konnten nicht geladen werden",
+      "nameRequired": "Bitte gib einen Raumnamen ein",
+      "create": "Raum konnte nicht erstellt werden",
+      "codeRequired": "Gib einen 6-stelligen Einladungscode ein",
+      "join": "Beitritt fehlgeschlagen",
+      "leave": "Raum konnte nicht verlassen werden",
+      "deleteRoom": "Raum konnte nicht gelöscht werden",
+      "copy": "Einladungscode konnte nicht kopiert werden",
+      "load": "Raum konnte nicht geladen werden",
+      "loadPost": "Beitrag konnte nicht geladen werden",
+      "comment": "Kommentar konnte nicht gepostet werden",
+      "delete": "Löschen fehlgeschlagen"
+    }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Stell dich vor",
+    "lead": "Du kannst deinen Namen später ändern. Wenn du kein Foto wählst, wird der erste Buchstabe deines Namens dein Profil.",
+    "pickPhoto": "Foto wählen",
+    "pickPhotoAria": "Profilfoto wählen",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name, den Freunde sehen (optional)",
+    "start": "Weiter",
+    "errName": "Bitte gib einen Namen ein",
+    "errNeedPhoto": "Bitte füge ein Profilfoto hinzu",
+    "errImage": "Nur Bilddateien",
+    "errPhoto": "Foto konnte nicht verarbeitet werden"
+  },
+  "appIntro": {
+    "aria": "App-Einführung",
+    "sample": "Beispiel {{n}}",
+    "prev": "Zurück",
+    "next": "Weiter"
+  },
+  "diary": {
+    "empty": {
+      "line1": "Noch keine Tagebücher.",
+      "line2": "Schreib dein erstes Tagebuch!",
+      "cta": "Charakter festlegen & erstes Bild malen"
+    },
+    "writeFabAria": "Tagebuch schreiben",
+    "search": {
+      "title": "Tagebücher suchen",
+      "aria": "Tagebücher suchen",
+      "placeholder": "Titel oder Inhalt suchen",
+      "empty": "Gib ein Wort ein, um zu suchen",
+      "noResults": "Keine passenden Tagebücher",
+      "count": "{{n}} gefunden"
+    },
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "Keine Tagebücher in diesem Monat.",
+      "showMore": "Mehr anzeigen · {{count}}",
+      "collapse": "Weniger anzeigen",
+      "noPreview": "Kein Inhalt"
+    },
+    "card": {
+      "imageAlt": "Zeichnung vom {{date}}"
+    }
+  },
+  "subscription": {
+    "limitTitle": "Tagebuchlimit",
+    "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt. Abonniere für {{price}} KRW/Monat, um weiterzuschreiben.",
+    "limitPremiumLead": "Du kannst diesen Monat noch {{n}} Einträge schreiben.",
+    "subscribeCta": "Abonnieren · {{price}} KRW/Mo.",
+    "appOnly": "Im App abonnieren",
+    "restore": "Käufe wiederherstellen",
+    "freeGrant": "Gratis bei Anmeldung: {{n}} Einträge",
+    "freeRemaining": "Gratis übrig: {{n}}"
+  },
+  "write": {
+    "title": {
+      "new": "Heutiges Tagebuch",
+      "edit": "Tagebuch bearbeiten"
+    },
+    "save": "Speichern",
+    "saveEdit": "Bearbeitung abschließen",
+    "cancel": "Abbrechen",
+    "titlePlaceholder": "Titel eingeben",
+    "contentPlaceholder": "z. B. Heute war ich schwimmen. Heute habe ich trainiert.",
+    "collapseCanvas": "Zeichnung ausblenden",
+    "expandCanvas": "Zeichnung anzeigen",
+    "ai": {
+      "button": "✨ KI-Zeichnung",
+      "sceneStep": "Prompt wird geschrieben…",
+      "drawStep": "Zeichnen…",
+      "statusScene": "Szene wird erstellt…",
+      "statusDraw": "Bild wird gezeichnet…",
+      "tip": "Tipp",
+      "tipBody": "Dein Charakter ist die Hauptfigur; die KI zeichnet aus dem gesamten Tagebuchtext.",
+      "tipVisible": "Sichtbare Handlungen & Orte",
+      "tipAsk": " — bitte schreib sie auf.",
+      "exGood1": "Gut: Heute hatten wir eine Pizza-Party",
+      "exGood2": "Gut: Ich habe im Park mit einem Hund gespielt",
+      "exBad": "Schwach: Heute fühlte ich mich gut",
+      "sceneUnderstood": "Szene, die die KI verstanden hat: {{scene}}",
+      "characterAria": "Charakter für KI-Zeichnung",
+      "characterTitle": "Dieser Charakter wird zur Hauptfigur",
+      "rewardTitle": "Werbung ansehen für 1 KI-Zeichnung",
+      "rewardLead": "Schau die Werbung bis zum Ende, um eine KI-Zeichnung freizuschalten.",
+      "rewardCta": "Werbung ansehen"
+    },
+    "confirm": {
+      "replaceTitle": "KI-Zeichnung",
+      "replaceWithAi": "Leinwand durch die KI-Zeichnung ersetzen?",
+      "replaceOk": "Ersetzen"
+    },
+    "err": {
+      "needContent": "Schreib zuerst das Tagebuch",
+      "aiFailed": "Zeichnung konnte nicht erstellt werden",
+      "aiNeedContent": "Schreib zuerst Tagebuchinhalt, bevor du generierst",
+      "aiHttp": "Zeichnen fehlgeschlagen: HTTP {{status}}",
+      "aiNoImage": "Kein Bild in der Server-Antwort",
+      "aiUrl": "Bild-URL konnte nicht geladen werden",
+      "aiConvert": "Bildkonvertierung fehlgeschlagen",
+      "saveImage": "Zeichnung konnte nicht exportiert werden",
+      "empty": "Füge Titel, Text oder Zeichnung hinzu",
+      "adNotCompleted": "Schau die Werbung zu Ende, um eine KI-Zeichnung zu erhalten",
+      "adAppOnly": "Werbung ist nur in der App verfügbar",
+      "aiDailyLimit": "Ohne Abo kannst du bis zu 2 KI-Zeichnungen pro Tag erstellen"
+    },
+    "coach": {
+      "character": "Leg dich fest, damit die KI dich zeichnen kann",
+      "ai": "Schreib ein Tagebuch und lass die KI es zeichnen"
+    }
+  },
+  "detail": {
+    "backAria": "Zurück",
+    "bookAria": "Als Tagebuchbuch ansehen",
+    "bookTitle": "Tagebuchbuch · PDF",
+    "pngAria": "PNG herunterladen",
+    "pngTitle": "Als PNG speichern",
+    "shareAria": "Teilen",
+    "moreAria": "Mehr",
+    "menuCloseAria": "Menü schließen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "imageAlt": "Zeichnung vom {{date}}",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "Tagebuch-Teilkarte",
+    "confirm": {
+      "delete": "Dieses Tagebuch löschen?"
+    },
+    "ok": {
+      "png": "Als PNG gespeichert"
+    },
+    "err": {
+      "png": "PNG-Speichern fehlgeschlagen",
+      "pngBlob": "PNG konnte nicht erstellt werden",
+      "share": "Teilen fehlgeschlagen",
+      "roomsList": "Räume konnten nicht geladen werden"
+    }
+  },
+  "share": {
+    "title": "Teilen",
+    "toRoomAria": "In Raum teilen",
+    "backToMenuAria": "Zurück zum Teilen-Menü",
+    "instagram": "Instagram",
+    "instagramDesc": "Als Story-Karte teilen",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "Foto im Chat teilen",
+    "sns": "In SNS teilen",
+    "snsIcon": "SNS",
+    "snsDesc": "Instagram, KakaoTalk und mehr wählen",
+    "rooms": "Freundesräume",
+    "roomsIcon": "Raum",
+    "roomsDesc": "In Räume posten, in denen du bist",
+    "roomsHint": "Wähle mehrere Räume zum gleichzeitigen Teilen",
+    "roomsLoading": "Räume werden geladen…",
+    "roomsEmpty": "Noch keine Räume. Erstelle oder tritt bei unter Menü → Freundesräume.",
+    "pagePrev": "Zurück",
+    "pageNext": "Weiter",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "Bereits geteilt",
+    "submit": "Teilen",
+    "sharing": "Teilen…",
+    "goToRoomsAsk": "Zur Raumliste gehen?",
+    "goToRooms": "Räume öffnen",
+    "pcHint": "Am Desktop kannst du nicht direkt in Apps teilen. Bild heruntergeladen — öffne es auf dem Handy oder lade es in der App hoch.",
+    "ok": {
+      "oneRoom": "Geteilt in „{{name}}“",
+      "manyRooms": "In {{n}} Räume geteilt",
+      "partial": "In {{n}} Räume geteilt. Fehlgeschlagen: {{fails}}"
+    },
+    "pick": {
+      "instagram": "Wähle Instagram im Teilen-Menü!",
+      "kakao": "Wähle KakaoTalk im Teilen-Menü!",
+      "sns": "Wähle Instagram, KakaoTalk oder eine andere App im Teilen-Menü!"
+    },
+    "saved": {
+      "instagram": "Bild gespeichert. Lade es in Instagram Stories hoch!",
+      "kakao": "Bild gespeichert. Sende es in KakaoTalk!",
+      "sns": "Bild gespeichert. Öffne Instagram, KakaoTalk oder eine andere App, um es zu posten!"
+    },
+    "native": {
+      "instagram": "Mein Tagebuch in Instagram Stories teilen",
+      "kakao": "Mein Tagebuch über KakaoTalk teilen",
+      "sns": "Mein Tagebuch teilen"
+    },
+    "err": {
+      "roomShare": "Teilen im Raum fehlgeschlagen",
+      "build": "Teilbild kann nicht erstellt werden",
+      "convert": "Teilbild-Konvertierung fehlgeschlagen",
+      "imageLoad": "Zeichnung konnte nicht geladen werden"
+    }
+  },
+  "character": {
+    "dialogAria": "Meine Charakter-Einstellungen",
+    "title": "Mein Charakter",
+    "done": "Fertig",
+    "desc": "Dieses Aussehen ist die Hauptfigur der KI-Zeichnung",
+    "who": "Geschlecht",
+    "hairLabel": "Haare",
+    "outfitLabel": "Outfit",
+    "gender": {
+      "boy": "Junge",
+      "girl": "Mädchen"
+    },
+    "hair": {
+      "short": "Herrenfrisur",
+      "medium": "Damen-Bob",
+      "curly": "Damen-Dauerwelle",
+      "bald": "Glatze"
+    },
+    "outfit": {
+      "short-sleeve": "Kurzarm",
+      "dress": "Kleid",
+      "hoodie": "Hoodie",
+      "school-uniform": "Schuluniform",
+      "swimsuit": "Badeanzug",
+      "ski-suit": "Skianzug"
+    },
+    "accessoryLabel": "Accessoire",
+    "accessory": {
+      "none": "Keins",
+      "glasses": "Brille",
+      "hat": "Hut",
+      "ribbon": "Schleife"
+    }
+  },
+  "export": {
+    "title": "Exportieren",
+    "aria": "Exportieren",
+    "period": "Zeitraum",
+    "presetsAria": "Zeitraum-Voreinstellungen",
+    "thisMonth": "Dieser Monat",
+    "lastMonth": "Letzter Monat",
+    "custom": "Benutzerdefiniert",
+    "start": "Start",
+    "end": "Ende",
+    "count": "{{n}} Tagebücher",
+    "empty": "Keine Tagebücher in diesem Zeitraum",
+    "pdf": "PDF speichern",
+    "sharePdf": "PDF teilen",
+    "shareReady": "Jetzt teilen",
+    "shareHint": "PDF ist bereit. Tippe erneut zum Teilen oder Speichern.",
+    "shareText": "PageBy-Tagebuchbuch",
+    "saving": "Wird vorbereitet…",
+    "openBook": "Tagebuchbuch ansehen",
+    "err": {
+      "pdf": "PDF-Speichern fehlgeschlagen"
+    }
+  },
+  "book": {
+    "dialogAria": "Tagebuchbuch-Ansicht",
+    "title": "Tagebuchbuch",
+    "pdfAria": "PDF speichern",
+    "pdfTitle": "PDF speichern",
+    "saving": "Dein PDF wird erstellt…",
+    "building": "Dein Tagebuch wird geschrieben…",
+    "prevPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "coverLabel": "Cover",
+    "cover": {
+      "total": "{{n}} Einträge insgesamt",
+      "hint": "Wische zur Seite zum Lesen"
+    },
+    "err": {
+      "build": "Tagebuchbuch konnte nicht erstellt werden",
+      "empty": "Keine Tagebücher zum Herunterladen",
+      "page": "Buchseite kann nicht erstellt werden",
+      "image": "Zeichnung konnte nicht geladen werden"
+    }
+  },
+  "canvas": {
+    "pen": "Stift",
+    "photo": "Foto",
+    "font": "Schrift",
+    "sticker": "Sticker",
+    "eraser": "Radierer",
+    "clearAll": "Alles löschen",
+    "stickerSelected": "{{emoji}} ausgewählt · tippe auf die Leinwand, dann Größe/Drehung ändern",
+    "colorAria": "Farbe {{c}}",
+    "pickColorTitle": "Farbe wählen",
+    "eraserSizeAria": "Radierergröße",
+    "eraserSize": {
+      "s": "Klein",
+      "m": "Mittel",
+      "l": "Groß"
+    },
+    "fontPickerTitle": "Schrift wählen",
+    "stickerSheetTitle": "Sticker",
+    "stickerCatsAria": "Sticker-Kategorien",
+    "sample": "Heutiges Tagebuch",
+    "confirm": {
+      "clear": "Die ganze Zeichnung löschen?"
+    },
+    "alert": {
+      "imageOnly": "Nur Bilddateien erlaubt"
+    },
+    "err": {
+      "noCanvas": "Keine Leinwand",
+      "noContext": "Canvas-Kontext kann nicht geöffnet werden",
+      "imageLoad": "Bild konnte nicht geladen werden",
+      "tainted": "Diese Zeichnung kann aus Sicherheitsgründen nicht gespeichert werden. Erstelle das KI-Bild erneut oder lade die Seite neu und versuche es noch einmal",
+      "export": "Zeichnung konnte nicht exportiert werden"
+    },
+    "penKindAria": "Stifttyp",
+    "penKind": {
+      "ballpoint": "Kugelschreiber",
+      "gel": "Gelstift",
+      "brush": "Pinsel",
+      "marker": "Filzstift",
+      "highlighter": "Textmarker"
+    },
+    "stickerRotate": "Drehen",
+    "removeOverlay": "Entfernen",
+    "undo": "Rückgängig"
+  },
+  "font": {
+    "dialogAria": "Schrift wählen",
+    "title": "Schrift",
+    "sample": "Heutiges Tagebuch",
+    "size": "Größe",
+    "sizeAria": "Textgröße wählen",
+    "sizes": {
+      "sm": "Klein",
+      "md": "Mittel",
+      "lg": "Groß",
+      "xl": "Extra"
+    },
+    "cat": {
+      "cute": "Niedliche Schriften",
+      "neat": "Saubere Schriften"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "Datum wählen",
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "prevYear": "Vorheriges Jahr",
+    "nextYear": "Nächstes Jahr",
+    "prevYears": "Frühere Jahre",
+    "nextYears": "Spätere Jahre",
+    "pickYearMonthAria": "Jahr und Monat wählen",
+    "done": "Fertig",
+    "pickYearAria": "Jahr wählen",
+    "monthsAria": "Monat",
+    "yearsAria": "Jahr",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mär",
+      "4": "Apr",
+      "5": "Mai",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Okt",
+      "11": "Nov",
+      "12": "Dez"
+    },
+    "thisMonth": "Dieser Monat",
+    "goToday": "Zu heute",
+    "displayLabel": "Startansicht",
+    "displayAria": "Startansicht",
+    "displayLatest": "Neueste",
+    "displayCalendar": "Kalender"
+  },
+  "mood": {
+    "happy": "Glücklich",
+    "excited": "Aufgeregt",
+    "love": "Verliebt",
+    "proud": "Stolz",
+    "calm": "Ruhig",
+    "sleepy": "Müde",
+    "soso": "Geht so",
+    "surprised": "Überrascht",
+    "sad": "Traurig",
+    "angry": "Wütend",
+    "anxious": "Ängstlich",
+    "sick": "Krank"
+  },
+  "stickers": {
+    "face": "Gesichter",
+    "animal": "Tiere",
+    "fruit": "Obst",
+    "building": "Gebäude",
+    "weather": "Wetter",
+    "sport": "Sport",
+    "clothes": "Kleidung",
+    "shape": "Formen",
+    "flag": "Flaggen"
+  },
+  "lock": {
+    "title": "Bildschirmsperre",
+    "aria": "Bildschirmsperre",
+    "hint": "Wenn aktiv, fragt die App beim Start und beim Zurückkehren aus dem Hintergrund nach einem Passwort.",
+    "status": "Status",
+    "on": "An",
+    "off": "Aus",
+    "turnOn": "Sperre aktivieren",
+    "turnOff": "Sperre deaktivieren",
+    "changePassword": "Passwort ändern",
+    "enableTitle": "Passwort festlegen",
+    "disableTitle": "Sperre deaktivieren",
+    "changeTitle": "Passwort ändern",
+    "setHint": "Wähle ein Passwort mit mindestens {{min}} Zeichen.",
+    "disableHint": "Gib dein 4-stelliges Passwort ein, um die Sperre zu deaktivieren.",
+    "password": "Passwort",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "currentPassword": "Aktuelles Passwort",
+    "unlock": "Entsperren",
+    "gateTitle": "Gesperrt",
+    "gateHint": "Bitte gib dein Passwort ein",
+    "gateAria": "Bildschirmsperre",
+    "forgotNote": "Es wird eine 4-stellige PIN verwendet. Wenn du sie vergisst, musst du die App-Daten löschen.",
+    "ok": {
+      "enabled": "Bildschirmsperre aktiviert",
+      "disabled": "Bildschirmsperre deaktiviert",
+      "changed": "Passwort aktualisiert"
+    },
+    "err": {
+      "passwordRequired": "Bitte gib dein Passwort ein",
+      "wrongPassword": "Falsches Passwort",
+      "tooShort": "Passwort muss mindestens {{min}} Zeichen haben",
+      "mismatch": "Passwörter stimmen nicht überein. Versuche es erneut",
+      "save": "Speichern fehlgeschlagen"
+    },
+    "pinTitle": "Passwort eingeben",
+    "pinEnterHint": "Bitte gib ein Passwort ein",
+    "pinConfirmHint": "Bitte gib das Passwort erneut ein",
+    "pinRestart": "Neu beginnen",
+    "delete": "Löschen",
+    "keypadAria": "Zifferntastatur",
+    "changeVerifyHint": "Gib dein aktuelles 4-stelliges Passwort ein."
+  }
+}

@@ -87,11 +87,11 @@
       "desc": "Ikon cuaca datar (Flaticon)"
     },
     "numbers": {
-      "name": "Numbers",
+      "name": "Number1",
       "desc": "Ikon angka (Flaticon)"
     },
     "numbers2": {
-      "name": "Numbers2",
+      "name": "Number2",
       "desc": "Ikon angka 2 (Flaticon)"
     }
   },
@@ -143,6 +143,10 @@
     "lemon": {
       "name": "Lemon",
       "desc": "Cahaya jeruk lembut"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "Merah muda lembut"
     }
   },
   "account": {
@@ -213,7 +217,7 @@
     "hint": "Bahasa tampilan aplikasi",
     "ko": "한국어",
     "en": "English",
-    "zh": "中文",
+    "zh": "简体中文",
     "id": "Bahasa Indonesia",
     "ja": "日本語",
     "vi": "Tiếng Việt",
@@ -222,7 +226,8 @@
     "es": "Español",
     "th": "ไทย",
     "title": "Bahasa",
-    "aria": "Bahasa"
+    "aria": "Bahasa",
+    "zh-TW": "繁體中文"
   },
   "credits": {
     "moodIcons": "Ikon mood: designed by {{author}} from Flaticon"
@@ -324,6 +329,8 @@
     "cancel": "Batal",
     "titlePlaceholder": "Masukkan judul",
     "contentPlaceholder": "mis. Hari ini aku berenang. Hari ini aku olahraga.",
+    "collapseCanvas": "Sembunyikan gambar",
+    "expandCanvas": "Tampilkan gambar",
     "ai": {
       "button": "✨ Gambar AI",
       "sceneStep": "Menulis prompt…",
@@ -549,6 +556,14 @@
     "dialogAria": "Pilih font",
     "title": "Font",
     "sample": "Diary hari ini",
+    "size": "Ukuran",
+    "sizeAria": "Pilih ukuran teks",
+    "sizes": {
+      "sm": "Kecil",
+      "md": "Sedang",
+      "lg": "Besar",
+      "xl": "Sangat besar"
+    },
     "cat": {
       "cute": "Font lucu",
       "neat": "Font rapi"

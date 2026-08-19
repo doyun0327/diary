@@ -92,11 +92,11 @@
       "desc": "Flat weather icons (Flaticon)"
     },
     "numbers": {
-      "name": "Numbers",
+      "name": "Number1",
       "desc": "Number icons (Flaticon)"
     },
     "numbers2": {
-      "name": "Numbers2",
+      "name": "Number2",
       "desc": "Number icons 2 (Flaticon)"
     }
   },
@@ -148,6 +148,10 @@
     "lemon": {
       "name": "Lemon",
       "desc": "Soft citrus glow"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "Soft rose pink"
     }
   },
   "account": {
@@ -229,7 +233,7 @@
     "hint": "App display language",
     "ko": "한국어",
     "en": "English",
-    "zh": "中文",
+    "zh": "简体中文",
     "id": "Bahasa Indonesia",
     "ja": "日本語",
     "vi": "Tiếng Việt",
@@ -238,7 +242,8 @@
     "es": "Español",
     "th": "ไทย",
     "title": "Language",
-    "aria": "Language"
+    "aria": "Language",
+    "zh-TW": "繁體中文"
   },
   "credits": {
     "moodIcons": "Mood icons: designed by {{author}} from Flaticon"
@@ -390,6 +395,8 @@
     "cancel": "Cancel",
     "titlePlaceholder": "Enter a title",
     "contentPlaceholder": "e.g. I went swimming today. I worked out today.",
+    "collapseCanvas": "Hide drawing",
+    "expandCanvas": "Show drawing",
     "ai": {
       "button": "✨ AI drawing",
       "sceneStep": "Writing prompt…",
@@ -642,6 +649,14 @@
     "dialogAria": "Choose font",
     "title": "Font",
     "sample": "Today's diary",
+    "size": "Size",
+    "sizeAria": "Choose text size",
+    "sizes": {
+      "sm": "Small",
+      "md": "Medium",
+      "lg": "Large",
+      "xl": "Extra"
+    },
     "cat": {
       "cute": "Cute fonts",
       "neat": "Neat fonts"

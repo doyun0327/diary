@@ -1,0 +1,671 @@
+{
+  "common": {
+    "close": "關閉",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "刪除",
+    "loading": "加載中…",
+    "anonymous": "匿名",
+    "back": "返回",
+    "processing": "處理中…",
+    "requestFailed": "請求失敗（{{status}}）",
+    "serverUnreachable": "無法連接服務器。請確認 Spring（8080）是否在運行。",
+    "weekday": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "dateFull": "{{y}}年{{m}}月{{d}}日（{{weekday}}）",
+    "yearMonth": "{{y}}年{{m}}月"
+  },
+  "header": {
+    "menu": "菜單",
+    "search": "搜索",
+    "searchHint": "搜索日記內容",
+    "tagline": "記錄我的一天",
+    "footer": "慢慢地，一天一天",
+    "account": "賬號",
+    "accountHintEmpty": "頭像 · 同步",
+    "rooms": "好友房",
+    "roomsHint": "我的房間",
+    "character": "角色",
+    "characterHint": "AI 畫裡的我",
+    "export": "導出",
+    "exportHint": "選擇期間查看日記本",
+    "decorate": "裝扮",
+    "decorateHint": "主題 · 表情",
+    "appInfo": "應用信息",
+    "appInfoHint": "版本 · 條款 · 致謝",
+    "language": "語言",
+    "languageHint": "顯示語言",
+    "screenLock": "屏幕鎖定",
+    "screenLockHint": "用密碼鎖定",
+    "screenLockHintOn": "已開啟 · 點按關閉",
+    "screenLockHintOff": "已關閉 · 點按開啟"
+  },
+  "decorate": {
+    "title": "裝扮",
+    "aria": "裝扮",
+    "tabsAria": "裝扮選項卡",
+    "tab": {
+      "theme": "主題",
+      "emoji": "表情"
+    }
+  },
+  "emojiPack": {
+    "hint": "更換心情圖標樣式",
+    "classic": {
+      "name": "經典",
+      "desc": "扁平圖標（Flaticon）"
+    },
+    "smileys": {
+      "name": "笑臉",
+      "desc": "動態圖標（Flaticon）"
+    },
+    "cat": {
+      "name": "貓咪",
+      "desc": "貓咪表情（Flaticon）"
+    },
+    "dog": {
+      "name": "小狗",
+      "desc": "小狗表情（Flaticon）"
+    },
+    "love": {
+      "name": "愛心",
+      "desc": "愛心情話（Flaticon）"
+    },
+    "ghost": {
+      "name": "幽靈",
+      "desc": "幽靈表情（Flaticon）"
+    },
+    "weather": {
+      "name": "Weather",
+      "desc": "扁平天氣圖標 (Flaticon)"
+    },
+    "numbers": {
+      "name": "Number1",
+      "desc": "數字圖標 (Flaticon)"
+    },
+    "numbers2": {
+      "name": "Number2",
+      "desc": "數字圖標 2 (Flaticon)"
+    }
+  },
+  "appInfo": {
+    "title": "應用信息",
+    "aria": "應用信息",
+    "back": "返回",
+    "version": "當前版本",
+    "legal": {
+      "menu": "條款與隱私政策",
+      "title": "條款 · 隱私",
+      "termsHeading": "服務條款",
+      "termsBody": "PageBy 是個人日記應用。請在遵守相關法律法規的前提下使用。您需對自己的賬號、暱稱和日記內容負責。禁止發佈或分享侵犯他人權利的內容。功能可能不經另行通知而變更。",
+      "privacyHeading": "隱私政策",
+      "privacyBody": "日記、畫作和資料可能保存在本設備；使用好友房時也可能同步到服務器。我們僅將該數據用於日記存儲、分享與應用功能。我們不會出售個人數據，除依法要求外不會對外提供。隱私相關請求請通過應用內渠道聯繫我們。"
+    },
+    "licenses": {
+      "menu": "開源許可與致謝",
+      "title": "許可 · 致謝",
+      "iconsHeading": "圖標緻謝",
+      "libsHeading": "開源庫",
+      "note": "免費的 Flaticon 圖標需註明出處。上方鏈接即為致謝。"
+    }
+  },
+  "theme": {
+    "title": "主題",
+    "aria": "選擇主題",
+    "hint": "更改整個應用的外觀",
+    "paper": {
+      "name": "Cream",
+      "desc": "柔和奶油文具風"
+    },
+    "matcha": {
+      "name": "Matcha",
+      "desc": "柔和薄荷綠"
+    },
+    "sky": {
+      "name": "Sky",
+      "desc": "溫柔天空藍"
+    },
+    "blossom": {
+      "name": "Blossom",
+      "desc": "薰衣草桃花粉"
+    },
+    "ink": {
+      "name": "Ink",
+      "desc": "溫暖柔灰"
+    },
+    "lemon": {
+      "name": "Lemon",
+      "desc": "柔和柑橘光"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "柔和玫瑰粉"
+    }
+  },
+  "account": {
+    "title": "賬號",
+    "aria": "賬號",
+    "photoLabel": "頭像",
+    "changePhotoAria": "更換頭像",
+    "pickPhoto": "選擇照片",
+    "editPhoto": "編輯",
+    "removePhoto": "刪除",
+    "nameLabel": "暱稱",
+    "nameHint": "好友房中顯示的名字",
+    "namePlaceholder": "請輸入暱稱",
+    "save": "保存",
+    "ok": {
+      "nameSaved": "暱稱已保存",
+      "photoSaved": "頭像已保存",
+      "photoRemoved": "頭像已刪除"
+    },
+    "err": {
+      "nameRequired": "請輸入暱稱",
+      "imageOnly": "只能選擇圖片文件",
+      "photoSave": "無法保存照片",
+      "photoRead": "無法讀取照片",
+      "photoProcess": "無法處理照片",
+      "photoLoad": "無法加載照片"
+    },
+    "useAccountPhoto": "使用賬號照片",
+    "replacePhoto": {
+      "title": "要換成 Google 照片嗎？",
+      "lead": "可以用 Google 賬號照片替換當前頭像。",
+      "confirm": "更換"
+    },
+    "withdraw": {
+      "button": "註銷賬號",
+      "title": "要註銷賬號嗎？",
+      "lead": "雲端日記與房間活動將被刪除並退出登錄。本機本地日記會保留。",
+      "confirm": "註銷"
+    },
+    "nameHintLoggedIn": "已填入賬號名稱，可隨時在應用中修改",
+    "sync": {
+      "label": "雲同步",
+      "hint": "登錄後日記會保存到賬號，換手機也能用同一賬號恢復。",
+      "continueGoogle": "使用 Google 繼續",
+      "continueApple": "使用 Apple 繼續",
+      "signingIn": "登錄中…",
+      "signOut": "退出登錄",
+      "syncNow": "立即同步",
+      "syncing": "同步中…",
+      "lastSynced": "上次同步 · {{time}}",
+      "lastSyncedAt": "上次同步時間 : {{time}}",
+      "am": "上午",
+      "pm": "下午",
+      "never": "尚未同步",
+      "providerGoogle": "Google",
+      "providerApple": "Apple",
+      "mockNote": "目前僅為界面預覽，正式登錄與備份即將上線。",
+      "okSignedIn": "已登錄（預覽）",
+      "okSignedOut": "已退出",
+      "okSynced": "已同步（預覽）",
+      "errSignIn": "無法登錄",
+      "errSync": "無法同步",
+      "noAccountPhoto": "此賬號沒有頭像"
+    }
+  },
+  "language": {
+    "label": "語言",
+    "hint": "應用顯示語言",
+    "ko": "한국어",
+    "en": "English",
+    "zh": "简体中文",
+    "id": "Bahasa Indonesia",
+    "ja": "日本語",
+    "vi": "Tiếng Việt",
+    "fr": "Français",
+    "pt": "Português (Brasil)",
+    "es": "Español",
+    "th": "ไทย",
+    "title": "語言",
+    "aria": "語言",
+    "zh-TW": "繁體中文"
+  },
+  "credits": {
+    "moodIcons": "心情圖標：designed by {{author}} from Flaticon"
+  },
+  "rooms": {
+    "title": "好友房",
+    "joinWithCode": "用邀請碼加入",
+    "create": "創建房間",
+    "empty": "還沒有加入任何房間",
+    "memberCount": "{{n}} 人",
+    "roomFallback": "房間",
+    "copyInvite": "邀請",
+    "copied": "已複製",
+    "copyInviteTitle": "邀請好友",
+    "copyInviteAria": "分享邀請碼",
+    "createSheetAria": "創建房間",
+    "createHint": "設置房間名後會自動生成 6 位邀請碼。",
+    "asChipCreate": "以 {{name}} 創建",
+    "roomNamePlaceholder": "房間名",
+    "creating": "創建中…",
+    "joinSheetAria": "用邀請碼加入",
+    "joinHint": "輸入朋友給你的 6 位邀請碼。",
+    "asChipJoin": "以 {{name}} 加入",
+    "invitePlaceholder": "例如 482913",
+    "joining": "加入中…",
+    "joinSubmit": "加入",
+    "noNickname": "未設置暱稱",
+    "backToList": "← 列表",
+    "refresh": "刷新",
+    "sharedDiaries": "分享的日記",
+    "sharedEmpty": "還沒有分享的日記。可在日記詳情裡點「分享到好友房」。",
+    "coach": {
+      "comment": "留言試試吧！"
+    },
+    "backToRoom": "← 返回房間",
+    "sharedDiary": "分享的日記",
+    "comments": "評論（{{n}}）",
+    "commentPlaceholder": "寫評論",
+    "commentSubmit": "發送",
+    "alert": {
+      "created": "房間已創建！\n\n邀請碼：{{code}}\n\n把這個碼分享給朋友吧。"
+    },
+    "confirm": {
+      "deletePost": "從房間移除此分享日記？"
+    },
+    "err": {
+      "needNickname": "請先到菜單 → 賬號設置暱稱",
+      "list": "無法加載房間列表",
+      "nameRequired": "請輸入房間名",
+      "create": "無法創建房間",
+      "codeRequired": "請輸入 6 位邀請碼",
+      "join": "無法加入房間",
+      "copy": "無法複製邀請碼",
+      "load": "無法加載房間",
+      "loadPost": "無法加載帖子",
+      "comment": "無法發送評論",
+      "delete": "刪除失敗"
+    }
+  },
+  "appIntro": {
+    "aria": "App introduction",
+    "sample": "Sample {{n}}",
+    "prev": "Back",
+    "next": "Next"
+  },
+  "diary": {
+    "empty": {
+      "line1": "還沒有日記。",
+      "line2": "寫下第一篇日記吧！",
+      "cta": "設置角色並畫第一張圖"
+    },
+    "writeFabAria": "寫日記",
+    "search": {
+      "title": "搜索日記",
+      "aria": "搜索日記",
+      "placeholder": "搜索標題或內容",
+      "empty": "請輸入搜索詞",
+      "noResults": "沒有匹配的日記",
+      "count": "{{n}}條"
+    },
+    "list": {
+      "monthTitle": "{{month}}",
+      "emptyMonth": "這個月還沒有日記。",
+      "showMore": "查看更多 · {{count}}",
+      "collapse": "收起",
+      "noPreview": "無內容"
+    },
+    "card": {
+      "imageAlt": "{{date}} 的畫"
+    }
+  },
+  "write": {
+    "title": {
+      "new": "今日日記",
+      "edit": "編輯日記"
+    },
+    "save": "保存",
+    "saveEdit": "完成編輯",
+    "cancel": "取消",
+    "titlePlaceholder": "請輸入標題",
+    "contentPlaceholder": "例如：今天去游泳了。今天鍛鍊了。",
+    "collapseCanvas": "收起圖畫",
+    "expandCanvas": "展開圖畫",
+    "ai": {
+      "button": "✨ AI 畫畫",
+      "sceneStep": "正在寫提示詞…",
+      "drawStep": "正在畫畫…",
+      "statusScene": "正在構思場景…",
+      "statusDraw": "正在畫畫…",
+      "tip": "提示",
+      "tipBody": "你設定的角色會成為主角，AI 會根據整篇日記來畫。",
+      "tipVisible": "看得見的動作與地點",
+      "tipAsk": "請寫出來。",
+      "exGood1": "好例子：今天開了披薩派對",
+      "exGood2": "好例子：在公園和狗狗一起玩",
+      "exBad": "較弱：今天心情不錯",
+      "sceneUnderstood": "AI 理解的場景：{{scene}}",
+      "characterAria": "AI 畫畫用的角色",
+      "characterTitle": "這個角色會成為畫中的主角"
+    },
+    "confirm": {
+      "replaceTitle": "AI 畫",
+      "replaceWithAi": "用 AI 畫替換畫布內容嗎？",
+      "replaceOk": "替換"
+    },
+    "err": {
+      "needContent": "請先寫日記",
+      "aiFailed": "生成畫失敗",
+      "aiNeedContent": "生成前請先寫日記內容",
+      "aiHttp": "畫畫失敗：HTTP {{status}}",
+      "aiNoImage": "後端響應中沒有圖片",
+      "aiUrl": "無法加載圖片鏈接",
+      "aiConvert": "圖片轉換失敗"
+    },
+    "coach": {
+      "character": "設定自己後，AI會按這個樣子畫畫",
+      "ai": "寫好日記後，用AI來畫畫吧"
+    }
+  },
+  "detail": {
+    "backAria": "返回",
+    "bookAria": "以日記本查看",
+    "bookTitle": "日記本 · PDF",
+    "pngAria": "下載 PNG",
+    "pngTitle": "保存為 PNG",
+    "shareAria": "分享",
+    "moreAria": "更多",
+    "menuCloseAria": "關閉菜單",
+    "edit": "編輯",
+    "delete": "刪除",
+    "imageAlt": "{{date}} 的畫",
+    "imageAltTitle": "{{title}}",
+    "sharePreviewAlt": "日記分享卡片",
+    "confirm": {
+      "delete": "刪除這篇日記？"
+    },
+    "ok": {
+      "png": "已保存為 PNG"
+    },
+    "err": {
+      "png": "PNG 保存失敗",
+      "pngBlob": "無法創建 PNG",
+      "share": "分享失敗",
+      "roomsList": "無法加載房間"
+    }
+  },
+  "share": {
+    "title": "分享",
+    "toRoomAria": "分享到好友房",
+    "backToMenuAria": "返回分享菜單",
+    "instagram": "Instagram",
+    "instagramDesc": "以故事卡片分享",
+    "kakao": "KakaoTalk",
+    "kakaoIcon": "Kakao",
+    "kakaoDesc": "在聊天中分享圖片",
+    "rooms": "好友房",
+    "roomsIcon": "房間",
+    "roomsDesc": "發到你加入的房間",
+    "roomsHint": "可一次選擇多個房間",
+    "roomsLoading": "正在加載房間…",
+    "roomsEmpty": "還沒有房間。請到菜單 → 好友房創建或加入。",
+    "submit": "分享",
+    "sharing": "分享中…",
+    "pcHint": "電腦網頁無法直接分享到 App。圖片已下載，請在手機打開或在 App 中上傳。",
+    "ok": {
+      "oneRoom": "已分享到「{{name}}」",
+      "manyRooms": "已分享到 {{n}} 個房間",
+      "partial": "已分享到 {{n}} 個房間。失敗：{{fails}}"
+    },
+    "pick": {
+      "instagram": "請在分享面板中選擇 Instagram！",
+      "kakao": "請在分享面板中選擇 KakaoTalk！"
+    },
+    "saved": {
+      "instagram": "圖片已保存。請上傳到 Instagram Stories！",
+      "kakao": "圖片已保存。請在 KakaoTalk 發送！"
+    },
+    "native": {
+      "instagram": "把我的日記分享到 Instagram Stories",
+      "kakao": "通過 KakaoTalk 分享我的日記"
+    },
+    "err": {
+      "roomShare": "無法分享到房間",
+      "build": "無法創建分享圖",
+      "convert": "分享圖轉換失敗",
+      "imageLoad": "無法加載畫作"
+    }
+  },
+  "character": {
+    "dialogAria": "我的角色設置",
+    "title": "我的角色",
+    "done": "完成",
+    "desc": "這個樣子會成為 AI 畫裡的主角",
+    "who": "性別",
+    "hairLabel": "髮型",
+    "outfitLabel": "服裝",
+    "gender": {
+      "boy": "男孩",
+      "girl": "女孩"
+    },
+    "hair": {
+      "short": "男士髮型",
+      "medium": "女士短髮",
+      "curly": "女士燙髮",
+      "bald": "光頭"
+    },
+    "outfit": {
+      "short-sleeve": "短袖",
+      "dress": "連衣裙",
+      "hoodie": "連帽衫",
+      "school-uniform": "校服",
+      "swimsuit": "泳裝",
+      "ski-suit": "滑雪服"
+    },
+    "accessoryLabel": "配飾",
+    "accessory": {
+      "none": "無",
+      "glasses": "眼鏡",
+      "hat": "帽子",
+      "ribbon": "髮帶"
+    }
+  },
+  "export": {
+    "title": "導出",
+    "aria": "導出",
+    "period": "期間",
+    "presetsAria": "期間預設",
+    "thisMonth": "本月",
+    "lastMonth": "上月",
+    "custom": "自定義",
+    "start": "開始",
+    "end": "結束",
+    "count": "{{n}} 篇日記",
+    "empty": "該期間沒有日記",
+    "pdf": "保存 PDF",
+    "saving": "保存中…",
+    "openBook": "查看日記本",
+    "err": {
+      "pdf": "PDF 保存失敗"
+    }
+  },
+  "book": {
+    "dialogAria": "日記本視圖",
+    "title": "日記本",
+    "pdfAria": "保存 PDF",
+    "pdfTitle": "保存 PDF",
+    "saving": "正在生成 PDF…",
+    "building": "正在寫日記…",
+    "prevPage": "上一頁",
+    "nextPage": "下一頁",
+    "coverLabel": "封面",
+    "cover": {
+      "total": "共 {{n}} 篇",
+      "hint": "左右滑動翻頁"
+    },
+    "err": {
+      "build": "無法生成日記本",
+      "empty": "沒有可下載的日記",
+      "page": "無法創建書頁",
+      "image": "無法加載畫作"
+    }
+  },
+  "canvas": {
+    "pen": "筆",
+    "photo": "照片",
+    "font": "字體",
+    "sticker": "貼紙",
+    "eraser": "橡皮",
+    "clearAll": "全部清除",
+    "stickerSelected": "已選 {{emoji}} · 點畫布後可調整大小與旋轉",
+    "colorAria": "顏色 {{c}}",
+    "pickColorTitle": "選擇顏色",
+    "eraserSizeAria": "橡皮大小",
+    "eraserSize": {
+      "s": "小",
+      "m": "中",
+      "l": "大"
+    },
+    "fontPickerTitle": "選擇字體",
+    "stickerSheetTitle": "貼紙",
+    "stickerCatsAria": "貼紙分類",
+    "sample": "今天的日記",
+    "confirm": {
+      "clear": "清除整幅畫？"
+    },
+    "alert": {
+      "imageOnly": "只能選擇圖片文件"
+    },
+    "err": {
+      "noCanvas": "沒有畫布",
+      "noContext": "無法打開畫布上下文",
+      "imageLoad": "圖片加載失敗"
+    },
+    "penKindAria": "筆類型",
+    "penKind": {
+      "ballpoint": "圓珠筆",
+      "gel": "中性筆",
+      "brush": "毛筆",
+      "marker": "馬克筆",
+      "highlighter": "熒光筆"
+    },
+    "stickerRotate": "旋轉",
+    "undo": "撤銷"
+  },
+  "font": {
+    "dialogAria": "選擇字體",
+    "title": "字體",
+    "sample": "今天的日記",
+    "size": "字號",
+    "sizeAria": "選擇字號",
+    "sizes": {
+      "sm": "小",
+      "md": "中",
+      "lg": "大",
+      "xl": "特大"
+    },
+    "cat": {
+      "cute": "可愛字體",
+      "neat": "端正字體"
+    },
+    "gaegu": "Gaegu",
+    "dongle": "Dongle",
+    "hiMelody": "Hi Melody",
+    "singleDay": "Single Day",
+    "cuteFont": "Cute Font",
+    "jua": "Jua",
+    "gamjaFlower": "Gamja Flower",
+    "poorStory": "Poor Story",
+    "nanumPen": "Nanum Pen",
+    "nanumBrush": "Nanum Brush",
+    "eastSeaDokdo": "East Sea Dokdo",
+    "yeonSung": "Yeon Sung",
+    "notoSans": "Noto Sans",
+    "nanumGothic": "Nanum Gothic",
+    "gowunDodum": "Gowun Dodum",
+    "gowunBatang": "Gowun Batang",
+    "nanumMyeongjo": "Nanum Myeongjo",
+    "songMyung": "Song Myung",
+    "doHyeon": "Do Hyeon",
+    "ibmPlex": "IBM Plex"
+  },
+  "calendar": {
+    "dialogAria": "選擇日期",
+    "prevMonth": "上個月",
+    "nextMonth": "下個月",
+    "goToday": "回到今天",
+    "displayLabel": "首頁顯示",
+    "displayAria": "首頁顯示方式",
+    "displayLatest": "最近",
+    "displayCalendar": "日曆"
+  },
+  "mood": {
+    "happy": "開心",
+    "excited": "興奮",
+    "love": "甜蜜",
+    "proud": "驕傲",
+    "calm": "平靜",
+    "sleepy": "睏倦",
+    "soso": "一般",
+    "surprised": "吃驚",
+    "sad": "難過",
+    "angry": "生氣",
+    "anxious": "焦慮",
+    "sick": "不舒服"
+  },
+  "stickers": {
+    "face": "表情",
+    "animal": "動物",
+    "fruit": "水果",
+    "building": "建築",
+    "weather": "天氣",
+    "sport": "運動",
+    "clothes": "服飾",
+    "shape": "形狀",
+    "flag": "國旗"
+  },
+  "lock": {
+    "title": "Screen lock",
+    "aria": "Screen lock",
+    "hint": "When on, the app asks for a password at launch.",
+    "status": "Status",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on lock",
+    "turnOff": "Turn off lock",
+    "changePassword": "Change password",
+    "enableTitle": "Set password",
+    "disableTitle": "Turn off lock",
+    "changeTitle": "Change password",
+    "setHint": "Choose a password with at least {{min}} characters.",
+    "disableHint": "Enter your 4-digit password to turn off the lock.",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "currentPassword": "Current password",
+    "unlock": "Unlock",
+    "gateTitle": "Locked",
+    "gateHint": "Please enter your password",
+    "gateAria": "Screen lock",
+    "forgotNote": "If you forget the password, you will need to clear this app’s data on the device.",
+    "ok": {
+      "enabled": "Screen lock turned on",
+      "disabled": "Screen lock turned off",
+      "changed": "Password updated"
+    },
+    "err": {
+      "passwordRequired": "Please enter your password",
+      "wrongPassword": "Incorrect password",
+      "tooShort": "Password must be at least {{min}} characters",
+      "mismatch": "Passwords do not match. Try again",
+      "save": "Could not save"
+    },
+    "pinTitle": "Enter password",
+    "pinEnterHint": "Please enter a password",
+    "pinConfirmHint": "Please enter the password again",
+    "pinRestart": "Start over",
+    "delete": "Delete",
+    "keypadAria": "Number keypad",
+    "changeVerifyHint": "Enter your current 4-digit password."
+  }
+}

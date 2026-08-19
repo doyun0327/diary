@@ -1,5 +1,4 @@
 .mood-cal {
-  --story-title: 'Gaegu', 'Hi Melody', cursive;
   margin: 0;
   padding: 18px 14px 16px;
   border-radius: 30px;
@@ -38,7 +37,7 @@
 }
 
 .mood-cal__display-label {
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -60,7 +59,7 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-text-muted);
@@ -76,7 +75,7 @@
 }
 
 .mood-cal__header strong {
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -110,7 +109,7 @@
 
 .mood-cal__weekdays span {
   text-align: center;
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--color-text-muted);
@@ -148,7 +147,7 @@
   border: none;
   border-radius: 16px;
   background: transparent;
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 1rem;
   font-weight: 700;
   color: var(--color-text-muted);

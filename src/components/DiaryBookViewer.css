@@ -213,7 +213,7 @@
 .diary-book__cover-brand {
   margin: 0;
   flex-shrink: 0;
-  font-family: 'Gaegu', 'Hi Melody', cursive;
+  font-family: var(--brand-font);
   font-size: 1.45rem;
   font-weight: 700;
   line-height: 1;

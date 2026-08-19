@@ -42,7 +42,7 @@
 
 .pin-screen__brand {
   text-align: center;
-  font-family: 'Gaegu', 'Hi Melody', cursive;
+  font-family: var(--brand-font);
   font-size: 1.55rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -87,7 +87,7 @@
 
 .pin-screen__title {
   margin: 0 0 8px;
-  font-family: var(--story-title, inherit);
+  font-family: var(--brand-font);
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -202,7 +202,7 @@
 
 .pin-inline__title {
   margin: 0 0 4px;
-  font-family: var(--story-title, inherit);
+  font-family: var(--brand-font);
   font-size: 1.2rem;
   font-weight: 800;
   color: var(--color-text);

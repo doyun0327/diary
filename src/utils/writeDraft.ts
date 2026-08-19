@@ -8,6 +8,7 @@ export interface WriteDraft {
   content: string;
   mood: DiarySticker;
   fontId?: string;
+  fontSize?: string;
   /** @deprecated 그림은 임시저장하지 않음 — 기존 데이터 호환용 */
   imageUrl?: string;
   savedAt: string;

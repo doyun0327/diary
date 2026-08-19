@@ -323,13 +323,6 @@ function Header({
       <div className="header-menu" role="dialog" aria-label={t('header.menu')}>
         <div className="header-menu__backdrop" onClick={() => setMenuOpen(false)} />
         <nav className="header-menu__panel">
-          <header className="header-menu__head">
-            <div className="header-menu__brand">
-              <p className="header-menu__brand-title">PageBy</p>
-              <p className="header-menu__brand-sub">{t('header.tagline')}</p>
-            </div>
-          </header>
-
           <ul className="header-menu__list">
             {onOpenAccount && (
               <MenuItem
@@ -396,8 +389,6 @@ function Header({
               />
             )}
           </ul>
-
-          <p className="header-menu__foot">{t('header.footer')}</p>
         </nav>
       </div>,
       document.getElementById('root') ?? document.body,

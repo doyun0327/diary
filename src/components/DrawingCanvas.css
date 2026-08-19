@@ -206,6 +206,10 @@
   cursor: crosshair;
 }
 
+.drawing__canvas--idle {
+  cursor: default;
+}
+
 .drawing__canvas--eraser {
   cursor: cell;
 }
@@ -256,6 +260,19 @@
   color: var(--color-text-muted);
   cursor: pointer;
   white-space: nowrap;
+}
+
+.drawing__dock-btn--tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+}
+
+.drawing__dock-btn--tool svg {
+  display: block;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 .drawing__dock-btn.active {
@@ -502,8 +519,12 @@
   box-shadow: var(--shadow-card);
 }
 
+.drawing__font-panel .font-size-picker {
+  margin: 0 0 10px;
+}
+
 .drawing__fonts {
-  max-height: 180px;
+  max-height: 160px;
   overflow-y: auto;
 }
 

@@ -1,7 +1,12 @@
 .diary-detail {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0 0 calc(32px + env(safe-area-inset-bottom));
+  margin: 0;
   background: var(--color-bg);
-  min-height: 100%;
 }
 
 .diary-detail__toolbar {
@@ -9,9 +14,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 4px;
-  /* paper margin(14px)과 맞춤 */
-  padding: 12px 14px 8px;
+  margin: 0;
+  padding: 8px 14px;
 }
 
 .diary-detail__back {
@@ -178,7 +182,7 @@
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-md);
   font-family: var(--diary-font);
-  font-size: 1.25rem;
+  font-size: calc(var(--diary-font-size, 1.2rem) * 1.04);
   font-weight: 700;
   letter-spacing: 0;
   background: var(--color-bg-input);
@@ -200,6 +204,13 @@
   border-radius: 0;
   border: none;
   display: block;
+}
+
+.diary-detail__image--emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
 }
 
 .diary-detail__section {
@@ -225,7 +236,7 @@
   border: none;
   border-radius: 0;
   font-family: var(--diary-font);
-  font-size: 1.2rem;
+  font-size: var(--diary-font-size, 1.2rem);
   white-space: pre-wrap;
   color: var(--color-text);
 }

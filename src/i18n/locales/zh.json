@@ -87,11 +87,11 @@
       "desc": "扁平天气图标 (Flaticon)"
     },
     "numbers": {
-      "name": "Numbers",
+      "name": "Number1",
       "desc": "数字图标 (Flaticon)"
     },
     "numbers2": {
-      "name": "Numbers2",
+      "name": "Number2",
       "desc": "数字图标 2 (Flaticon)"
     }
   },
@@ -143,6 +143,10 @@
     "lemon": {
       "name": "Lemon",
       "desc": "柔和柑橘光"
+    },
+    "pink": {
+      "name": "Pink",
+      "desc": "柔和玫瑰粉"
     }
   },
   "account": {
@@ -213,7 +217,7 @@
     "hint": "应用显示语言",
     "ko": "한국어",
     "en": "English",
-    "zh": "中文",
+    "zh": "简体中文",
     "id": "Bahasa Indonesia",
     "ja": "日本語",
     "vi": "Tiếng Việt",
@@ -222,7 +226,8 @@
     "es": "Español",
     "th": "ไทย",
     "title": "语言",
-    "aria": "语言"
+    "aria": "语言",
+    "zh-TW": "繁體中文"
   },
   "credits": {
     "moodIcons": "心情图标：designed by {{author}} from Flaticon"
@@ -324,6 +329,8 @@
     "cancel": "取消",
     "titlePlaceholder": "请输入标题",
     "contentPlaceholder": "例如：今天去游泳了。今天锻炼了。",
+    "collapseCanvas": "收起图画",
+    "expandCanvas": "展开图画",
     "ai": {
       "button": "✨ AI 画画",
       "sceneStep": "正在写提示词…",
@@ -549,6 +556,14 @@
     "dialogAria": "选择字体",
     "title": "字体",
     "sample": "今天的日记",
+    "size": "字号",
+    "sizeAria": "选择字号",
+    "sizes": {
+      "sm": "小",
+      "md": "中",
+      "lg": "大",
+      "xl": "特大"
+    },
     "cat": {
       "cute": "可爱字体",
       "neat": "端正字体"

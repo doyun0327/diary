@@ -26,6 +26,7 @@
   background: var(--sheet-bg);
   box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.14);
   translate: -50% 0;
+  font-family: var(--brand-font);
   animation: month-year-picker-in 0.28s var(--ease-out);
 }
 

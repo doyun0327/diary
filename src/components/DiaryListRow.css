@@ -1,5 +1,4 @@
 .diary-row {
-  --story-title: 'Gaegu', 'Hi Melody', cursive;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -53,7 +52,7 @@
 }
 
 .diary-row__date {
-  font-family: var(--story-title);
+  font-family: var(--brand-font);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--color-text);
