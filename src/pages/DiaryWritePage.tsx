@@ -23,7 +23,6 @@ import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
-  MONTHLY_PRICE_KRW,
   consumeAiDrawCredit,
   consumeFreeAiDrawChance,
   getAiDrawCredits,
@@ -62,20 +61,27 @@ interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
+  entriesCount: number;
   onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onOpenCharacter: () => void;
+  /** 작성 한도 초과 시 구독 모달 */
+  onOpenWriteLimitModal?: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean) => void;
+  writeQuota?: { used: number; limit: number };
 }
 
 function DiaryWritePage({
   character,
   initialEntry,
+  entriesCount,
   onSave,
   onCancel,
   onOpenCharacter,
+  onOpenWriteLimitModal,
   onNativeSaveStateChange,
+  writeQuota,
 }: DiaryWritePageProps) {
   const { t, i18n } = useTranslation();
   const isEdit = Boolean(initialEntry);
@@ -204,11 +210,20 @@ function DiaryWritePage({
     return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
   }, []);
 
+  const ensureAiDrawAllowed = () => {
+    if (isEdit) return true;
+    const status = getDiaryAccessState(entriesCount);
+    if (status.canCreate) return true;
+    onOpenWriteLimitModal?.();
+    return false;
+  };
+
   const handleAiDraw = () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
+    if (!ensureAiDrawAllowed()) return;
     if (canvasRef.current?.hasContent()) {
       setReplaceConfirmOpen(true);
       return;
@@ -225,6 +240,7 @@ function DiaryWritePage({
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
+    if (!ensureAiDrawAllowed()) return;
     if (AI_REWARD_AD_ENABLED) {
       const access = getDiaryAccessState();
       if (!access.isPremiumActive) {
@@ -318,7 +334,17 @@ function DiaryWritePage({
           <button type="button" className="diary-write__nav-btn" onClick={handleCancel}>
             {t('write.cancel')}
           </button>
-          <span className="diary-write__nav-title">{isEdit ? t('write.title.edit') : t('write.title.new')}</span>
+          <span className="diary-write__nav-title">
+            {isEdit ? t('write.title.edit') : t('write.title.new')}
+            {!isEdit && writeQuota ? (
+              <span className="diary-write__quota">
+                {t('quota.fraction', {
+                  used: Math.min(writeQuota.limit, writeQuota.used + 1),
+                  limit: writeQuota.limit,
+                })}
+              </span>
+            ) : null}
+          </span>
           <button
             type="submit"
             className="diary-write__nav-btn diary-write__nav-btn--save"
@@ -344,6 +370,14 @@ function DiaryWritePage({
           >
             {formatDate(date)}
           </button>
+          {!isEdit && writeQuota ? (
+            <span className="diary-write__quota-chip">
+              {t('quota.fraction', {
+                used: Math.min(writeQuota.limit, writeQuota.used + 1),
+                limit: writeQuota.limit,
+              })}
+            </span>
+          ) : null}
           {calendarOpen && (
             <CalendarPopup
               value={date}
@@ -561,7 +595,7 @@ function DiaryWritePage({
           onDismiss={() => setRewardPromptOpen(false)}
           showClose={false}
           closeAriaLabel={t('common.close')}
-          secondaryLabel={t('subscription.subscribeCta', { price: MONTHLY_PRICE_KRW })}
+          secondaryLabel={t('subscription.subscribeCta')}
           onSecondary={() => {
             setRewardPromptOpen(false);
             requestSubscriptionPurchase();

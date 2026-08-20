@@ -33,19 +33,3 @@
 .subscription-modal__body p {
   margin: 0 0 6px;
 }
-
-.subscription-modal__restore {
-  margin-top: 12px;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-text-muted, #6b7280);
-  font-size: 13px;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.subscription-modal__restore:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}

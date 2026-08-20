@@ -45,22 +45,29 @@ import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import { clearWriteDraft } from "./utils/writeDraft";
 import {
+  applyMonthlyUsageFromServer,
   consumeDiaryUsage,
   getDiaryAccessState,
-  MONTHLY_PRICE_KRW,
+  MONTHLY_DIARY_LIMIT,
+  setDiaryAccessAccountId,
   subscribeDiaryAccess,
   SUBSCRIPTION_CHANGE_EVENT,
 } from "./utils/diaryAccess";
 import {
+  consumeMonthlyUsage,
+  fetchMonthlyUsage,
+} from "./api/usageApi";
+import {
   identifySubscriptionUser,
   installSubscriptionBridge,
   requestSubscriptionPurchase,
-  requestSubscriptionRestore,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
 import "./App.css";
 
 export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
+
+type SubscriptionModalReason = "write" | "search" | "export";
 
 function App() {
   const { t } = useTranslation();
@@ -91,7 +98,9 @@ function App() {
   } | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
-  const [writeLimitOpen, setWriteLimitOpen] = useState(false);
+  const [subscriptionModal, setSubscriptionModal] =
+    useState<SubscriptionModalReason | null>(null);
+  const [drawConfirmOpen, setDrawConfirmOpen] = useState(false);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
@@ -126,26 +135,66 @@ function App() {
   }, []);
 
   useEffect(() => {
+    setDiaryAccessAccountId(session?.userId ?? clientId);
+  }, [session?.userId, clientId]);
+
+  useEffect(() => {
     if (!isFlutterApp()) return;
     const userId = session?.userId ?? clientId;
     if (userId) identifySubscriptionUser(userId);
   }, [session?.userId, clientId]);
 
   useEffect(() => {
-    if (!writeLimitOpen) return;
+    const token = getAccessToken();
+    if (!token || !getDiaryAccessState(entries.length).isPremiumActive) return;
+    void fetchMonthlyUsage(token)
+      .then((usage) =>
+        applyMonthlyUsageFromServer(usage.used, usage.yearMonth),
+      )
+      .catch(() => {
+        // 백엔드 미적용 시 로컬 카운트 유지
+      });
+  }, [session?.userId, entries.length, accessTick]);
+
+  const closeSubscriptionModal = useCallback(() => {
+    setSubscriptionModal(null);
+    setSubscribing(false);
+  }, []);
+
+  const openPremiumFeature = useCallback(
+    (reason: "search" | "export", open: () => void) => {
+      if (accessStatus.isPremiumActive) {
+        open();
+        return;
+      }
+      setSubscriptionModal(reason);
+    },
+    [accessStatus.isPremiumActive],
+  );
+
+  useEffect(() => {
+    if (!subscriptionModal) return;
     const onSubscriptionChange = () => {
       const next = getDiaryAccessState(entries.length);
-      if (next.canCreate) {
-        setWriteLimitOpen(false);
-        setSubscribing(false);
+      if (subscriptionModal === "write" && next.canCreate) {
+        closeSubscriptionModal();
         setEditingId(null);
         setPage("write");
+        return;
+      }
+      if (
+        (subscriptionModal === "search" || subscriptionModal === "export") &&
+        next.isPremiumActive
+      ) {
+        const reason = subscriptionModal;
+        closeSubscriptionModal();
+        if (reason === "search") setSearchOpen(true);
       }
     };
     window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
     return () =>
       window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
-  }, [writeLimitOpen, entries.length]);
+  }, [subscriptionModal, entries.length, closeSubscriptionModal]);
 
   useEffect(() => {
     if (needsProfileSetup) return;
@@ -208,12 +257,44 @@ function App() {
 
     const status = getDiaryAccessState(entries.length);
     if (!status.canCreate) {
-      setWriteLimitOpen(true);
+      setSubscriptionModal("write");
       return;
     }
 
+    if (status.isPremiumActive) {
+      const token = getAccessToken();
+      if (token) {
+        void consumeMonthlyUsage(token)
+          .then((usage) => {
+            applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+            addEntry(entry);
+            setPage("home");
+            syncInBackground();
+          })
+          .catch(async (err) => {
+            const message =
+              err instanceof Error ? err.message : String(err);
+            if (message.includes("409")) {
+              try {
+                const usage = await fetchMonthlyUsage(token);
+                applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+              } catch {
+                // ignore
+              }
+              setSubscriptionModal("write");
+              return;
+            }
+            consumeDiaryUsage();
+            addEntry(entry);
+            setPage("home");
+            syncInBackground();
+          });
+        return;
+      }
+      consumeDiaryUsage();
+    }
+
     addEntry(entry);
-    consumeDiaryUsage();
     setPage("home");
     syncInBackground();
   };
@@ -239,6 +320,10 @@ function App() {
   };
 
   const goBack = useCallback((): boolean => {
+    if (drawConfirmOpen) {
+      setDrawConfirmOpen(false);
+      return true;
+    }
     if (screenLock.locked) return true;
     if (bookEntries) {
       setBookEntries(null);
@@ -317,6 +402,7 @@ function App() {
     languageOpen,
     lockDisableOpen,
     lockSetupOpen,
+    drawConfirmOpen,
     page,
     screenLock.locked,
   ]);
@@ -399,15 +485,23 @@ function App() {
     };
   }, []);
 
-  const handleNewWrite = () => {
-    const status = getDiaryAccessState(entries.length);
-    if (!status.canCreate) {
-      setWriteLimitOpen(true);
-      return;
-    }
+  const openWritePage = () => {
     setEditingId(null);
     clearWriteDraft();
     setPage("write");
+  };
+
+  const handleNewWrite = () => {
+    const status = getDiaryAccessState(entries.length);
+    if (!status.canCreate) {
+      setSubscriptionModal("write");
+      return;
+    }
+    if (status.isPremiumActive) {
+      setDrawConfirmOpen(true);
+      return;
+    }
+    openWritePage();
   };
 
   const handleStartFirstDiary = () => {
@@ -531,7 +625,9 @@ function App() {
         onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
         onOpenExport={() => setExportOpen(true)}
-        onOpenSearch={() => setSearchOpen(true)}
+        onOpenSearch={() =>
+          openPremiumFeature("search", () => setSearchOpen(true))
+        }
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
         onNativeBack={() => {
@@ -566,6 +662,14 @@ function App() {
               setCalMonth(month);
             }}
             onStartFirstDiary={handleStartFirstDiary}
+            quota={
+              accessStatus.isPremiumActive
+                ? {
+                    used: accessStatus.monthlyUsed,
+                    limit: accessStatus.monthlyLimit,
+                  }
+                : undefined
+            }
           />
         )}
         {page === "write" && (
@@ -573,10 +677,20 @@ function App() {
             key={editingId ?? "new"}
             character={character}
             initialEntry={editingEntry}
+            entriesCount={entries.length}
             onSave={handleSave}
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
+            onOpenWriteLimitModal={() => setSubscriptionModal("write")}
             onNativeSaveStateChange={setWriteSaveEnabled}
+            writeQuota={
+              accessStatus.isPremiumActive
+                ? {
+                    used: accessStatus.monthlyUsed,
+                    limit: accessStatus.monthlyLimit,
+                  }
+                : undefined
+            }
           />
         )}
         {page === "detail" && selectedEntry && (
@@ -638,57 +752,30 @@ function App() {
         )}
       </main>
       {page === "home" && <WriteFab onClick={handleNewWrite} />}
-      {writeLimitOpen && (
-        <AppModal
-          title={t("subscription.limitTitle")}
-          lead={
-            accessStatus.isPremiumActive
-              ? t("subscription.limitPremiumLead", {
-                  n: accessStatus.monthlyRemaining,
-                })
-              : t("subscription.limitFreeLead", { price: MONTHLY_PRICE_KRW })
-          }
-          onDismiss={() => {
-            setWriteLimitOpen(false);
-            setSubscribing(false);
-          }}
-          secondaryLabel={t("common.cancel")}
-          onSecondary={() => {
-            setWriteLimitOpen(false);
-            setSubscribing(false);
-          }}
-          primaryLabel={
-            subscribing
-              ? t("common.processing")
-              : isFlutterApp()
-                ? t("subscription.subscribeCta", { price: MONTHLY_PRICE_KRW })
-                : t("subscription.appOnly")
-          }
-          onPrimary={() => {
-            if (!isFlutterApp()) return;
-            if (subscribing) return;
-            setSubscribing(true);
-            requestSubscriptionPurchase();
-          }}
-          closeAriaLabel={t("common.close")}
-        >
-          <div className="subscription-modal__body">
-            <p>{t("subscription.freeGrant", { n: 5 })}</p>
-            <p>{t("subscription.freeRemaining", { n: accessStatus.remaining })}</p>
-            <button
-              type="button"
-              className="subscription-modal__restore"
-              disabled={!isFlutterApp() || subscribing}
-              onClick={() => {
-                setSubscribing(true);
-                requestSubscriptionRestore();
-              }}
-            >
-              {t("subscription.restore")}
-            </button>
-          </div>
-        </AppModal>
-      )}
+      {drawConfirmOpen &&
+        createPortal(
+          <AppModal
+            title={t("quota.drawConfirmTitle")}
+            lead={t("quota.drawConfirmLead", {
+              n: Math.min(
+                accessStatus.monthlyLimit,
+                accessStatus.monthlyUsed + 1,
+              ),
+              limit: accessStatus.monthlyLimit,
+            })}
+            onDismiss={() => setDrawConfirmOpen(false)}
+            showClose={false}
+            secondaryLabel={t("common.cancel")}
+            onSecondary={() => setDrawConfirmOpen(false)}
+            primaryLabel={t("quota.drawConfirmOk")}
+            onPrimary={() => {
+              setDrawConfirmOpen(false);
+              openWritePage();
+            }}
+            closeAriaLabel={t("common.close")}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
       {accountOpen &&
         createPortal(
           <AccountSheet
@@ -794,11 +881,57 @@ function App() {
             entries={bookEntries}
             rangeStart={bookRange?.start}
             rangeEnd={bookRange?.end}
+            avatarUrl={avatarUrl}
+            canDownloadPdf={accessStatus.isPremiumActive}
+            onRequirePremium={() => setSubscriptionModal("export")}
             onClose={() => {
               setBookEntries(null);
               setBookRange(null);
             }}
           />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {subscriptionModal &&
+        createPortal(
+          <AppModal
+            title={
+              subscriptionModal === "write"
+                ? t("subscription.limitTitle")
+                : t("subscription.featureGateTitle")
+            }
+            lead={
+              subscriptionModal === "search" || subscriptionModal === "export"
+                ? t("subscription.featureGateLead")
+                : accessStatus.isPremiumActive
+                  ? t("subscription.limitPremiumReachedLead")
+                  : t("subscription.limitFreeLead")
+            }
+            onDismiss={closeSubscriptionModal}
+            showClose={false}
+            secondaryLabel={t("common.cancel")}
+            onSecondary={closeSubscriptionModal}
+            primaryLabel={
+              subscribing
+                ? t("common.processing")
+                : isFlutterApp()
+                  ? t("subscription.subscribeCta")
+                  : t("subscription.appOnly")
+            }
+            onPrimary={() => {
+              if (!isFlutterApp()) return;
+              if (subscribing) return;
+              setSubscribing(true);
+              requestSubscriptionPurchase();
+            }}
+            closeAriaLabel={t("common.close")}
+          >
+            <div className="subscription-modal__body">
+              <p>
+                {t("subscription.premiumBenefits", { n: MONTHLY_DIARY_LIMIT })}
+                PRO 기능 사진으로 넣어서 스와이프 하도록 추가
+              </p>
+            </div>
+          </AppModal>,
           document.getElementById("root") ?? document.body,
         )}
     </div>

@@ -247,6 +247,22 @@ function DrawingCanvas({
   const undoStack = useRef<HTMLCanvasElement[]>([]);
   const strokeSnapshotPushed = useRef(false);
   const photoImages = useRef<Map<string, HTMLImageElement>>(new Map());
+  const photoLayersRef = useRef<PhotoLayer[]>([]);
+  const stickerLayersRef = useRef<StickerLayer[]>([]);
+  const activePhotoIdRef = useRef<string | null>(null);
+  const activeStickerIdRef = useRef<string | null>(null);
+  const overlayPointers = useRef<Map<number, { x: number; y: number }>>(
+    new Map(),
+  );
+  const overlayPinch = useRef<{
+    target: 'photo' | 'sticker';
+    id: string;
+    originPhoto?: PhotoLayer;
+    originSticker?: StickerLayer;
+    startDist: number;
+    startMidX: number;
+    startMidY: number;
+  } | null>(null);
   const photoDrag = useRef<{
     kind: PhotoDragKind;
     id: string;
@@ -286,6 +302,10 @@ function DrawingCanvas({
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [stickerLayers, setStickerLayers] = useState<StickerLayer[]>([]);
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
+  photoLayersRef.current = photoLayers;
+  stickerLayersRef.current = stickerLayers;
+  activePhotoIdRef.current = activePhotoId;
+  activeStickerIdRef.current = activeStickerId;
   const [canUndo, setCanUndo] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
@@ -533,8 +553,156 @@ function DrawingCanvas({
     return () => observer.disconnect();
   }, []);
 
+  const beginOverlayPinch = () => {
+    const pts = [...overlayPointers.current.values()];
+    if (pts.length < 2) return;
+    const startDist = Math.max(1, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+    const startMidX = (pts[0].x + pts[1].x) / 2;
+    const startMidY = (pts[0].y + pts[1].y) / 2;
+    const photoId = activePhotoIdRef.current;
+    const stickerId = activeStickerIdRef.current;
+    if (photoId) {
+      const origin = photoLayersRef.current.find((l) => l.id === photoId);
+      if (!origin) return;
+      photoDrag.current = null;
+      overlayPinch.current = {
+        target: 'photo',
+        id: photoId,
+        originPhoto: { ...origin },
+        startDist,
+        startMidX,
+        startMidY,
+      };
+      return;
+    }
+    if (stickerId) {
+      const origin = stickerLayersRef.current.find((l) => l.id === stickerId);
+      if (!origin) return;
+      stickerDrag.current = null;
+      overlayPinch.current = {
+        target: 'sticker',
+        id: stickerId,
+        originSticker: { ...origin },
+        startDist,
+        startMidX,
+        startMidY,
+      };
+    }
+  };
+
+  const resumeOverlayMove = () => {
+    overlayPinch.current = null;
+    const remaining = overlayPointers.current.entries().next().value as
+      | [number, { x: number; y: number }]
+      | undefined;
+    if (!remaining) {
+      photoDrag.current = null;
+      stickerDrag.current = null;
+      return;
+    }
+    const [, pos] = remaining;
+    const photoId = activePhotoIdRef.current;
+    const stickerId = activeStickerIdRef.current;
+    if (photoId) {
+      const origin = photoLayersRef.current.find((l) => l.id === photoId);
+      if (origin) {
+        photoDrag.current = {
+          kind: 'move',
+          id: photoId,
+          startX: pos.x,
+          startY: pos.y,
+          origin: { ...origin },
+          startAngle: 0,
+        };
+      }
+      return;
+    }
+    if (stickerId) {
+      const origin = stickerLayersRef.current.find((l) => l.id === stickerId);
+      if (origin) {
+        stickerDrag.current = {
+          kind: 'move',
+          id: stickerId,
+          startX: pos.x,
+          startY: pos.y,
+          origin: { ...origin },
+          startAngle: 0,
+        };
+      }
+    }
+  };
+
   useEffect(() => {
     const onMove = (e: globalThis.PointerEvent) => {
+      if (overlayPointers.current.has(e.pointerId)) {
+        overlayPointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      const pinch = overlayPinch.current;
+      if (pinch) {
+        const pts = [...overlayPointers.current.values()];
+        if (pts.length < 2) return;
+        const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        const scale = dist / pinch.startDist;
+        const midX = (pts[0].x + pts[1].x) / 2;
+        const midY = (pts[0].y + pts[1].y) / 2;
+        const wrap = wrapRef.current?.getBoundingClientRect();
+        if (!wrap) return;
+        const midLocalX = midX - wrap.left;
+        const midLocalY = midY - wrap.top;
+        const startMidLocalX = pinch.startMidX - wrap.left;
+        const startMidLocalY = pinch.startMidY - wrap.top;
+
+        if (pinch.target === 'photo' && pinch.originPhoto) {
+          const origin = pinch.originPhoto;
+          const maxW = Math.max(MIN_PHOTO_SIZE, wrap.width * 3);
+          const newWidth = Math.min(
+            maxW,
+            Math.max(MIN_PHOTO_SIZE, origin.width * scale),
+          );
+          const s = newWidth / origin.width;
+          const newHeight = newWidth / origin.aspect;
+          const ocx = origin.x + origin.width / 2;
+          const ocy = origin.y + origin.height / 2;
+          const newCx = midLocalX + (ocx - startMidLocalX) * s;
+          const newCy = midLocalY + (ocy - startMidLocalY) * s;
+          setPhotoLayers((prev) =>
+            prev.map((layer) =>
+              layer.id === pinch.id
+                ? {
+                    ...layer,
+                    width: newWidth,
+                    height: newHeight,
+                    x: newCx - newWidth / 2,
+                    y: newCy - newHeight / 2,
+                  }
+                : layer,
+            ),
+          );
+        }
+
+        if (pinch.target === 'sticker' && pinch.originSticker) {
+          const origin = pinch.originSticker;
+          const next = Math.round(
+            Math.min(
+              MAX_STICKER_SIZE,
+              Math.max(MIN_STICKER_SIZE, origin.size * scale),
+            ),
+          );
+          const s = next / origin.size;
+          const newX = midLocalX + (origin.x - startMidLocalX) * s;
+          const newY = midLocalY + (origin.y - startMidLocalY) * s;
+          setStickerLayers((prev) =>
+            prev.map((layer) =>
+              layer.id === pinch.id
+                ? { ...layer, size: next, x: newX, y: newY }
+                : layer,
+            ),
+          );
+        }
+        return;
+      }
+
       if (photoDrag.current) {
         const { kind, id, startX, startY, origin, startAngle } = photoDrag.current;
         const dx = e.clientX - startX;
@@ -556,8 +724,8 @@ function DrawingCanvas({
                 1,
                 Math.hypot(startX - cx, startY - cy),
               );
-              const scale = dist / originDist;
-              const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width * scale);
+              const nextScale = dist / originDist;
+              const newWidth = Math.max(MIN_PHOTO_SIZE, origin.width * nextScale);
               const newHeight = newWidth / origin.aspect;
               const cxLocal = origin.x + origin.width / 2;
               const cyLocal = origin.y + origin.height / 2;
@@ -569,7 +737,6 @@ function DrawingCanvas({
                 y: cyLocal - newHeight / 2,
               };
             }
-            // rotate
             const wrap = wrapRef.current?.getBoundingClientRect();
             if (!wrap) return layer;
             const cx = wrap.left + origin.x + origin.width / 2;
@@ -607,7 +774,6 @@ function DrawingCanvas({
             );
             return { ...layer, size: next };
           }
-          // rotate
           const wrap = wrapRef.current?.getBoundingClientRect();
           if (!wrap) return layer;
           const cx = wrap.left + origin.x;
@@ -618,7 +784,14 @@ function DrawingCanvas({
       );
     };
 
-    const onUp = () => {
+    const onUp = (e: globalThis.PointerEvent) => {
+      overlayPointers.current.delete(e.pointerId);
+      if (overlayPinch.current) {
+        if (overlayPointers.current.size >= 2) return;
+        resumeOverlayMove();
+        return;
+      }
+      if (overlayPointers.current.size > 0) return;
       photoDrag.current = null;
       stickerDrag.current = null;
     };
@@ -837,18 +1010,32 @@ function DrawingCanvas({
     e.preventDefault();
     if (activeStickerId) setActiveStickerId(null);
     setActivePhotoId(layer.id);
+    activePhotoIdRef.current = layer.id;
+    activeStickerIdRef.current = null;
 
+    const live = photoLayersRef.current.find((l) => l.id === layer.id) ?? layer;
     const wrap = wrapRef.current?.getBoundingClientRect();
-    const cx = (wrap?.left ?? 0) + layer.x + layer.width / 2;
-    const cy = (wrap?.top ?? 0) + layer.y + layer.height / 2;
+    const cx = (wrap?.left ?? 0) + live.x + live.width / 2;
+    const cy = (wrap?.top ?? 0) + live.y + live.height / 2;
     const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+
+    if (kind === 'move') {
+      overlayPointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (overlayPointers.current.size >= 2) {
+        beginOverlayPinch();
+        return;
+      }
+    } else {
+      overlayPointers.current.clear();
+      overlayPinch.current = null;
+    }
 
     photoDrag.current = {
       kind,
-      id: layer.id,
+      id: live.id,
       startX: e.clientX,
       startY: e.clientY,
-      origin: { ...layer },
+      origin: { ...live },
       startAngle,
     };
   };
@@ -862,20 +1049,45 @@ function DrawingCanvas({
     e.preventDefault();
     if (activePhotoId) setActivePhotoId(null);
     setActiveStickerId(layer.id);
+    activeStickerIdRef.current = layer.id;
+    activePhotoIdRef.current = null;
 
+    const live = stickerLayersRef.current.find((l) => l.id === layer.id) ?? layer;
     const wrap = wrapRef.current?.getBoundingClientRect();
-    const cx = (wrap?.left ?? 0) + layer.x;
-    const cy = (wrap?.top ?? 0) + layer.y;
+    const cx = (wrap?.left ?? 0) + live.x;
+    const cy = (wrap?.top ?? 0) + live.y;
     const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx);
+
+    if (kind === 'move') {
+      overlayPointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (overlayPointers.current.size >= 2) {
+        beginOverlayPinch();
+        return;
+      }
+    } else {
+      overlayPointers.current.clear();
+      overlayPinch.current = null;
+    }
 
     stickerDrag.current = {
       kind,
-      id: layer.id,
+      id: live.id,
       startX: e.clientX,
       startY: e.clientY,
-      origin: { ...layer },
+      origin: { ...live },
       startAngle,
     };
+  };
+
+  const handleWrapPinchCapture = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse') return;
+    if (overlayPointers.current.has(e.pointerId)) return;
+    if (overlayPointers.current.size === 0) return;
+    if (!activePhotoIdRef.current && !activeStickerIdRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    overlayPointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    beginOverlayPinch();
   };
 
   const getPos = (e: PointerEvent<HTMLCanvasElement>) => {
@@ -1005,7 +1217,11 @@ function DrawingCanvas({
         onChange={handlePhotoChange}
       />
 
-      <div className="drawing__canvas-wrap" ref={wrapRef}>
+      <div
+        className="drawing__canvas-wrap"
+        ref={wrapRef}
+        onPointerDownCapture={handleWrapPinchCapture}
+      >
         <canvas
           ref={canvasRef}
           className={canvasClass}

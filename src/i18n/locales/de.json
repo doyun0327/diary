@@ -378,13 +378,23 @@
   },
   "subscription": {
     "limitTitle": "Tagebuchlimit",
-    "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt. Abonniere für {{price}} KRW/Monat, um weiterzuschreiben.",
+    "featureGateTitle": "Premium-Funktion",
+    "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt. Mit Abo: Suche, Export und bis zu 50 Einträge pro Monat.",
     "limitPremiumLead": "Du kannst diesen Monat noch {{n}} Einträge schreiben.",
-    "subscribeCta": "Abonnieren · {{price}} KRW/Mo.",
+    "limitPremiumReachedLead": "Monatslimit von 50 Einträgen erreicht. Nächsten Monat kannst du wieder schreiben.",
+    "featureGateLead": "Suche und Export erfordern ein Abo. Mit Abo: Suche, Export und bis zu 50 Einträge pro Monat.",
+    "premiumBenefits": "Premium: Suche, Export, {{n}} Einträge pro Monat",
+    "subscribeCta": "Auf PRO upgraden",
     "appOnly": "Im App abonnieren",
     "restore": "Käufe wiederherstellen",
-    "freeGrant": "Gratis bei Anmeldung: {{n}} Einträge",
+    "freeGrant": "Gratis: {{n}} Tagebucheinträge",
     "freeRemaining": "Gratis übrig: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Zeichnen?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Zeichnen"
   },
   "write": {
     "title": {

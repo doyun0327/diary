@@ -4,9 +4,9 @@
 
 | 항목 | 값 |
 |------|-----|
-| 무료 | 가입 후 **5장** |
-| 구독 | **월 3,300원** (`pageby_monthly`) |
-| 구독 혜택 | **월 50장** 작성 |
+| 무료 | 가입 후 **5장** (검색·보내기 불가) |
+| 구독 | **월 1,900원** (`pageby_monthly`, 스토어에서 현지 가격 표시) |
+| 구독 혜택 | **검색**, **보내기**, **월 50장** 작성 |
 
 코드 상수: `src/utils/diaryAccess.ts`, `lib/subscription_config.dart`
 
@@ -37,7 +37,7 @@ flutter run --dart-define=REVENUECAT_GOOGLE_KEY=goog_xxx --dart-define=REVENUECA
 
 1. **Monetize → Subscriptions** → 구독 생성
 2. Product ID: **`pageby_monthly`**
-3. 가격: **₩3,300 / 1 month**
+3. 가격: **₩1,900 / 1 month**
 4. RevenueCat 대시보드 → Google Play 서비스 계정 JSON 연결
 
 ---
@@ -46,7 +46,7 @@ flutter run --dart-define=REVENUECAT_GOOGLE_KEY=goog_xxx --dart-define=REVENUECA
 
 1. **Subscriptions** 그룹 생성
 2. Product ID: **`pageby_monthly`**
-3. 가격: **₩3,300 / 1 month**
+3. 가격: **₩1,900 / 1 month**
 4. RevenueCat에 App Store Connect API Key 연결
 
 ---

@@ -12,6 +12,7 @@
   aspect-ratio: var(--diary-drawing-ratio);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  touch-action: none;
   background:
     linear-gradient(180deg, #fffefc, var(--color-surface));
   box-shadow:

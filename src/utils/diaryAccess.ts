@@ -1,8 +1,8 @@
 export const FREE_ENTRY_GRANT = 5;
-/** ???: ???? 5?? ??? ????. ??? ???? ?? true?? ??????? ?? */
-export const FREE_ENTRY_LIMIT_ENABLED = false;
+/** true면 무료 5장 이후 신규 작성 시 구독 필요 */
+export const FREE_ENTRY_LIMIT_ENABLED = true;
 export const MONTHLY_DIARY_LIMIT = 50;
-export const MONTHLY_PRICE_KRW = 2900;
+export const MONTHLY_PRICE_KRW = 1900;
 export const FREE_AI_DRAWS_PER_DAY = 2;
 /** 임시: 광고 보고 AI 그림 1회 비활성. 다시 켤 때 true */
 export const AI_REWARD_AD_ENABLED = false;
@@ -11,6 +11,19 @@ const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";
 
 export const SUBSCRIPTION_CHANGE_EVENT = "diary-subscription-change";
+
+let accessAccountId = "guest";
+
+export function setDiaryAccessAccountId(accountId: string) {
+  const next = accountId.trim() || "guest";
+  if (accessAccountId === next) return;
+  accessAccountId = next;
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+}
+
+function storageKey() {
+  return `${STORAGE_KEY}:${accessAccountId}`;
+}
 
 type AccessState = {
   premiumUntil: number | null;
@@ -26,11 +39,13 @@ export type DiaryAccessStatus = {
   remaining: number;
   isPremiumActive: boolean;
   monthlyRemaining: number;
+  monthlyUsed: number;
+  monthlyLimit: number;
   message: string;
 };
 
 function getMonthKey(date = new Date()) {
-  return `${date.getFullYear()}-${date.getMonth()}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function getDayKey(date = new Date()) {
@@ -39,7 +54,7 @@ function getDayKey(date = new Date()) {
 
 function loadAccessState(): AccessState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey());
     if (!raw) {
       return {
         premiumUntil: null,
@@ -81,7 +96,7 @@ function loadAccessState(): AccessState {
 
 function saveAccessState(state: AccessState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(storageKey(), JSON.stringify(state));
   } catch {
     // ignore
   }
@@ -146,10 +161,12 @@ export function getDiaryAccessState(
       remaining,
       isPremiumActive: true,
       monthlyRemaining: remaining,
+      monthlyUsed: state.monthlyLimitUsed,
+      monthlyLimit: MONTHLY_DIARY_LIMIT,
       message:
         remaining > 0
-          ? "?? ?????? ??????? ??? ??? ?? ?? ?? ????."
-          : "??? ?? 50?? ???X?? ??? ????????. ???? ??? ??? ????? ?? ????.",
+          ? `Premium: ${remaining} entries left this month.`
+          : "Monthly limit of 50 entries reached.",
     };
   }
 
@@ -159,6 +176,8 @@ export function getDiaryAccessState(
       remaining: Number.MAX_SAFE_INTEGER,
       isPremiumActive: false,
       monthlyRemaining: 0,
+      monthlyUsed: 0,
+      monthlyLimit: 0,
       message: "Free diary limit is temporarily disabled.",
     };
   }
@@ -170,6 +189,8 @@ export function getDiaryAccessState(
     remaining: freeRemaining,
     isPremiumActive: false,
     monthlyRemaining: 0,
+    monthlyUsed: Math.min(FREE_ENTRY_GRANT, entriesCount),
+    monthlyLimit: FREE_ENTRY_GRANT,
     message:
       freeRemaining > 0
         ? `Free diaries remaining: ${freeRemaining}.`
@@ -190,9 +211,23 @@ export function consumeDiaryUsage() {
   if (state.premiumUntil && state.premiumUntil > now) {
     state.monthlyLimitUsed = Math.max(0, state.monthlyLimitUsed + 1);
     saveAccessState(state);
+    window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   }
 
   return true;
+}
+
+export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
+  const state = loadAccessState();
+  const monthKey = yearMonth || getMonthKey();
+  if (state.monthKey !== monthKey) {
+    state.monthKey = monthKey;
+    state.monthlyLimitUsed = 0;
+  }
+  state.monthKey = monthKey;
+  state.monthlyLimitUsed = Math.max(0, Math.min(MONTHLY_DIARY_LIMIT, Math.floor(used)));
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
 function normalizeAiCreditDay(state: AccessState) {

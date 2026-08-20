@@ -377,13 +377,23 @@
   },
   "subscription": {
     "limitTitle": "Diary limit",
-    "limitFreeLead": "You've used all 5 free entries. Subscribe for {{price}} KRW/month to keep writing.",
+    "featureGateTitle": "Premium feature",
+    "limitFreeLead": "You've used all 5 free entries. Subscribe for search, export, and up to 50 entries per month.",
     "limitPremiumLead": "You can write {{n}} more entries this month.",
-    "subscribeCta": "Subscribe · {{price}} KRW/mo",
+    "limitPremiumReachedLead": "You've reached this month's limit of 50 entries. You can write again next month.",
+    "featureGateLead": "Search and export require a subscription. Subscribe for search, export, and up to 50 entries per month.",
+    "premiumBenefits": "Premium: search, export, {{n}} entries per month",
+    "subscribeCta": "Upgrade to PRO",
     "appOnly": "Subscribe in the app",
     "restore": "Restore purchases",
-    "freeGrant": "Free on signup: {{n}} entries",
+    "freeGrant": "Free: {{n}} diary entries",
     "freeRemaining": "Free remaining: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Start drawing?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Draw"
   },
   "write": {
     "title": {

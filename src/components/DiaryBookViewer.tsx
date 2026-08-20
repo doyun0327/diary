@@ -37,6 +37,8 @@ interface DiaryBookViewerProps {
   rangeStart?: string;
   rangeEnd?: string;
   avatarUrl?: string | null;
+  canDownloadPdf?: boolean;
+  onRequirePremium?: () => void;
   onClose: () => void;
 }
 
@@ -86,6 +88,8 @@ function DiaryBookViewer({
   rangeStart,
   rangeEnd,
   avatarUrl = null,
+  canDownloadPdf = true,
+  onRequirePremium,
   onClose,
 }: DiaryBookViewerProps) {
   const { t } = useTranslation();
@@ -215,6 +219,10 @@ function DiaryBookViewer({
 
   const handleDownload = async () => {
     if (downloading) return;
+    if (!canDownloadPdf) {
+      onRequirePremium?.();
+      return;
+    }
     setDownloading(true);
     setPdfLottie(pickRandomLottie(pdfLottiePool));
     setPdfLottieKey((key) => key + 1);
