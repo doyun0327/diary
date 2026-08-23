@@ -1,9 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    // full lottie.js 는 AE expression용 eval 포함 → 빌드 [EVAL] 경고
+    // 로딩 애니메이션은 light 빌드로 충분
+    alias: {
+      'lottie-web': path.resolve(
+        rootDir,
+        'node_modules/lottie-web/build/player/lottie_light.js',
+      ),
+    },
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,
