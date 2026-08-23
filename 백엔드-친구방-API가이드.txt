@@ -32,7 +32,9 @@ CORS (직접 8080 호출 시):
 ----------------------------------------------------------
 
 Room
-  id, name, inviteCode(6자리 숫자 문자열), createdAt, createdByClientId
+  id, name, inviteCode(6자리 숫자 문자열), createdAt, createdByClientId,
+  coverPreset(nullable, 짧은 문자열 — kraft/mint/rose/sky/lilac/cream 등 CSS 프리셋 id),
+  coverUrl(nullable, TEXT — 갤러리 커버 data URL 또는 http(s). 있으면 coverPreset보다 우선)
 
 RoomMember
   roomId, clientId, nickname, avatarUrl(nullable, TEXT), joinedAt
@@ -56,19 +58,44 @@ RoomComment
 
 (1) 방 만들기
 POST /api/rooms
-Body: { "name": "우리반 일기방", "nickname": "민지", "avatarUrl": "data:image/..." }
+Body: {
+  "name": "우리반 일기방",
+  "nickname": "민지",
+  "avatarUrl": "data:image/...",
+  "coverPreset": "kraft",
+  "coverUrl": "data:image/jpeg;base64,..."
+}
   ※ inviteCode 는 요청에 넣지 않는다. 서버가 숫자 6자리를 자동 생성한다.
   ※ nickname, avatarUrl 은 optional. 있으면 생성자 RoomMember 에 저장.
+  ※ coverPreset 은 optional. 스크랩 커버 프리셋 id (예: kraft, mint, rose, sky, lilac, cream).
+    없거나 알 수 없는 값이면 서버/클라 모두 기본값 kraft 로 취급.
+  ※ coverUrl 은 optional. 갤러리에서 고른 커버(data URL 권장). 있으면 목록/상세에 포함하고
+    표시 시 coverPreset보다 우선. coverUrl 이 있으면 coverPreset 은 생략해도 됨.
 Response 200:
 {
   "id": "uuid",
   "name": "우리반 일기방",
   "inviteCode": "482913",
   "createdAt": "2026-07-24T10:00:00",
-  "memberCount": 1
+  "memberCount": 1,
+  "coverPreset": "kraft",
+  "coverUrl": null
 }
 - 생성자를 RoomMember 에 자동 추가
 - inviteCode: 000000~999999 랜덤, 앞에 0 패딩, 중복 시 재시도
+- coverPreset / coverUrl 은 Room 에 저장하고 목록·상세 응답에 포함
+  (coverUrl 이 data URL 이면 TEXT/MEDIUMTEXT 권장)
+
+
+(1-1) 방 커버 변경 (방장만)
+PATCH /api/rooms/{roomId}
+Body: {
+  "coverPreset": "mint",          // optional, coverUrl 이 있으면 null 권장
+  "coverUrl": "data:image/..."    // optional, null 이면 이미지 커버 제거
+}
+Response 200: RoomSummary (갱신된 coverPreset / coverUrl 포함)
+- 방장이 아니면 403
+- coverUrl 이 있으면 표시 시 coverPreset보다 우선
 
 
 (2) 초대코드로 입장
@@ -81,7 +108,7 @@ Response 200: RoomSummary (위와 동일)
 
 (3) 내 방 목록
 GET /api/rooms
-Response 200: RoomSummary[]
+Response 200: RoomSummary[]  (coverPreset / coverUrl 포함. coverUrl 있으면 이미지 커버, 없으면 preset 또는 기본 kraft)
 - X-Client-Id 가 멤버인 방만
 
 
@@ -94,6 +121,7 @@ Response 200:
   "inviteCode": "482913",
   "createdAt": "...",
   "memberCount": 3,
+  "coverPreset": "kraft",
   "members": [
     { "clientId": "...", "nickname": "민지", "avatarUrl": "data:image/jpeg;base64,...", "joinedAt": "..." }
   ]

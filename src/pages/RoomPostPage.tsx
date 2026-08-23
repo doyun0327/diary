@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
@@ -13,6 +13,17 @@ interface RoomPostPageProps {
   onBack: () => void;
 }
 
+/** 스레드에 등장한 순서 기준 0~9 색 인덱스 */
+function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const c of comments) {
+    if (!map.has(c.authorUserId)) {
+      map.set(c.authorUserId, map.size % 10);
+    }
+  }
+  return map;
+}
+
 function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const { t } = useTranslation();
   const [post, setPost] = useState<RoomPost | null>(null);
@@ -21,6 +32,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const colorMap = useMemo(() => buildCommentColorMap(comments), [comments]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -110,6 +123,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
             const prev = comments[i - 1];
             const showName = !prev || prev.authorUserId !== c.authorUserId;
             const isMine = c.authorUserId === userId;
+            const colorIdx = colorMap.get(c.authorUserId) ?? 0;
             return (
               <li
                 key={c.id}
@@ -117,9 +131,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   'rooms__comment',
                   isMine ? 'rooms__comment--mine' : 'rooms__comment--other',
                   showName ? 'rooms__comment--named' : 'rooms__comment--cont',
+                  `rooms__comment--c${colorIdx}`,
                 ].join(' ')}
               >
-                {showName && !isMine && (
+                {showName && (
                   <strong className="rooms__comment-name">{c.authorNickname}</strong>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>

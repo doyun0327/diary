@@ -1196,19 +1196,21 @@ function DrawingCanvas({
     setClearConfirmOpen(false);
   };
 
+  const editingOverlay = Boolean(activePhotoId || activeStickerId);
+  const allowPageScroll =
+    mode === 'none' && !fontOpen && !stickerOpen && !editingOverlay;
+
   const canvasClass = [
     'drawing__canvas',
-    mode === 'none' ? 'drawing__canvas--idle' : '',
+    allowPageScroll ? 'drawing__canvas--idle' : '',
     mode === 'eraser' ? 'drawing__canvas--eraser' : '',
     mode === 'sticker' ? 'drawing__canvas--sticker' : '',
   ]
     .filter(Boolean)
     .join(' ');
 
-  const editingOverlay = Boolean(activePhotoId || activeStickerId);
-
   return (
-      <div className="drawing" data-no-swipe ref={rootRef}>
+      <div className="drawing" data-no-swipe={!allowPageScroll || undefined} ref={rootRef}>
       <input
         ref={fileInputRef}
         type="file"
@@ -1218,7 +1220,7 @@ function DrawingCanvas({
       />
 
       <div
-        className="drawing__canvas-wrap"
+        className={`drawing__canvas-wrap${allowPageScroll ? ' drawing__canvas-wrap--scroll' : ''}`}
         ref={wrapRef}
         onPointerDownCapture={handleWrapPinchCapture}
       >

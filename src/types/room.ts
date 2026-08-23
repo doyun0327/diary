@@ -16,6 +16,10 @@ export interface RoomSummary {
   memberCount?: number;
   /** 내가 방장(생성자)인지 */
   owner?: boolean;
+  /** CSS 스크랩 커버 프리셋 id (예: kraft, mint). 없으면 기본값 */
+  coverPreset?: string | null;
+  /** 갤러리에서 고른 커버 이미지 (data URL 또는 http(s)). 있으면면 preset보다 우선 */
+  coverUrl?: string | null;
 }
 
 export interface RoomDetail extends RoomSummary {

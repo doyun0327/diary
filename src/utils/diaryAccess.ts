@@ -4,8 +4,8 @@ export const FREE_ENTRY_LIMIT_ENABLED = true;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 1900;
 export const FREE_AI_DRAWS_PER_DAY = 2;
-/** 임시: 광고 보고 AI 그림 1회 비활성. 다시 켤 때 true */
-export const AI_REWARD_AD_ENABLED = false;
+/** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 */
+export const AI_REWARD_AD_ENABLED = true;
 
 const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";

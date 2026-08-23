@@ -253,6 +253,7 @@
     "joinWithCode": "코드로 입장",
     "create": "방 만들기",
     "empty": "아직 참여한 방이 없어요",
+    "emptyLead": "친구랑 일기 붙여 둘 방을 하나 만들어 볼까요?",
     "memberCount": "멤버 {{n}}",
     "roomFallback": "방",
     "copyInvite": "초대하기",
@@ -271,6 +272,22 @@
     "deleteConfirmLead": "「{{name}}」방을 삭제합니다. 멤버 전원이 나가고, 공유된 일기도 사라져요.",
     "createSheetAria": "방 만들기",
     "createHint": "방 이름만 정하면 초대코드 6자리가 자동으로 만들어져요.",
+    "coverLabel": "방 커버",
+    "coverFromGallery": "갤러리",
+    "changeCover": "커버 변경",
+    "changeCoverAria": "방 커버 변경",
+    "changeCoverSheetAria": "방 커버 변경",
+    "changeCoverHint": "「{{name}}」방의 커버를 바꿔요.",
+    "changeCoverSave": "저장",
+    "changingCover": "저장 중…",
+    "covers": {
+      "kraft": "크라프트",
+      "mint": "민트",
+      "rose": "로즈",
+      "sky": "하늘",
+      "lilac": "라일락",
+      "cream": "크림"
+    },
     "asChipCreate": "{{name}}로 만들기",
     "roomNamePlaceholder": "방 이름",
     "creating": "만드는 중…",
@@ -326,7 +343,9 @@
       "load": "방을 불러오지 못했어요",
       "loadPost": "글을 불러오지 못했어요",
       "comment": "댓글을 남기지 못했어요",
-      "delete": "삭제에 실패했어요"
+      "delete": "삭제에 실패했어요",
+      "coverImage": "커버 사진을 불러오지 못했어요",
+      "coverUpdate": "커버를 바꾸지 못했어요"
     }
   },
   "profileSetup": {

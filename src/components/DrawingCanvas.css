@@ -20,6 +20,10 @@
     inset 0 0 0 1px var(--color-border-soft);
 }
 
+.drawing__canvas-wrap--scroll {
+  touch-action: pan-y;
+}
+
 .drawing__photo-layers {
   position: absolute;
   inset: 0;
@@ -209,6 +213,7 @@
 
 .drawing__canvas--idle {
   cursor: default;
+  touch-action: pan-y;
 }
 
 .drawing__canvas--eraser {

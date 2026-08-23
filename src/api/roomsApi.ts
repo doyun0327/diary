@@ -63,6 +63,20 @@ export function listRooms(): Promise<RoomSummary[]> {
   return request<RoomSummary[]>('/api/rooms');
 }
 
+/** 방장: 방 커버(프리셋 또는 갤러리 이미지) 변경 */
+export function updateRoomCover(
+  roomId: string,
+  body: { coverPreset?: string | null; coverUrl?: string | null },
+): Promise<RoomSummary> {
+  return request<RoomSummary>(`/api/rooms/${encodeURIComponent(roomId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      coverPreset: body.coverUrl ? null : body.coverPreset ?? null,
+      coverUrl: body.coverUrl ?? null,
+    }),
+  });
+}
+
 /** 해당 일기가 이미 공유된 방 id 목록 */
 export function listRoomsSharingDiary(diaryId: string): Promise<string[]> {
   return request<string[]>(`/api/rooms/shared-diaries/${encodeURIComponent(diaryId)}`);
@@ -72,6 +86,8 @@ export function createRoom(
   name: string,
   nickname?: string,
   avatarUrl?: string | null,
+  coverPreset?: string | null,
+  coverUrl?: string | null,
 ): Promise<RoomSummary> {
   return request<RoomSummary>('/api/rooms', {
     method: 'POST',
@@ -79,6 +95,8 @@ export function createRoom(
       name,
       nickname: nickname?.trim() || undefined,
       avatarUrl: avatarUrl || undefined,
+      coverPreset: coverUrl ? undefined : coverPreset || undefined,
+      coverUrl: coverUrl || undefined,
     }),
   });
 }

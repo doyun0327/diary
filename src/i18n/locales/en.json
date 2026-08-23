@@ -253,6 +253,7 @@
     "joinWithCode": "Join with code",
     "create": "Create room",
     "empty": "You're not in any rooms yet",
+    "emptyLead": "Make a cozy room to stick diaries with friends.",
     "memberCount": "{{n}} members",
     "roomFallback": "Room",
     "copyInvite": "Invite",
@@ -271,6 +272,22 @@
     "deleteConfirmLead": "「{{name}}」will be deleted. Everyone leaves and shared diaries are removed.",
     "createSheetAria": "Create room",
     "createHint": "Set a room name; a 6-digit invite code is created automatically.",
+    "coverLabel": "Room cover",
+    "coverFromGallery": "Gallery",
+    "changeCover": "Change cover",
+    "changeCoverAria": "Change room cover",
+    "changeCoverSheetAria": "Change room cover",
+    "changeCoverHint": "Update the cover for 「{{name}}」.",
+    "changeCoverSave": "Save",
+    "changingCover": "Saving…",
+    "covers": {
+      "kraft": "Kraft",
+      "mint": "Mint",
+      "rose": "Rose",
+      "sky": "Sky",
+      "lilac": "Lilac",
+      "cream": "Cream"
+    },
     "asChipCreate": "Create as {{name}}",
     "roomNamePlaceholder": "Room name",
     "creating": "Creating…",
@@ -326,7 +343,9 @@
       "load": "Couldn't load room",
       "loadPost": "Couldn't load post",
       "comment": "Couldn't post comment",
-      "delete": "Delete failed"
+      "delete": "Delete failed",
+      "coverImage": "Couldn't load cover photo",
+      "coverUpdate": "Couldn't update cover"
     }
   },
   "profileSetup": {

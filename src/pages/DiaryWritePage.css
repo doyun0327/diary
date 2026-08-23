@@ -26,7 +26,7 @@
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--color-text);
+  color: #1a1a1a;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -97,13 +97,14 @@
 .diary-write__meta {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
 
 .diary-write__date {
   display: block;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   width: auto;
   padding: 0;
@@ -115,11 +116,15 @@
   color: var(--color-text);
   text-align: left;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .diary-write__moods {
   display: flex;
   flex: 1 1 100%;
+  width: 100%;
   gap: 6px;
   margin-top: 8px;
   overflow-x: auto;

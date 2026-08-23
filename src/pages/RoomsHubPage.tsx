@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { RoomSummary } from "../types/room";
 import * as roomsApi from "../api/roomsApi";
@@ -7,6 +7,12 @@ import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
 import { isFlutterApp, shareViaNative } from "../utils/nativeShare";
+import {
+  coverClassName,
+  fileToCoverDataUrl,
+  rememberRoomCover,
+  resolveRoomCover,
+} from "../utils/roomCovers";
 import "./RoomsPages.css";
 
 interface RoomsHubPageProps {
@@ -20,6 +26,15 @@ interface RoomsHubPageProps {
 }
 
 type SheetKind = "create" | "join" | null;
+
+function sortRoomsNewestFirst(list: RoomSummary[]): RoomSummary[] {
+  return [...list].sort((a, b) => {
+    const tb = Date.parse(b.createdAt) || 0;
+    const ta = Date.parse(a.createdAt) || 0;
+    if (tb !== ta) return tb - ta;
+    return b.id.localeCompare(a.id);
+  });
+}
 
 function canShare(nickname: string, avatarUrl: string | null) {
   return Boolean(nickname.trim() && avatarUrl);
@@ -62,6 +77,10 @@ function RoomsHubPage({
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [roomName, setRoomName] = useState("");
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const coverFileRef = useRef<HTMLInputElement>(null);
+  const coverPickModeRef = useRef<"create" | "edit" | null>(null);
+  const coverEditRoomIdRef = useRef<string | null>(null);
   const [inviteCode, setInviteCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [createdRoom, setCreatedRoom] = useState<{
@@ -99,7 +118,7 @@ function RoomsHubPage({
       }
       await ensureAuth();
       const list = await roomsApi.listRooms();
-      setRooms(list);
+      setRooms(sortRoomsNewestFirst(list));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("rooms.err.list"));
       setRooms([]);
@@ -128,6 +147,81 @@ function RoomsHubPage({
     setError(null);
   };
 
+  const applyRoomCoverUrl = async (roomId: string, nextUrl: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await ensureAuth();
+      try {
+        const updated = await roomsApi.updateRoomCover(roomId, {
+          coverPreset: null,
+          coverUrl: nextUrl,
+        });
+        rememberRoomCover(roomId, { preset: null, url: nextUrl });
+        setRooms((prev) =>
+          sortRoomsNewestFirst(
+            prev.map((r) =>
+              r.id === roomId
+                ? {
+                    ...r,
+                    ...updated,
+                    coverPreset: null,
+                    coverUrl: updated.coverUrl ?? nextUrl,
+                  }
+                : r,
+            ),
+          ),
+        );
+      } catch {
+        rememberRoomCover(roomId, { preset: null, url: nextUrl });
+        setRooms((prev) =>
+          prev.map((r) =>
+            r.id === roomId
+              ? { ...r, coverPreset: null, coverUrl: nextUrl }
+              : r,
+          ),
+        );
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("rooms.err.coverUpdate"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const openCoverGallery = (mode: "create" | "edit", roomId?: string) => {
+    setError(null);
+    coverPickModeRef.current = mode;
+    coverEditRoomIdRef.current = roomId ?? null;
+    coverFileRef.current?.click();
+  };
+
+  const onCoverFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    void (async () => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      const mode = coverPickModeRef.current;
+      coverPickModeRef.current = null;
+      if (!file || !mode) return;
+      if (!file.type.startsWith("image/")) {
+        setError(t("rooms.err.coverImage"));
+        return;
+      }
+      try {
+        const url = await fileToCoverDataUrl(file);
+        if (mode === "create") {
+          setCoverUrl(url);
+          return;
+        }
+        const roomId = coverEditRoomIdRef.current;
+        coverEditRoomIdRef.current = null;
+        if (roomId) await applyRoomCoverUrl(roomId, url);
+      } catch {
+        setError(t("rooms.err.coverImage"));
+      }
+    })();
+  };
+
   const handleCreate = async () => {
     if (!shareReady || busy) return;
     const name = roomName.trim();
@@ -139,8 +233,19 @@ function RoomsHubPage({
     setError(null);
     try {
       await ensureAuth();
-      const room = await roomsApi.createRoom(name, nickname.trim(), avatarUrl);
+      const room = await roomsApi.createRoom(
+        name,
+        nickname.trim(),
+        avatarUrl,
+        null,
+        coverUrl,
+      );
+      rememberRoomCover(room.id, {
+        preset: null,
+        url: coverUrl,
+      });
       setRoomName("");
+      setCoverUrl(null);
       setSheet(null);
       setCreatedRoom({ id: room.id, inviteCode: room.inviteCode });
       await refresh();
@@ -252,6 +357,13 @@ function RoomsHubPage({
 
   return (
     <div className="rooms">
+      <input
+        ref={coverFileRef}
+        type="file"
+        accept="image/*"
+        className="rooms-cover-picker__file"
+        onChange={onCoverFileChange}
+      />
       {!isFlutterApp() && (
         <div className="rooms__toolbar">
           <button
@@ -268,11 +380,11 @@ function RoomsHubPage({
       )}
 
       {!shareReady ? (
-        <div className="rooms__empty">
-          <p>{t("rooms.err.needProfile")}</p>
+        <div className="rooms__empty rooms__empty--scrap">
+          <p className="rooms__empty-title">{t("rooms.err.needProfile")}</p>
           <button
             type="button"
-            className="rooms__btn primary"
+            className="rooms__btn primary rooms__btn--scrap"
             onClick={onOpenAccount}
           >
             {t("account.title")}
@@ -283,14 +395,14 @@ function RoomsHubPage({
           <div className="rooms__actions">
             <button
               type="button"
-              className="rooms__btn"
+              className="rooms__btn rooms__btn--scrap rooms__btn--tilt-left"
               onClick={() => openSheet("join")}
             >
               {t("rooms.joinWithCode")}
             </button>
             <button
               type="button"
-              className="rooms__btn primary"
+              className="rooms__btn primary rooms__btn--scrap rooms__btn--tilt-right"
               onClick={() => openSheet("create")}
             >
               {t("rooms.create")}
@@ -302,29 +414,66 @@ function RoomsHubPage({
           {loading && <p className="rooms__muted">{t("common.loading")}</p>}
 
           {!loading && rooms.length === 0 && (
-            <div className="rooms__empty">
-              <p>{t("rooms.empty")}</p>
+            <div className="rooms__empty rooms__empty--scrap">
+              <p className="rooms__empty-title">{t("rooms.empty")}</p>
+              <p className="rooms__empty-lead">{t("rooms.emptyLead")}</p>
+              <button
+                type="button"
+                className="rooms__btn primary rooms__btn--scrap"
+                onClick={() => openSheet("create")}
+              >
+                {t("rooms.create")}
+              </button>
             </div>
           )}
 
-          <ul className="rooms__list">
-            {rooms.map((room) => (
-              <li key={room.id} className="rooms__room-item">
-                <button
-                  type="button"
-                  className="rooms__room-main"
-                  onClick={() => onOpenRoom(room.id)}
+          <ul className="rooms__list rooms__list--polaroid">
+            {rooms.map((room, index) => {
+              const cover = resolveRoomCover(
+                room.id,
+                room.coverPreset,
+                room.coverUrl,
+              );
+              return (
+                <li
+                  key={room.id}
+                  className={`rooms__polaroid${
+                    index % 2 === 1 ? " rooms__polaroid--tilt" : ""
+                  }`}
                 >
-                  <span className="rooms__room-name">{room.name}</span>
-                </button>
-                <div className="rooms__room-meta">
-                  <span className="rooms__room-meta-left">
-                    {room.memberCount != null
-                      ? t("rooms.memberCount", { n: room.memberCount })
-                      : t("rooms.roomFallback")}
-                    <span className="rooms__meta-sep" aria-hidden>
-                      ·
+                  <span
+                    className={`rooms__polaroid-pin rooms__polaroid-pin--washi rooms__polaroid-pin--washi-${
+                      index % 6
+                    }`}
+                    aria-hidden
+                  />
+                  <button
+                    type="button"
+                    className="rooms__polaroid-main"
+                    onClick={() => onOpenRoom(room.id)}
+                  >
+                    {cover.kind === "image" ? (
+                      <span className="rooms__polaroid-photo rooms__polaroid-photo--image">
+                        <img src={cover.url} alt="" />
+                      </span>
+                    ) : (
+                      <span
+                        className={`rooms__polaroid-photo ${coverClassName(cover.id)}`}
+                        aria-hidden
+                      />
+                    )}
+                    <span className="rooms__polaroid-caption">
+                      <span className="rooms__polaroid-copy">
+                        <span className="rooms__room-name">{room.name}</span>
+                        <span className="rooms__room-members">
+                          {room.memberCount != null
+                            ? t("rooms.memberCount", { n: room.memberCount })
+                            : t("rooms.roomFallback")}
+                        </span>
+                      </span>
                     </span>
+                  </button>
+                  <div className="rooms__polaroid-actions">
                     <button
                       type="button"
                       className="rooms__invite-quiet"
@@ -334,72 +483,96 @@ function RoomsHubPage({
                     >
                       {t("rooms.copyInvite")}
                     </button>
-                  </span>
-                  {room.owner ? (
-                    <button
-                      type="button"
-                      className="rooms__leave-btn rooms__leave-btn--danger"
-                      aria-label={t("rooms.deleteAria")}
-                      title={t("rooms.delete")}
-                      onClick={() =>
-                        setRoomAction({
-                          id: room.id,
-                          name: room.name,
-                          kind: "delete",
-                        })
-                      }
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
+                    {room.owner ? (
+                      <>
+                        <button
+                          type="button"
+                          className="rooms__leave-btn"
+                          aria-label={t("rooms.changeCoverAria")}
+                          title={t("rooms.changeCover")}
+                          onClick={() => openCoverGallery("edit", room.id)}
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden
+                          >
+                            <path d="M12 20h9" />
+                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          className="rooms__leave-btn rooms__leave-btn--danger"
+                          aria-label={t("rooms.deleteAria")}
+                          title={t("rooms.delete")}
+                          onClick={() =>
+                            setRoomAction({
+                              id: room.id,
+                              name: room.name,
+                              kind: "delete",
+                            })
+                          }
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden
+                          >
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="rooms__leave-btn"
+                        aria-label={t("rooms.leaveAria")}
+                        title={t("rooms.leave")}
+                        onClick={() =>
+                          setRoomAction({
+                            id: room.id,
+                            name: room.name,
+                            kind: "leave",
+                          })
+                        }
                       >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        <line x1="10" y1="11" x2="10" y2="17" />
-                        <line x1="14" y1="11" x2="14" y2="17" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="rooms__leave-btn"
-                      aria-label={t("rooms.leaveAria")}
-                      title={t("rooms.leave")}
-                      onClick={() =>
-                        setRoomAction({
-                          id: room.id,
-                          name: room.name,
-                          kind: "leave",
-                        })
-                      }
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
-                      >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </li>
-            ))}
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                          <polyline points="16 17 21 12 16 7" />
+                          <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </>
       )}
@@ -411,9 +584,12 @@ function RoomsHubPage({
           aria-label={t("rooms.createSheetAria")}
         >
           <div className="rooms-sheet__backdrop" onClick={closeSheet} />
-          <div className="rooms-sheet__panel">
+          <div className="rooms-sheet__panel rooms-sheet__panel--scrap">
             <header className="rooms-sheet__head">
-              <h3>{t("rooms.create")}</h3>
+              <div className="rooms-sheet__titles">
+                <h3>{t("rooms.create")}</h3>
+                <p className="rooms-sheet__hint">{t("rooms.createHint")}</p>
+              </div>
               <button
                 type="button"
                 className="sheet-close-btn"
@@ -434,7 +610,24 @@ function RoomsHubPage({
               />
               <button
                 type="button"
-                className="rooms__btn primary rooms__btn--block"
+                className={`rooms-cover-pick${coverUrl ? " is-filled" : ""}`}
+                onClick={() => openCoverGallery("create")}
+              >
+                {coverUrl ? (
+                  <img
+                    className="rooms-cover-pick__preview"
+                    src={coverUrl}
+                    alt=""
+                  />
+                ) : (
+                  <span className="rooms-cover-pick__placeholder">
+                    {t("rooms.coverFromGallery")}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="rooms__btn primary rooms__btn--block rooms__btn--scrap"
                 disabled={busy}
                 onClick={() => void handleCreate()}
               >
@@ -453,9 +646,12 @@ function RoomsHubPage({
           aria-label={t("rooms.joinSheetAria")}
         >
           <div className="rooms-sheet__backdrop" onClick={closeSheet} />
-          <div className="rooms-sheet__panel">
+          <div className="rooms-sheet__panel rooms-sheet__panel--scrap">
             <header className="rooms-sheet__head">
-              <h3>{t("rooms.joinWithCode")}</h3>
+              <div className="rooms-sheet__titles">
+                <h3>{t("rooms.joinWithCode")}</h3>
+                <p className="rooms-sheet__hint">{t("rooms.joinHint")}</p>
+              </div>
               <button
                 type="button"
                 className="sheet-close-btn"
@@ -479,7 +675,7 @@ function RoomsHubPage({
               />
               <button
                 type="button"
-                className="rooms__btn primary rooms__btn--block"
+                className="rooms__btn primary rooms__btn--block rooms__btn--scrap"
                 disabled={busy}
                 onClick={() => void handleJoin()}
               >
