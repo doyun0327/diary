@@ -397,7 +397,7 @@
   "subscription": {
     "limitTitle": "Diary limit",
     "featureGateTitle": "Premium feature",
-    "limitFreeLead": "You've used all 5 free entries. Subscribe for search, export, and up to 50 entries per month.",
+    "limitFreeLead": "You've used all 5 free entries.",
     "limitPremiumLead": "You can write {{n}} more entries this month.",
     "limitPremiumReachedLead": "You've reached this month's limit of 50 entries. You can write again next month.",
     "featureGateLead": "Search and export require a subscription. Subscribe for search, export, and up to 50 entries per month.",

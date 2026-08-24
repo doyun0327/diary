@@ -7,6 +7,11 @@
     "loading": "Memuat…",
     "anonymous": "Anonim",
     "back": "Kembali",
+    "pagerAria": "Halaman",
+    "pagerPagesAria": "Nomor halaman",
+    "pagePrevAria": "Halaman sebelumnya",
+    "pageNextAria": "Halaman berikutnya",
+    "pageGoAria": "Halaman {{page}}",
     "processing": "Memproses…",
     "requestFailed": "Permintaan gagal ({{status}})",
     "serverUnreachable": "Tidak bisa terhubung ke server. Pastikan Spring (8080) berjalan.",
@@ -156,24 +161,6 @@
     "changePhotoAria": "Ubah foto profil",
     "pickPhoto": "Pilih foto",
     "editPhoto": "Edit",
-    "removePhoto": "Hapus",
-    "nameLabel": "Nama",
-    "nameHint": "Nama yang tampil di ruang teman",
-    "namePlaceholder": "Masukkan nama",
-    "save": "Simpan",
-    "ok": {
-      "nameSaved": "Nama disimpan",
-      "photoSaved": "Foto profil disimpan",
-      "photoRemoved": "Foto profil dihapus"
-    },
-    "err": {
-      "nameRequired": "Masukkan nama",
-      "imageOnly": "Hanya file gambar yang diizinkan",
-      "photoSave": "Tidak bisa menyimpan foto",
-      "photoRead": "Tidak bisa membaca foto",
-      "photoProcess": "Tidak bisa memproses foto",
-      "photoLoad": "Tidak bisa memuat foto"
-    },
     "useAccountPhoto": "Pakai foto akun",
     "replacePhoto": {
       "title": "Pakai foto Google?",
@@ -186,7 +173,16 @@
       "lead": "Diary cloud dan aktivitas ruang akan dihapus, lalu Anda keluar. Diary di perangkat ini tetap ada.",
       "confirm": "Hapus"
     },
+    "removePhoto": "Hapus",
+    "nameLabel": "Nama",
+    "nameHint": "Nama yang tampil di ruang teman",
     "nameHintLoggedIn": "Terisi dari akun — bisa diubah kapan saja di aplikasi",
+    "namePlaceholder": "Masukkan nama",
+    "save": "Simpan",
+    "profile": {
+      "label": "Profil di perangkat ini",
+      "hint": "Terpisah dari login. Nama dan foto hanya di aplikasi ini."
+    },
     "sync": {
       "label": "Sinkronisasi cloud",
       "hint": "Masuk untuk menyimpan diary ke akun dan memulihkannya di ponsel baru.",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "Pratinjau UI saja — login & backup asli segera hadir.",
+      "autoNote": "Menyimpan atau menghapus diary tersinkron otomatis.",
       "okSignedIn": "Masuk (pratinjau)",
+      "okSignedInSynced": "Masuk dan diary tersinkron",
       "okSignedOut": "Keluar",
       "okSynced": "Tersinkron (pratinjau)",
       "errSignIn": "Gagal masuk",
+      "errGoogleNative": "Login Google gagal",
+      "errGoogleDeveloper": "Tambahkan SHA-1 aplikasi ini ke klien OAuth Android Google Cloud, lalu coba lagi",
+      "errGooglePlay": "Emulator ini membutuhkan Google Play dan akun Google",
+      "errGoogleNetwork": "Periksa jaringan dan coba lagi",
+      "errGoogleToken": "Token Google tidak didapat. Periksa SHA-1 dan Web Client ID",
       "errSync": "Gagal sinkron",
       "noAccountPhoto": "Akun ini tidak punya foto profil"
+    },
+    "ok": {
+      "nameSaved": "Nama disimpan",
+      "photoSaved": "Foto profil disimpan",
+      "photoRemoved": "Foto profil dihapus"
+    },
+    "err": {
+      "nameRequired": "Masukkan nama",
+      "imageOnly": "Hanya file gambar yang diizinkan",
+      "photoSave": "Tidak bisa menyimpan foto",
+      "photoRead": "Tidak bisa membaca foto",
+      "photoProcess": "Tidak bisa memproses foto",
+      "photoLoad": "Tidak bisa memuat foto"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "Disalin",
     "copyInviteTitle": "Undang teman",
     "copyInviteAria": "Bagikan kode undangan",
+    "leave": "Keluar",
+    "leaveAria": "Keluar dari ruang",
+    "leaving": "Keluar…",
+    "leaveConfirmTitle": "Keluar dari ruang ini?",
+    "leaveConfirmLead": "Anda akan keluar dari 「{{name}}」.",
+    "delete": "Hapus ruang",
+    "deleteAria": "Hapus ruang",
+    "deleting": "Menghapus…",
+    "deleteConfirmTitle": "Hapus ruang ini?",
+    "deleteConfirmLead": "「{{name}}」 akan dihapus. Semua anggota keluar dan diary bersama hilang.",
     "createSheetAria": "Buat ruang",
     "createHint": "Atur nama ruang; kode undangan 6 digit dibuat otomatis.",
     "coverLabel": "Sampul ruang",
     "coverFromGallery": "Galeri",
+    "changeCover": "Ganti sampul",
+    "changeCoverAria": "Ganti sampul ruang",
+    "changeCoverSheetAria": "Ganti sampul ruang",
+    "changeCoverHint": "Perbarui sampul 「{{name}}」.",
+    "changeCoverSave": "Simpan",
+    "changingCover": "Menyimpan…",
     "covers": {
       "kraft": "Kraft",
       "mint": "Mint",
@@ -267,18 +299,30 @@
     "joinSubmit": "Gabung",
     "noNickname": "Belum ada nama",
     "backToList": "← Daftar",
+    "backToListAria": "Kembali ke daftar",
     "refresh": "Muat ulang",
     "sharedDiaries": "Diary bersama",
     "sharedEmpty": "Belum ada diary bersama.\nCoba “Bagikan ke ruang” di diary Anda.",
+    "sharePrompt": "Mau bagikan diary?",
+    "goHome": "Ke beranda",
+    "openPostAria": "Buka diary {{title}} milik {{author}}",
     "coach": {
       "comment": "Tinggalkan komentar!"
     },
     "backToRoom": "← Ke ruang",
+    "backToRoomAria": "Kembali ke ruang",
     "sharedDiary": "Diary bersama",
     "comments": "Komentar ({{n}})",
     "commentPlaceholder": "Tulis komentar",
     "commentSubmit": "Kirim",
     "alert": {
+      "createdTitle": "Ruang dibuat!",
+      "createdLead": "Bagikan kode undangan ini ke teman.",
+      "copyCode": "Salin kode",
+      "share": "Bagikan",
+      "shareTitle": "Undangan ruang PageBy",
+      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}",
+      "enterRoom": "Masuk ruang",
       "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "Atur nama dulu di Menu → Akun",
+      "needProfile": "Nama dan foto diperlukan untuk berbagi dengan teman",
+      "guestAuth": "Tidak bisa terhubung ke ruang teman. Coba lagi nanti",
       "list": "Tidak bisa memuat ruang",
       "nameRequired": "Masukkan nama ruang",
       "create": "Tidak bisa membuat ruang",
       "codeRequired": "Masukkan kode undangan 6 digit",
       "join": "Tidak bisa bergabung",
+      "leave": "Tidak bisa keluar dari ruang",
+      "deleteRoom": "Tidak bisa menghapus ruang",
       "copy": "Tidak bisa menyalin kode",
       "load": "Tidak bisa memuat ruang",
       "loadPost": "Tidak bisa memuat postingan",
       "comment": "Tidak bisa mengirim komentar",
-      "delete": "Hapus gagal"
+      "delete": "Hapus gagal",
+      "coverImage": "Tidak bisa memuat foto sampul",
+      "coverUpdate": "Tidak bisa memperbarui sampul"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Perkenalkan diri",
+    "lead": "Nama bisa diubah nanti. Jika lewati foto, huruf pertama nama jadi profil.",
+    "pickPhoto": "Pilih foto",
+    "pickPhotoAria": "Pilih foto profil",
+    "nameLabel": "Nama",
+    "namePlaceholder": "Nama yang dilihat teman (opsional)",
+    "start": "Lanjut",
+    "errName": "Masukkan nama",
+    "errNeedPhoto": "Tambahkan foto profil",
+    "errImage": "Hanya file gambar",
+    "errPhoto": "Tidak bisa memproses foto"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "Gambar {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "Batas diary",
+    "featureGateTitle": "Fitur premium",
+    "limitFreeLead": "5 entri gratis sudah habis.",
+    "limitPremiumLead": "Anda masih bisa menulis {{n}} entri bulan ini.",
+    "limitPremiumReachedLead": "Batas 50 entri bulan ini tercapai. Bisa menulis lagi bulan depan.",
+    "featureGateLead": "Cari dan ekspor memerlukan langganan. Dengan langganan: cari, ekspor, dan hingga 50 entri per bulan.",
+    "premiumBenefits": "Premium: cari, ekspor, {{n}} entri per bulan",
+    "subscribeCta": "Upgrade ke PRO",
+    "appOnly": "Berlangganan di aplikasi",
+    "restore": "Pulihkan pembelian",
+    "freeGrant": "Gratis: {{n}} entri diary",
+    "freeRemaining": "Sisa gratis: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Mulai menggambar?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Gambar"
+  },
   "write": {
     "title": {
       "new": "Diary hari ini",
@@ -357,7 +441,10 @@
       "exBad": "Kurang: Hari ini aku senang",
       "sceneUnderstood": "Adegan yang dipahami AI: {{scene}}",
       "characterAria": "Karakter untuk gambar AI",
-      "characterTitle": "Karakter ini menjadi tokoh utama"
+      "characterTitle": "Karakter ini menjadi tokoh utama",
+      "rewardTitle": "Tonton iklan untuk 1 gambar AI",
+      "rewardLead": "Tonton iklan sampai selesai untuk membuka satu gambar AI.",
+      "rewardCta": "Tonton iklan"
     },
     "confirm": {
       "replaceTitle": "Gambar AI",
@@ -371,7 +458,12 @@
       "aiHttp": "Gambar gagal: HTTP {{status}}",
       "aiNoImage": "Tidak ada gambar di respons backend",
       "aiUrl": "Tidak bisa memuat URL gambar",
-      "aiConvert": "Konversi gambar gagal"
+      "aiConvert": "Konversi gambar gagal",
+      "saveImage": "Tidak bisa mengekspor gambar",
+      "empty": "Tambahkan judul, teks, atau gambar",
+      "adNotCompleted": "Selesaikan iklan untuk mendapat satu gambar AI",
+      "adAppOnly": "Iklan hanya tersedia di aplikasi",
+      "aiDailyLimit": "Non-pelanggan: maksimal 2 gambar AI per hari"
     },
     "coach": {
       "character": "Atur dirimu agar AI menggambarmu",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "Bagikan foto di chat",
+    "sns": "Bagikan ke SNS",
+    "snsIcon": "SNS",
+    "snsDesc": "Pilih Instagram, KakaoTalk, dan lainnya",
     "rooms": "Ruang teman",
     "roomsIcon": "Ruang",
     "roomsDesc": "Posting ke ruang yang kamu ikuti",
     "roomsHint": "Pilih beberapa ruang sekaligus",
     "roomsLoading": "Memuat ruang…",
     "roomsEmpty": "Belum ada ruang. Buat atau gabung di Menu → Ruang teman.",
+    "pagePrev": "Sebelumnya",
+    "pageNext": "Berikutnya",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "Sudah dibagikan",
     "submit": "Bagikan",
     "sharing": "Membagikan…",
+    "goToRoomsAsk": "Ke daftar ruang?",
+    "goToRooms": "Buka ruang",
     "pcHint": "Web desktop tidak bisa langsung bagikan ke app. Gambar diunduh—buka di ponsel atau unggah di app.",
     "ok": {
       "oneRoom": "Dibagikan ke “{{name}}”",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "Pilih Instagram di lembar bagikan!",
-      "kakao": "Pilih KakaoTalk di lembar bagikan!"
+      "kakao": "Pilih KakaoTalk di lembar bagikan!",
+      "sns": "Pilih Instagram, KakaoTalk, atau aplikasi lain di lembar berbagi!"
     },
     "saved": {
       "instagram": "Gambar disimpan. Unggah ke Instagram Stories!",
-      "kakao": "Gambar disimpan. Kirim lewat KakaoTalk!"
+      "kakao": "Gambar disimpan. Kirim lewat KakaoTalk!",
+      "sns": "Gambar disimpan. Buka Instagram, KakaoTalk, dll. untuk memposting!"
     },
     "native": {
       "instagram": "Membagikan diary saya ke Instagram Stories",
-      "kakao": "Membagikan diary saya lewat KakaoTalk"
+      "kakao": "Membagikan diary saya lewat KakaoTalk",
+      "sns": "Membagikan diary saya"
     },
     "err": {
       "roomShare": "Tidak bisa bagikan ke ruang",
@@ -494,6 +598,10 @@
     "count": "{{n}} diary",
     "empty": "Tidak ada diary di periode ini",
     "pdf": "Simpan PDF",
+    "sharePdf": "Bagikan PDF",
+    "shareReady": "Bagikan sekarang",
+    "shareHint": "PDF siap. Ketuk lagi untuk membagikan atau menyimpan.",
+    "shareText": "Buku diary PageBy",
     "saving": "Menyimpan…",
     "openBook": "Lihat buku diary",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "Tidak ada kanvas",
       "noContext": "Tidak bisa membuka konteks kanvas",
-      "imageLoad": "Gagal memuat gambar"
+      "imageLoad": "Gagal memuat gambar",
+      "tainted": "Gambar ini tidak bisa disimpan karena keamanan browser. Buat ulang gambar AI, atau segarkan dan coba lagi",
+      "export": "Tidak bisa mengekspor gambar"
     },
     "penKindAria": "Jenis pena",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "Stabilo"
     },
     "stickerRotate": "Putar",
+    "removeOverlay": "Hapus",
     "undo": "Urungkan"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "Pilih tanggal",
     "prevMonth": "Bulan sebelumnya",
     "nextMonth": "Bulan berikutnya",
+    "prevYear": "Tahun sebelumnya",
+    "nextYear": "Tahun berikutnya",
+    "prevYears": "Tahun lebih awal",
+    "nextYears": "Tahun lebih akhir",
+    "pickYearMonthAria": "Pilih tahun dan bulan",
+    "done": "Selesai",
+    "pickYearAria": "Pilih tahun",
+    "monthsAria": "Bulan",
+    "yearsAria": "Tahun",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "Mei",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Agu",
+      "9": "Sep",
+      "10": "Okt",
+      "11": "Nov",
+      "12": "Des"
+    },
+    "thisMonth": "Bulan ini",
     "goToday": "Ke hari ini",
     "displayLabel": "Tampilan beranda",
     "displayAria": "Tampilan beranda",

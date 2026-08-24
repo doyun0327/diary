@@ -7,6 +7,11 @@
     "loading": "กำลังโหลด…",
     "anonymous": "ไม่ระบุชื่อ",
     "back": "ย้อนกลับ",
+    "pagerAria": "การแบ่งหน้า",
+    "pagerPagesAria": "หมายเลขหน้า",
+    "pagePrevAria": "หน้าก่อนหน้า",
+    "pageNextAria": "หน้าถัดไป",
+    "pageGoAria": "หน้า {{page}}",
     "processing": "กำลังดำเนินการ…",
     "requestFailed": "คำขอล้มเหลว ({{status}})",
     "serverUnreachable": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบว่า Spring (8080) ทำงานอยู่",
@@ -156,24 +161,6 @@
     "changePhotoAria": "เปลี่ยนรูปโปรไฟล์",
     "pickPhoto": "เลือกรูป",
     "editPhoto": "แก้ไข",
-    "removePhoto": "ลบออก",
-    "nameLabel": "ชื่อ",
-    "nameHint": "ชื่อที่แสดงในห้องเพื่อน",
-    "namePlaceholder": "ใส่ชื่อของคุณ",
-    "save": "บันทึก",
-    "ok": {
-      "nameSaved": "บันทึกชื่อแล้ว",
-      "photoSaved": "บันทึกรูปโปรไฟล์แล้ว",
-      "photoRemoved": "ลบรูปโปรไฟล์แล้ว"
-    },
-    "err": {
-      "nameRequired": "กรุณาใส่ชื่อ",
-      "imageOnly": "อนุญาตเฉพาะไฟล์รูปภาพ",
-      "photoSave": "บันทึกรูปไม่ได้",
-      "photoRead": "อ่านรูปไม่ได้",
-      "photoProcess": "ประมวลผลรูปไม่ได้",
-      "photoLoad": "โหลดรูปไม่ได้"
-    },
     "useAccountPhoto": "ใช้รูปจากบัญชี",
     "replacePhoto": {
       "title": "ใช้รูป Google ไหม?",
@@ -186,7 +173,16 @@
       "lead": "ไดอารี่บนคลาวด์และกิจกรรมในห้องจะถูกลบ และคุณจะออกจากระบบ ไดอารี่ในเครื่องนี้ยังคงอยู่",
       "confirm": "ลบ"
     },
+    "removePhoto": "ลบออก",
+    "nameLabel": "ชื่อ",
+    "nameHint": "ชื่อที่แสดงในห้องเพื่อน",
     "nameHintLoggedIn": "ดึงชื่อจากบัญชีแล้ว แก้ไขในแอปได้ตลอด",
+    "namePlaceholder": "ใส่ชื่อของคุณ",
+    "save": "บันทึก",
+    "profile": {
+      "label": "โปรไฟล์บนอุปกรณ์นี้",
+      "hint": "แยกจากบัญชีเข้าสู่ระบบ ชื่อและรูปใช้เฉพาะในแอปนี้"
+    },
     "sync": {
       "label": "ซิงค์คลาวด์",
       "hint": "เข้าสู่ระบบเพื่อบันทึกไดอารี่ไว้ในบัญชี และกู้คืนบนมือถือเครื่องใหม่ได้",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "ตัวอย่าง UI เท่านั้น — ล็อกอินและสำรองจริงจะมาเร็วๆ นี้",
+      "autoNote": "บันทึกหรือลบไดอารี่จะซิงก์อัตโนมัติ",
       "okSignedIn": "เข้าสู่ระบบแล้ว (ตัวอย่าง)",
+      "okSignedInSynced": "เข้าสู่ระบบและซิงก์ไดอารี่แล้ว",
       "okSignedOut": "ออกจากระบบแล้ว",
       "okSynced": "ซิงค์แล้ว (ตัวอย่าง)",
       "errSignIn": "เข้าสู่ระบบไม่ได้",
+      "errGoogleNative": "เข้าสู่ระบบ Google ไม่สำเร็จ",
+      "errGoogleDeveloper": "เพิ่ม SHA-1 ของแอปนี้ใน Google Cloud Android OAuth แล้วลองใหม่",
+      "errGooglePlay": "เอ뮬เลเตอร์นี้ต้องมี Google Play และบัญชี Google",
+      "errGoogleNetwork": "ตรวจสอบเครือข่ายแล้วลองใหม่",
+      "errGoogleToken": "ไม่ได้โทเค็น Google ตรวจสอบ SHA-1 และ Web Client ID",
       "errSync": "ซิงค์ไม่ได้",
       "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์"
+    },
+    "ok": {
+      "nameSaved": "บันทึกชื่อแล้ว",
+      "photoSaved": "บันทึกรูปโปรไฟล์แล้ว",
+      "photoRemoved": "ลบรูปโปรไฟล์แล้ว"
+    },
+    "err": {
+      "nameRequired": "กรุณาใส่ชื่อ",
+      "imageOnly": "อนุญาตเฉพาะไฟล์รูปภาพ",
+      "photoSave": "บันทึกรูปไม่ได้",
+      "photoRead": "อ่านรูปไม่ได้",
+      "photoProcess": "ประมวลผลรูปไม่ได้",
+      "photoLoad": "โหลดรูปไม่ได้"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "คัดลอกแล้ว",
     "copyInviteTitle": "เชิญเพื่อน",
     "copyInviteAria": "แชร์รหัสเชิญ",
+    "leave": "ออก",
+    "leaveAria": "ออกจากห้อง",
+    "leaving": "กำลังออก…",
+    "leaveConfirmTitle": "ออกจากห้องนี้ไหม?",
+    "leaveConfirmLead": "คุณจะออกจาก「{{name}}」",
+    "delete": "ลบห้อง",
+    "deleteAria": "ลบห้อง",
+    "deleting": "กำลังลบ…",
+    "deleteConfirmTitle": "ลบห้องนี้ไหม?",
+    "deleteConfirmLead": "จะลบ「{{name}}」 สมาชิกทุกคนออก และไดอารี่ที่แชร์จะหายไป",
     "createSheetAria": "สร้างห้อง",
     "createHint": "ตั้งชื่อห้อง ระบบจะสร้างรหัสเชิญ 6 หลักให้อัตโนมัติ",
     "coverLabel": "ปกห้อง",
     "coverFromGallery": "แกลเลอรี",
+    "changeCover": "เปลี่ยนปก",
+    "changeCoverAria": "เปลี่ยนปกห้อง",
+    "changeCoverSheetAria": "เปลี่ยนปกห้อง",
+    "changeCoverHint": "อัปเดตปกของ「{{name}}」",
+    "changeCoverSave": "บันทึก",
+    "changingCover": "กำลังบันทึก…",
     "covers": {
       "kraft": "คราฟต์",
       "mint": "มิ้นต์",
@@ -267,18 +299,30 @@
     "joinSubmit": "เข้าร่วม",
     "noNickname": "ยังไม่มีชื่อเล่น",
     "backToList": "← รายการ",
+    "backToListAria": "กลับไปรายการ",
     "refresh": "รีเฟรช",
     "sharedDiaries": "ไดอารี่ที่แชร์",
     "sharedEmpty": "ยังไม่มีไดอารี่ที่แชร์\nลอง “แชร์ไปห้อง” ในไดอารี่ของคุณ",
+    "sharePrompt": "อยากแชร์ไดอารี่ไหม?",
+    "goHome": "ไปหน้าหลัก",
+    "openPostAria": "เปิดไดอารี่ {{title}} ของ {{author}}",
     "coach": {
       "comment": "ลองคอมเมนต์ดูสิ!"
     },
     "backToRoom": "← ไปห้อง",
+    "backToRoomAria": "กลับไปห้อง",
     "sharedDiary": "ไดอารี่ที่แชร์",
     "comments": "ความคิดเห็น ({{n}})",
     "commentPlaceholder": "เขียนความคิดเห็น",
     "commentSubmit": "โพสต์",
     "alert": {
+      "createdTitle": "สร้างห้องแล้ว!",
+      "createdLead": "แชร์รหัสเชิญนี้ให้เพื่อน",
+      "copyCode": "คัดลอกรหัส",
+      "share": "แชร์",
+      "shareTitle": "คำเชิญห้อง PageBy",
+      "shareText": "อยากลองไดอารี่วาดรูปไหม? 🖍️\nมาวาดด้วยกันทุกวัน!\n\nรหัสเชิญ: {{code}}",
+      "enterRoom": "เข้าห้อง",
       "created": "สร้างห้องแล้ว!\n\nรหัสเชิญ: {{code}}\n\nแชร์รหัสนี้ให้เพื่อน"
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "ตั้งชื่อใน เมนู → บัญชีก่อน",
+      "needProfile": "ต้องมีชื่อและรูปถึงจะแชร์กับเพื่อนได้",
+      "guestAuth": "เชื่อมต่อห้องเพื่อนไม่ได้ ลองใหม่ภายหลัง",
       "list": "โหลดห้องไม่ได้",
       "nameRequired": "กรุณาใส่ชื่อห้อง",
       "create": "สร้างห้องไม่ได้",
       "codeRequired": "ใส่รหัสเชิญ 6 หลัก",
       "join": "เข้าร่วมห้องไม่ได้",
+      "leave": "ออกจากห้องไม่ได้",
+      "deleteRoom": "ลบห้องไม่ได้",
       "copy": "คัดลอกรหัสเชิญไม่ได้",
       "load": "โหลดห้องไม่ได้",
       "loadPost": "โหลดโพสต์ไม่ได้",
       "comment": "โพสต์ความคิดเห็นไม่ได้",
-      "delete": "ลบล้มเหลว"
+      "delete": "ลบล้มเหลว",
+      "coverImage": "โหลดรูปปกไม่ได้",
+      "coverUpdate": "อัปเดตปกไม่ได้"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "แนะนำตัวเอง",
+    "lead": "เปลี่ยนชื่อทีหลังได้ ถ้าข้ามรูป จะใช้ตัวอักษรแรกของชื่อเป็นโปรไฟล์",
+    "pickPhoto": "เลือกรูป",
+    "pickPhotoAria": "เลือกรูปโปรไฟล์",
+    "nameLabel": "ชื่อ",
+    "namePlaceholder": "ชื่อที่เพื่อนเห็น (ไม่บังคับ)",
+    "start": "ถัดไป",
+    "errName": "กรุณาใส่ชื่อ",
+    "errNeedPhoto": "กรุณาเพิ่มรูปโปรไฟล์",
+    "errImage": "ไฟล์รูปเท่านั้น",
+    "errPhoto": "ประมวลผลรูปไม่ได้"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "ภาพวาดวันที่ {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "จำกัดจำนวนไดอารี่",
+    "featureGateTitle": "ฟีเจอร์พรีเมียม",
+    "limitFreeLead": "ใช้สิทธิ์ฟรี 5 หน้าครบแล้ว",
+    "limitPremiumLead": "เดือนนี้เขียนได้อีก {{n}} หน้า",
+    "limitPremiumReachedLead": "ถึงขีดจำกัด 50 หน้าของเดือนนี้แล้ว เดือนหน้าเขียนได้อีก",
+    "featureGateLead": "ค้นหาและส่งออกต้องสมัครสมาชิก สมัครแล้วใช้ค้นหา ส่งออก และเขียนได้เดือนละ 50 หน้า",
+    "premiumBenefits": "พรีเมียม: ค้นหา ส่งออก {{n}} หน้าต่อเดือน",
+    "subscribeCta": "อัปเกรดเป็น PRO",
+    "appOnly": "สมัครในแอป",
+    "restore": "กู้คืนการซื้อ",
+    "freeGrant": "ฟรี: ไดอารี่ {{n}} หน้า",
+    "freeRemaining": "ฟรีเหลือ: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "เริ่มวาดไหม?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "วาด"
+  },
   "write": {
     "title": {
       "new": "ไดอารี่วันนี้",
@@ -357,7 +441,10 @@
       "exBad": "อ่อน: วันนี้รู้สึกดี",
       "sceneUnderstood": "ฉากที่ AI เข้าใจ: {{scene}}",
       "characterAria": "ตัวละครสำหรับภาพวาด AI",
-      "characterTitle": "ตัวละครนี้จะเป็นตัวเอก"
+      "characterTitle": "ตัวละครนี้จะเป็นตัวเอก",
+      "rewardTitle": "ดูโฆษณาเพื่อวาด AI 1 ครั้ง",
+      "rewardLead": "ดูโฆษณาจนจบเพื่อปลดล็อกการวาด AI หนึ่งครั้ง",
+      "rewardCta": "ดูโฆษณา"
     },
     "confirm": {
       "replaceTitle": "ภาพวาด AI",
@@ -371,7 +458,12 @@
       "aiHttp": "วาดไม่สำเร็จ: HTTP {{status}}",
       "aiNoImage": "ไม่มีรูปในตอบกลับจากแบ็กเอนด์",
       "aiUrl": "โหลด URL รูปไม่ได้",
-      "aiConvert": "แปลงรูปไม่สำเร็จ"
+      "aiConvert": "แปลงรูปไม่สำเร็จ",
+      "saveImage": "ส่งออกรูปวาดไม่ได้",
+      "empty": "เพิ่มชื่อ เนื้อหา หรือรูปวาด",
+      "adNotCompleted": "ดูโฆษณาจนจบเพื่อรับการวาด AI",
+      "adAppOnly": "โฆษณาใช้ได้ในแอปเท่านั้น",
+      "aiDailyLimit": "ผู้ไม่ได้สมัครวาด AI ได้วันละไม่เกิน 2 ครั้ง"
     },
     "coach": {
       "character": "ตั้งตัวเอง เพื่อให้ AI วาดตาม",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "แชร์รูปในแชท",
+    "sns": "แชร์ไป SNS",
+    "snsIcon": "SNS",
+    "snsDesc": "เลือก Instagram, KakaoTalk และอื่นๆ",
     "rooms": "ห้องเพื่อน",
     "roomsIcon": "ห้อง",
     "roomsDesc": "โพสต์ไปยังห้องที่คุณอยู่",
     "roomsHint": "เลือกหลายห้องเพื่อแชร์พร้อมกัน",
     "roomsLoading": "กำลังโหลดห้อง…",
     "roomsEmpty": "ยังไม่มีห้อง สร้างหรือเข้าร่วมที่ เมนู → ห้องเพื่อน",
+    "pagePrev": "ก่อนหน้า",
+    "pageNext": "ถัดไป",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "แชร์แล้ว",
     "submit": "แชร์",
     "sharing": "กำลังแชร์…",
+    "goToRoomsAsk": "ไปรายการห้องไหม?",
+    "goToRooms": "เปิดห้อง",
     "pcHint": "เว็บบนเดสก์ท็อปแชร์ไปแอปโดยตรงไม่ได้ ดาวน์โหลดรูปแล้ว — เปิดบนมือถือหรืออัปโหลดในแอป",
     "ok": {
       "oneRoom": "แชร์ไปยัง “{{name}}” แล้ว",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "เลือก Instagram ในแผ่นแชร์!",
-      "kakao": "เลือก KakaoTalk ในแผ่นแชร์!"
+      "kakao": "เลือก KakaoTalk ในแผ่นแชร์!",
+      "sns": "เลือก Instagram, KakaoTalk หรือแอปอื่นในแผ่นแชร์!"
     },
     "saved": {
       "instagram": "บันทึกรูปแล้ว อัปโหลดไป Instagram Stories!",
-      "kakao": "บันทึกรูปแล้ว ส่งใน KakaoTalk!"
+      "kakao": "บันทึกรูปแล้ว ส่งใน KakaoTalk!",
+      "sns": "บันทึกรูปแล้ว เปิด Instagram, KakaoTalk ฯลฯ เพื่อโพสต์!"
     },
     "native": {
       "instagram": "กำลังแชร์ไดอารี่ไป Instagram Stories",
-      "kakao": "กำลังแชร์ไดอารี่ผ่าน KakaoTalk"
+      "kakao": "กำลังแชร์ไดอารี่ผ่าน KakaoTalk",
+      "sns": "กำลังแชร์ไดอารี่ของฉัน"
     },
     "err": {
       "roomShare": "แชร์ไปห้องไม่ได้",
@@ -494,6 +598,10 @@
     "count": "{{n}} ไดอารี่",
     "empty": "ไม่มีไดอารี่ในช่วงนี้",
     "pdf": "บันทึก PDF",
+    "sharePdf": "แชร์ PDF",
+    "shareReady": "แชร์เลย",
+    "shareHint": "PDF พร้อมแล้ว แตะอีกครั้งเพื่อแชร์หรือบันทึก",
+    "shareText": "สมุดไดอารี่ PageBy",
     "saving": "กำลังบันทึก…",
     "openBook": "ดูสมุดไดอารี่",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "ไม่มีแคนวาส",
       "noContext": "เปิดบริบทแคนวาสไม่ได้",
-      "imageLoad": "โหลดรูปไม่สำเร็จ"
+      "imageLoad": "โหลดรูปไม่สำเร็จ",
+      "tainted": "บันทึกรูปนี้ไม่ได้เพราะความปลอดภัยของเบราว์เซอร์ สร้างภาพ AI ใหม่ หรือรีเฟรชแล้วลองใหม่",
+      "export": "ส่งออกรูปวาดไม่ได้"
     },
     "penKindAria": "ชนิดปากกา",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "ไฮไลต์"
     },
     "stickerRotate": "หมุน",
+    "removeOverlay": "ลบ",
     "undo": "ย้อนกลับ"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "เลือกวันที่",
     "prevMonth": "เดือนก่อน",
     "nextMonth": "เดือนถัดไป",
+    "prevYear": "ปีก่อน",
+    "nextYear": "ปีถัดไป",
+    "prevYears": "ปีก่อนหน้า",
+    "nextYears": "ปีถัดไป",
+    "pickYearMonthAria": "เลือกปีและเดือน",
+    "done": "เสร็จ",
+    "pickYearAria": "เลือกปี",
+    "monthsAria": "เดือน",
+    "yearsAria": "ปี",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "ม.ค.",
+      "2": "ก.พ.",
+      "3": "มี.ค.",
+      "4": "เม.ย.",
+      "5": "พ.ค.",
+      "6": "มิ.ย.",
+      "7": "ก.ค.",
+      "8": "ส.ค.",
+      "9": "ก.ย.",
+      "10": "ต.ค.",
+      "11": "พ.ย.",
+      "12": "ธ.ค."
+    },
+    "thisMonth": "เดือนนี้",
     "goToday": "ไปวันนี้",
     "displayLabel": "หน้าหลัก",
     "displayAria": "มุมมองหน้าหลัก",

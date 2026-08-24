@@ -13,7 +13,38 @@
 }
 
 .rooms--hub {
-  padding-top: 22px;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  margin: 0;
+  min-height: 0;
+}
+
+/* 친구방 목록·방 안·공유 일기: 웹 헤더가 상단에 붙음 */
+.rooms--hub .rooms__toolbar,
+.rooms--in-room .rooms__toolbar,
+.rooms--post .rooms__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  margin: 0 0 14px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+  border-bottom: 1px solid var(--color-border-soft);
+  background: var(--color-bg);
+}
+
+.rooms--hub > :not(.rooms__toolbar):not(.rooms-cover-picker__file):not(.rooms-sheet):not(.app-modal),
+.rooms--in-room > :not(.rooms__toolbar),
+.rooms--post > :not(.rooms__toolbar) {
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 /* 방 안·공유 일기: 좌우 패딩도 제거, 툴바가 화면 상단에 붙음 */
@@ -29,24 +60,6 @@
   padding-bottom: calc(40px + env(safe-area-inset-bottom));
   margin: 0;
   min-height: 0;
-}
-
-.rooms--in-room .rooms__toolbar,
-.rooms--post .rooms__toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-sizing: border-box;
-  margin: 0 0 14px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
-  border-bottom: 1px solid var(--color-border-soft);
-  background: var(--color-bg);
-}
-
-.rooms--in-room > :not(.rooms__toolbar),
-.rooms--post > :not(.rooms__toolbar) {
-  padding-left: 18px;
-  padding-right: 18px;
 }
 
 .rooms__toolbar {

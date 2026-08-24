@@ -6,7 +6,7 @@ import { getAccessToken } from "../hooks/useAuthSession";
 import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
-import { isFlutterApp, shareViaNative } from "../utils/nativeShare";
+import { shareViaNative } from "../utils/nativeShare";
 import {
   coverClassName,
   fileToCoverDataUrl,
@@ -364,20 +364,18 @@ function RoomsHubPage({
         className="rooms-cover-picker__file"
         onChange={onCoverFileChange}
       />
-      {!isFlutterApp() && (
-        <div className="rooms__toolbar">
-          <button
-            type="button"
-            className="rooms__back"
-            onClick={onBack}
-            aria-label={t("common.back")}
-          >
-            <BackIcon />
-          </button>
-          <h2>{t("rooms.title")}</h2>
-          <span />
-        </div>
-      )}
+      <div className="rooms__toolbar">
+        <button
+          type="button"
+          className="rooms__back"
+          onClick={onBack}
+          aria-label={t("common.back")}
+        >
+          <BackIcon />
+        </button>
+        <h2>{t("rooms.title")}</h2>
+        <span />
+      </div>
 
       {!shareReady ? (
         <div className="rooms__empty rooms__empty--scrap">

@@ -7,6 +7,11 @@
     "loading": "Chargement…",
     "anonymous": "Anonyme",
     "back": "Retour",
+    "pagerAria": "Pagination",
+    "pagerPagesAria": "Numéros de page",
+    "pagePrevAria": "Page précédente",
+    "pageNextAria": "Page suivante",
+    "pageGoAria": "Page {{page}}",
     "processing": "Traitement…",
     "requestFailed": "Échec de la requête ({{status}})",
     "serverUnreachable": "Impossible de se connecter au serveur. Vérifiez que Spring (8080) est démarré.",
@@ -156,24 +161,6 @@
     "changePhotoAria": "Changer la photo de profil",
     "pickPhoto": "Choisir une photo",
     "editPhoto": "Modifier",
-    "removePhoto": "Supprimer",
-    "nameLabel": "Nom",
-    "nameHint": "Nom affiché dans les salons d'amis",
-    "namePlaceholder": "Entrez votre nom",
-    "save": "Enregistrer",
-    "ok": {
-      "nameSaved": "Nom enregistré",
-      "photoSaved": "Photo de profil enregistrée",
-      "photoRemoved": "Photo de profil supprimée"
-    },
-    "err": {
-      "nameRequired": "Veuillez entrer un nom",
-      "imageOnly": "Seuls les fichiers image sont autorisés",
-      "photoSave": "Impossible d'enregistrer la photo",
-      "photoRead": "Impossible de lire la photo",
-      "photoProcess": "Impossible de traiter la photo",
-      "photoLoad": "Impossible de charger la photo"
-    },
     "useAccountPhoto": "Utiliser la photo du compte",
     "replacePhoto": {
       "title": "Utiliser la photo Google ?",
@@ -186,7 +173,16 @@
       "lead": "Les journaux cloud et l’activité des salles seront supprimés, et vous serez déconnecté. Les journaux locaux restent.",
       "confirm": "Supprimer"
     },
+    "removePhoto": "Supprimer",
+    "nameLabel": "Nom",
+    "nameHint": "Nom affiché dans les salons d'amis",
     "nameHintLoggedIn": "Rempli depuis votre compte — modifiable à tout moment",
+    "namePlaceholder": "Entrez votre nom",
+    "save": "Enregistrer",
+    "profile": {
+      "label": "Profil sur cet appareil",
+      "hint": "Séparé de la connexion. Nom et photo utilisés uniquement dans cette app."
+    },
     "sync": {
       "label": "Sync cloud",
       "hint": "Connectez-vous pour enregistrer votre journal sur votre compte et le retrouver sur un nouveau téléphone.",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "Aperçu UI seulement — connexion et sauvegarde réelles bientôt.",
+      "autoNote": "Enregistrer ou supprimer un journal se synchronise automatiquement.",
       "okSignedIn": "Connecté (aperçu)",
+      "okSignedInSynced": "Connecté et journal synchronisé",
       "okSignedOut": "Déconnecté",
       "okSynced": "Synchronisé (aperçu)",
       "errSignIn": "Connexion impossible",
+      "errGoogleNative": "Échec de la connexion Google",
+      "errGoogleDeveloper": "Ajoutez le SHA-1 de cette app au client OAuth Android Google Cloud, puis réessayez",
+      "errGooglePlay": "Cet émulateur nécessite Google Play et un compte Google",
+      "errGoogleNetwork": "Vérifiez le réseau et réessayez",
+      "errGoogleToken": "Jeton Google introuvable. Vérifiez le SHA-1 et l’ID client Web",
       "errSync": "Sync impossible",
       "noAccountPhoto": "Ce compte n'a pas de photo"
+    },
+    "ok": {
+      "nameSaved": "Nom enregistré",
+      "photoSaved": "Photo de profil enregistrée",
+      "photoRemoved": "Photo de profil supprimée"
+    },
+    "err": {
+      "nameRequired": "Veuillez entrer un nom",
+      "imageOnly": "Seuls les fichiers image sont autorisés",
+      "photoSave": "Impossible d'enregistrer la photo",
+      "photoRead": "Impossible de lire la photo",
+      "photoProcess": "Impossible de traiter la photo",
+      "photoLoad": "Impossible de charger la photo"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "Copié",
     "copyInviteTitle": "Inviter des amis",
     "copyInviteAria": "Partager le code d'invitation",
+    "leave": "Quitter",
+    "leaveAria": "Quitter le salon",
+    "leaving": "Départ…",
+    "leaveConfirmTitle": "Quitter ce salon ?",
+    "leaveConfirmLead": "Vous quitterez 「{{name}}」.",
+    "delete": "Supprimer le salon",
+    "deleteAria": "Supprimer le salon",
+    "deleting": "Suppression…",
+    "deleteConfirmTitle": "Supprimer ce salon ?",
+    "deleteConfirmLead": "「{{name}}」 sera supprimé. Tout le monde part et les journaux partagés disparaissent.",
     "createSheetAria": "Créer un salon",
     "createHint": "Donnez un nom au salon ; un code d'invitation à 6 chiffres est créé automatiquement.",
     "coverLabel": "Couverture",
     "coverFromGallery": "Galerie",
+    "changeCover": "Changer la couverture",
+    "changeCoverAria": "Changer la couverture du salon",
+    "changeCoverSheetAria": "Changer la couverture du salon",
+    "changeCoverHint": "Mettre à jour la couverture de 「{{name}}」.",
+    "changeCoverSave": "Enregistrer",
+    "changingCover": "Enregistrement…",
     "covers": {
       "kraft": "Kraft",
       "mint": "Menthe",
@@ -267,18 +299,30 @@
     "joinSubmit": "Rejoindre",
     "noNickname": "Pas de pseudo",
     "backToList": "← Liste",
+    "backToListAria": "Retour à la liste",
     "refresh": "Actualiser",
     "sharedDiaries": "Journaux partagés",
     "sharedEmpty": "Pas encore de journaux partagés.\nEssayez « Partager dans un salon » sur votre journal.",
+    "sharePrompt": "Partager un journal ?",
+    "goHome": "Accueil",
+    "openPostAria": "Ouvrir le journal {{title}} de {{author}}",
     "coach": {
       "comment": "Laissez un commentaire !"
     },
     "backToRoom": "← Au salon",
+    "backToRoomAria": "Retour au salon",
     "sharedDiary": "Journal partagé",
     "comments": "Commentaires ({{n}})",
     "commentPlaceholder": "Écrire un commentaire",
     "commentSubmit": "Publier",
     "alert": {
+      "createdTitle": "Salon créé !",
+      "createdLead": "Partagez ce code d’invitation avec vos amis.",
+      "copyCode": "Copier le code",
+      "share": "Partager",
+      "shareTitle": "Invitation salon PageBy",
+      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}",
+      "enterRoom": "Entrer dans le salon",
       "created": "Salon créé !\n\nCode d'invitation : {{code}}\n\nPartagez ce code avec vos amis."
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "Définissez d'abord votre nom dans Menu → Compte",
+      "needProfile": "Nom et photo requis pour partager avec des amis",
+      "guestAuth": "Impossible de rejoindre les salons. Réessayez plus tard",
       "list": "Impossible de charger les salons",
       "nameRequired": "Veuillez entrer un nom de salon",
       "create": "Impossible de créer le salon",
       "codeRequired": "Entrez un code d'invitation à 6 chiffres",
       "join": "Impossible de rejoindre le salon",
+      "leave": "Impossible de quitter le salon",
+      "deleteRoom": "Impossible de supprimer le salon",
       "copy": "Impossible de copier le code d'invitation",
       "load": "Impossible de charger le salon",
       "loadPost": "Impossible de charger la publication",
       "comment": "Impossible de publier le commentaire",
-      "delete": "Échec de la suppression"
+      "delete": "Échec de la suppression",
+      "coverImage": "Impossible de charger la couverture",
+      "coverUpdate": "Impossible de mettre à jour la couverture"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Présentez-vous",
+    "lead": "Vous pourrez changer le nom plus tard. Sans photo, l’initiale de votre nom sert d’avatar.",
+    "pickPhoto": "Choisir une photo",
+    "pickPhotoAria": "Choisir la photo de profil",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Nom visible par vos amis (facultatif)",
+    "start": "Suivant",
+    "errName": "Entrez un nom",
+    "errNeedPhoto": "Ajoutez une photo de profil",
+    "errImage": "Fichiers image uniquement",
+    "errPhoto": "Impossible de traiter la photo"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "Dessin du {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "Limite de journaux",
+    "featureGateTitle": "Fonction premium",
+    "limitFreeLead": "Vous avez utilisé vos 5 entrées gratuites.",
+    "limitPremiumLead": "Vous pouvez encore écrire {{n}} entrées ce mois-ci.",
+    "limitPremiumReachedLead": "Limite de 50 entrées atteinte ce mois-ci. Vous pourrez écrire le mois prochain.",
+    "featureGateLead": "Recherche et export nécessitent un abonnement. Avec abonnement : recherche, export et jusqu’à 50 entrées par mois.",
+    "premiumBenefits": "Premium : recherche, export, {{n}} entrées par mois",
+    "subscribeCta": "Passer à PRO",
+    "appOnly": "Abonnez-vous dans l’app",
+    "restore": "Restaurer les achats",
+    "freeGrant": "Gratuit : {{n}} entrées",
+    "freeRemaining": "Gratuit restant : {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Commencer à dessiner ?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Dessiner"
+  },
   "write": {
     "title": {
       "new": "Journal du jour",
@@ -357,7 +441,10 @@
       "exBad": "Faible : Aujourd'hui je me suis senti bien",
       "sceneUnderstood": "Scène comprise par l'IA : {{scene}}",
       "characterAria": "Personnage pour le dessin IA",
-      "characterTitle": "Ce personnage devient le protagoniste"
+      "characterTitle": "Ce personnage devient le protagoniste",
+      "rewardTitle": "Regarder une pub pour 1 dessin IA",
+      "rewardLead": "Regardez la pub jusqu’à la fin pour débloquer un dessin IA.",
+      "rewardCta": "Voir la pub"
     },
     "confirm": {
       "replaceTitle": "Dessin IA",
@@ -371,7 +458,12 @@
       "aiHttp": "Échec du dessin : HTTP {{status}}",
       "aiNoImage": "Pas d'image dans la réponse du backend",
       "aiUrl": "Impossible de charger l'URL de l'image",
-      "aiConvert": "Échec de la conversion d'image"
+      "aiConvert": "Échec de la conversion d'image",
+      "saveImage": "Impossible d’exporter le dessin",
+      "empty": "Ajoutez un titre, un texte ou un dessin",
+      "adNotCompleted": "Terminez la pub pour obtenir un dessin IA",
+      "adAppOnly": "Les pubs sont disponibles uniquement dans l’app",
+      "aiDailyLimit": "Sans abonnement : jusqu’à 2 dessins IA par jour"
     },
     "coach": {
       "character": "Définis-toi pour que l’IA te dessine",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "Partager une photo dans le chat",
+    "sns": "Partager sur les réseaux",
+    "snsIcon": "Réseaux",
+    "snsDesc": "Choisissez Instagram, KakaoTalk, etc.",
     "rooms": "Salons d'amis",
     "roomsIcon": "Salon",
     "roomsDesc": "Publier dans les salons où vous êtes",
     "roomsHint": "Choisissez plusieurs salons à la fois",
     "roomsLoading": "Chargement des salons…",
     "roomsEmpty": "Pas encore de salon. Créez ou rejoignez via Menu → Salons d'amis.",
+    "pagePrev": "Préc.",
+    "pageNext": "Suiv.",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "Déjà partagé",
     "submit": "Partager",
     "sharing": "Partage…",
+    "goToRoomsAsk": "Aller à la liste des salons ?",
+    "goToRooms": "Ouvrir les salons",
     "pcHint": "Le web bureau ne peut pas partager directement vers les apps. Image téléchargée — ouvrez-la sur le téléphone ou importez-la dans l'app.",
     "ok": {
       "oneRoom": "Partagé dans « {{name}} »",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "Choisissez Instagram dans la feuille de partage !",
-      "kakao": "Choisissez KakaoTalk dans la feuille de partage !"
+      "kakao": "Choisissez KakaoTalk dans la feuille de partage !",
+      "sns": "Choisissez Instagram, KakaoTalk ou une autre app dans le partage !"
     },
     "saved": {
       "instagram": "Image enregistrée. Importez-la dans Instagram Stories !",
-      "kakao": "Image enregistrée. Envoyez-la sur KakaoTalk !"
+      "kakao": "Image enregistrée. Envoyez-la sur KakaoTalk !",
+      "sns": "Image enregistrée. Ouvrez Instagram, KakaoTalk, etc. pour la publier !"
     },
     "native": {
       "instagram": "Partage de mon journal sur Instagram Stories",
-      "kakao": "Partage de mon journal via KakaoTalk"
+      "kakao": "Partage de mon journal via KakaoTalk",
+      "sns": "Partage de mon journal"
     },
     "err": {
       "roomShare": "Impossible de partager dans le salon",
@@ -494,6 +598,10 @@
     "count": "{{n}} journaux",
     "empty": "Aucun journal sur cette période",
     "pdf": "Enregistrer PDF",
+    "sharePdf": "Partager le PDF",
+    "shareReady": "Partager maintenant",
+    "shareHint": "Le PDF est prêt. Touchez à nouveau pour partager ou enregistrer.",
+    "shareText": "Carnet PageBy",
     "saving": "Enregistrement…",
     "openBook": "Voir le carnet",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "Pas de canevas",
       "noContext": "Impossible d'ouvrir le contexte du canevas",
-      "imageLoad": "Échec du chargement de l'image"
+      "imageLoad": "Échec du chargement de l'image",
+      "tainted": "Ce dessin ne peut pas être enregistré (sécurité du navigateur). Régénérez l’image IA ou actualisez",
+      "export": "Impossible d’exporter le dessin"
     },
     "penKindAria": "Type de stylo",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "Surligneur"
     },
     "stickerRotate": "Pivoter",
+    "removeOverlay": "Retirer",
     "undo": "Annuler"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "Choisir une date",
     "prevMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
+    "prevYear": "Année précédente",
+    "nextYear": "Année suivante",
+    "prevYears": "Années précédentes",
+    "nextYears": "Années suivantes",
+    "pickYearMonthAria": "Choisir l’année et le mois",
+    "done": "Terminé",
+    "pickYearAria": "Choisir une année",
+    "monthsAria": "Mois",
+    "yearsAria": "Année",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "Janv.",
+      "2": "Févr.",
+      "3": "Mars",
+      "4": "Avr.",
+      "5": "Mai",
+      "6": "Juin",
+      "7": "Juil.",
+      "8": "Août",
+      "9": "Sept.",
+      "10": "Oct.",
+      "11": "Nov.",
+      "12": "Déc."
+    },
+    "thisMonth": "Ce mois-ci",
     "goToday": "Aller à aujourd'hui",
     "displayLabel": "Accueil",
     "displayAria": "Affichage de l'accueil",

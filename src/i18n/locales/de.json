@@ -241,10 +241,10 @@
     "pt": "Português (Brasil)",
     "es": "Español",
     "th": "ไทย",
-    "de": "Deutsch",
     "title": "Sprache",
     "aria": "Sprache",
-    "zh-TW": "繁體中文"
+    "zh-TW": "繁體中文",
+    "de": "Deutsch"
   },
   "credits": {
     "moodIcons": "Stimmungs-Icons: entworfen von {{author}} von Flaticon"
@@ -275,6 +275,12 @@
     "createHint": "Gib einen Raumnamen ein; ein 6-stelliger Einladungscode wird automatisch erstellt.",
     "coverLabel": "Raumcover",
     "coverFromGallery": "Galerie",
+    "changeCover": "Cover ändern",
+    "changeCoverAria": "Raum-Cover ändern",
+    "changeCoverSheetAria": "Raum-Cover ändern",
+    "changeCoverHint": "Cover für 「{{name}}」 aktualisieren.",
+    "changeCoverSave": "Speichern",
+    "changingCover": "Speichern…",
     "covers": {
       "kraft": "Kraft",
       "mint": "Minze",
@@ -338,7 +344,9 @@
       "load": "Raum konnte nicht geladen werden",
       "loadPost": "Beitrag konnte nicht geladen werden",
       "comment": "Kommentar konnte nicht gepostet werden",
-      "delete": "Löschen fehlgeschlagen"
+      "delete": "Löschen fehlgeschlagen",
+      "coverImage": "Cover-Foto konnte nicht geladen werden",
+      "coverUpdate": "Cover konnte nicht aktualisiert werden"
     }
   },
   "profileSetup": {
@@ -390,7 +398,7 @@
   "subscription": {
     "limitTitle": "Tagebuchlimit",
     "featureGateTitle": "Premium-Funktion",
-    "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt. Mit Abo: Suche, Export und bis zu 50 Einträge pro Monat.",
+    "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt.",
     "limitPremiumLead": "Du kannst diesen Monat noch {{n}} Einträge schreiben.",
     "limitPremiumReachedLead": "Monatslimit von 50 Einträgen erreicht. Nächsten Monat kannst du wieder schreiben.",
     "featureGateLead": "Suche und Export erfordern ein Abo. Mit Abo: Suche, Export und bis zu 50 Einträge pro Monat.",

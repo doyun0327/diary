@@ -7,6 +7,11 @@
     "loading": "Đang tải…",
     "anonymous": "Ẩn danh",
     "back": "Quay lại",
+    "pagerAria": "Phân trang",
+    "pagerPagesAria": "Số trang",
+    "pagePrevAria": "Trang trước",
+    "pageNextAria": "Trang sau",
+    "pageGoAria": "Trang {{page}}",
     "processing": "Đang xử lý…",
     "requestFailed": "Yêu cầu thất bại ({{status}})",
     "serverUnreachable": "Không kết nối được máy chủ. Kiểm tra xem Spring (8080) có đang chạy không.",
@@ -156,24 +161,6 @@
     "changePhotoAria": "Đổi ảnh đại diện",
     "pickPhoto": "Chọn ảnh",
     "editPhoto": "Sửa",
-    "removePhoto": "Xóa",
-    "nameLabel": "Tên",
-    "nameHint": "Tên hiển thị trong phòng bạn bè",
-    "namePlaceholder": "Nhập tên của bạn",
-    "save": "Lưu",
-    "ok": {
-      "nameSaved": "Đã lưu tên",
-      "photoSaved": "Đã lưu ảnh đại diện",
-      "photoRemoved": "Đã xóa ảnh đại diện"
-    },
-    "err": {
-      "nameRequired": "Vui lòng nhập tên",
-      "imageOnly": "Chỉ cho phép tệp ảnh",
-      "photoSave": "Không lưu được ảnh",
-      "photoRead": "Không đọc được ảnh",
-      "photoProcess": "Không xử lý được ảnh",
-      "photoLoad": "Không tải được ảnh"
-    },
     "useAccountPhoto": "Dùng ảnh tài khoản",
     "replacePhoto": {
       "title": "Dùng ảnh Google?",
@@ -186,7 +173,16 @@
       "lead": "Nhật ký đám mây và hoạt động phòng sẽ bị xóa, bạn sẽ đăng xuất. Nhật ký trên máy vẫn giữ.",
       "confirm": "Xóa"
     },
+    "removePhoto": "Xóa",
+    "nameLabel": "Tên",
+    "nameHint": "Tên hiển thị trong phòng bạn bè",
     "nameHintLoggedIn": "Đã điền từ tài khoản — bạn có thể đổi bất cứ lúc nào",
+    "namePlaceholder": "Nhập tên của bạn",
+    "save": "Lưu",
+    "profile": {
+      "label": "Hồ sơ trên thiết bị này",
+      "hint": "Tách khỏi đăng nhập. Tên và ảnh chỉ dùng trong ứng dụng này."
+    },
     "sync": {
       "label": "Đồng bộ đám mây",
       "hint": "Đăng nhập để lưu nhật ký vào tài khoản và khôi phục trên điện thoại mới.",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "Chỉ xem trước giao diện — đăng nhập & sao lưu thật sẽ sớm có.",
+      "autoNote": "Lưu hoặc xóa nhật ký sẽ đồng bộ tự động.",
       "okSignedIn": "Đã đăng nhập (xem trước)",
+      "okSignedInSynced": "Đã đăng nhập và đồng bộ nhật ký",
       "okSignedOut": "Đã đăng xuất",
       "okSynced": "Đã đồng bộ (xem trước)",
       "errSignIn": "Không đăng nhập được",
+      "errGoogleNative": "Đăng nhập Google thất bại",
+      "errGoogleDeveloper": "Thêm SHA-1 của ứng dụng vào máy khách OAuth Android Google Cloud rồi thử lại",
+      "errGooglePlay": "Trình giả lập này cần Google Play và tài khoản Google",
+      "errGoogleNetwork": "Kiểm tra mạng và thử lại",
+      "errGoogleToken": "Không lấy được mã Google. Kiểm tra SHA-1 và Web Client ID",
       "errSync": "Không đồng bộ được",
       "noAccountPhoto": "Tài khoản này không có ảnh đại diện"
+    },
+    "ok": {
+      "nameSaved": "Đã lưu tên",
+      "photoSaved": "Đã lưu ảnh đại diện",
+      "photoRemoved": "Đã xóa ảnh đại diện"
+    },
+    "err": {
+      "nameRequired": "Vui lòng nhập tên",
+      "imageOnly": "Chỉ cho phép tệp ảnh",
+      "photoSave": "Không lưu được ảnh",
+      "photoRead": "Không đọc được ảnh",
+      "photoProcess": "Không xử lý được ảnh",
+      "photoLoad": "Không tải được ảnh"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "Đã sao chép",
     "copyInviteTitle": "Mời bạn bè",
     "copyInviteAria": "Chia sẻ mã mời",
+    "leave": "Rời phòng",
+    "leaveAria": "Rời phòng",
+    "leaving": "Đang rời…",
+    "leaveConfirmTitle": "Rời phòng này?",
+    "leaveConfirmLead": "Bạn sẽ rời 「{{name}}」.",
+    "delete": "Xóa phòng",
+    "deleteAria": "Xóa phòng",
+    "deleting": "Đang xóa…",
+    "deleteConfirmTitle": "Xóa phòng này?",
+    "deleteConfirmLead": "「{{name}}」 sẽ bị xóa. Mọi người rời đi và nhật ký đã chia sẻ cũng mất.",
     "createSheetAria": "Tạo phòng",
     "createHint": "Đặt tên phòng; mã mời 6 chữ số được tạo tự động.",
     "coverLabel": "Ảnh bìa phòng",
     "coverFromGallery": "Thư viện",
+    "changeCover": "Đổi ảnh bìa",
+    "changeCoverAria": "Đổi ảnh bìa phòng",
+    "changeCoverSheetAria": "Đổi ảnh bìa phòng",
+    "changeCoverHint": "Cập nhật ảnh bìa của 「{{name}}」.",
+    "changeCoverSave": "Lưu",
+    "changingCover": "Đang lưu…",
     "covers": {
       "kraft": "Kraft",
       "mint": "Bạc hà",
@@ -267,18 +299,30 @@
     "joinSubmit": "Tham gia",
     "noNickname": "Chưa có biệt danh",
     "backToList": "← Danh sách",
+    "backToListAria": "Về danh sách",
     "refresh": "Làm mới",
     "sharedDiaries": "Nhật ký đã chia sẻ",
     "sharedEmpty": "Chưa có nhật ký chia sẻ.\nThử “Chia sẻ vào phòng” trên nhật ký của bạn.",
+    "sharePrompt": "Muốn chia sẻ nhật ký?",
+    "goHome": "Về trang chủ",
+    "openPostAria": "Mở nhật ký {{title}} của {{author}}",
     "coach": {
       "comment": "Hãy để lại bình luận!"
     },
     "backToRoom": "← Về phòng",
+    "backToRoomAria": "Về phòng",
     "sharedDiary": "Nhật ký đã chia sẻ",
     "comments": "Bình luận ({{n}})",
     "commentPlaceholder": "Viết bình luận",
     "commentSubmit": "Đăng",
     "alert": {
+      "createdTitle": "Đã tạo phòng!",
+      "createdLead": "Chia sẻ mã mời này với bạn bè.",
+      "copyCode": "Sao chép mã",
+      "share": "Chia sẻ",
+      "shareTitle": "Lời mời phòng PageBy",
+      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}",
+      "enterRoom": "Vào phòng",
       "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "Hãy đặt tên trong Menu → Tài khoản trước",
+      "needProfile": "Cần tên và ảnh để chia sẻ với bạn bè",
+      "guestAuth": "Không kết nối được phòng bạn bè. Thử lại sau",
       "list": "Không tải được phòng",
       "nameRequired": "Vui lòng nhập tên phòng",
       "create": "Không tạo được phòng",
       "codeRequired": "Nhập mã mời 6 chữ số",
       "join": "Không tham gia được phòng",
+      "leave": "Không thể rời phòng",
+      "deleteRoom": "Không thể xóa phòng",
       "copy": "Không sao chép được mã mời",
       "load": "Không tải được phòng",
       "loadPost": "Không tải được bài đăng",
       "comment": "Không đăng được bình luận",
-      "delete": "Xóa thất bại"
+      "delete": "Xóa thất bại",
+      "coverImage": "Không tải được ảnh bìa",
+      "coverUpdate": "Không cập nhật được ảnh bìa"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Giới thiệu bản thân",
+    "lead": "Bạn có thể đổi tên sau. Nếu bỏ qua ảnh, chữ cái đầu tên sẽ thành hồ sơ.",
+    "pickPhoto": "Chọn ảnh",
+    "pickPhotoAria": "Chọn ảnh hồ sơ",
+    "nameLabel": "Tên",
+    "namePlaceholder": "Tên bạn bè sẽ thấy (tùy chọn)",
+    "start": "Tiếp",
+    "errName": "Vui lòng nhập tên",
+    "errNeedPhoto": "Vui lòng thêm ảnh hồ sơ",
+    "errImage": "Chỉ tệp ảnh",
+    "errPhoto": "Không xử lý được ảnh"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "Tranh ngày {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "Giới hạn nhật ký",
+    "featureGateTitle": "Tính năng cao cấp",
+    "limitFreeLead": "Bạn đã dùng hết 5 trang miễn phí.",
+    "limitPremiumLead": "Tháng này bạn còn viết được {{n}} trang.",
+    "limitPremiumReachedLead": "Đã đạt giới hạn 50 trang tháng này. Tháng sau viết tiếp được.",
+    "featureGateLead": "Tìm kiếm và xuất cần đăng ký. Đăng ký để tìm kiếm, xuất và viết tối đa 50 trang/tháng.",
+    "premiumBenefits": "Cao cấp: tìm kiếm, xuất, {{n}} trang/tháng",
+    "subscribeCta": "Nâng cấp PRO",
+    "appOnly": "Đăng ký trong ứng dụng",
+    "restore": "Khôi phục giao dịch",
+    "freeGrant": "Miễn phí: {{n}} trang nhật ký",
+    "freeRemaining": "Miễn phí còn lại: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Bắt đầu vẽ?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Vẽ"
+  },
   "write": {
     "title": {
       "new": "Nhật ký hôm nay",
@@ -357,7 +441,10 @@
       "exBad": "Yếu: Hôm nay tôi cảm thấy vui",
       "sceneUnderstood": "Cảnh AI hiểu: {{scene}}",
       "characterAria": "Nhân vật cho tranh AI",
-      "characterTitle": "Nhân vật này sẽ thành nhân vật chính"
+      "characterTitle": "Nhân vật này sẽ thành nhân vật chính",
+      "rewardTitle": "Xem quảng cáo để vẽ AI 1 lần",
+      "rewardLead": "Xem hết quảng cáo để mở khóa một lần vẽ AI.",
+      "rewardCta": "Xem quảng cáo"
     },
     "confirm": {
       "replaceTitle": "Tranh AI",
@@ -371,7 +458,12 @@
       "aiHttp": "Vẽ thất bại: HTTP {{status}}",
       "aiNoImage": "Không có ảnh trong phản hồi backend",
       "aiUrl": "Không tải được URL ảnh",
-      "aiConvert": "Chuyển đổi ảnh thất bại"
+      "aiConvert": "Chuyển đổi ảnh thất bại",
+      "saveImage": "Không xuất được bức vẽ",
+      "empty": "Thêm tiêu đề, nội dung hoặc bức vẽ",
+      "adNotCompleted": "Xem hết quảng cáo để nhận một lần vẽ AI",
+      "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
+      "aiDailyLimit": "Chưa đăng ký: tối đa 2 lần vẽ AI mỗi ngày"
     },
     "coach": {
       "character": "Chọn nhân vật để AI vẽ đúng bạn",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "Chia sẻ ảnh trong chat",
+    "sns": "Chia sẻ lên mạng xã hội",
+    "snsIcon": "MXH",
+    "snsDesc": "Chọn Instagram, KakaoTalk và hơn thế",
     "rooms": "Phòng bạn bè",
     "roomsIcon": "Phòng",
     "roomsDesc": "Đăng vào các phòng bạn đang tham gia",
     "roomsHint": "Chọn nhiều phòng để chia sẻ cùng lúc",
     "roomsLoading": "Đang tải phòng…",
     "roomsEmpty": "Chưa có phòng. Tạo hoặc tham gia tại Menu → Phòng bạn bè.",
+    "pagePrev": "Trước",
+    "pageNext": "Sau",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "Đã chia sẻ",
     "submit": "Chia sẻ",
     "sharing": "Đang chia sẻ…",
+    "goToRoomsAsk": "Đến danh sách phòng?",
+    "goToRooms": "Mở phòng",
     "pcHint": "Web máy tính không chia sẻ thẳng sang app. Ảnh đã tải xuống—mở trên điện thoại hoặc tải lên trong app.",
     "ok": {
       "oneRoom": "Đã chia sẻ tới “{{name}}”",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "Chọn Instagram trong bảng chia sẻ!",
-      "kakao": "Chọn KakaoTalk trong bảng chia sẻ!"
+      "kakao": "Chọn KakaoTalk trong bảng chia sẻ!",
+      "sns": "Chọn Instagram, KakaoTalk hoặc ứng dụng khác trong bảng chia sẻ!"
     },
     "saved": {
       "instagram": "Đã lưu ảnh. Tải lên Instagram Stories!",
-      "kakao": "Đã lưu ảnh. Gửi qua KakaoTalk!"
+      "kakao": "Đã lưu ảnh. Gửi qua KakaoTalk!",
+      "sns": "Đã lưu ảnh. Mở Instagram, KakaoTalk… để đăng!"
     },
     "native": {
       "instagram": "Đang chia sẻ nhật ký lên Instagram Stories",
-      "kakao": "Đang chia sẻ nhật ký qua KakaoTalk"
+      "kakao": "Đang chia sẻ nhật ký qua KakaoTalk",
+      "sns": "Đang chia sẻ nhật ký của tôi"
     },
     "err": {
       "roomShare": "Không chia sẻ được vào phòng",
@@ -494,6 +598,10 @@
     "count": "{{n}} nhật ký",
     "empty": "Không có nhật ký trong kỳ này",
     "pdf": "Lưu PDF",
+    "sharePdf": "Chia sẻ PDF",
+    "shareReady": "Chia sẻ ngay",
+    "shareHint": "PDF đã sẵn sàng. Chạm lại để chia sẻ hoặc lưu.",
+    "shareText": "Sổ nhật ký PageBy",
     "saving": "Đang lưu…",
     "openBook": "Xem sổ nhật ký",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "Không có canvas",
       "noContext": "Không mở được ngữ cảnh canvas",
-      "imageLoad": "Tải ảnh thất bại"
+      "imageLoad": "Tải ảnh thất bại",
+      "tainted": "Không lưu được bức vẽ do bảo mật trình duyệt. Tạo lại ảnh AI hoặc làm mới rồi thử",
+      "export": "Không xuất được bức vẽ"
     },
     "penKindAria": "Loại bút",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "Bút dạ quang"
     },
     "stickerRotate": "Xoay",
+    "removeOverlay": "Gỡ",
     "undo": "Hoàn tác"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "Chọn ngày",
     "prevMonth": "Tháng trước",
     "nextMonth": "Tháng sau",
+    "prevYear": "Năm trước",
+    "nextYear": "Năm sau",
+    "prevYears": "Các năm trước",
+    "nextYears": "Các năm sau",
+    "pickYearMonthAria": "Chọn năm và tháng",
+    "done": "Xong",
+    "pickYearAria": "Chọn năm",
+    "monthsAria": "Tháng",
+    "yearsAria": "Năm",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "Th1",
+      "2": "Th2",
+      "3": "Th3",
+      "4": "Th4",
+      "5": "Th5",
+      "6": "Th6",
+      "7": "Th7",
+      "8": "Th8",
+      "9": "Th9",
+      "10": "Th10",
+      "11": "Th11",
+      "12": "Th12"
+    },
+    "thisMonth": "Tháng này",
     "goToday": "Về hôm nay",
     "displayLabel": "Trang chính",
     "displayAria": "Cách xem trang chính",

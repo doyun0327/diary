@@ -7,6 +7,11 @@
     "loading": "読み込み中…",
     "anonymous": "匿名",
     "back": "戻る",
+    "pagerAria": "ページ送り",
+    "pagerPagesAria": "ページ番号",
+    "pagePrevAria": "前のページ",
+    "pageNextAria": "次のページ",
+    "pageGoAria": "{{page}}ページ",
     "processing": "処理中…",
     "requestFailed": "リクエストに失敗しました（{{status}}）",
     "serverUnreachable": "サーバーに接続できません。Spring（8080）が起動しているか確認してください。",
@@ -156,24 +161,6 @@
     "changePhotoAria": "プロフィール写真を変更",
     "pickPhoto": "写真を選ぶ",
     "editPhoto": "編集",
-    "removePhoto": "削除",
-    "nameLabel": "ニックネーム",
-    "nameHint": "フレンドルームに表示される名前",
-    "namePlaceholder": "ニックネームを入力",
-    "save": "保存",
-    "ok": {
-      "nameSaved": "ニックネームを保存しました",
-      "photoSaved": "プロフィール写真を保存しました",
-      "photoRemoved": "プロフィール写真を削除しました"
-    },
-    "err": {
-      "nameRequired": "ニックネームを入力してください",
-      "imageOnly": "画像ファイルのみ選択できます",
-      "photoSave": "写真を保存できませんでした",
-      "photoRead": "写真を読み取れませんでした",
-      "photoProcess": "写真を処理できませんでした",
-      "photoLoad": "写真を読み込めませんでした"
-    },
     "useAccountPhoto": "アカウントの写真を使う",
     "replacePhoto": {
       "title": "Googleの写真に替えますか？",
@@ -186,7 +173,16 @@
       "lead": "クラウドの日記・ルーム活動が削除され、ログインが解除されます。この端末のローカル日記は残ります。",
       "confirm": "退会する"
     },
+    "removePhoto": "削除",
+    "nameLabel": "ニックネーム",
+    "nameHint": "フレンドルームに表示される名前",
     "nameHintLoggedIn": "アカウント名が入っています。アプリでいつでも変更できます",
+    "namePlaceholder": "ニックネームを入力",
+    "save": "保存",
+    "profile": {
+      "label": "この端末のプロフィール",
+      "hint": "ログインとは別です。名前と写真はこのアプリ内だけで使います。"
+    },
     "sync": {
       "label": "クラウド同期",
       "hint": "ログインすると日記がアカウントに保存され、別の端末でも同じアカウントで復元できます。",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "いまは画面のみです。本番のログイン・バックアップは準備中です。",
+      "autoNote": "日記の保存・削除は自動で同期されます。",
       "okSignedIn": "ログインしました（プレビュー）",
+      "okSignedInSynced": "ログインして日記を同期しました",
       "okSignedOut": "ログアウトしました",
       "okSynced": "同期しました（プレビュー）",
       "errSignIn": "ログインできませんでした",
+      "errGoogleNative": "Googleログインに失敗しました",
+      "errGoogleDeveloper": "Google CloudのAndroid OAuthクライアントにこのアプリのSHA-1を追加してから再試行してください",
+      "errGooglePlay": "このエミュレータにはGoogle PlayとGoogleアカウントが必要です",
+      "errGoogleNetwork": "ネットワークを確認して再試行してください",
+      "errGoogleToken": "Googleトークンを取得できませんでした。SHA-1とWebクライアントIDを確認してください",
       "errSync": "同期できませんでした",
       "noAccountPhoto": "このアカウントにプロフィール写真がありません"
+    },
+    "ok": {
+      "nameSaved": "ニックネームを保存しました",
+      "photoSaved": "プロフィール写真を保存しました",
+      "photoRemoved": "プロフィール写真を削除しました"
+    },
+    "err": {
+      "nameRequired": "ニックネームを入力してください",
+      "imageOnly": "画像ファイルのみ選択できます",
+      "photoSave": "写真を保存できませんでした",
+      "photoRead": "写真を読み取れませんでした",
+      "photoProcess": "写真を処理できませんでした",
+      "photoLoad": "写真を読み込めませんでした"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "コピーしました",
     "copyInviteTitle": "友だちを招待",
     "copyInviteAria": "招待コードを共有",
+    "leave": "退出",
+    "leaveAria": "ルームを退出",
+    "leaving": "退出中…",
+    "leaveConfirmTitle": "このルームを退出しますか？",
+    "leaveConfirmLead": "「{{name}}」から退出します。",
+    "delete": "ルーム削除",
+    "deleteAria": "ルーム削除",
+    "deleting": "削除中…",
+    "deleteConfirmTitle": "このルームを削除しますか？",
+    "deleteConfirmLead": "「{{name}}」を削除します。全員が退出し、共有日記も消えます。",
     "createSheetAria": "ルームを作成",
     "createHint": "ルーム名を決めると、6桁の招待コードが自動で作成されます。",
     "coverLabel": "ルームカバー",
     "coverFromGallery": "ギャラリー",
+    "changeCover": "カバー変更",
+    "changeCoverAria": "ルームカバーを変更",
+    "changeCoverSheetAria": "ルームカバーを変更",
+    "changeCoverHint": "「{{name}}」のカバーを更新します。",
+    "changeCoverSave": "保存",
+    "changingCover": "保存中…",
     "covers": {
       "kraft": "クラフト",
       "mint": "ミント",
@@ -267,18 +299,30 @@
     "joinSubmit": "参加",
     "noNickname": "ニックネーム未設定",
     "backToList": "← 一覧",
+    "backToListAria": "一覧へ",
     "refresh": "更新",
     "sharedDiaries": "共有された日記",
     "sharedEmpty": "まだ共有された日記はありません。\n日記詳細の「ルームに共有」を試してみてください。",
+    "sharePrompt": "日記を共有しますか？",
+    "goHome": "ホームへ",
+    "openPostAria": "{{author}}の日記「{{title}}」を開く",
     "coach": {
       "comment": "コメントを残してみてね！"
     },
     "backToRoom": "← ルームへ",
+    "backToRoomAria": "ルームへ",
     "sharedDiary": "共有日記",
     "comments": "コメント（{{n}}）",
     "commentPlaceholder": "コメントを書く",
     "commentSubmit": "投稿",
     "alert": {
+      "createdTitle": "ルームを作成しました！",
+      "createdLead": "この招待コードを友達に共有してください。",
+      "copyCode": "コードをコピー",
+      "share": "共有",
+      "shareTitle": "PageByルーム招待",
+      "shareText": "絵日記、一緒にやってみない？ 🖍️\n毎日ひとつ描こう！\n\n招待コード: {{code}}",
+      "enterRoom": "ルームに入る",
       "created": "ルームを作成しました！\n\n招待コード：{{code}}\n\nこのコードを友達に共有してください。"
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "先にメニュー → アカウントでニックネームを設定してください",
+      "needProfile": "友達と共有するには名前と写真が必要です",
+      "guestAuth": "フレンドルームに接続できませんでした。しばらくして再試行してください",
       "list": "ルーム一覧を読み込めませんでした",
       "nameRequired": "ルーム名を入力してください",
       "create": "ルームを作成できませんでした",
       "codeRequired": "6桁の招待コードを入力してください",
       "join": "ルームに参加できませんでした",
+      "leave": "ルームを退出できませんでした",
+      "deleteRoom": "ルームを削除できませんでした",
       "copy": "招待コードをコピーできませんでした",
       "load": "ルームを読み込めませんでした",
       "loadPost": "投稿を読み込めませんでした",
       "comment": "コメントを投稿できませんでした",
-      "delete": "削除に失敗しました"
+      "delete": "削除に失敗しました",
+      "coverImage": "カバー写真を読み込めませんでした",
+      "coverUpdate": "カバーを更新できませんでした"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "自己紹介",
+    "lead": "名前はあとで変更できます。写真を省略すると、名前の頭文字がプロフィールになります。",
+    "pickPhoto": "写真を選ぶ",
+    "pickPhotoAria": "プロフィール写真を選ぶ",
+    "nameLabel": "名前",
+    "namePlaceholder": "友達に見える名前（任意）",
+    "start": "次へ",
+    "errName": "名前を入力してください",
+    "errNeedPhoto": "プロフィール写真を追加してください",
+    "errImage": "画像ファイルのみ",
+    "errPhoto": "写真を処理できませんでした"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "{{date}} の絵"
     }
   },
+  "subscription": {
+    "limitTitle": "日記の作成上限",
+    "featureGateTitle": "プレミアム機能",
+    "limitFreeLead": "無料5枚を使い切りました。",
+    "limitPremiumLead": "今月あと{{n}}枚書けます。",
+    "limitPremiumReachedLead": "今月の作成上限（50枚）に達しました。来月また書けます。",
+    "featureGateLead": "検索・エクスポートは登録後に利用できます。登録すると検索・エクスポートと月50枚の作成ができます。",
+    "premiumBenefits": "プレミアム：検索、エクスポート、月{{n}}枚",
+    "subscribeCta": "PROにアップグレード",
+    "appOnly": "アプリで登録",
+    "restore": "購入を復元",
+    "freeGrant": "無料：日記{{n}}枚",
+    "freeRemaining": "無料残り：{{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "描き始めますか？",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "描く"
+  },
   "write": {
     "title": {
       "new": "今日の日記",
@@ -357,7 +441,10 @@
       "exBad": "弱い例：今日は気分がよかった",
       "sceneUnderstood": "AIが理解したシーン：{{scene}}",
       "characterAria": "AI絵用のキャラクター",
-      "characterTitle": "このキャラクターが主人公になります"
+      "characterTitle": "このキャラクターが主人公になります",
+      "rewardTitle": "広告を見てAI描画1回",
+      "rewardLead": "広告を最後まで見るとAI描画が1回使えます。",
+      "rewardCta": "広告を見る"
     },
     "confirm": {
       "replaceTitle": "AIの絵",
@@ -371,7 +458,12 @@
       "aiHttp": "描画失敗：HTTP {{status}}",
       "aiNoImage": "バックエンド応答に画像がありません",
       "aiUrl": "画像URLを読み込めませんでした",
-      "aiConvert": "画像変換に失敗しました"
+      "aiConvert": "画像変換に失敗しました",
+      "saveImage": "絵を書き出せませんでした",
+      "empty": "タイトル・本文・絵のいずれかを入力してください",
+      "adNotCompleted": "広告を最後まで見てAI描画を受け取ってください",
+      "adAppOnly": "広告はアプリでのみ利用できます",
+      "aiDailyLimit": "非登録者はAI描画を1日2回まで"
     },
     "coach": {
       "character": "自分を決めるとAIがその姿で描きます",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "チャットで写真を共有",
+    "sns": "SNSに共有",
+    "snsIcon": "SNS",
+    "snsDesc": "Instagramやカカオトークなどを選べます",
     "rooms": "フレンドルーム",
     "roomsIcon": "ルーム",
     "roomsDesc": "参加中のルームに投稿",
     "roomsHint": "複数のルームを一度に選べます",
     "roomsLoading": "ルームを読み込み中…",
     "roomsEmpty": "まだルームがありません。メニュー → フレンドルームで作成または参加してください。",
+    "pagePrev": "前へ",
+    "pageNext": "次へ",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "共有済み",
     "submit": "共有",
     "sharing": "共有中…",
+    "goToRoomsAsk": "ルーム一覧へ移動しますか？",
+    "goToRooms": "ルームを開く",
     "pcHint": "PCのWebからはアプリへ直接共有できません。画像をダウンロードしたので、スマホで開くかアプリでアップロードしてください。",
     "ok": {
       "oneRoom": "「{{name}}」に共有しました",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "共有シートで Instagram を選んでください！",
-      "kakao": "共有シートで KakaoTalk を選んでください！"
+      "kakao": "共有シートで KakaoTalk を選んでください！",
+      "sns": "共有シートでInstagramやカカオトークなどを選んでください！"
     },
     "saved": {
       "instagram": "画像を保存しました。Instagram Storiesにアップロードしてください！",
-      "kakao": "画像を保存しました。KakaoTalkで送信してください！"
+      "kakao": "画像を保存しました。KakaoTalkで送信してください！",
+      "sns": "画像を保存しました。Instagramやカカオトークなどで投稿してください！"
     },
     "native": {
       "instagram": "日記を Instagram Stories に共有",
-      "kakao": "日記を KakaoTalk で共有"
+      "kakao": "日記を KakaoTalk で共有",
+      "sns": "日記を共有しています"
     },
     "err": {
       "roomShare": "ルームに共有できませんでした",
@@ -494,6 +598,10 @@
     "count": "{{n}} 件の日記",
     "empty": "この期間に日記がありません",
     "pdf": "PDFを保存",
+    "sharePdf": "PDFを共有",
+    "shareReady": "今すぐ共有",
+    "shareHint": "PDFの準備ができました。もう一度タップして共有または保存。",
+    "shareText": "PageBy日記帳",
     "saving": "保存中…",
     "openBook": "日記帳を見る",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "キャンバスがありません",
       "noContext": "キャンバスコンテキストを開けません",
-      "imageLoad": "画像の読み込みに失敗しました"
+      "imageLoad": "画像の読み込みに失敗しました",
+      "tainted": "ブラウザのセキュリティによりこの絵は保存できません。AI画像を再生成するか、更新して再試行してください",
+      "export": "絵を書き出せませんでした"
     },
     "penKindAria": "ペンの種類",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "蛍光ペン"
     },
     "stickerRotate": "回転",
+    "removeOverlay": "削除",
     "undo": "戻る"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "日付を選ぶ",
     "prevMonth": "前月",
     "nextMonth": "翌月",
+    "prevYear": "前年",
+    "nextYear": "翌年",
+    "prevYears": "前の年へ",
+    "nextYears": "後の年へ",
+    "pickYearMonthAria": "年月を選択",
+    "done": "完了",
+    "pickYearAria": "年を選択",
+    "monthsAria": "月",
+    "yearsAria": "年",
+    "yearSuffix": "年",
+    "monthShort": "{{m}}月",
+    "months": {
+      "1": "1月",
+      "2": "2月",
+      "3": "3月",
+      "4": "4月",
+      "5": "5月",
+      "6": "6月",
+      "7": "7月",
+      "8": "8月",
+      "9": "9月",
+      "10": "10月",
+      "11": "11月",
+      "12": "12月"
+    },
+    "thisMonth": "今月",
     "goToday": "今日へ",
     "displayLabel": "ホーム表示",
     "displayAria": "ホームの表示",

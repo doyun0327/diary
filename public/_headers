@@ -1,0 +1,10 @@
+# HTML은 항상 재검증 (친구방 AppBar 등 웹 배포가 WebView에 바로 닿게)
+/
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+# 해시 붙은 번들은 장기 캐시
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

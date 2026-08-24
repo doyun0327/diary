@@ -7,6 +7,11 @@
     "loading": "加载中…",
     "anonymous": "匿名",
     "back": "返回",
+    "pagerAria": "分页",
+    "pagerPagesAria": "页码",
+    "pagePrevAria": "上一页",
+    "pageNextAria": "下一页",
+    "pageGoAria": "第{{page}}页",
     "processing": "处理中…",
     "requestFailed": "请求失败（{{status}}）",
     "serverUnreachable": "无法连接服务器。请确认 Spring（8080）是否在运行。",
@@ -156,24 +161,6 @@
     "changePhotoAria": "更换头像",
     "pickPhoto": "选择照片",
     "editPhoto": "编辑",
-    "removePhoto": "删除",
-    "nameLabel": "昵称",
-    "nameHint": "好友房中显示的名字",
-    "namePlaceholder": "请输入昵称",
-    "save": "保存",
-    "ok": {
-      "nameSaved": "昵称已保存",
-      "photoSaved": "头像已保存",
-      "photoRemoved": "头像已删除"
-    },
-    "err": {
-      "nameRequired": "请输入昵称",
-      "imageOnly": "只能选择图片文件",
-      "photoSave": "无法保存照片",
-      "photoRead": "无法读取照片",
-      "photoProcess": "无法处理照片",
-      "photoLoad": "无法加载照片"
-    },
     "useAccountPhoto": "使用账号照片",
     "replacePhoto": {
       "title": "要换成 Google 照片吗？",
@@ -186,7 +173,16 @@
       "lead": "云端日记与房间活动将被删除并退出登录。本机本地日记会保留。",
       "confirm": "注销"
     },
+    "removePhoto": "删除",
+    "nameLabel": "昵称",
+    "nameHint": "好友房中显示的名字",
     "nameHintLoggedIn": "已填入账号名称，可随时在应用中修改",
+    "namePlaceholder": "请输入昵称",
+    "save": "保存",
+    "profile": {
+      "label": "本机资料",
+      "hint": "与登录账号分开。姓名和头像仅在本应用内使用。"
+    },
     "sync": {
       "label": "云同步",
       "hint": "登录后日记会保存到账号，换手机也能用同一账号恢复。",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "目前仅为界面预览，正式登录与备份即将上线。",
+      "autoNote": "保存或删除日记会自动同步。",
       "okSignedIn": "已登录（预览）",
+      "okSignedInSynced": "已登录并同步日记",
       "okSignedOut": "已退出",
       "okSynced": "已同步（预览）",
       "errSignIn": "无法登录",
+      "errGoogleNative": "Google 登录失败",
+      "errGoogleDeveloper": "请把本应用的 SHA-1 加到 Google Cloud Android OAuth 客户端后再试",
+      "errGooglePlay": "此模拟器需要 Google Play 和 Google 账号",
+      "errGoogleNetwork": "请检查网络后重试",
+      "errGoogleToken": "未获取到 Google令牌。请检查 SHA-1 和 Web 客户端 ID",
       "errSync": "无法同步",
       "noAccountPhoto": "此账号没有头像"
+    },
+    "ok": {
+      "nameSaved": "昵称已保存",
+      "photoSaved": "头像已保存",
+      "photoRemoved": "头像已删除"
+    },
+    "err": {
+      "nameRequired": "请输入昵称",
+      "imageOnly": "只能选择图片文件",
+      "photoSave": "无法保存照片",
+      "photoRead": "无法读取照片",
+      "photoProcess": "无法处理照片",
+      "photoLoad": "无法加载照片"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "已复制",
     "copyInviteTitle": "邀请好友",
     "copyInviteAria": "分享邀请码",
+    "leave": "退出",
+    "leaveAria": "退出房间",
+    "leaving": "正在退出…",
+    "leaveConfirmTitle": "要退出这个房间吗？",
+    "leaveConfirmLead": "将退出「{{name}}」。",
+    "delete": "删除房间",
+    "deleteAria": "删除房间",
+    "deleting": "正在删除…",
+    "deleteConfirmTitle": "要删除这个房间吗？",
+    "deleteConfirmLead": "将删除「{{name}}」。所有人会退出，已分享的日记也会消失。",
     "createSheetAria": "创建房间",
     "createHint": "设置房间名后会自动生成 6 位邀请码。",
     "coverLabel": "房间封面",
     "coverFromGallery": "相册",
+    "changeCover": "更换封面",
+    "changeCoverAria": "更换房间封面",
+    "changeCoverSheetAria": "更换房间封面",
+    "changeCoverHint": "更新「{{name}}」的封面。",
+    "changeCoverSave": "保存",
+    "changingCover": "保存中…",
     "covers": {
       "kraft": "牛皮纸",
       "mint": "薄荷",
@@ -267,18 +299,30 @@
     "joinSubmit": "加入",
     "noNickname": "未设置昵称",
     "backToList": "← 列表",
+    "backToListAria": "返回列表",
     "refresh": "刷新",
     "sharedDiaries": "分享的日记",
     "sharedEmpty": "还没有分享的日记。\n可在日记详情里点「分享到好友房」。",
+    "sharePrompt": "要分享日记吗？",
+    "goHome": "回到主页",
+    "openPostAria": "打开{{author}}的日记{{title}}",
     "coach": {
       "comment": "留言试试吧！"
     },
     "backToRoom": "← 返回房间",
+    "backToRoomAria": "返回房间",
     "sharedDiary": "分享的日记",
     "comments": "评论（{{n}}）",
     "commentPlaceholder": "写评论",
     "commentSubmit": "发送",
     "alert": {
+      "createdTitle": "房间已创建！",
+      "createdLead": "把邀请码分享给朋友吧。",
+      "copyCode": "复制邀请码",
+      "share": "分享",
+      "shareTitle": "PageBy 好友房邀请",
+      "shareText": "要不要一起画图日记？ 🖍️\n我们每天画一张吧！\n\n邀请码：{{code}}",
+      "enterRoom": "进入房间",
       "created": "房间已创建！\n\n邀请码：{{code}}\n\n把这个码分享给朋友吧。"
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "请先到菜单 → 账号设置昵称",
+      "needProfile": "需要姓名和头像才能与朋友分享",
+      "guestAuth": "无法连接好友房，请稍后再试",
       "list": "无法加载房间列表",
       "nameRequired": "请输入房间名",
       "create": "无法创建房间",
       "codeRequired": "请输入 6 位邀请码",
       "join": "无法加入房间",
+      "leave": "无法退出房间",
+      "deleteRoom": "无法删除房间",
       "copy": "无法复制邀请码",
       "load": "无法加载房间",
       "loadPost": "无法加载帖子",
       "comment": "无法发送评论",
-      "delete": "删除失败"
+      "delete": "删除失败",
+      "coverImage": "无法加载封面照片",
+      "coverUpdate": "无法更新封面"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "介绍一下自己",
+    "lead": "名字之后可以改。如果不选照片，会用名字首字母作为头像。",
+    "pickPhoto": "选择照片",
+    "pickPhotoAria": "选择头像",
+    "nameLabel": "名字",
+    "namePlaceholder": "朋友看到的名字（可选）",
+    "start": "下一步",
+    "errName": "请输入名字",
+    "errNeedPhoto": "请添加头像",
+    "errImage": "仅支持图片文件",
+    "errPhoto": "无法处理照片"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "{{date}} 的画"
     }
   },
+  "subscription": {
+    "limitTitle": "日记张数上限",
+    "featureGateTitle": "高级功能",
+    "limitFreeLead": "免费 5 篇已用完。",
+    "limitPremiumLead": "本月还能写 {{n}} 篇。",
+    "limitPremiumReachedLead": "已达到本月上限（50 篇）。下个月可以再写。",
+    "featureGateLead": "搜索和导出需要订阅。订阅后可使用搜索、导出，每月可写 50 篇。",
+    "premiumBenefits": "高级：搜索、导出、每月 {{n}} 篇",
+    "subscribeCta": "升级到 PRO",
+    "appOnly": "请在 App 内订阅",
+    "restore": "恢复购买",
+    "freeGrant": "免费：{{n}} 篇日记",
+    "freeRemaining": "免费剩余：{{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "开始画画？",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "画"
+  },
   "write": {
     "title": {
       "new": "今日日记",
@@ -357,7 +441,10 @@
       "exBad": "较弱：今天心情不错",
       "sceneUnderstood": "AI 理解的场景：{{scene}}",
       "characterAria": "AI 画画用的角色",
-      "characterTitle": "这个角色会成为画中的主角"
+      "characterTitle": "这个角色会成为画中的主角",
+      "rewardTitle": "看广告获得 1 次 AI 绘画",
+      "rewardLead": "完整观看广告可解锁一次 AI 绘画。",
+      "rewardCta": "看广告"
     },
     "confirm": {
       "replaceTitle": "AI 画",
@@ -371,7 +458,12 @@
       "aiHttp": "画画失败：HTTP {{status}}",
       "aiNoImage": "后端响应中没有图片",
       "aiUrl": "无法加载图片链接",
-      "aiConvert": "图片转换失败"
+      "aiConvert": "图片转换失败",
+      "saveImage": "无法导出画作",
+      "empty": "请填写标题、正文或画作",
+      "adNotCompleted": "请看完广告以获得一次 AI 绘画",
+      "adAppOnly": "广告仅在 App 内可用",
+      "aiDailyLimit": "未订阅用户每天最多 2 次 AI 绘画"
     },
     "coach": {
       "character": "设定自己后，AI会按这个样子画画",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "在聊天中分享图片",
+    "sns": "分享到社交",
+    "snsIcon": "社交",
+    "snsDesc": "可选择 Instagram、KakaoTalk 等",
     "rooms": "好友房",
     "roomsIcon": "房间",
     "roomsDesc": "发到你加入的房间",
     "roomsHint": "可一次选择多个房间",
     "roomsLoading": "正在加载房间…",
     "roomsEmpty": "还没有房间。请到菜单 → 好友房创建或加入。",
+    "pagePrev": "上一页",
+    "pageNext": "下一页",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "已分享",
     "submit": "分享",
     "sharing": "分享中…",
+    "goToRoomsAsk": "前往好友房列表？",
+    "goToRooms": "打开好友房",
     "pcHint": "电脑网页无法直接分享到 App。图片已下载，请在手机打开或在 App 中上传。",
     "ok": {
       "oneRoom": "已分享到「{{name}}」",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "请在分享面板中选择 Instagram！",
-      "kakao": "请在分享面板中选择 KakaoTalk！"
+      "kakao": "请在分享面板中选择 KakaoTalk！",
+      "sns": "请在分享面板中选择 Instagram、KakaoTalk 等应用！"
     },
     "saved": {
       "instagram": "图片已保存。请上传到 Instagram Stories！",
-      "kakao": "图片已保存。请在 KakaoTalk 发送！"
+      "kakao": "图片已保存。请在 KakaoTalk 发送！",
+      "sns": "图片已保存。请打开 Instagram、KakaoTalk 等发布！"
     },
     "native": {
       "instagram": "把我的日记分享到 Instagram Stories",
-      "kakao": "通过 KakaoTalk 分享我的日记"
+      "kakao": "通过 KakaoTalk 分享我的日记",
+      "sns": "正在分享我的日记"
     },
     "err": {
       "roomShare": "无法分享到房间",
@@ -494,6 +598,10 @@
     "count": "{{n}} 篇日记",
     "empty": "该期间没有日记",
     "pdf": "保存 PDF",
+    "sharePdf": "分享 PDF",
+    "shareReady": "立即分享",
+    "shareHint": "PDF 已就绪。再点一次即可分享或保存。",
+    "shareText": "PageBy 日记本",
     "saving": "保存中…",
     "openBook": "查看日记本",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "没有画布",
       "noContext": "无法打开画布上下文",
-      "imageLoad": "图片加载失败"
+      "imageLoad": "图片加载失败",
+      "tainted": "因浏览器安全限制无法保存此画作。请重新生成 AI 图，或刷新后重试",
+      "export": "无法导出画作"
     },
     "penKindAria": "笔类型",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "荧光笔"
     },
     "stickerRotate": "旋转",
+    "removeOverlay": "移除",
     "undo": "撤销"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "选择日期",
     "prevMonth": "上个月",
     "nextMonth": "下个月",
+    "prevYear": "上一年",
+    "nextYear": "下一年",
+    "prevYears": "更早年份",
+    "nextYears": "更晚年份",
+    "pickYearMonthAria": "选择年月",
+    "done": "完成",
+    "pickYearAria": "选择年份",
+    "monthsAria": "月份",
+    "yearsAria": "年份",
+    "yearSuffix": "年",
+    "monthShort": "{{m}}月",
+    "months": {
+      "1": "1月",
+      "2": "2月",
+      "3": "3月",
+      "4": "4月",
+      "5": "5月",
+      "6": "6月",
+      "7": "7月",
+      "8": "8月",
+      "9": "9月",
+      "10": "10月",
+      "11": "11月",
+      "12": "12月"
+    },
+    "thisMonth": "本月",
     "goToday": "回到今天",
     "displayLabel": "首页显示",
     "displayAria": "首页显示方式",

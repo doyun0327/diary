@@ -7,6 +7,11 @@
     "loading": "Carregando…",
     "anonymous": "Anônimo",
     "back": "Voltar",
+    "pagerAria": "Paginação",
+    "pagerPagesAria": "Números das páginas",
+    "pagePrevAria": "Página anterior",
+    "pageNextAria": "Próxima página",
+    "pageGoAria": "Página {{page}}",
     "processing": "Processando…",
     "requestFailed": "Falha na solicitação ({{status}})",
     "serverUnreachable": "Não foi possível conectar ao servidor. Verifique se o Spring (8080) está rodando.",
@@ -156,24 +161,6 @@
     "changePhotoAria": "Mudar foto de perfil",
     "pickPhoto": "Escolher foto",
     "editPhoto": "Editar",
-    "removePhoto": "Remover",
-    "nameLabel": "Nome",
-    "nameHint": "Nome mostrado nas salas de amigos",
-    "namePlaceholder": "Digite seu nome",
-    "save": "Salvar",
-    "ok": {
-      "nameSaved": "Nome salvo",
-      "photoSaved": "Foto de perfil salva",
-      "photoRemoved": "Foto de perfil removida"
-    },
-    "err": {
-      "nameRequired": "Digite um nome",
-      "imageOnly": "Só são permitidos arquivos de imagem",
-      "photoSave": "Não foi possível salvar a foto",
-      "photoRead": "Não foi possível ler a foto",
-      "photoProcess": "Não foi possível processar a foto",
-      "photoLoad": "Não foi possível carregar a foto"
-    },
     "useAccountPhoto": "Usar foto da conta",
     "replacePhoto": {
       "title": "Usar a foto do Google?",
@@ -186,7 +173,16 @@
       "lead": "Diários na nuvem e atividade nas salas serão removidos e você sairá. Diários deste aparelho permanecem.",
       "confirm": "Excluir"
     },
+    "removePhoto": "Remover",
+    "nameLabel": "Nome",
+    "nameHint": "Nome mostrado nas salas de amigos",
     "nameHintLoggedIn": "Preenchido da conta — você pode mudar quando quiser",
+    "namePlaceholder": "Digite seu nome",
+    "save": "Salvar",
+    "profile": {
+      "label": "Perfil neste dispositivo",
+      "hint": "Separado do login. Nome e foto só neste app."
+    },
     "sync": {
       "label": "Sincronização na nuvem",
       "hint": "Entre para salvar o diário na conta e restaurar em outro celular.",
@@ -204,12 +200,32 @@
       "providerGoogle": "Google",
       "providerApple": "Apple",
       "mockNote": "Prévia da UI — login e backup reais em breve.",
+      "autoNote": "Salvar ou excluir um diário sincroniza automaticamente.",
       "okSignedIn": "Conectado (prévia)",
+      "okSignedInSynced": "Entrou e sincronizou o diário",
       "okSignedOut": "Desconectado",
       "okSynced": "Sincronizado (prévia)",
       "errSignIn": "Não foi possível entrar",
+      "errGoogleNative": "Falha no login com Google",
+      "errGoogleDeveloper": "Adicione o SHA-1 deste app ao cliente OAuth Android do Google Cloud e tente de novo",
+      "errGooglePlay": "Este emulador precisa do Google Play e de uma conta Google",
+      "errGoogleNetwork": "Verifique a rede e tente de novo",
+      "errGoogleToken": "Não obteve o token do Google. Confira o SHA-1 e o Web Client ID",
       "errSync": "Não foi possível sincronizar",
       "noAccountPhoto": "Esta conta não tem foto de perfil"
+    },
+    "ok": {
+      "nameSaved": "Nome salvo",
+      "photoSaved": "Foto de perfil salva",
+      "photoRemoved": "Foto de perfil removida"
+    },
+    "err": {
+      "nameRequired": "Digite um nome",
+      "imageOnly": "Só são permitidos arquivos de imagem",
+      "photoSave": "Não foi possível salvar a foto",
+      "photoRead": "Não foi possível ler a foto",
+      "photoProcess": "Não foi possível processar a foto",
+      "photoLoad": "Não foi possível carregar a foto"
     }
   },
   "language": {
@@ -244,10 +260,26 @@
     "copied": "Copiado",
     "copyInviteTitle": "Convidar amigos",
     "copyInviteAria": "Compartilhar código de convite",
+    "leave": "Sair",
+    "leaveAria": "Sair da sala",
+    "leaving": "Saindo…",
+    "leaveConfirmTitle": "Sair desta sala?",
+    "leaveConfirmLead": "Você sairá de 「{{name}}」.",
+    "delete": "Excluir sala",
+    "deleteAria": "Excluir sala",
+    "deleting": "Excluindo…",
+    "deleteConfirmTitle": "Excluir esta sala?",
+    "deleteConfirmLead": "「{{name}}」 será excluída. Todos saem e os diários compartilhados somem.",
     "createSheetAria": "Criar sala",
     "createHint": "Defina um nome; um código de 6 dígitos é criado automaticamente.",
     "coverLabel": "Capa da sala",
     "coverFromGallery": "Galeria",
+    "changeCover": "Alterar capa",
+    "changeCoverAria": "Alterar capa da sala",
+    "changeCoverSheetAria": "Alterar capa da sala",
+    "changeCoverHint": "Atualize a capa de 「{{name}}」.",
+    "changeCoverSave": "Salvar",
+    "changingCover": "Salvando…",
     "covers": {
       "kraft": "Kraft",
       "mint": "Menta",
@@ -267,18 +299,30 @@
     "joinSubmit": "Entrar",
     "noNickname": "Sem apelido",
     "backToList": "← Lista",
+    "backToListAria": "Voltar à lista",
     "refresh": "Atualizar",
     "sharedDiaries": "Diários compartilhados",
     "sharedEmpty": "Ainda não há diários compartilhados.\nExperimente “Compartilhar na sala” no seu diário.",
+    "sharePrompt": "Quer compartilhar um diário?",
+    "goHome": "Ir ao início",
+    "openPostAria": "Abrir o diário {{title}} de {{author}}",
     "coach": {
       "comment": "Deixe um comentário!"
     },
     "backToRoom": "← Para a sala",
+    "backToRoomAria": "Voltar à sala",
     "sharedDiary": "Diário compartilhado",
     "comments": "Comentários ({{n}})",
     "commentPlaceholder": "Escreva um comentário",
     "commentSubmit": "Publicar",
     "alert": {
+      "createdTitle": "Sala criada!",
+      "createdLead": "Compartilhe este código de convite com amigos.",
+      "copyCode": "Copiar código",
+      "share": "Compartilhar",
+      "shareTitle": "Convite para sala PageBy",
+      "shareText": "Quer experimentar um diário ilustrado? 🖍️\nVamos desenhar um juntos todo dia!\n\nCódigo: {{code}}",
+      "enterRoom": "Entrar na sala",
       "created": "Sala criada!\n\nCódigo de convite: {{code}}\n\nCompartilhe este código com amigos."
     },
     "confirm": {
@@ -286,17 +330,37 @@
     },
     "err": {
       "needNickname": "Defina seu nome em Menu → Conta primeiro",
+      "needProfile": "Nome e foto são necessários para compartilhar com amigos",
+      "guestAuth": "Não foi possível conectar às salas. Tente de novo em breve",
       "list": "Não foi possível carregar as salas",
       "nameRequired": "Digite um nome para a sala",
       "create": "Não foi possível criar a sala",
       "codeRequired": "Digite um código de 6 dígitos",
       "join": "Não foi possível entrar na sala",
+      "leave": "Não foi possível sair da sala",
+      "deleteRoom": "Não foi possível excluir a sala",
       "copy": "Não foi possível copiar o código",
       "load": "Não foi possível carregar a sala",
       "loadPost": "Não foi possível carregar a postagem",
       "comment": "Não foi possível publicar o comentário",
-      "delete": "Falha ao excluir"
+      "delete": "Falha ao excluir",
+      "coverImage": "Não foi possível carregar a capa",
+      "coverUpdate": "Não foi possível atualizar a capa"
     }
+  },
+  "profileSetup": {
+    "eyebrow": "PageBy",
+    "title": "Apresente-se",
+    "lead": "Você pode mudar o nome depois. Se pular a foto, a inicial do nome vira o perfil.",
+    "pickPhoto": "Escolher foto",
+    "pickPhotoAria": "Escolher foto de perfil",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Nome que os amigos verão (opcional)",
+    "start": "Próximo",
+    "errName": "Digite um nome",
+    "errNeedPhoto": "Adicione uma foto de perfil",
+    "errImage": "Somente arquivos de imagem",
+    "errPhoto": "Não foi possível processar a foto"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -330,6 +394,26 @@
       "imageAlt": "Desenho de {{date}}"
     }
   },
+  "subscription": {
+    "limitTitle": "Limite de diários",
+    "featureGateTitle": "Recurso premium",
+    "limitFreeLead": "Você usou as 5 entradas grátis.",
+    "limitPremiumLead": "Você pode escrever mais {{n}} entradas este mês.",
+    "limitPremiumReachedLead": "Você atingiu o limite de 50 entradas este mês. Poderá escrever de novo no mês que vem.",
+    "featureGateLead": "Busca e exportação exigem assinatura. Com assinatura: busca, exportação e até 50 entradas por mês.",
+    "premiumBenefits": "Premium: busca, exportação, {{n}} entradas por mês",
+    "subscribeCta": "Upgrade para PRO",
+    "appOnly": "Assine no app",
+    "restore": "Restaurar compras",
+    "freeGrant": "Grátis: {{n}} entradas",
+    "freeRemaining": "Grátis restantes: {{n}}"
+  },
+  "quota": {
+    "fraction": "{{used}}/{{limit}}",
+    "drawConfirmTitle": "Começar a desenhar?",
+    "drawConfirmLead": "{{n}}/{{limit}}",
+    "drawConfirmOk": "Desenhar"
+  },
   "write": {
     "title": {
       "new": "Diário de hoje",
@@ -357,7 +441,10 @@
       "exBad": "Fraco: Hoje me senti bem",
       "sceneUnderstood": "Cena que a IA entendeu: {{scene}}",
       "characterAria": "Personagem para desenho IA",
-      "characterTitle": "Este personagem será o protagonista"
+      "characterTitle": "Este personagem será o protagonista",
+      "rewardTitle": "Assista a um anúncio por 1 desenho IA",
+      "rewardLead": "Assista ao anúncio até o fim para liberar um desenho IA.",
+      "rewardCta": "Ver anúncio"
     },
     "confirm": {
       "replaceTitle": "Desenho da IA",
@@ -371,7 +458,12 @@
       "aiHttp": "Falha no desenho: HTTP {{status}}",
       "aiNoImage": "Sem imagem na resposta do backend",
       "aiUrl": "Não foi possível carregar a URL da imagem",
-      "aiConvert": "Falha na conversão da imagem"
+      "aiConvert": "Falha na conversão da imagem",
+      "saveImage": "Não foi possível exportar o desenho",
+      "empty": "Adicione um título, texto ou desenho",
+      "adNotCompleted": "Termine o anúncio para receber um desenho IA",
+      "adAppOnly": "Anúncios só estão disponíveis no app",
+      "aiDailyLimit": "Sem assinatura: até 2 desenhos IA por dia"
     },
     "coach": {
       "character": "Defina você para a IA te desenhar",
@@ -414,14 +506,23 @@
     "kakao": "KakaoTalk",
     "kakaoIcon": "Kakao",
     "kakaoDesc": "Compartilhar foto no chat",
+    "sns": "Compartilhar nas redes",
+    "snsIcon": "Redes",
+    "snsDesc": "Escolha Instagram, KakaoTalk e mais",
     "rooms": "Salas de amigos",
     "roomsIcon": "Sala",
     "roomsDesc": "Postar nas salas em que você está",
     "roomsHint": "Escolha várias salas de uma vez",
     "roomsLoading": "Carregando salas…",
     "roomsEmpty": "Ainda não há salas. Crie ou entre em Menu → Salas de amigos.",
+    "pagePrev": "Ant.",
+    "pageNext": "Próx.",
+    "pageStatus": "{{page}} / {{total}}",
+    "alreadyShared": "Já compartilhado",
     "submit": "Compartilhar",
     "sharing": "Compartilhando…",
+    "goToRoomsAsk": "Ir para a lista de salas?",
+    "goToRooms": "Abrir salas",
     "pcHint": "A web no computador não compartilha direto com apps. Imagem baixada — abra no celular ou envie no app.",
     "ok": {
       "oneRoom": "Compartilhado em “{{name}}”",
@@ -430,15 +531,18 @@
     },
     "pick": {
       "instagram": "Escolha o Instagram na folha de compartilhamento!",
-      "kakao": "Escolha o KakaoTalk na folha de compartilhamento!"
+      "kakao": "Escolha o KakaoTalk na folha de compartilhamento!",
+      "sns": "Escolha Instagram, KakaoTalk ou outro app na folha de compartilhar!"
     },
     "saved": {
       "instagram": "Imagem salva. Envie para o Instagram Stories!",
-      "kakao": "Imagem salva. Envie pelo KakaoTalk!"
+      "kakao": "Imagem salva. Envie pelo KakaoTalk!",
+      "sns": "Imagem salva. Abra no Instagram, KakaoTalk ou outro app para postar!"
     },
     "native": {
       "instagram": "Compartilhando meu diário no Instagram Stories",
-      "kakao": "Compartilhando meu diário pelo KakaoTalk"
+      "kakao": "Compartilhando meu diário pelo KakaoTalk",
+      "sns": "Compartilhando meu diário"
     },
     "err": {
       "roomShare": "Não foi possível compartilhar na sala",
@@ -494,6 +598,10 @@
     "count": "{{n}} diários",
     "empty": "Nenhum diário neste período",
     "pdf": "Salvar PDF",
+    "sharePdf": "Compartilhar PDF",
+    "shareReady": "Compartilhar agora",
+    "shareHint": "O PDF está pronto. Toque de novo para compartilhar ou salvar.",
+    "shareText": "Livro de diários PageBy",
     "saving": "Salvando…",
     "openBook": "Ver livro de diário",
     "err": {
@@ -550,7 +658,9 @@
     "err": {
       "noCanvas": "Sem tela",
       "noContext": "Não foi possível abrir o contexto da tela",
-      "imageLoad": "Falha ao carregar a imagem"
+      "imageLoad": "Falha ao carregar a imagem",
+      "tainted": "Este desenho não pode ser salvo por segurança do navegador. Gere a imagem IA de novo ou atualize e tente",
+      "export": "Não foi possível exportar o desenho"
     },
     "penKindAria": "Tipo de caneta",
     "penKind": {
@@ -561,6 +671,7 @@
       "highlighter": "Marca-texto"
     },
     "stickerRotate": "Girar",
+    "removeOverlay": "Remover",
     "undo": "Desfazer"
   },
   "font": {
@@ -604,6 +715,32 @@
     "dialogAria": "Escolher data",
     "prevMonth": "Mês anterior",
     "nextMonth": "Próximo mês",
+    "prevYear": "Ano anterior",
+    "nextYear": "Próximo ano",
+    "prevYears": "Anos anteriores",
+    "nextYears": "Anos posteriores",
+    "pickYearMonthAria": "Escolher ano e mês",
+    "done": "Concluído",
+    "pickYearAria": "Escolher ano",
+    "monthsAria": "Mês",
+    "yearsAria": "Ano",
+    "yearSuffix": "",
+    "monthShort": "{{m}}",
+    "months": {
+      "1": "Jan",
+      "2": "Fev",
+      "3": "Mar",
+      "4": "Abr",
+      "5": "Mai",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Ago",
+      "9": "Set",
+      "10": "Out",
+      "11": "Nov",
+      "12": "Dez"
+    },
+    "thisMonth": "Este mês",
     "goToday": "Ir para hoje",
     "displayLabel": "Início",
     "displayAria": "Visualização inicial",
