@@ -26,7 +26,7 @@
   min-height: 0;
 }
 
-/* 친구방 목록·방 안·공유 일기: 웹 헤더가 상단에 붙음 */
+/* 친구방 웹 헤더 = Flutter AppBar (toolbar 44px + safe-area) */
 .rooms--hub .rooms__toolbar,
 .rooms--in-room .rooms__toolbar,
 .rooms--post .rooms__toolbar {
@@ -34,10 +34,50 @@
   top: 0;
   z-index: 10;
   box-sizing: border-box;
+  min-height: calc(44px + env(safe-area-inset-top, 0px));
   margin: 0 0 14px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
-  border-bottom: 1px solid var(--color-border-soft);
-  background: var(--color-bg);
+  padding: env(safe-area-inset-top, 0px) 4px 0 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent-text) 12%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-soft) 76%, var(--color-bg) 24%) 0%,
+    color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.rooms--hub .rooms__toolbar h2,
+.rooms--in-room .rooms__toolbar h2,
+.rooms--post .rooms__toolbar h2 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 44px;
+}
+
+.rooms--hub .rooms__back,
+.rooms--in-room .rooms__back,
+.rooms--post .rooms__back {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 0;
+}
+
+.rooms--hub .rooms__toolbar-balance,
+.rooms--in-room .rooms__toolbar-balance,
+.rooms--post .rooms__toolbar-balance {
+  width: 44px;
+  height: 44px;
+}
+
+.rooms--hub .rooms__toolbar > button:not(.rooms__back),
+.rooms--in-room .rooms__toolbar > button:not(.rooms__back),
+.rooms--post .rooms__toolbar > button:not(.rooms__back),
+.rooms--post .rooms__danger {
+  min-height: 44px;
+  padding: 0 8px;
 }
 
 .rooms--hub > :not(.rooms__toolbar):not(.rooms-cover-picker__file):not(.rooms-sheet):not(.app-modal),
