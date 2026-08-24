@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatYearMonth } from '../utils/date';
@@ -239,13 +239,56 @@ function Header({
   onOpenSearch,
 }: HeaderProps) {
   const { t } = useTranslation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const menuCloseTimerRef = useRef<number | null>(null);
+
+  const clearMenuCloseTimer = useCallback(() => {
+    if (menuCloseTimerRef.current != null) {
+      window.clearTimeout(menuCloseTimerRef.current);
+      menuCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const openMenu = useCallback(() => {
+    clearMenuCloseTimer();
+    setMenuClosing(false);
+    setMenuVisible(true);
+  }, [clearMenuCloseTimer]);
+
+  const closeMenu = useCallback(() => {
+    if (!menuVisible || menuClosing) return;
+    clearMenuCloseTimer();
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setMenuVisible(false);
+      setMenuClosing(false);
+      return;
+    }
+
+    setMenuClosing(true);
+    menuCloseTimerRef.current = window.setTimeout(() => {
+      setMenuVisible(false);
+      setMenuClosing(false);
+      menuCloseTimerRef.current = null;
+    }, 360);
+  }, [clearMenuCloseTimer, menuClosing, menuVisible]);
+
+  const finishMenuClose = useCallback(() => {
+    clearMenuCloseTimer();
+    setMenuVisible(false);
+    setMenuClosing(false);
+  }, [clearMenuCloseTimer]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    return () => clearMenuCloseTimer();
+  }, [clearMenuCloseTimer]);
+
+  useEffect(() => {
+    if (!menuVisible) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Escape') closeMenu();
     };
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -254,7 +297,7 @@ function Header({
       document.body.style.overflow = prevOverflow;
       document.removeEventListener('keydown', onKey);
     };
-  }, [menuOpen]);
+  }, [closeMenu, menuVisible]);
 
   useEffect(() => {
     if (!calendarNav) setMonthPickerOpen(false);
@@ -264,21 +307,22 @@ function Header({
     window.diaryHeaderAction = (action, payload) => {
       if (action === 'openMenu') {
         setMonthPickerOpen(false);
-        setMenuOpen((open) => !open);
+        if (menuVisible && !menuClosing) closeMenu();
+        else openMenu();
       }
       if (action === 'openSearch') {
-        setMenuOpen(false);
+        closeMenu();
         setMonthPickerOpen(false);
         onOpenSearch?.();
       }
-      if (action === 'closeMenu') setMenuOpen(false);
+      if (action === 'closeMenu') closeMenu();
       if (action === 'back') {
-        setMenuOpen(false);
+        closeMenu();
         setMonthPickerOpen(false);
         onNativeBack?.();
       }
       if (action === 'save') {
-        setMenuOpen(false);
+        closeMenu();
         setMonthPickerOpen(false);
         onNativeSave?.();
       }
@@ -291,7 +335,7 @@ function Header({
         calendarNav?.onNext();
       }
       if (action === 'openMonthPicker' && calendarNav) {
-        setMenuOpen(false);
+        closeMenu();
         setMonthPickerOpen((open) => !open);
       }
       if (action === 'selectMonth' && calendarNav && payload) {
@@ -305,10 +349,10 @@ function Header({
     return () => {
       delete window.diaryHeaderAction;
     };
-  }, [calendarNav, onNativeBack, onNativeSave, onOpenSearch]);
+  }, [calendarNav, closeMenu, menuClosing, menuVisible, onNativeBack, onNativeSave, onOpenSearch, openMenu]);
 
   const closeAnd = (fn?: () => void) => {
-    setMenuOpen(false);
+    closeMenu();
     setMonthPickerOpen(false);
     fn?.();
   };
@@ -318,11 +362,23 @@ function Header({
     : t('header.accountHintEmpty');
 
   const menu =
-    menuOpen &&
+    menuVisible &&
     createPortal(
-      <div className="header-menu" role="dialog" aria-label={t('header.menu')}>
-        <div className="header-menu__backdrop" onClick={() => setMenuOpen(false)} />
-        <nav className="header-menu__panel">
+      <div
+        className={`header-menu${menuClosing ? ' is-closing' : ''}`}
+        role="dialog"
+        aria-label={t('header.menu')}
+        aria-hidden={menuClosing}
+      >
+        <div className="header-menu__backdrop" onClick={closeMenu} />
+        <nav
+          className="header-menu__panel"
+          onAnimationEnd={(e) => {
+            if (!menuClosing || e.target !== e.currentTarget) return;
+            if (e.animationName !== 'header-menu-out') return;
+            finishMenuClose();
+          }}
+        >
           <ul className="header-menu__list">
             {onOpenAccount && (
               <MenuItem
@@ -464,7 +520,7 @@ function Header({
             aria-label={t('header.search')}
             title={t('header.searchHint')}
             onClick={() => {
-              setMenuOpen(false);
+              closeMenu();
               setMonthPickerOpen(false);
               onOpenSearch();
             }}
@@ -490,7 +546,7 @@ function Header({
           type="button"
           className="header__burger"
           aria-label={t('header.menu')}
-          onClick={() => setMenuOpen(true)}
+          onClick={openMenu}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

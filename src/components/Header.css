@@ -143,7 +143,8 @@
   inset: 0;
   background: var(--color-overlay);
   backdrop-filter: blur(4px);
-  animation: header-menu-fade 0.22s ease;
+  -webkit-backdrop-filter: blur(4px);
+  animation: header-menu-fade 0.34s ease both;
 }
 
 .header-menu__panel {
@@ -153,8 +154,10 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   overflow: auto;
-  padding: calc(12px + env(safe-area-inset-top)) 16px calc(12px + env(safe-area-inset-bottom));
+  /* 앱 AppBar 아래 WebView면 safe-area를 또 더하면 위가 텅 빔 → 최소 여백만 */
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--color-accent-soft) 42%, var(--sheet-bg) 58%) 0%,
@@ -163,8 +166,30 @@
   border-left: 1px solid var(--color-border-soft);
   border-radius: 22px 0 0 22px;
   box-shadow: -12px 0 36px rgba(0, 0, 0, 0.1);
-  animation: header-menu-in 0.3s var(--ease-out);
+  animation: header-menu-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
 }
+
+.header-menu.is-closing .header-menu__backdrop {
+  animation: header-menu-fade-out 0.28s ease both;
+}
+
+.header-menu.is-closing .header-menu__panel {
+  animation: header-menu-out 0.32s cubic-bezier(0.4, 0, 0.8, 0.25) both;
+}
+
+.header-menu.is-closing .header-menu__list li {
+  animation: header-menu-item-out 0.22s ease both;
+}
+
+.header-menu.is-closing .header-menu__list li:nth-child(1) { animation-delay: 0.14s; }
+.header-menu.is-closing .header-menu__list li:nth-child(2) { animation-delay: 0.12s; }
+.header-menu.is-closing .header-menu__list li:nth-child(3) { animation-delay: 0.1s; }
+.header-menu.is-closing .header-menu__list li:nth-child(4) { animation-delay: 0.08s; }
+.header-menu.is-closing .header-menu__list li:nth-child(5) { animation-delay: 0.06s; }
+.header-menu.is-closing .header-menu__list li:nth-child(6) { animation-delay: 0.04s; }
+.header-menu.is-closing .header-menu__list li:nth-child(7) { animation-delay: 0.02s; }
+.header-menu.is-closing .header-menu__list li:nth-child(8) { animation-delay: 0s; }
 
 .header-menu__brand-title {
   margin: 0;
@@ -214,32 +239,31 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-height: 0;
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .header-menu__list li {
-  flex: 1 1 0;
-  display: flex;
-  min-height: 52px;
-  animation: header-menu-item 0.32s var(--ease-out) both;
+  flex: 0 0 auto;
+  animation: header-menu-item 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.header-menu__list li:nth-child(1) { animation-delay: 0.03s; }
-.header-menu__list li:nth-child(2) { animation-delay: 0.06s; }
-.header-menu__list li:nth-child(3) { animation-delay: 0.09s; }
-.header-menu__list li:nth-child(4) { animation-delay: 0.12s; }
+.header-menu__list li:nth-child(1) { animation-delay: 0.1s; }
+.header-menu__list li:nth-child(2) { animation-delay: 0.14s; }
+.header-menu__list li:nth-child(3) { animation-delay: 0.18s; }
+.header-menu__list li:nth-child(4) { animation-delay: 0.22s; }
+.header-menu__list li:nth-child(5) { animation-delay: 0.26s; }
+.header-menu__list li:nth-child(6) { animation-delay: 0.3s; }
+.header-menu__list li:nth-child(7) { animation-delay: 0.34s; }
+.header-menu__list li:nth-child(8) { animation-delay: 0.38s; }
 
 .header-menu__item {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
   width: 100%;
-  min-height: 52px;
   padding: 12px;
   border: 1px solid var(--color-border-soft);
   border-radius: 16px;
@@ -371,23 +395,72 @@
 }
 
 @keyframes header-menu-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes header-menu-in {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    opacity: 0.72;
+    transform: translateX(105%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes header-menu-item {
   from {
     opacity: 0;
-    transform: translateX(8px);
+    transform: translate3d(18px, 6px, 0) scale(0.97);
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes header-menu-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes header-menu-out {
+  from {
+    opacity: 1;
     transform: translateX(0);
+  }
+  to {
+    opacity: 0.6;
+    transform: translateX(105%);
+  }
+}
+
+@keyframes header-menu-item-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(12px, 4px, 0) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-menu__backdrop,
+  .header-menu__panel,
+  .header-menu__list li {
+    animation: none;
   }
 }
 
