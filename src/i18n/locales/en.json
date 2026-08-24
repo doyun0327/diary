@@ -446,6 +446,10 @@
       "rewardLead": "Watch the ad to the end to unlock one AI drawing.",
       "rewardCta": "Watch ad"
     },
+    "reward": {
+      "saveTitle": "Watch an ad to save 1 diary",
+      "saveLead": "You've used your free diaries. Watch an ad to save one more."
+    },
     "confirm": {
       "replaceTitle": "AI drawing",
       "replaceWithAi": "Replace the canvas with the AI drawing?",
@@ -464,6 +468,7 @@
       "saveImage": "Couldn't export the drawing",
       "empty": "Add a title, text, or drawing",
       "adNotCompleted": "Finish the ad to get one AI drawing",
+      "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
       "aiDailyLimit": "Non-subscribers can create up to 2 AI drawings per day"
     },

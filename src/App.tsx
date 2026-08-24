@@ -496,7 +496,8 @@ function App() {
 
   const handleNewWrite = () => {
     const status = getDiaryAccessState(entries.length);
-    if (!status.canCreate) {
+    // 프리미엄 월 한도만 작성 진입에서 막음. 무료 한도 소진 후에도 그림 일기는 열 수 있음.
+    if (status.isPremiumActive && !status.canCreate) {
       setSubscriptionModal("write");
       return;
     }
@@ -546,23 +547,34 @@ function App() {
 
   useEffect(() => {
     const syncNativeHeader = () => {
-      if (!isFlutterApp()) return;
       const isWrite = page === "write";
       const isRoomsHub = page === "rooms";
-      /** 친구방 전체(목록·방·일기)는 웹 툴바 사용 → Flutter AppBar 숨김 */
+      /** 친구방·상세처럼 웹 자체 툴바를 쓰는 화면 → Flutter AppBar 숨김 */
       const hideNativeChrome =
         page === "detail" ||
         page === "rooms" ||
         page === "room" ||
         page === "room-post";
+
+      // Flutter가 isFlutterApp()/채널 타이밍과 무관하게 읽을 수 있게 항상 기록
+      try {
+        window.__diaryHideNativeChrome = hideNativeChrome;
+      } catch {
+        // ignore
+      }
+
+      const visible =
+        !needsProfileSetup && !needsAppIntro && !hideNativeChrome;
+
+      // 채널만 있으면 전송 (isFlutterApp 게이트 제거 — 플래그 미설정 시에도 숨김 반영)
       postDiaryNative({
         type: "headerState",
-        visible: !needsProfileSetup && !needsAppIntro && !hideNativeChrome,
+        visible,
         showCalendar: page === "home",
         showBack: isWrite,
         showSave: isWrite,
-        showMenu: !isWrite && !isRoomsHub,
-        showSearch: !isWrite && !isRoomsHub,
+        showMenu: !isWrite && !isRoomsHub && visible,
+        showSearch: !isWrite && !isRoomsHub && visible,
         year: calYear,
         month: calMonth,
         label:

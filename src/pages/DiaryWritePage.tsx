@@ -24,11 +24,13 @@ import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferred
 import {
   AI_REWARD_AD_ENABLED,
   consumeAiDrawCredit,
+  consumeBonusDiarySlotIfNeeded,
   consumeFreeAiDrawChance,
   getAiDrawCredits,
   getDiaryAccessState,
   getRemainingFreeAiDrawsToday,
   grantAiDrawCredits,
+  grantBonusDiarySlots,
 } from '../utils/diaryAccess';
 import {
   isAiCoachSeen,
@@ -65,7 +67,7 @@ interface DiaryWritePageProps {
   onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onOpenCharacter: () => void;
-  /** 작성 한도 초과 시 구독 모달 */
+  /** 작성 한도 초과 시 구독 모달 (프리미엄 월 한도 등) */
   onOpenWriteLimitModal?: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean) => void;
@@ -109,6 +111,8 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
+  const [rewardPromptKind, setRewardPromptKind] = useState<'ai' | 'write'>('ai');
+  const pendingSaveAfterAdRef = useRef(false);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
@@ -254,20 +258,11 @@ function DiaryWritePage({
     formRef.current?.requestSubmit();
   };
 
-  const ensureAiDrawAllowed = () => {
-    if (isEdit) return true;
-    const status = getDiaryAccessState(entriesCount);
-    if (status.canCreate) return true;
-    onOpenWriteLimitModal?.();
-    return false;
-  };
-
   const handleAiDraw = () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    if (!ensureAiDrawAllowed()) return;
     if (canvasRef.current?.hasContent()) {
       setReplaceConfirmOpen(true);
       return;
@@ -275,6 +270,7 @@ function DiaryWritePage({
     if (AI_REWARD_AD_ENABLED) {
       const access = getDiaryAccessState();
       if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
+        setRewardPromptKind('ai');
         setRewardPromptOpen(true);
         return;
       }
@@ -284,7 +280,6 @@ function DiaryWritePage({
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
-    if (!ensureAiDrawAllowed()) return;
     if (AI_REWARD_AD_ENABLED) {
       const access = getDiaryAccessState();
       if (!access.isPremiumActive) {
@@ -293,6 +288,7 @@ function DiaryWritePage({
           return;
         }
         if (!consumeAiDrawCredit()) {
+          setRewardPromptKind('ai');
           setRewardPromptOpen(true);
           return;
         }
@@ -327,7 +323,8 @@ function DiaryWritePage({
       setAiError(t('write.err.adAppOnly'));
       return;
     }
-    if (getRemainingFreeAiDrawsToday() <= 0) {
+    const kind = rewardPromptKind;
+    if (kind === 'ai' && getRemainingFreeAiDrawsToday() <= 0) {
       setRewardPromptOpen(false);
       setAiError(t('write.err.aiDailyLimit'));
       return;
@@ -336,7 +333,17 @@ function DiaryWritePage({
     setAiError(null);
     const ok = await requestAiRewardedAd();
     if (!ok) {
-      setAiError(t('write.err.adNotCompleted'));
+      setAiError(
+        kind === 'write'
+          ? t('write.err.adNotCompletedWrite')
+          : t('write.err.adNotCompleted'),
+      );
+      return;
+    }
+    if (kind === 'write') {
+      grantBonusDiarySlots(1);
+      pendingSaveAfterAdRef.current = false;
+      formRef.current?.requestSubmit();
       return;
     }
     grantAiDrawCredits(1);
@@ -356,6 +363,23 @@ function DiaryWritePage({
       setAiError(t('write.err.empty'));
       return;
     }
+
+    if (!isEdit) {
+      const status = getDiaryAccessState(entriesCount);
+      if (!status.canCreate) {
+        if (status.isPremiumActive) {
+          onOpenWriteLimitModal?.();
+          return;
+        }
+        // 무료 한도 소진 → 광고로 1편 저장 해금
+        setRewardPromptKind('write');
+        setRewardPromptOpen(true);
+        pendingSaveAfterAdRef.current = true;
+        return;
+      }
+      consumeBonusDiarySlotIfNeeded(entriesCount);
+    }
+
     setAiError(null);
     clearWriteDraft();
     onSave({
@@ -647,14 +671,26 @@ function DiaryWritePage({
       )}
       {rewardPromptOpen && (
         <AppModal
-          title={t('write.ai.rewardTitle')}
-          lead={t('write.ai.rewardLead')}
-          onDismiss={() => setRewardPromptOpen(false)}
+          title={
+            rewardPromptKind === 'write'
+              ? t('write.reward.saveTitle')
+              : t('write.ai.rewardTitle')
+          }
+          lead={
+            rewardPromptKind === 'write'
+              ? t('write.reward.saveLead')
+              : t('write.ai.rewardLead')
+          }
+          onDismiss={() => {
+            setRewardPromptOpen(false);
+            pendingSaveAfterAdRef.current = false;
+          }}
           showClose={false}
           closeAriaLabel={t('common.close')}
           secondaryLabel={t('subscription.subscribeCta')}
           onSecondary={() => {
             setRewardPromptOpen(false);
+            pendingSaveAfterAdRef.current = false;
             requestSubscriptionPurchase();
           }}
           primaryLabel={t('write.ai.rewardCta')}

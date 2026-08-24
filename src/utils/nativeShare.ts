@@ -2,6 +2,8 @@ declare global {
   interface Window {
     DiaryNative?: { postMessage: (message: string) => void };
     __DIARY_FLUTTER__?: boolean;
+    /** true면 Flutter AppBar를 숨겨야 함 (친구방·상세 등) */
+    __diaryHideNativeChrome?: boolean;
     __onDiaryGoogleIdToken?: (idToken: string) => void;
     __onDiaryGoogleSignInError?: (reason: string) => void;
     diaryGoBack?: () => boolean;

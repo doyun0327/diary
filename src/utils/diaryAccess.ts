@@ -32,6 +32,8 @@ type AccessState = {
   aiDrawCredits: number;
   aiCreditDayKey: string | null;
   aiDrawUsedToday: number;
+  /** 광고로 받은 추가 일기 저장 슬롯 (무료 한도 소진 후) */
+  bonusDiarySlots: number;
 };
 
 export type DiaryAccessStatus = {
@@ -63,6 +65,7 @@ function loadAccessState(): AccessState {
         aiDrawCredits: 0,
         aiCreditDayKey: getDayKey(),
         aiDrawUsedToday: 0,
+        bonusDiarySlots: 0,
       };
     }
 
@@ -81,6 +84,7 @@ function loadAccessState(): AccessState {
           ? parsed.aiCreditDayKey
           : getDayKey(),
       aiDrawUsedToday: Math.max(0, Number(parsed.aiDrawUsedToday ?? 0)),
+      bonusDiarySlots: Math.max(0, Number(parsed.bonusDiarySlots ?? 0)),
     };
   } catch {
     return {
@@ -90,6 +94,7 @@ function loadAccessState(): AccessState {
       aiDrawCredits: 0,
       aiCreditDayKey: getDayKey(),
       aiDrawUsedToday: 0,
+      bonusDiarySlots: 0,
     };
   }
 }
@@ -183,17 +188,19 @@ export function getDiaryAccessState(
   }
 
   const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
+  const bonusSlots = Math.max(0, state.bonusDiarySlots);
+  const remaining = freeRemaining + bonusSlots;
 
   return {
-    canCreate: freeRemaining > 0,
-    remaining: freeRemaining,
+    canCreate: remaining > 0,
+    remaining,
     isPremiumActive: false,
     monthlyRemaining: 0,
     monthlyUsed: Math.min(FREE_ENTRY_GRANT, entriesCount),
     monthlyLimit: FREE_ENTRY_GRANT,
     message:
-      freeRemaining > 0
-        ? `Free diaries remaining: ${freeRemaining}.`
+      remaining > 0
+        ? `Free diaries remaining: ${remaining}.`
         : "Free 5 diaries used. Subscribe to keep writing.",
   };
 }
@@ -277,6 +284,30 @@ export function consumeAiDrawCredit() {
   normalizeAiCreditDay(state);
   if (state.aiDrawCredits <= 0) return false;
   state.aiDrawCredits -= 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** 광고 시청 후 무료 한도 초과해도 일기 1편 저장 가능 */
+export function grantBonusDiarySlots(count = 1) {
+  const state = loadAccessState();
+  state.bonusDiarySlots = Math.max(
+    0,
+    state.bonusDiarySlots + Math.max(0, count),
+  );
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return state.bonusDiarySlots;
+}
+
+/** 저장 시 무료 기본 한도를 넘는 경우 보너스 슬롯 1개 소모 */
+export function consumeBonusDiarySlotIfNeeded(entriesCount: number) {
+  const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
+  if (freeRemaining > 0) return true;
+  const state = loadAccessState();
+  if (state.bonusDiarySlots <= 0) return false;
+  state.bonusDiarySlots -= 1;
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;

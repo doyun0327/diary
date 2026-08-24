@@ -207,8 +207,8 @@
       "okSynced": "일기 {{count}}편을 동기화했어요",
       "errSignIn": "로그인하지 못했어요",
       "errGoogleNative": "Google 로그인에 실패했어요",
-      "errGoogleDeveloper": "앱 SHA-1이 Google Cloud Android 클라이언트에 없어요. SHA-1을 추가한 뒤 다시 시도해 주세요",
-      "errGooglePlay": "에뮬레이터에 Google Play / 계정이 필요해요",
+      "errGoogleDeveloper": "Play 앱 서명 SHA-1이 Google Cloud Android 클라이언트에 없어요. SHA-1 추가 후 앱을 삭제하고 다시 설치해 주세요",
+      "errGooglePlay": "Google Play 서비스 또는 계정 설정을 확인해 주세요",
       "errGoogleNetwork": "네트워크를 확인한 뒤 다시 시도해 주세요",
       "errGoogleToken": "Google 토큰을 받지 못했어요. SHA-1과 Web Client ID를 확인해 주세요",
       "errSync": "동기화하지 못했어요",
@@ -446,6 +446,10 @@
       "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
       "rewardCta": "광고 보기"
     },
+    "reward": {
+      "saveTitle": "광고 보고 일기 1편 저장",
+      "saveLead": "무료 일기를 모두 썼어요. 광고를 보면 일기 1편을 더 저장할 수 있어요."
+    },
     "confirm": {
       "replaceTitle": "AI 그림",
       "replaceWithAi": "그림판 내용을 AI 그림으로 바꿀까요?",
@@ -464,6 +468,7 @@
       "saveImage": "그림을 저장 파일로 만들지 못했어요",
       "empty": "제목, 내용, 그림 중 하나는 넣어 주세요",
       "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 받을 수 있어요",
+      "adNotCompletedWrite": "광고를 끝까지 봐야 일기를 저장할 수 있어요",
       "adAppOnly": "앱에서만 광고를 볼 수 있어요",
       "aiDailyLimit": "미구독자는 하루에 AI 그림을 2번까지 그릴 수 있어요"
     },
