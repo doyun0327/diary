@@ -414,9 +414,7 @@ function RoomsHubPage({
           {loading && <p className="rooms__muted">{t("common.loading")}</p>}
 
           {!loading && rooms.length === 0 && (
-            <div className="rooms__empty rooms__empty--scrap">
-              <p className="rooms__empty-title">{t("rooms.empty")}</p>
-              <p className="rooms__empty-lead">{t("rooms.emptyLead")}</p>
+            <div className="rooms__empty rooms__empty--create-only">
               <button
                 type="button"
                 className="rooms__btn primary rooms__btn--scrap"
