@@ -35,13 +35,17 @@ function RoomDiaryPaper({ post, compact = false, className = '' }: RoomDiaryPape
             src={post.imageUrl}
             alt={t('detail.imageAltTitle', { title: label })}
             draggable={false}
+            loading={compact ? 'lazy' : 'eager'}
+            decoding="async"
           />
         </div>
       ) : null}
 
-      <section className="diary-detail__section">
-        <p className="diary-detail__content">{post.content || ' '}</p>
-      </section>
+      {!compact ? (
+        <section className="diary-detail__section">
+          <p className="diary-detail__content">{post.content || ' '}</p>
+        </section>
+      ) : null}
     </article>
   );
 }

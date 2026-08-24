@@ -8,6 +8,8 @@ import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
 import { shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
+import { compressDataUrlForShare } from '../utils/shareImageUrl';
+import { getCachedRoomsList, invalidateRoomFeed, setCachedRoomsList } from '../utils/roomCache';
 import MoodIcon from '../components/MoodIcon';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
@@ -102,10 +104,14 @@ function DiaryDetailPage({
     setRoomsPage(0);
     setRoomsLoading(true);
     try {
+      const cached = getCachedRoomsList();
+      if (cached) setRooms(cached);
+
       const [list, already] = await Promise.all([
         roomsApi.listRooms(),
         roomsApi.listRoomsSharingDiary(entry.id).catch(() => [] as string[]),
       ]);
+      setCachedRoomsList(list);
       setRooms(list);
       setSharedRoomIds(already);
       setRoomsPage(0);
@@ -138,6 +144,11 @@ function DiaryDetailPage({
 
     setSharing(true);
     setFeedback(null);
+
+    const imageUrl = entry.imageUrl
+      ? await compressDataUrlForShare(entry.imageUrl).catch(() => entry.imageUrl)
+      : undefined;
+
     const body = {
       diaryId: entry.id,
       title: entry.title,
@@ -145,21 +156,26 @@ function DiaryDetailPage({
       content: entry.content,
       mood: entry.mood,
       moodPack: entry.moodPack,
-      imageUrl: entry.imageUrl,
+      imageUrl,
     };
 
     const okNames: string[] = [];
     const failNames: string[] = [];
 
     try {
-      for (const room of targets) {
-        try {
-          await roomsApi.createRoomPost(room.id, body);
+      const results = await Promise.allSettled(
+        targets.map((room) => roomsApi.createRoomPost(room.id, body)),
+      );
+
+      results.forEach((result, i) => {
+        const room = targets[i];
+        if (result.status === 'fulfilled') {
           okNames.push(room.name);
-        } catch {
+          invalidateRoomFeed(room.id);
+        } else {
           failNames.push(room.name);
         }
-      }
+      });
 
       closeShare({ force: true });
 

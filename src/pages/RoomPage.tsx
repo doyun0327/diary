@@ -9,6 +9,10 @@ import {
   isRoomCommentCoachSeen,
   markRoomCommentCoachSeen,
 } from '../utils/onboarding';
+import {
+  getCachedRoomFeed,
+  setCachedRoomFeed,
+} from '../utils/roomCache';
 import './RoomsPages.css';
 
 const ROOM_POSTS_PAGE_SIZE = 10;
@@ -46,7 +50,14 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
   }, [postsPage, postsPageCount]);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
+    const cached = getCachedRoomFeed(roomId);
+    if (cached) {
+      setRoom(cached.room);
+      setPosts(cached.posts);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     try {
       const [detail, feed] = await Promise.all([
@@ -55,8 +66,11 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
       ]);
       setRoom(detail);
       setPosts(feed);
+      setCachedRoomFeed(roomId, detail, feed);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('rooms.err.load'));
+      if (!cached) {
+        setError(err instanceof Error ? err.message : t('rooms.err.load'));
+      }
     } finally {
       setLoading(false);
     }

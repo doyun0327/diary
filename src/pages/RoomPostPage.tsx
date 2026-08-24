@@ -5,6 +5,7 @@ import * as roomsApi from '../api/roomsApi';
 import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
+import { getCachedRoomPost } from '../utils/roomCache';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
@@ -27,10 +28,14 @@ function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
 
 function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const { t } = useTranslation();
-  const [post, setPost] = useState<RoomPost | null>(null);
+  const cachedPost = useMemo(
+    () => getCachedRoomPost(roomId, postId),
+    [roomId, postId],
+  );
+  const [post, setPost] = useState<RoomPost | null>(cachedPost);
   const [comments, setComments] = useState<RoomComment[]>([]);
   const [text, setText] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedPost);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,9 +43,21 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const colorMap = useMemo(() => buildCommentColorMap(comments), [comments]);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
+    const fromCache = getCachedRoomPost(roomId, postId);
+    if (fromCache) {
+      setPost(fromCache);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     try {
+      if (fromCache) {
+        const list = await roomsApi.listComments(roomId, postId);
+        setComments(list);
+        void roomsApi.getRoomPost(roomId, postId).then(setPost).catch(() => {});
+        return;
+      }
       const [detail, list] = await Promise.all([
         roomsApi.getRoomPost(roomId, postId),
         roomsApi.listComments(roomId, postId),

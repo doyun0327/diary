@@ -13,6 +13,10 @@ import {
   rememberRoomCover,
   resolveRoomCover,
 } from "../utils/roomCovers";
+import {
+  getCachedRoomsList,
+  setCachedRoomsList,
+} from "../utils/roomCache";
 import "./RoomsPages.css";
 
 interface RoomsHubPageProps {
@@ -109,7 +113,13 @@ function RoomsHubPage({
   };
 
   const refresh = async () => {
-    setLoading(true);
+    const cached = shareReady ? getCachedRoomsList() : null;
+    if (cached) {
+      setRooms(sortRoomsNewestFirst(cached));
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     try {
       if (!shareReady) {
@@ -118,10 +128,13 @@ function RoomsHubPage({
       }
       await ensureAuth();
       const list = await roomsApi.listRooms();
+      setCachedRoomsList(list);
       setRooms(sortRoomsNewestFirst(list));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("rooms.err.list"));
-      setRooms([]);
+      if (!cached) {
+        setError(err instanceof Error ? err.message : t("rooms.err.list"));
+        setRooms([]);
+      }
     } finally {
       setLoading(false);
     }
