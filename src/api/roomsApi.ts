@@ -82,6 +82,20 @@ export function listRoomsSharingDiary(diaryId: string): Promise<string[]> {
   return request<string[]>(`/api/rooms/shared-diaries/${encodeURIComponent(diaryId)}`);
 }
 
+/** 원본 일기 수정 → 공유된 방 게시글 내용 동기화 */
+export function updateSharedDiary(
+  diaryId: string,
+  body: Omit<CreateRoomPostBody, 'diaryId'>,
+): Promise<{ updated: number; roomIds: string[] }> {
+  return request<{ updated: number; roomIds: string[] }>(
+    `/api/rooms/shared-diaries/${encodeURIComponent(diaryId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    },
+  );
+}
+
 export function createRoom(
   name: string,
   nickname?: string,

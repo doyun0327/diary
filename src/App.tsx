@@ -44,6 +44,7 @@ import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import { clearWriteDraft } from "./utils/writeDraft";
+import { syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import {
   applyMonthlyUsageFromServer,
   consumeDiaryUsage,
@@ -247,10 +248,12 @@ function App() {
     entry,
   ) => {
     if (editingId) {
-      updateEntry(editingId, entry);
-      setSelectedId(editingId);
+      const id = editingId;
+      updateEntry(id, entry);
+      setSelectedId(id);
       setEditingId(null);
       setPage("detail");
+      void syncSharedDiaryAfterEdit(id, entry);
       syncInBackground();
       return;
     }

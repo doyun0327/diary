@@ -38,13 +38,7 @@
   margin: 0 0 14px;
   padding: env(safe-area-inset-top, 0px) 4px 0 4px;
   border-bottom: 1px solid color-mix(in srgb, var(--color-accent-text) 12%, transparent);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-accent-soft) 76%, var(--color-bg) 24%) 0%,
-    color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
-  );
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-bg) 45%);
 }
 
 .rooms--hub .rooms__toolbar h2,
@@ -1259,10 +1253,12 @@
   }
 }
 
+/* 공유 일기: 일기장 테마 유지, 칸 크기는 방 목록 폴라로이드와 동일 */
 .rooms__gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 10px;
+  gap: 18px 12px;
+  width: 100%;
   align-items: start;
 }
 
@@ -1271,7 +1267,7 @@
   flex-direction: column;
   gap: 6px;
   width: 100%;
-  height: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: none;
@@ -1288,82 +1284,116 @@
 
 .rooms__gallery-author {
   flex-shrink: 0;
-  height: 1.5em;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text-muted);
+  height: 1.35em;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 2px;
+  text-align: left;
 }
 
-/* PDF/상세와 같은 paper — 갤러리 축소 (칸마다 동일 3:4) */
 .rooms__paper {
   width: 100%;
   box-sizing: border-box;
 }
 
+/* 폴라로이드 본문(정사각 사진 영역)과 같은 외곽 크기 */
 .rooms__paper--compact {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  margin: 0;
-  gap: 8px;
-  padding: 10px;
+  gap: 5px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   height: auto;
-  max-height: none;
-  overflow: visible;
+  min-height: 0;
+  margin: 0;
+  padding: 8px 7px;
+  overflow: hidden;
   pointer-events: none;
   transition: transform 0.15s;
 }
 
 .rooms__paper--compact .diary-detail__dateline {
   flex-shrink: 0;
-  font-size: 0.78rem;
-  gap: 6px;
+  gap: 4px;
+  font-size: 0.58rem;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.rooms__paper--compact .diary-detail__dateline > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rooms__paper--compact .diary-detail__mood {
+  flex-shrink: 0;
+}
+
+.rooms__paper--compact .diary-detail__mood img,
+.rooms__paper--compact .diary-detail__mood svg {
+  width: 12px;
+  height: 12px;
 }
 
 .rooms__paper--compact .diary-detail__title {
   flex-shrink: 0;
-  font-size: 0.82rem;
-  padding: 7px 8px;
-  overflow: visible;
-  white-space: normal;
+  font-size: 0.62rem;
+  padding: 4px 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   display: block;
-  -webkit-line-clamp: unset;
 }
 
 .rooms__paper--compact .diary-detail__image {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   width: 100%;
-  aspect-ratio: 1 / 1.55;
   min-height: 0;
+  max-height: 38%;
+  aspect-ratio: auto;
+  margin: 0;
   border-radius: var(--radius-md);
   box-shadow: none;
+  background: var(--color-bg-soft);
 }
 
 .rooms__paper--compact .diary-detail__image img {
   width: 100%;
   height: 100%;
   max-height: none;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .rooms__paper--compact .diary-detail__section {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
+  overflow: hidden;
 }
 
 .rooms__paper--compact .diary-detail__content {
-  font-size: 0.78rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
   min-height: 0;
-  max-height: none;
+  max-height: 100%;
   height: auto;
-  padding: 2px 2px 4px;
-  overflow: visible;
+  padding: 1px 0 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.rooms__paper--compact:not(:has(.diary-detail__image)) .diary-detail__content {
+  -webkit-line-clamp: 10;
 }
 
 .rooms__post-expand {

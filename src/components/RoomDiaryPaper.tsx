@@ -23,7 +23,7 @@ function RoomDiaryPaper({ post, compact = false, className = '' }: RoomDiaryPape
       <div className="diary-detail__dateline">
         <span>{formatDate(post.date)}</span>
         <span className="diary-detail__mood">
-          <MoodIcon mood={post.mood} packId={post.moodPack} size={compact ? 16 : 22} />
+          <MoodIcon mood={post.mood} packId={post.moodPack} size={compact ? 12 : 22} />
         </span>
       </div>
 
