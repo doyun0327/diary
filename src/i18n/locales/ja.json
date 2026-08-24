@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "AIの絵",
       "replaceWithAi": "キャンバスをAIの絵で置き換えますか？",
-      "replaceOk": "置き換える"
+      "replaceOk": "置き換える",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "先に日記を書いてください",

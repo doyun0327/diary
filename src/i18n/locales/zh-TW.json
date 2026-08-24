@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "AI 畫",
       "replaceWithAi": "用 AI 畫替換畫布內容嗎？",
-      "replaceOk": "替換"
+      "replaceOk": "替換",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "請先寫日記",

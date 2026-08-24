@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "AI 画",
       "replaceWithAi": "用 AI 画替换画布内容吗？",
-      "replaceOk": "替换"
+      "replaceOk": "替换",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "请先写日记",

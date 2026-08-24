@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "Desenho da IA",
       "replaceWithAi": "Substituir a tela pelo desenho da IA?",
-      "replaceOk": "Substituir"
+      "replaceOk": "Substituir",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Escreva o diário primeiro",

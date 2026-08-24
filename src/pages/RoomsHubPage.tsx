@@ -13,6 +13,7 @@ import {
   rememberRoomCover,
   resolveRoomCover,
 } from "../utils/roomCovers";
+import { letterAvatarDataUrl } from "../utils/letterAvatar";
 import {
   getCachedRoomsList,
   setCachedRoomsList,
@@ -40,8 +41,8 @@ function sortRoomsNewestFirst(list: RoomSummary[]): RoomSummary[] {
   });
 }
 
-function canShare(nickname: string, avatarUrl: string | null) {
-  return Boolean(nickname.trim() && avatarUrl);
+function canShare(nickname: string) {
+  return Boolean(nickname.trim());
 }
 
 async function copyText(text: string) {
@@ -98,7 +99,10 @@ function RoomsHubPage({
   } | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
 
-  const shareReady = canShare(nickname, avatarUrl);
+  const shareReady = canShare(nickname);
+
+  const profileAvatar = () =>
+    avatarUrl || letterAvatarDataUrl(nickname.trim() || "?");
 
   const ensureAuth = async () => {
     if (!shareReady) {
@@ -249,7 +253,7 @@ function RoomsHubPage({
       const room = await roomsApi.createRoom(
         name,
         nickname.trim(),
-        avatarUrl,
+        profileAvatar(),
         null,
         coverUrl,
       );
@@ -328,7 +332,7 @@ function RoomsHubPage({
     setError(null);
     try {
       await ensureAuth();
-      const room = await roomsApi.joinRoom(code, nickname.trim(), avatarUrl);
+      const room = await roomsApi.joinRoom(code, nickname.trim(), profileAvatar());
       setInviteCode("");
       setSheet(null);
       await refresh();
@@ -387,7 +391,7 @@ function RoomsHubPage({
           <BackIcon />
         </button>
         <h2>{t("rooms.title")}</h2>
-        <span />
+        <span className="rooms__toolbar-balance" aria-hidden />
       </div>
 
       {!shareReady ? (

@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "Dessin IA",
       "replaceWithAi": "Remplacer le canevas par le dessin IA ?",
-      "replaceOk": "Remplacer"
+      "replaceOk": "Remplacer",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Écrivez d'abord le journal",

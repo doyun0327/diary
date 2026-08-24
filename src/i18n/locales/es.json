@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "Dibujo IA",
       "replaceWithAi": "¿Reemplazar el lienzo con el dibujo IA?",
-      "replaceOk": "Reemplazar"
+      "replaceOk": "Reemplazar",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Escribe el diario primero",

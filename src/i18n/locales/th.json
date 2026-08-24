@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "ภาพวาด AI",
       "replaceWithAi": "แทนที่แคนวาสด้วยภาพวาด AI?",
-      "replaceOk": "แทนที่"
+      "replaceOk": "แทนที่",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "เขียนไดอารี่ก่อน",

@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "Tranh AI",
       "replaceWithAi": "Thay canvas bằng tranh AI?",
-      "replaceOk": "Thay"
+      "replaceOk": "Thay",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Hãy viết nhật ký trước",

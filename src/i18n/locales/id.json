@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "Gambar AI",
       "replaceWithAi": "Ganti kanvas dengan gambar AI?",
-      "replaceOk": "Ganti"
+      "replaceOk": "Ganti",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Tulis diary dulu",

@@ -157,11 +157,6 @@
   line-height: 0;
 }
 
-.account-sheet__oauth-logo--apple {
-  width: 22px;
-  height: 22px;
-}
-
 .account-sheet__oauth-logo svg {
   display: block;
 }
@@ -182,12 +177,6 @@
 .account-sheet__oauth-btn--google {
   background: var(--color-surface);
   color: var(--color-text);
-}
-
-.account-sheet__oauth-btn--apple {
-  background: #111;
-  border-color: #111;
-  color: #fff;
 }
 
 .account-sheet__sync {

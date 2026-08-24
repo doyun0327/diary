@@ -169,8 +169,8 @@
     },
     "withdraw": {
       "button": "회원 탈퇴",
-      "title": "회원 탈퇴할까요?",
-      "lead": "클라우드에 저장된 일기·방 활동이 삭제되고 로그인 계정이 해제돼요. 이 기기의 로컬 일기는 남아요.",
+      "title": "정말 탈퇴하시겠습니까?",
+      "lead": "",
       "confirm": "탈퇴하기"
     },
     "removePhoto": "삭제",
@@ -330,7 +330,7 @@
     },
     "err": {
       "needNickname": "이름과 프로필 사진을 먼저 정해 주세요",
-      "needProfile": "이름과 프로필 사진이 있어야 친구와 공유할 수 있어요",
+      "needProfile": "이름을 설정하면 친구와 공유할 수 있어요",
       "guestAuth": "친구 방 연결에 실패했어요. 잠시 후 다시 시도해 주세요",
       "list": "방 목록을 불러오지 못했어요",
       "nameRequired": "방 이름을 입력해 주세요",
@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "AI 그림",
       "replaceWithAi": "그림판 내용을 AI 그림으로 바꿀까요?",
-      "replaceOk": "바꾸기"
+      "replaceOk": "바꾸기",
+      "saveOnLeave": "저장할까요?",
+      "saveOnLeaveDiscard": "저장 안 함"
     },
     "err": {
       "needContent": "일기 내용을 먼저 적어 주세요",

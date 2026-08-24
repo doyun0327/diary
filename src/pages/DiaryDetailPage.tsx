@@ -10,6 +10,8 @@ import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
 import { compressDataUrlForShare } from '../utils/shareImageUrl';
 import { getCachedRoomsList, invalidateRoomFeed, setCachedRoomsList } from '../utils/roomCache';
+import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
+import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
@@ -42,6 +44,8 @@ function DiaryDetailPage({
   onOpenRooms,
 }: DiaryDetailPageProps) {
   const { t } = useTranslation();
+  const { ensureGuestSession } = useAuthSession();
+  const { clientId, nickname } = useClientProfile();
   const [shareOpen, setShareOpen] = useState(false);
   const [shareStep, setShareStep] = useState<ShareStep>('menu');
   const [moreOpen, setMoreOpen] = useState(false);
@@ -104,6 +108,11 @@ function DiaryDetailPage({
     setRoomsPage(0);
     setRoomsLoading(true);
     try {
+      if (!getAccessToken()) {
+        const nick = nickname.trim() || t('common.anonymous');
+        await ensureGuestSession(clientId, nick);
+      }
+
       const cached = getCachedRoomsList();
       if (cached) setRooms(cached);
 
@@ -144,6 +153,20 @@ function DiaryDetailPage({
 
     setSharing(true);
     setFeedback(null);
+
+    try {
+      if (!getAccessToken()) {
+        const nick = nickname.trim() || t('common.anonymous');
+        await ensureGuestSession(clientId, nick);
+      }
+    } catch (err) {
+      setSharing(false);
+      setFeedback({
+        kind: 'info',
+        title: err instanceof Error ? err.message : t('detail.err.roomsList'),
+      });
+      return;
+    }
 
     const imageUrl = entry.imageUrl
       ? await compressDataUrlForShare(entry.imageUrl).catch(() => entry.imageUrl)

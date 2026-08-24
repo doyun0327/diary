@@ -127,7 +127,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
             {t('common.delete')}
           </button>
         ) : (
-          <span />
+          <span className="rooms__toolbar-balance" aria-hidden />
         )}
       </div>
 

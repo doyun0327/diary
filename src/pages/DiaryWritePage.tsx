@@ -109,6 +109,17 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const drawingTouchedRef = useRef(false);
+  const baselineRef = useRef({
+    date: initialEntry?.date ?? today(),
+    title: initialEntry?.title ?? '',
+    content: initialEntry?.content ?? '',
+    mood: (initialEntry?.mood ?? defaultStickerForPack(getStoredMoodPackId())) as DiarySticker,
+    fontId: initialEntry?.fontId ?? getPreferredFontId(),
+    fontSizeId: parseFontSizeId(initialEntry?.fontSize ?? getPreferredFontSizeId()),
+    hadImage: Boolean(initialEntry?.imageUrl),
+  });
   const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
     if (isEdit) return null;
     if (!isCharacterCoachSeen() && !isCharacterSetupDone()) return 'character';
@@ -196,9 +207,38 @@ function DiaryWritePage({
     void canvasRef.current?.loadImage(src);
   }, [initialEntry?.imageUrl]);
 
-  const handleCancel = () => {
+  const leaveWithoutSaving = () => {
     if (!isEdit) clearWriteDraft();
+    setLeaveConfirmOpen(false);
     onCancel();
+  };
+
+  const isDirty = () => {
+    const b = baselineRef.current;
+    if (date !== b.date) return true;
+    if (title !== b.title) return true;
+    if (content !== b.content) return true;
+    if (mood !== b.mood) return true;
+    if (fontId !== b.fontId) return true;
+    if (fontSizeId !== b.fontSizeId) return true;
+    if (drawingTouchedRef.current) return true;
+    const hasDrawing = Boolean(canvasRef.current?.hasContent());
+    if (!isEdit && hasDrawing) return true;
+    if (isEdit && hasDrawing !== b.hadImage) return true;
+    return false;
+  };
+
+  const handleCancel = () => {
+    if (leaveConfirmOpen) {
+      setLeaveConfirmOpen(false);
+      return;
+    }
+    if (aiLoading) return;
+    if (isDirty()) {
+      setLeaveConfirmOpen(true);
+      return;
+    }
+    leaveWithoutSaving();
   };
 
   const handleCancelRef = useRef(handleCancel);
@@ -209,6 +249,10 @@ function DiaryWritePage({
     window.addEventListener('diary-write-cancel', onNativeCancel);
     return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
   }, []);
+
+  const saveAndLeave = () => {
+    formRef.current?.requestSubmit();
+  };
 
   const ensureAiDrawAllowed = () => {
     if (isEdit) return true;
@@ -269,6 +313,7 @@ function DiaryWritePage({
         character,
       });
       await canvasRef.current?.loadImage(imageUrl);
+      drawingTouchedRef.current = true;
       dismissAiCoach();
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
@@ -575,6 +620,18 @@ function DiaryWritePage({
           {aiError && <p className="diary-write__ai-error">{aiError}</p>}
         </section>
       </div>
+      {leaveConfirmOpen && (
+        <AppModal
+          title={t('write.confirm.saveOnLeave')}
+          onDismiss={() => setLeaveConfirmOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('write.confirm.saveOnLeaveDiscard')}
+          onSecondary={leaveWithoutSaving}
+          primaryLabel={isEdit ? t('write.saveEdit') : t('write.save')}
+          onPrimary={saveAndLeave}
+        />
+      )}
       {replaceConfirmOpen && (
         <AppModal
           title={t('write.confirm.replaceTitle')}

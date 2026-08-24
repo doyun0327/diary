@@ -169,8 +169,8 @@
     },
     "withdraw": {
       "button": "Delete account",
-      "title": "Delete your account?",
-      "lead": "Cloud diaries and room activity will be removed, and you’ll be signed out. Diaries on this device stay.",
+      "title": "Are you sure you want to delete your account?",
+      "lead": "",
       "confirm": "Delete"
     },
     "removePhoto": "Remove",
@@ -330,7 +330,7 @@
     },
     "err": {
       "needNickname": "Set your name and profile photo first",
-      "needProfile": "Name and photo are required to share with friends",
+      "needProfile": "Set a name to share with friends",
       "guestAuth": "Couldn't connect to friend rooms. Try again shortly",
       "list": "Couldn't load rooms",
       "nameRequired": "Please enter a room name",
@@ -449,7 +449,9 @@
     "confirm": {
       "replaceTitle": "AI drawing",
       "replaceWithAi": "Replace the canvas with the AI drawing?",
-      "replaceOk": "Replace"
+      "replaceOk": "Replace",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Write the diary first",

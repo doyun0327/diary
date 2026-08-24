@@ -41,11 +41,9 @@ function RoomDiaryPaper({ post, compact = false, className = '' }: RoomDiaryPape
         </div>
       ) : null}
 
-      {!compact ? (
-        <section className="diary-detail__section">
-          <p className="diary-detail__content">{post.content || ' '}</p>
-        </section>
-      ) : null}
+      <section className="diary-detail__section">
+        <p className="diary-detail__content">{post.content || ' '}</p>
+      </section>
     </article>
   );
 }

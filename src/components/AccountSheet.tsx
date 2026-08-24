@@ -5,7 +5,6 @@ import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
 import {
   useAuthSession,
-  type AuthProvider,
   type AuthSession,
 } from '../hooks/useAuthSession';
 import { isFlutterApp } from '../utils/nativeShare';
@@ -98,14 +97,14 @@ function AccountSheet({
   onClose,
 }: AccountSheetProps) {
   const { t } = useTranslation();
-  const { session, signIn, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
+  const { session, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
     useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const googleHostRef = useRef<HTMLDivElement>(null);
   const onGoogleTokenRef = useRef<(idToken: string) => void>(() => {});
   const [nameDraft, setNameDraft] = useState(nickname);
   const [busy, setBusy] = useState(false);
-  const [authBusy, setAuthBusy] = useState<AuthProvider | null>(null);
+  const [authBusy, setAuthBusy] = useState<'google' | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
@@ -282,35 +281,16 @@ function AccountSheet({
     }
   };
 
-  const handleSignIn = async (provider: AuthProvider) => {
-    setAuthBusy(provider);
-    try {
-      const next = await signIn(provider);
-      seedProfileFromAuth(next);
-      try {
-        const result = await onSyncDiaries(null);
-        markSynced(result.serverTime);
-      } catch {
-        // 로컬 로그인만 된 경우
-      }
-    } catch {
-      // 메시지 UI 없음
-    } finally {
-      setAuthBusy(null);
-    }
-  };
-
   const handleSignOut = () => {
     signOut();
     void import('../lib/googleAuth').then(({ nativeGoogleSignOut }) => {
       nativeGoogleSignOut();
     });
-    // 친구 방용 게스트 세션 복구
-    if (nickname.trim()) {
-      void ensureGuestSession(clientId, nickname.trim()).catch(() => {
-        // ignore
-      });
-    }
+    // 친구 방용 게스트 세션 복구 (Google 없이도 공유 가능)
+    const nick = nickname.trim() || t('common.anonymous');
+    void ensureGuestSession(clientId, nick).catch(() => {
+      // ignore
+    });
   };
 
   const handleWithdraw = async () => {
@@ -318,11 +298,10 @@ function AccountSheet({
     try {
       await deleteAccount();
       setWithdrawOpen(false);
-      if (nickname.trim()) {
-        void ensureGuestSession(clientId, nickname.trim()).catch(() => {
-          // ignore
-        });
-      }
+      const nick = nickname.trim() || t('common.anonymous');
+      void ensureGuestSession(clientId, nick).catch(() => {
+        // ignore
+      });
     } catch {
       // 메시지 UI 없음
     } finally {
@@ -601,23 +580,6 @@ function AccountSheet({
                   ) : null}
                 </div>
                 {authError ? <p className="account-sheet__error">{authError}</p> : null}
-                <button
-                  type="button"
-                  className="account-sheet__oauth-btn account-sheet__oauth-btn--apple"
-                  disabled={authBusy !== null}
-                  onClick={() => void handleSignIn('apple')}
-                >
-                  <span className="account-sheet__oauth-logo account-sheet__oauth-logo--apple" aria-hidden>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                      <path d="M16.7 12.65c-.03-2.36 1.93-3.5 2.02-3.55-1.1-1.61-2.82-1.83-3.43-1.86-1.46-.15-2.85.86-3.59.86-.74 0-1.89-.84-3.1-.82-1.6.02-3.07.93-3.89 2.36-1.66 2.88-.42 7.14 1.19 9.48.79 1.14 1.73 2.42 2.96 2.38 1.19-.05 1.64-.76 3.08-.76 1.43 0 1.84.76 3.1.74 1.28-.02 2.09-1.16 2.87-2.31.9-1.32 1.27-2.6 1.29-2.66-.03-.01-2.47-.95-2.5-3.76zM14.4 5.95c.66-.8 1.1-1.9.98-3.01-0.95.04-2.1.63-2.78 1.43-.61.7-1.14 1.82-1 2.89 1.05.08 2.13-.54 2.8-1.31z" />
-                    </svg>
-                  </span>
-                  <span>
-                    {authBusy === 'apple'
-                      ? t('account.sync.signingIn')
-                      : t('account.sync.continueApple')}
-                  </span>
-                </button>
                 <p className="account-sheet__sync-note">{t('account.sync.autoNote')}</p>
               </div>
             </section>
@@ -653,13 +615,13 @@ function AccountSheet({
       {withdrawOpen ? (
         <AppModal
           title={t('account.withdraw.title')}
-          lead={t('account.withdraw.lead')}
           onDismiss={() => setWithdrawOpen(false)}
           secondaryLabel={t('common.cancel')}
           onSecondary={() => setWithdrawOpen(false)}
           primaryLabel={
             authBusy ? t('common.processing') : t('account.withdraw.confirm')
           }
+          primaryDanger
           onPrimary={() => {
             if (authBusy) return;
             void handleWithdraw();

@@ -450,7 +450,9 @@
     "confirm": {
       "replaceTitle": "KI-Zeichnung",
       "replaceWithAi": "Leinwand durch die KI-Zeichnung ersetzen?",
-      "replaceOk": "Ersetzen"
+      "replaceOk": "Ersetzen",
+      "saveOnLeave": "Save before leaving?",
+      "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
       "needContent": "Schreib zuerst das Tagebuch",
