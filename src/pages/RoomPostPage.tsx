@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
+import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import './RoomsPages.css';
@@ -31,6 +32,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const colorMap = useMemo(() => buildCommentColorMap(comments), [comments]);
@@ -73,11 +75,12 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   };
 
   const handleDelete = async () => {
-    if (!post || post.authorUserId !== userId) return;
-    if (!confirm(t('rooms.confirm.deletePost'))) return;
+    if (!post || post.authorUserId !== userId || busy) return;
     setBusy(true);
+    setError(null);
     try {
       await roomsApi.deleteRoomPost(roomId, postId);
+      setConfirmDelete(false);
       onBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : t('rooms.err.delete'));
@@ -98,7 +101,12 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
         </button>
         <h2>{t('rooms.sharedDiary')}</h2>
         {post?.authorUserId === userId ? (
-          <button type="button" className="rooms__danger" disabled={busy} onClick={() => void handleDelete()}>
+          <button
+            type="button"
+            className="rooms__danger"
+            disabled={busy}
+            onClick={() => setConfirmDelete(true)}
+          >
             {t('common.delete')}
           </button>
         ) : (
@@ -134,7 +142,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   `rooms__comment--c${colorIdx}`,
                 ].join(' ')}
               >
-                {showName && (
+                {showName && !isMine && (
                   <strong className="rooms__comment-name">{c.authorNickname}</strong>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>
@@ -163,6 +171,26 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           </button>
         </div>
       </section>
+
+      {confirmDelete && (
+        <AppModal
+          title={t('rooms.confirm.deletePost')}
+          onDismiss={() => {
+            if (!busy) setConfirmDelete(false);
+          }}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => {
+            if (!busy) setConfirmDelete(false);
+          }}
+          primaryDanger
+          primaryLabel={busy ? t('rooms.deleting') : t('common.delete')}
+          onPrimary={() => {
+            if (!busy) void handleDelete();
+          }}
+        />
+      )}
     </div>
   );
 }

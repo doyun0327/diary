@@ -356,7 +356,7 @@ function RoomsHubPage({
   };
 
   return (
-    <div className="rooms">
+    <div className="rooms rooms--hub">
       <input
         ref={coverFileRef}
         type="file"

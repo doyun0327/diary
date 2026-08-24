@@ -1,6 +1,6 @@
 .rooms {
-  padding: 22px 18px;
-  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  /* 상단 패딩 없음 — 허브만 .rooms--hub 로 부여 */
+  padding: 0 18px calc(40px + env(safe-area-inset-bottom));
   min-height: 100%;
   background:
     radial-gradient(
@@ -10,6 +10,43 @@
     ),
     var(--color-bg);
   font-family: var(--brand-font);
+}
+
+.rooms--hub {
+  padding-top: 22px;
+}
+
+/* 방 안·공유 일기: 좌우 패딩도 제거, 툴바가 화면 상단에 붙음 */
+.rooms--in-room,
+.rooms--post {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  margin: 0;
+  min-height: 0;
+}
+
+.rooms--in-room .rooms__toolbar,
+.rooms--post .rooms__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  margin: 0 0 14px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+  border-bottom: 1px solid var(--color-border-soft);
+  background: var(--color-bg);
+}
+
+.rooms--in-room > :not(.rooms__toolbar),
+.rooms--post > :not(.rooms__toolbar) {
+  padding-left: 18px;
+  padding-right: 18px;
 }
 
 .rooms__toolbar {
@@ -248,6 +285,12 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #1a1a1a;
+}
+
+.rooms__empty-title--multiline {
+  white-space: pre-line;
+  line-height: 1.45;
+  max-width: 22em;
 }
 
 .rooms__empty-lead {
@@ -558,15 +601,18 @@
 
 .rooms__polaroid-caption {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
   min-width: 0;
   padding: 0 2px;
+  text-align: center;
 }
 
 .rooms__polaroid-copy {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1px;
   min-width: 0;
   flex: 1;
@@ -579,10 +625,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  text-align: center;
 }
 
 .rooms__polaroid .rooms__room-members {
   font-size: 0.75rem;
+  text-align: center;
 }
 
 .rooms__polaroid-actions {

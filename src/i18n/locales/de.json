@@ -297,7 +297,7 @@
     "backToListAria": "Zurück zur Liste",
     "refresh": "Aktualisieren",
     "sharedDiaries": "Geteilte Tagebücher",
-    "sharedEmpty": "Noch keine geteilten Tagebücher. Öffne ein Tagebuch und tippe auf Teilen → Freundesräume.",
+    "sharedEmpty": "Noch keine geteilten Tagebücher.\nÖffne ein Tagebuch und tippe auf Teilen → Freundesräume.",
     "sharePrompt": "Möchtest du ein Tagebuch teilen?",
     "goHome": "Zur Startseite",
     "openPostAria": "Tagebuch von {{author}} öffnen: {{title}}",

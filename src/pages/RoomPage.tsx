@@ -77,7 +77,7 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
   };
 
   return (
-    <div className="rooms">
+    <div className="rooms rooms--in-room">
       <div className="rooms__toolbar">
         <button
           type="button"
@@ -96,16 +96,17 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
 
       {room && (
         <section className="rooms__list-wrap">
-          <div className="rooms__section-head">
-            <h3>{t('rooms.sharedDiaries')}</h3>
-            {posts.length > 0 && (
+          {posts.length > 0 && (
+            <div className="rooms__section-head">
+              <h3>{t('rooms.sharedDiaries')}</h3>
               <span className="rooms__section-count">{posts.length}</span>
-            )}
-          </div>
+            </div>
+          )}
           {posts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
-              <p className="rooms__empty-title">{t('rooms.sharePrompt')}</p>
-              <p className="rooms__muted">{t('rooms.sharedEmpty')}</p>
+              <p className="rooms__empty-title rooms__empty-title--multiline">
+                {t('rooms.sharedEmpty')}
+              </p>
               <button type="button" className="rooms__btn primary" onClick={onGoHome}>
                 {t('rooms.goHome')}
               </button>

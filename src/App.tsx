@@ -545,9 +545,12 @@ function App() {
     if (!isFlutterApp()) return;
     const isWrite = page === "write";
     const isRooms = page === "rooms";
+    /** 방 안·공유 일기 상세는 웹 툴바가 있으므로 Flutter AppBar 숨김 */
+    const hideNativeChrome =
+      page === "detail" || page === "room" || page === "room-post";
     postDiaryNative({
       type: "headerState",
-      visible: !needsProfileSetup && !needsAppIntro && page !== "detail",
+      visible: !needsProfileSetup && !needsAppIntro && !hideNativeChrome,
       showCalendar: page === "home",
       showBack: isRooms || isWrite,
       showSave: isWrite,
@@ -616,7 +619,12 @@ function App() {
   return (
     <div className="app">
       <Header
-        hideBar={isFlutterApp()}
+        hideBar={
+          isFlutterApp() ||
+          page === "detail" ||
+          page === "room" ||
+          page === "room-post"
+        }
         nickname={nickname}
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}

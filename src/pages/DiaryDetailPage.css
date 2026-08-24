@@ -15,7 +15,10 @@
   align-items: center;
   gap: 12px;
   margin: 0;
-  padding: 8px 14px;
+  box-sizing: border-box;
+  min-height: calc(44px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 14px 0;
+  background: var(--color-bg);
 }
 
 .diary-detail__back {
@@ -444,28 +447,56 @@
 }
 
 .diary-detail__room-grid .diary-detail__room-option {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   margin-bottom: 0;
-  min-height: 64px;
-  padding: 10px;
+  min-height: 108px;
+  padding: 12px 10px 10px;
   gap: 8px;
-  align-items: flex-start;
+  text-align: center;
 }
 
 .diary-detail__room-grid .diary-detail__picker-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   font-size: 0.78rem;
+}
+
+.diary-detail__room-grid .diary-detail__picker-icon--cover {
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 0;
+  background: color-mix(in srgb, var(--color-accent-soft) 50%, #fff);
+}
+
+.diary-detail__room-grid .diary-detail__picker-icon--cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.diary-detail__room-grid .diary-detail__room-option-text {
+  flex: 0 1 auto;
+  width: 100%;
+  text-align: center;
 }
 
 .diary-detail__room-grid .diary-detail__picker-item strong {
   font-size: 0.82rem;
   line-height: 1.25;
+  text-align: center;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.diary-detail__room-grid .diary-detail__room-option-text small {
+  text-align: center;
 }
 
 .diary-detail__room-grid .diary-detail__room-check {

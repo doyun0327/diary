@@ -269,7 +269,7 @@
     "backToList": "← Liste",
     "refresh": "Actualiser",
     "sharedDiaries": "Journaux partagés",
-    "sharedEmpty": "Pas encore de journaux partagés. Essayez « Partager dans un salon » sur votre journal.",
+    "sharedEmpty": "Pas encore de journaux partagés.\nEssayez « Partager dans un salon » sur votre journal.",
     "coach": {
       "comment": "Laissez un commentaire !"
     },

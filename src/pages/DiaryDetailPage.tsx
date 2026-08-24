@@ -7,11 +7,13 @@ import { formatDate } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
 import { shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
+import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
 import MoodIcon from '../components/MoodIcon';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
 import './DiaryDetailPage.css';
+import './RoomsPages.css';
 
 const SHARE_ROOMS_PAGE_SIZE = 10;
 
@@ -448,6 +450,11 @@ function DiaryDetailPage({
                       {pagedRooms.map((room) => {
                         const selected = selectedRoomIds.includes(room.id);
                         const alreadyShared = sharedRoomIds.includes(room.id);
+                        const cover = resolveRoomCover(
+                          room.id,
+                          room.coverPreset,
+                          room.coverUrl,
+                        );
                         return (
                           <button
                             key={room.id}
@@ -459,9 +466,16 @@ function DiaryDetailPage({
                             aria-disabled={alreadyShared}
                             onClick={() => toggleRoom(room.id)}
                           >
-                            <span className="diary-detail__picker-icon" aria-hidden>
-                              {room.name.trim().charAt(0) || t('rooms.roomFallback')}
-                            </span>
+                            {cover.kind === 'image' ? (
+                              <span className="diary-detail__picker-icon diary-detail__picker-icon--cover">
+                                <img src={cover.url} alt="" />
+                              </span>
+                            ) : (
+                              <span
+                                className={`diary-detail__picker-icon diary-detail__picker-icon--cover ${coverClassName(cover.id)}`}
+                                aria-hidden
+                              />
+                            )}
                             <span className="diary-detail__room-option-text">
                               <strong>{room.name}</strong>
                               {alreadyShared ? (
