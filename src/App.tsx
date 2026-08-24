@@ -542,36 +542,44 @@ function App() {
   }, [page]);
 
   useEffect(() => {
-    if (!isFlutterApp()) return;
-    const isWrite = page === "write";
-    const isRoomsHub = page === "rooms";
-    /** 친구방 전체(목록·방·일기)는 웹 툴바 사용 → Flutter AppBar 숨김 */
-    const hideNativeChrome =
-      page === "detail" ||
-      page === "rooms" ||
-      page === "room" ||
-      page === "room-post";
-    postDiaryNative({
-      type: "headerState",
-      visible: !needsProfileSetup && !needsAppIntro && !hideNativeChrome,
-      showCalendar: page === "home",
-      showBack: isWrite,
-      showSave: isWrite,
-      showMenu: !isWrite && !isRoomsHub,
-      showSearch: !isWrite && !isRoomsHub,
-      year: calYear,
-      month: calMonth,
-      label:
-        page === "home"
-          ? formatYearMonth(calYear, calMonth)
-          : isWrite
-            ? editingId
-              ? t("write.title.edit")
-              : t("write.title.new")
-            : "",
-      saveLabel: editingId ? t("write.saveEdit") : t("write.save"),
-      saveEnabled: writeSaveEnabled,
-    });
+    const syncNativeHeader = () => {
+      if (!isFlutterApp()) return;
+      const isWrite = page === "write";
+      const isRoomsHub = page === "rooms";
+      /** 친구방 전체(목록·방·일기)는 웹 툴바 사용 → Flutter AppBar 숨김 */
+      const hideNativeChrome =
+        page === "detail" ||
+        page === "rooms" ||
+        page === "room" ||
+        page === "room-post";
+      postDiaryNative({
+        type: "headerState",
+        visible: !needsProfileSetup && !needsAppIntro && !hideNativeChrome,
+        showCalendar: page === "home",
+        showBack: isWrite,
+        showSave: isWrite,
+        showMenu: !isWrite && !isRoomsHub,
+        showSearch: !isWrite && !isRoomsHub,
+        year: calYear,
+        month: calMonth,
+        label:
+          page === "home"
+            ? formatYearMonth(calYear, calMonth)
+            : isWrite
+              ? editingId
+                ? t("write.title.edit")
+                : t("write.title.new")
+              : "",
+        saveLabel: editingId ? t("write.saveEdit") : t("write.save"),
+        saveEnabled: writeSaveEnabled,
+      });
+    };
+
+    syncNativeHeader();
+    window.addEventListener("diary-flutter-ready", syncNativeHeader);
+    return () => {
+      window.removeEventListener("diary-flutter-ready", syncNativeHeader);
+    };
   }, [
     page,
     calYear,
