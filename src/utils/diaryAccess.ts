@@ -7,6 +7,10 @@ export const MONTHLY_PRICE_KRW = 1900;
 export const FREE_AI_DRAWS_PER_DAY = 5;
 /** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 */
 export const AI_REWARD_AD_ENABLED = true;
+/** 설치 후 검색·보내기 무료 체험 기간 */
+export const FEATURE_TRIAL_DAYS = 7;
+const FEATURE_TRIAL_MS = FEATURE_TRIAL_DAYS * 24 * 60 * 60 * 1000;
+const FEATURE_TRIAL_START_KEY = "picture-diary-search-export-trial-start-v2";
 
 const STORAGE_KEY = "picture-diary-access-v1";
 const ENTRIES_KEY = "picture-diary-entries";
@@ -57,6 +61,8 @@ export type DiaryAccessStatus = {
   canCreate: boolean;
   remaining: number;
   isPremiumActive: boolean;
+  /** Pro 또는 첫 7일 체험 — 검색·보내기 */
+  canUseSearchAndExport: boolean;
   monthlyRemaining: number;
   monthlyUsed: number;
   monthlyLimit: number;
@@ -184,6 +190,40 @@ export function getStoredDiaryEntryCount() {
   }
 }
 
+/** 기기 기준 검색·보내기 체험 시작 시각 (최초 1회 기록) */
+function getOrCreateFeatureTrialStart(): number {
+  try {
+    const raw = localStorage.getItem(FEATURE_TRIAL_START_KEY);
+    if (raw) {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+  } catch {
+    // ignore
+  }
+
+  const start = Date.now();
+  try {
+    localStorage.setItem(FEATURE_TRIAL_START_KEY, String(start));
+  } catch {
+    // ignore
+  }
+  return start;
+}
+
+/** 검색·보내기 7일 체험 중인지 */
+export function isSearchExportTrialActive(): boolean {
+  return Date.now() < getOrCreateFeatureTrialStart() + FEATURE_TRIAL_MS;
+}
+
+/** Pro 구독 또는 첫 주 체험 */
+export function canUseSearchAndExport(): boolean {
+  const now = Date.now();
+  const state = loadAccessState();
+  const isPremium = Boolean(state.premiumUntil && state.premiumUntil > now);
+  return isPremium || isSearchExportTrialActive();
+}
+
 export function getDiaryAccessState(
   entriesCount = getStoredDiaryEntryCount(),
 ): DiaryAccessStatus {
@@ -200,6 +240,7 @@ export function getDiaryAccessState(
   const isPremiumActive = Boolean(
     state.premiumUntil && state.premiumUntil > now,
   );
+  const searchExportOk = isPremiumActive || isSearchExportTrialActive();
 
   if (isPremiumActive) {
     const remaining = Math.max(0, MONTHLY_DIARY_LIMIT - state.monthlyLimitUsed);
@@ -207,6 +248,7 @@ export function getDiaryAccessState(
       canCreate: remaining > 0,
       remaining,
       isPremiumActive: true,
+      canUseSearchAndExport: true,
       monthlyRemaining: remaining,
       monthlyUsed: state.monthlyLimitUsed,
       monthlyLimit: MONTHLY_DIARY_LIMIT,
@@ -222,6 +264,7 @@ export function getDiaryAccessState(
       canCreate: true,
       remaining: Number.MAX_SAFE_INTEGER,
       isPremiumActive: false,
+      canUseSearchAndExport: searchExportOk,
       monthlyRemaining: 0,
       monthlyUsed: 0,
       monthlyLimit: 0,
@@ -237,6 +280,7 @@ export function getDiaryAccessState(
     canCreate: remaining > 0,
     remaining,
     isPremiumActive: false,
+    canUseSearchAndExport: searchExportOk,
     monthlyRemaining: 0,
     monthlyUsed: Math.min(FREE_ENTRY_GRANT, entriesCount),
     monthlyLimit: FREE_ENTRY_GRANT,

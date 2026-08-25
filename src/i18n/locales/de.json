@@ -401,7 +401,7 @@
     "limitFreeLead": "Du hast alle 5 kostenlosen Einträge genutzt.",
     "limitPremiumLead": "Du kannst diesen Monat noch {{n}} Einträge schreiben.",
     "limitPremiumReachedLead": "Monatslimit von 50 Einträgen erreicht. Nächsten Monat kannst du wieder schreiben.",
-    "featureGateLead": "Suche und Export erfordern ein Abo. Mit Abo: Suche, Export und bis zu 50 Einträge pro Monat.",
+    "featureGateLead": "Mit Pro kannst du die Funktionen unten nutzen.",
     "premiumBenefits": "Premium: Suche, Export, {{n}} Einträge pro Monat",
     "subscribeCta": "Auf PRO upgraden",
     "appOnly": "Im App abonnieren",

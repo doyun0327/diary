@@ -30,13 +30,5 @@
 }
 
 .subscription-modal__body {
-  margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #4b5563;
-  text-align: left;
-}
-
-.subscription-modal__body p {
-  margin: 0 0 6px;
+  margin: 4px 0 12px;
 }

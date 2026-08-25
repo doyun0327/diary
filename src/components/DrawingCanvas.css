@@ -192,9 +192,10 @@
   box-sizing: border-box;
   padding: 5px 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  background: color-mix(in srgb, var(--sheet-bg) 90%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-float);
   pointer-events: auto;
 }
 
@@ -335,12 +336,15 @@
 
 .drawing__colors {
   display: flex;
-  gap: 6px;
-  padding: 6px 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 7px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  background: color-mix(in srgb, var(--sheet-bg) 90%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--shadow-float);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -351,25 +355,47 @@
 
 .drawing__color {
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  border: 2px solid #fff;
-  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.drawing__color.selected {
-  box-shadow: 0 0 0 2px var(--color-accent);
+.drawing__color-chip {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1.5px rgba(0, 0, 0, 0.14),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s ease;
+}
+
+.drawing__color:active .drawing__color-chip {
+  transform: scale(0.92);
+}
+
+.drawing__color.selected .drawing__color-chip {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 1.5px rgba(0, 0, 0, 0.14),
+    0 0 0 2.5px var(--color-bg),
+    0 0 0 4px var(--color-accent);
 }
 
 .drawing__color--custom {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: conic-gradient(#e74c3c, #f1c40f, #2ecc71, #3498db, #9b59b6, #e74c3c);
 }
 
 .drawing__color--custom input {
@@ -379,12 +405,40 @@
   cursor: pointer;
 }
 
+.drawing__color-chip--spectrum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    conic-gradient(
+      from 210deg,
+      #ef6b6b,
+      #f0b429,
+      #5cbc7a,
+      #5aa3d9,
+      #8f7cc4,
+      #ef6b6b
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
 .drawing__color-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border: 1px solid #fff;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
   pointer-events: none;
+}
+
+.drawing__color--custom.selected .drawing__color-chip--spectrum {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 0 0 2.5px var(--color-bg),
+    0 0 0 4px var(--color-accent);
 }
 
 

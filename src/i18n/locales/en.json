@@ -366,7 +366,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "Enjoy PRO benefits free for 7 days!",
+    "trialSub": "Includes 5 AI drawings · Search · Export"
   },
   "diary": {
     "empty": {
@@ -400,7 +402,7 @@
     "limitFreeLead": "You've used all 5 free entries.",
     "limitPremiumLead": "You can write {{n}} more entries this month.",
     "limitPremiumReachedLead": "You've reached this month's limit of 50 entries. You can write again next month.",
-    "featureGateLead": "Search and export require a subscription. Subscribe for search, export, and up to 50 entries per month.",
+    "featureGateLead": "With Pro, you can use the features below.",
     "premiumBenefits": "Premium: search, export, {{n}} entries per month",
     "subscribeCta": "Upgrade to PRO",
     "appOnly": "Subscribe in the app",

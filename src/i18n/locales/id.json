@@ -400,7 +400,7 @@
     "limitFreeLead": "5 entri gratis sudah habis.",
     "limitPremiumLead": "Anda masih bisa menulis {{n}} entri bulan ini.",
     "limitPremiumReachedLead": "Batas 50 entri bulan ini tercapai. Bisa menulis lagi bulan depan.",
-    "featureGateLead": "Cari dan ekspor memerlukan langganan. Dengan langganan: cari, ekspor, dan hingga 50 entri per bulan.",
+    "featureGateLead": "Dengan Pro, Anda dapat memakai fitur di bawah.",
     "premiumBenefits": "Premium: cari, ekspor, {{n}} entri per bulan",
     "subscribeCta": "Upgrade ke PRO",
     "appOnly": "Berlangganan di aplikasi",

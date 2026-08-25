@@ -68,14 +68,14 @@ type PhotoDragKind = 'move' | 'resize' | 'rotate';
 type StickerDragKind = 'move' | 'resize' | 'rotate';
 
 const COLORS = [
-  '#333333',
-  '#e74c3c',
-  '#e67e22',
-  '#f1c40f',
-  '#2ecc71',
-  '#3498db',
-  '#9b59b6',
-  '#8d6e63',
+  '#2b2b2b',
+  '#d94a4a',
+  '#e08a3c',
+  '#e0b12a',
+  '#3aaa6a',
+  '#3d8fc9',
+  '#7a6bb0',
+  '#9a7358',
 ];
 
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
@@ -1425,16 +1425,19 @@ function DrawingCanvas({
                   </button>
                 ))}
               </div>
-              <div className="drawing__colors">
+              <div className="drawing__colors" role="listbox" aria-label={t('canvas.pickColorTitle')}>
                 {COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"
+                    role="option"
+                    aria-selected={color === c}
                     className={`drawing__color ${color === c ? 'selected' : ''}`}
-                    style={{ backgroundColor: c }}
                     aria-label={t(`canvas.colorAria`, { c })}
                     onClick={() => setColor(c)}
-                  />
+                  >
+                    <span className="drawing__color-chip" style={{ backgroundColor: c }} />
+                  </button>
                 ))}
                 <label
                   className={`drawing__color drawing__color--custom ${
@@ -1450,7 +1453,9 @@ function DrawingCanvas({
                       setColor(e.target.value);
                     }}
                   />
-                  <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
+                  <span className="drawing__color-chip drawing__color-chip--spectrum" aria-hidden>
+                    <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
+                  </span>
                 </label>
               </div>
             </>

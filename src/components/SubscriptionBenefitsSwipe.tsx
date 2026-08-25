@@ -1,33 +1,23 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './AppIntro.css';
+import './SubscriptionBenefitsSwipe.css';
 
-/** 1·3·4·5 소개 → 9 (체험/혜택) */
-const INTRO_IMAGES = [1, 3, 4, 5, 9] as const;
-const SLIDE_COUNT = INTRO_IMAGES.length;
+const IMAGES = [2, 6, 7, 8] as const;
 
-type AppIntroProps = {
-  onFinish: () => void;
-};
-
-/** 첫 실행 앱 소개 — public/intro 이미지 가로 슬라이드 */
-export default function AppIntro({ onFinish }: AppIntroProps) {
+/** 구독 모달 — Pro 소개 이미지 가로 스와이프 */
+export default function SubscriptionBenefitsSwipe() {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
 
   const go = (next: number) => {
-    if (next >= SLIDE_COUNT) {
-      onFinish();
-      return;
-    }
-    setIndex(Math.max(0, Math.min(SLIDE_COUNT - 1, next)));
+    setIndex(Math.max(0, Math.min(IMAGES.length - 1, next)));
   };
 
   return (
-    <div className="app-intro" role="dialog" aria-label={t('appIntro.aria')}>
+    <div className="sub-benefits">
       <div
-        className="app-intro__viewport"
+        className="sub-benefits__viewport"
         onTouchStart={(e) => {
           touchX.current = e.changedTouches[0]?.clientX ?? null;
         }}
@@ -52,28 +42,28 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
         }}
       >
         <div
-          className="app-intro__track"
+          className="sub-benefits__track"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {INTRO_IMAGES.map((n, i) => (
-            <section key={n} className="app-intro__slide" aria-hidden={i !== index}>
+          {IMAGES.map((n, i) => (
+            <div key={n} className="sub-benefits__slide" aria-hidden={i !== index}>
               <img
-                className="app-intro__image"
+                className="sub-benefits__image"
                 src={`/intro/${n}.png`}
                 alt={t('appIntro.sample', { n })}
                 draggable={false}
               />
-            </section>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="app-intro__dots" role="tablist" aria-label={t('appIntro.aria')}>
-        {INTRO_IMAGES.map((n, i) => (
+      <div className="sub-benefits__dots" role="tablist" aria-label={t('appIntro.aria')}>
+        {IMAGES.map((n, i) => (
           <button
             key={n}
             type="button"
-            className={`app-intro__dot${i === index ? ' is-active' : ''}`}
+            className={`sub-benefits__dot${i === index ? ' is-active' : ''}`}
             onClick={() => go(i)}
             aria-label={t('appIntro.sample', { n })}
             aria-current={i === index ? 'true' : undefined}

@@ -16,6 +16,7 @@ import DecorateSheet from "./components/DecorateSheet";
 import AppInfoSheet from "./components/AppInfoSheet";
 import SearchSheet from "./components/SearchSheet";
 import AppModal from "./components/AppModal";
+import SubscriptionBenefitsSwipe from "./components/SubscriptionBenefitsSwipe";
 import { applyStoredFont } from "./components/FontPicker";
 import DiaryBookViewer from "./components/DiaryBookViewer";
 import DiaryListPage from "./pages/DiaryListPage";
@@ -49,7 +50,6 @@ import {
   applyMonthlyUsageFromServer,
   consumeDiaryUsage,
   getDiaryAccessState,
-  MONTHLY_DIARY_LIMIT,
   setDiaryAccessAccountId,
   subscribeDiaryAccess,
   SUBSCRIPTION_CHANGE_EVENT,
@@ -165,13 +165,13 @@ function App() {
 
   const openPremiumFeature = useCallback(
     (reason: "search" | "export", open: () => void) => {
-      if (accessStatus.isPremiumActive) {
+      if (accessStatus.canUseSearchAndExport) {
         open();
         return;
       }
       setSubscriptionModal(reason);
     },
-    [accessStatus.isPremiumActive],
+    [accessStatus.canUseSearchAndExport],
   );
 
   useEffect(() => {
@@ -186,11 +186,12 @@ function App() {
       }
       if (
         (subscriptionModal === "search" || subscriptionModal === "export") &&
-        next.isPremiumActive
+        next.canUseSearchAndExport
       ) {
         const reason = subscriptionModal;
         closeSubscriptionModal();
         if (reason === "search") setSearchOpen(true);
+        if (reason === "export") setExportOpen(true);
       }
     };
     window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
@@ -659,7 +660,9 @@ function App() {
         screenLockEnabled={screenLock.enabled}
         onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
-        onOpenExport={() => setExportOpen(true)}
+        onOpenExport={() =>
+          openPremiumFeature("export", () => setExportOpen(true))
+        }
         onOpenSearch={() =>
           openPremiumFeature("search", () => setSearchOpen(true))
         }
@@ -888,7 +891,7 @@ function App() {
             rangeStart={bookRange?.start}
             rangeEnd={bookRange?.end}
             avatarUrl={avatarUrl}
-            canDownloadPdf={accessStatus.isPremiumActive}
+            canDownloadPdf={accessStatus.canUseSearchAndExport}
             onRequirePremium={() => setSubscriptionModal("export")}
             onClose={() => {
               setBookEntries(null);
@@ -932,10 +935,7 @@ function App() {
             closeAriaLabel={t("common.close")}
           >
             <div className="subscription-modal__body">
-              <p>
-                {t("subscription.premiumBenefits", { n: MONTHLY_DIARY_LIMIT })}
-                PRO 기능 사진으로 넣어서 스와이프 하도록 추가
-              </p>
+              <SubscriptionBenefitsSwipe />
             </div>
           </AppModal>,
           document.getElementById("root") ?? document.body,

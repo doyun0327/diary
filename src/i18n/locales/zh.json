@@ -400,7 +400,7 @@
     "limitFreeLead": "免费 5 篇已用完。",
     "limitPremiumLead": "本月还能写 {{n}} 篇。",
     "limitPremiumReachedLead": "已达到本月上限（50 篇）。下个月可以再写。",
-    "featureGateLead": "搜索和导出需要订阅。订阅后可使用搜索、导出，每月可写 50 篇。",
+    "featureGateLead": "升级 Pro，即可使用以下功能。",
     "premiumBenefits": "高级：搜索、导出、每月 {{n}} 篇",
     "subscribeCta": "升级到 PRO",
     "appOnly": "请在 App 内订阅",

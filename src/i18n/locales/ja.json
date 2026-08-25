@@ -400,7 +400,7 @@
     "limitFreeLead": "無料5枚を使い切りました。",
     "limitPremiumLead": "今月あと{{n}}枚書けます。",
     "limitPremiumReachedLead": "今月の作成上限（50枚）に達しました。来月また書けます。",
-    "featureGateLead": "検索・エクスポートは登録後に利用できます。登録すると検索・エクスポートと月50枚の作成ができます。",
+    "featureGateLead": "Proなら、下の機能が使えます。",
     "premiumBenefits": "プレミアム：検索、エクスポート、月{{n}}枚",
     "subscribeCta": "PROにアップグレード",
     "appOnly": "アプリで登録",

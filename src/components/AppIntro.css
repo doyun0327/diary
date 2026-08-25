@@ -5,27 +5,26 @@
   display: flex;
   flex-direction: column;
   padding:
-    calc(20px + env(safe-area-inset-top))
-    20px
-    calc(24px + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 55%),
-    linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-soft, var(--color-bg)) 100%);
+    calc(12px + max(env(safe-area-inset-top, 0px), var(--diary-safe-top, 0px)))
+    12px
+    calc(16px + max(env(safe-area-inset-bottom, 0px), var(--diary-safe-bottom, 0px)));
+  background: #f4f4f4;
 }
 
 .app-intro__viewport {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: 20px;
-  background: var(--color-surface);
+  border-radius: 16px;
+  background: #fff;
   box-shadow: var(--shadow-card);
+  touch-action: pan-y;
 }
 
 .app-intro__track {
   display: flex;
   height: 100%;
-  transition: transform 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
@@ -36,33 +35,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px;
+  padding: 0;
   box-sizing: border-box;
+  background: #fff;
 }
 
-.app-intro__sample {
-  margin: 0;
-  font-size: clamp(1.6rem, 6vw, 2.2rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--color-text-muted);
+.app-intro__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .app-intro__dots {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin: 18px 0 14px;
+  gap: 7px;
+  margin: 14px 0 4px;
 }
 
 .app-intro__dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   padding: 0;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+  background: color-mix(in srgb, var(--color-text-muted) 32%, transparent);
   cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease;
 }
 
 .app-intro__dot.is-active {
