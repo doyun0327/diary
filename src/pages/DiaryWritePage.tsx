@@ -208,7 +208,10 @@ function DiaryWritePage({
     const src = initialEntry?.imageUrl;
     if (!src || imageLoadedRef.current) return;
     imageLoadedRef.current = true;
-    void canvasRef.current?.loadImage(src);
+    // 수정 모드: 사진 레이어로 올려 클릭 시 확대·취소·삭제 가능하게
+    void canvasRef.current?.loadEditableImage(src).catch(() => {
+      void canvasRef.current?.loadImage(src);
+    });
   }, [initialEntry?.imageUrl]);
 
   const leaveWithoutSaving = () => {

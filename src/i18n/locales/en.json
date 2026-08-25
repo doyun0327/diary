@@ -679,6 +679,7 @@
     },
     "stickerRotate": "Rotate",
     "removeOverlay": "Remove",
+    "photoCancel": "Cancel",
     "undo": "Undo"
   },
   "font": {

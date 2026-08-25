@@ -22,7 +22,10 @@ import './DrawingCanvas.css';
 export interface DrawingCanvasHandle {
   toDataURL: () => string | undefined;
   clear: () => void;
+  /** 캔버스에 그려 넣음 (AI 교체 등) */
   loadImage: (src: string) => Promise<void>;
+  /** 수정 가능 사진 레이어로 올림 — 클릭 시 확대·취소·삭제 */
+  loadEditableImage: (src: string) => Promise<void>;
   hasContent: () => boolean;
 }
 
@@ -827,6 +830,18 @@ function DrawingCanvas({
       await drawImageOnCanvas(src, true);
       clearUndoStack();
     },
+    loadEditableImage: async (src: string) => {
+      clearUndoStack();
+      fillWhite();
+      hasDrawn.current = false;
+      photoImages.current.clear();
+      setPhotoLayers([]);
+      setActivePhotoId(null);
+      setStickerLayers([]);
+      setActiveStickerId(null);
+      const safeSrc = await materializeImageSrc(src);
+      await addPhotoLayerAsync(safeSrc, 0.85, false);
+    },
   }));
 
   /** ✓ / 도구 전환 — 합치지 않고 선택만 해제 (다시 탭하면 이동·확대 가능) */
@@ -932,43 +947,59 @@ function DrawingCanvas({
     setFontOpen(false);
   };
 
-  const addPhotoLayer = (dataUrl: string) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const img = new Image();
-    img.onload = () => {
-      const rect = canvas.getBoundingClientRect();
-      const aspect = img.width / img.height;
-      let width = rect.width * 0.55;
-      let height = width / aspect;
-      if (height > rect.height * 0.55) {
-        height = rect.height * 0.55;
-        width = height * aspect;
+  const addPhotoLayerAsync = (
+    dataUrl: string,
+    fit = 0.55,
+    select = true,
+  ): Promise<void> =>
+    new Promise((resolve, reject) => {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        reject(new Error(t('canvas.err.noCanvas')));
+        return;
       }
 
-      const id = createId();
-      const layer: PhotoLayer = {
-        id,
-        src: dataUrl,
-        x: (rect.width - width) / 2,
-        y: (rect.height - height) / 2,
-        width,
-        height,
-        aspect,
-        rotation: 0,
-      };
+      const img = new Image();
+      img.onload = () => {
+        const rect = canvas.getBoundingClientRect();
+        const aspect = img.width / Math.max(1, img.height);
+        let width = rect.width * fit;
+        let height = width / aspect;
+        if (height > rect.height * fit) {
+          height = rect.height * fit;
+          width = height * aspect;
+        }
 
-      confirmActiveOverlay();
-      photoImages.current.set(id, img);
-      setPhotoLayers((prev) => [...prev, layer]);
-      setActivePhotoId(id);
-      setMode('pen');
-      setColorsOpen(false);
-      setFontOpen(false);
-      setStickerOpen(false);
-    };
-    img.src = dataUrl;
+        const id = createId();
+        const layer: PhotoLayer = {
+          id,
+          src: dataUrl,
+          x: (rect.width - width) / 2,
+          y: (rect.height - height) / 2,
+          width,
+          height,
+          aspect,
+          rotation: 0,
+        };
+
+        confirmActiveOverlay();
+        photoImages.current.set(id, img);
+        setPhotoLayers((prev) => [...prev, layer]);
+        setActivePhotoId(select ? id : null);
+        setMode('pen');
+        setColorsOpen(false);
+        setFontOpen(false);
+        setStickerOpen(false);
+        resolve();
+      };
+      img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
+      img.src = dataUrl;
+    });
+
+  const addPhotoLayer = (dataUrl: string) => {
+    void addPhotoLayerAsync(dataUrl).catch(() => {
+      alert(t('canvas.err.imageLoad'));
+    });
   };
 
   const placeStickerLayer = (emoji: string, x: number, y: number) => {
@@ -1275,7 +1306,8 @@ function DrawingCanvas({
                     <button
                       type="button"
                       className="drawing__photo-confirm"
-                      aria-label={t('common.save')}
+                      aria-label={t('canvas.photoCancel')}
+                      title={t('canvas.photoCancel')}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
