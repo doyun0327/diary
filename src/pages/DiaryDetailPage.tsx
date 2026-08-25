@@ -365,6 +365,7 @@ function DiaryDetailPage({
         </div>
       </div>
 
+      <div className="diary-detail__main">
       <div
         className="diary-detail__paper"
         ref={paperRef}
@@ -395,6 +396,7 @@ function DiaryDetailPage({
         <section className="diary-detail__section">
           <p className="diary-detail__content">{entry.content || ' '}</p>
         </section>
+      </div>
       </div>
 
       {feedback && (
