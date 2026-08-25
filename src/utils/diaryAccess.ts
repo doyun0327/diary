@@ -18,8 +18,24 @@ let accessAccountId = "guest";
 export function setDiaryAccessAccountId(accountId: string) {
   const next = accountId.trim() || "guest";
   if (accessAccountId === next) return;
+  // 계정 키 바꾸기 전 premium 보존 (guest→user 전환 시 Pro 상태 유실 방지)
+  const prev = loadAccessState();
   accessAccountId = next;
+  const state = loadAccessState();
+  if (
+    prev.premiumUntil &&
+    prev.premiumUntil > Date.now() &&
+    (!state.premiumUntil || state.premiumUntil < prev.premiumUntil)
+  ) {
+    state.premiumUntil = prev.premiumUntil;
+    saveAccessState(state);
+  }
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+}
+
+/** 현재 저장소 기준 Pro 여부 (항상 최신 localStorage) */
+export function isPremiumActiveNow(): boolean {
+  return getDiaryAccessState().isPremiumActive;
 }
 
 function storageKey() {
@@ -114,18 +130,43 @@ export function subscribeDiaryAccess(onStoreChange: () => void) {
     window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onStoreChange);
 }
 
-/** RevenueCat ?? Flutter ?? WebView ???? ???? ??? */
+function normalizeExpiresAtMs(expiresAt: number | null): number | null {
+  if (expiresAt == null || expiresAt <= 0) return null;
+  // 초 단위로 오면 ms로 변환
+  if (expiresAt < 1_000_000_000_000) return expiresAt * 1000;
+  return expiresAt;
+}
+
+/** RevenueCat → Flutter → WebView 구독 상태 반영 */
 export function applySubscriptionStatus(
   active: boolean,
   expiresAt: number | null,
+  productId?: string | null,
 ) {
   const state = loadAccessState();
-  if (active) {
+  const now = Date.now();
+  const until = normalizeExpiresAtMs(expiresAt);
+  // Flutter가 active=true 로 보내거나, 활성 구독 productId를 실어 보낼 때만 Pro
+  const treatActive =
+    active ||
+    (typeof productId === "string" &&
+      productId.length > 0 &&
+      (productId.includes("pageby") ||
+        productId.includes("premium") ||
+        productId === "pageby_monthly"));
+
+  if (treatActive) {
     state.premiumUntil =
-      expiresAt && expiresAt > Date.now()
-        ? expiresAt
-        : Date.now() + 30 * 24 * 60 * 60 * 1000;
+      until != null && until > now
+        ? until
+        : now + 30 * 24 * 60 * 60 * 1000;
   } else {
+    const localValid = Boolean(state.premiumUntil && state.premiumUntil > now);
+    // 초기화 전 false / 모호한 inactive 가 유효 Pro를 지우지 않게
+    // 만료 시각이 과거로 명시된 경우에만 해제
+    if (localValid && (until == null || until > now)) {
+      return;
+    }
     state.premiumUntil = null;
   }
   saveAccessState(state);

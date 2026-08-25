@@ -63,17 +63,24 @@ export function listRooms(): Promise<RoomSummary[]> {
   return request<RoomSummary[]>('/api/rooms');
 }
 
-/** 방장: 방 커버(프리셋 또는 갤러리 이미지) 변경 */
+/** 방장: 방 이름·커버 변경 */
 export function updateRoomCover(
   roomId: string,
-  body: { coverPreset?: string | null; coverUrl?: string | null },
+  body: {
+    name?: string;
+    coverPreset?: string | null;
+    coverUrl?: string | null;
+  },
 ): Promise<RoomSummary> {
+  const payload: Record<string, string | null> = {};
+  if (body.name != null) payload.name = body.name;
+  if (body.coverUrl !== undefined || body.coverPreset !== undefined) {
+    payload.coverPreset = body.coverUrl ? null : body.coverPreset ?? null;
+    payload.coverUrl = body.coverUrl ?? null;
+  }
   return request<RoomSummary>(`/api/rooms/${encodeURIComponent(roomId)}`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      coverPreset: body.coverUrl ? null : body.coverPreset ?? null,
-      coverUrl: body.coverUrl ?? null,
-    }),
+    body: JSON.stringify(payload),
   });
 }
 

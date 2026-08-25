@@ -30,7 +30,7 @@ interface RoomsHubPageProps {
   onBack: () => void;
 }
 
-type SheetKind = "create" | "join" | null;
+type SheetKind = "create" | "join" | "edit" | null;
 
 function sortRoomsNewestFirst(list: RoomSummary[]): RoomSummary[] {
   return [...list].sort((a, b) => {
@@ -83,9 +83,10 @@ function RoomsHubPage({
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [roomName, setRoomName] = useState("");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [editCoverDirty, setEditCoverDirty] = useState(false);
+  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const coverFileRef = useRef<HTMLInputElement>(null);
   const coverPickModeRef = useRef<"create" | "edit" | null>(null);
-  const coverEditRoomIdRef = useRef<string | null>(null);
   const [inviteCode, setInviteCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [createdRoom, setCreatedRoom] = useState<{
@@ -155,6 +156,12 @@ function RoomsHubPage({
       setError(t("rooms.err.needProfile"));
       return;
     }
+    if (kind === "create") {
+      setRoomName("");
+      setCoverUrl(null);
+      setEditingRoomId(null);
+      setEditCoverDirty(false);
+    }
     setSheet(kind);
   };
 
@@ -162,54 +169,27 @@ function RoomsHubPage({
     if (busy) return;
     setSheet(null);
     setError(null);
+    setEditingRoomId(null);
+    setEditCoverDirty(false);
   };
 
-  const applyRoomCoverUrl = async (roomId: string, nextUrl: string) => {
-    setBusy(true);
+  const openEditRoom = (room: RoomSummary) => {
     setError(null);
-    try {
-      await ensureAuth();
-      try {
-        const updated = await roomsApi.updateRoomCover(roomId, {
-          coverPreset: null,
-          coverUrl: nextUrl,
-        });
-        rememberRoomCover(roomId, { preset: null, url: nextUrl });
-        setRooms((prev) =>
-          sortRoomsNewestFirst(
-            prev.map((r) =>
-              r.id === roomId
-                ? {
-                    ...r,
-                    ...updated,
-                    coverPreset: null,
-                    coverUrl: updated.coverUrl ?? nextUrl,
-                  }
-                : r,
-            ),
-          ),
-        );
-      } catch {
-        rememberRoomCover(roomId, { preset: null, url: nextUrl });
-        setRooms((prev) =>
-          prev.map((r) =>
-            r.id === roomId
-              ? { ...r, coverPreset: null, coverUrl: nextUrl }
-              : r,
-          ),
-        );
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("rooms.err.coverUpdate"));
-    } finally {
-      setBusy(false);
+    if (!shareReady) {
+      setError(t("rooms.err.needProfile"));
+      return;
     }
+    const cover = resolveRoomCover(room.id, room.coverPreset, room.coverUrl);
+    setEditingRoomId(room.id);
+    setRoomName(room.name);
+    setCoverUrl(cover.kind === "image" ? cover.url : null);
+    setEditCoverDirty(false);
+    setSheet("edit");
   };
 
-  const openCoverGallery = (mode: "create" | "edit", roomId?: string) => {
+  const openCoverGallery = (mode: "create" | "edit") => {
     setError(null);
     coverPickModeRef.current = mode;
-    coverEditRoomIdRef.current = roomId ?? null;
     coverFileRef.current?.click();
   };
 
@@ -226,17 +206,65 @@ function RoomsHubPage({
       }
       try {
         const url = await fileToCoverDataUrl(file);
-        if (mode === "create") {
-          setCoverUrl(url);
-          return;
-        }
-        const roomId = coverEditRoomIdRef.current;
-        coverEditRoomIdRef.current = null;
-        if (roomId) await applyRoomCoverUrl(roomId, url);
+        setCoverUrl(url);
+        if (mode === "edit") setEditCoverDirty(true);
       } catch {
         setError(t("rooms.err.coverImage"));
       }
     })();
+  };
+
+  const handleEditSave = async () => {
+    if (!editingRoomId || busy) return;
+    const name = roomName.trim();
+    if (!name) {
+      setError(t("rooms.err.nameRequired"));
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await ensureAuth();
+      const body: {
+        name: string;
+        coverPreset?: string | null;
+        coverUrl?: string | null;
+      } = { name };
+      if (editCoverDirty) {
+        body.coverPreset = null;
+        body.coverUrl = coverUrl;
+      }
+      const updated = await roomsApi.updateRoomCover(editingRoomId, body);
+      if (editCoverDirty && coverUrl) {
+        rememberRoomCover(editingRoomId, { preset: null, url: coverUrl });
+      }
+      setRooms((prev) =>
+        sortRoomsNewestFirst(
+          prev.map((r) =>
+            r.id === editingRoomId
+              ? {
+                  ...r,
+                  ...updated,
+                  name: updated.name ?? name,
+                  coverPreset: editCoverDirty
+                    ? null
+                    : (updated.coverPreset ?? r.coverPreset),
+                  coverUrl: editCoverDirty
+                    ? (updated.coverUrl ?? coverUrl)
+                    : (updated.coverUrl ?? r.coverUrl),
+                }
+              : r,
+          ),
+        ),
+      );
+      setSheet(null);
+      setEditingRoomId(null);
+      setEditCoverDirty(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("rooms.err.coverUpdate"));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleCreate = async () => {
@@ -503,7 +531,7 @@ function RoomsHubPage({
                           className="rooms__leave-btn"
                           aria-label={t("rooms.changeCoverAria")}
                           title={t("rooms.changeCover")}
-                          onClick={() => openCoverGallery("edit", room.id)}
+                          onClick={() => openEditRoom(room)}
                         >
                           <svg
                             width="16"
@@ -645,6 +673,70 @@ function RoomsHubPage({
                 onClick={() => void handleCreate()}
               >
                 {busy ? t("rooms.creating") : t("rooms.create")}
+              </button>
+            </div>
+            {error && <p className="rooms__error">{error}</p>}
+          </div>
+        </div>
+      )}
+
+      {sheet === "edit" && (
+        <div
+          className="rooms-sheet"
+          role="dialog"
+          aria-label={t("rooms.changeCoverSheetAria")}
+        >
+          <div className="rooms-sheet__backdrop" onClick={closeSheet} />
+          <div className="rooms-sheet__panel rooms-sheet__panel--scrap">
+            <header className="rooms-sheet__head">
+              <div className="rooms-sheet__titles">
+                <h3>{t("rooms.changeCover")}</h3>
+                <p className="rooms-sheet__hint">
+                  {t("rooms.changeCoverHint", { name: roomName || t("rooms.roomFallback") })}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="sheet-close-btn"
+                onClick={closeSheet}
+                disabled={busy}
+                aria-label={t("common.close")}
+              >
+                <CloseIcon />
+              </button>
+            </header>
+            <div className="rooms-sheet__body">
+              <input
+                type="text"
+                value={roomName}
+                maxLength={30}
+                placeholder={t("rooms.roomNamePlaceholder")}
+                onChange={(e) => setRoomName(e.target.value)}
+              />
+              <button
+                type="button"
+                className={`rooms-cover-pick${coverUrl ? " is-filled" : ""}`}
+                onClick={() => openCoverGallery("edit")}
+              >
+                {coverUrl ? (
+                  <img
+                    className="rooms-cover-pick__preview"
+                    src={coverUrl}
+                    alt=""
+                  />
+                ) : (
+                  <span className="rooms-cover-pick__placeholder">
+                    {t("rooms.coverFromGallery")}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="rooms__btn primary rooms__btn--block rooms__btn--scrap"
+                disabled={busy}
+                onClick={() => void handleEditSave()}
+              >
+                {busy ? t("rooms.changingCover") : t("rooms.changeCoverSave")}
               </button>
             </div>
             {error && <p className="rooms__error">{error}</p>}

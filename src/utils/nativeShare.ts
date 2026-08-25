@@ -11,7 +11,7 @@ declare global {
     __onDiarySubscriptionStatus?: (payload: {
       active: boolean;
       expiresAt: number | null;
-      productId?: string;
+      productId?: string | null;
     }) => void;
     __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
   }

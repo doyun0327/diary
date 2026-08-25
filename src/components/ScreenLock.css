@@ -4,30 +4,44 @@
   z-index: 210;
   display: flex;
   flex-direction: column;
-  padding:
-    calc(12px + env(safe-area-inset-top))
-    20px
-    calc(20px + env(safe-area-inset-bottom));
+  padding: 0 0 calc(20px + env(safe-area-inset-bottom));
   background: var(--color-bg);
 }
 
+/* 친구방 웹 헤더와 동일 — Flutter AppBar 영역을 덮음 */
 .pin-screen__head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: 72px 1fr 72px;
+  grid-template-columns: minmax(72px, auto) 1fr minmax(72px, auto);
   align-items: center;
-  margin-bottom: 8px;
+  min-height: calc(44px + max(env(safe-area-inset-top, 0px), var(--diary-safe-top, 0px)));
+  margin: 0;
+  padding:
+    max(env(safe-area-inset-top, 0px), var(--diary-safe-top, 0px))
+    12px
+    0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent-text) 12%, transparent);
+  background: color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-bg) 45%);
 }
 
 .pin-screen__nav {
+  box-sizing: border-box;
+  min-width: 72px;
+  min-height: 44px;
   border: none;
   background: none;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 650;
   color: var(--color-text);
   cursor: pointer;
-  padding: 8px 0;
+  padding: 0 4px;
   justify-self: start;
+  display: inline-flex;
+  align-items: center;
 }
 
 .pin-screen__nav:disabled {
@@ -38,15 +52,16 @@
 .pin-screen__nav--spacer {
   visibility: hidden;
   pointer-events: none;
+  min-height: 44px;
 }
 
 .pin-screen__brand {
   text-align: center;
   font-family: var(--brand-font);
-  font-size: 1.55rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 44px;
   color: var(--color-text);
 }
 
@@ -59,6 +74,7 @@
   max-width: 360px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 20px;
   text-align: center;
 }
 

@@ -16,7 +16,6 @@ interface DiaryListPageProps {
   onViewChange: (year: number, month: number) => void;
   /** 빈 홈에서 캐릭터·첫 그림 유도 */
   onStartFirstDiary?: () => void;
-  quota?: { used: number; limit: number };
 }
 
 function DiaryListPage({
@@ -26,7 +25,6 @@ function DiaryListPage({
   viewMonth,
   onViewChange,
   onStartFirstDiary,
-  quota,
 }: DiaryListPageProps) {
   const { t } = useTranslation();
   const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
@@ -62,11 +60,6 @@ function DiaryListPage({
 
   return (
     <div className={`diary-list${entries.length === 0 ? ' diary-list--empty' : ''}`}>
-      {quota && (
-        <p className="diary-list__quota" aria-live="polite">
-          {t('quota.fraction', { used: quota.used, limit: quota.limit })}
-        </p>
-      )}
       <MoodCalendar
         entries={entries}
         viewYear={viewYear}

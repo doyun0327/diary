@@ -231,10 +231,21 @@
   position: relative;
 }
 
+.diary-write__ai-remaining {
+  flex-shrink: 0;
+  margin-left: 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .diary-write__coach-anchor {
   position: relative;
   display: inline-flex;
   align-items: center;
+  gap: 6px;
 }
 
 .diary-write__coach {

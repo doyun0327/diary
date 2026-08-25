@@ -101,7 +101,6 @@ function App() {
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const [subscriptionModal, setSubscriptionModal] =
     useState<SubscriptionModalReason | null>(null);
-  const [drawConfirmOpen, setDrawConfirmOpen] = useState(false);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
@@ -143,6 +142,8 @@ function App() {
     if (!isFlutterApp()) return;
     const userId = session?.userId ?? clientId;
     if (userId) identifySubscriptionUser(userId);
+    // 계정 전환·로그인 직후 Pro 상태 다시 받아 AI 광고 스킵되게
+    syncSubscriptionFromNative();
   }, [session?.userId, clientId]);
 
   useEffect(() => {
@@ -324,10 +325,6 @@ function App() {
   };
 
   const goBack = useCallback((): boolean => {
-    if (drawConfirmOpen) {
-      setDrawConfirmOpen(false);
-      return true;
-    }
     if (screenLock.locked) return true;
     if (bookEntries) {
       setBookEntries(null);
@@ -406,7 +403,6 @@ function App() {
     languageOpen,
     lockDisableOpen,
     lockSetupOpen,
-    drawConfirmOpen,
     page,
     screenLock.locked,
   ]);
@@ -502,10 +498,6 @@ function App() {
       setSubscriptionModal("write");
       return;
     }
-    if (status.isPremiumActive) {
-      setDrawConfirmOpen(true);
-      return;
-    }
     openWritePage();
   };
 
@@ -550,12 +542,15 @@ function App() {
     const syncNativeHeader = () => {
       const isWrite = page === "write";
       const isRoomsHub = page === "rooms";
-      /** 친구방·상세처럼 웹 자체 툴바를 쓰는 화면 → Flutter AppBar 숨김 */
+      /** 친구방·상세·화면잠금처럼 웹 자체 툴바를 쓰는 화면 → Flutter AppBar 숨김 */
       const hideNativeChrome =
         page === "detail" ||
         page === "rooms" ||
         page === "room" ||
-        page === "room-post";
+        page === "room-post" ||
+        lockSetupOpen ||
+        lockDisableOpen ||
+        screenLock.locked;
 
       // Flutter가 isFlutterApp()/채널 타이밍과 무관하게 읽을 수 있게 항상 기록
       try {
@@ -604,6 +599,9 @@ function App() {
     needsAppIntro,
     editingId,
     writeSaveEnabled,
+    lockSetupOpen,
+    lockDisableOpen,
+    screenLock.locked,
     t,
   ]);
 
@@ -649,7 +647,10 @@ function App() {
           page === "detail" ||
           page === "rooms" ||
           page === "room" ||
-          page === "room-post"
+          page === "room-post" ||
+          lockSetupOpen ||
+          lockDisableOpen ||
+          screenLock.locked
         }
         nickname={nickname}
         avatarUrl={avatarUrl}
@@ -696,14 +697,6 @@ function App() {
               setCalMonth(month);
             }}
             onStartFirstDiary={handleStartFirstDiary}
-            quota={
-              accessStatus.isPremiumActive
-                ? {
-                    used: accessStatus.monthlyUsed,
-                    limit: accessStatus.monthlyLimit,
-                  }
-                : undefined
-            }
           />
         )}
         {page === "write" && (
@@ -786,30 +779,6 @@ function App() {
         )}
       </main>
       {page === "home" && <WriteFab onClick={handleNewWrite} />}
-      {drawConfirmOpen &&
-        createPortal(
-          <AppModal
-            title={t("quota.drawConfirmTitle")}
-            lead={t("quota.drawConfirmLead", {
-              n: Math.min(
-                accessStatus.monthlyLimit,
-                accessStatus.monthlyUsed + 1,
-              ),
-              limit: accessStatus.monthlyLimit,
-            })}
-            onDismiss={() => setDrawConfirmOpen(false)}
-            showClose={false}
-            secondaryLabel={t("common.cancel")}
-            onSecondary={() => setDrawConfirmOpen(false)}
-            primaryLabel={t("quota.drawConfirmOk")}
-            onPrimary={() => {
-              setDrawConfirmOpen(false);
-              openWritePage();
-            }}
-            closeAriaLabel={t("common.close")}
-          />,
-          document.getElementById("root") ?? document.body,
-        )}
       {accountOpen &&
         createPortal(
           <AccountSheet
@@ -904,11 +873,14 @@ function App() {
           />,
           document.getElementById("root") ?? document.body,
         )}
-      {page === "home" && screenLock.locked && (
-        <ScreenLockGate
-          onUnlock={async (password) => screenLock.unlock(password)}
-        />
-      )}
+      {page === "home" &&
+        screenLock.locked &&
+        createPortal(
+          <ScreenLockGate
+            onUnlock={async (password) => screenLock.unlock(password)}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
       {bookEntries &&
         createPortal(
           <DiaryBookViewer

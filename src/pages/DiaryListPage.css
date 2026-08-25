@@ -13,16 +13,6 @@
   overflow: visible;
 }
 
-.diary-list__quota {
-  margin: 0;
-  padding: 0 2px;
-  font-family: var(--ui-font);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--color-text-muted);
-}
-
 .diary-list > * {
   position: relative;
   z-index: 1;

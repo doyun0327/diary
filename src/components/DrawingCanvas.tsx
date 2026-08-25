@@ -273,6 +273,8 @@ function DrawingCanvas({
     startY: number;
     origin: PhotoLayer;
     startAngle: number;
+    /** 이미 선택된 상태에서 짧게 탭하면 ✓와 동일하게 확정 */
+    wasAlreadyActive: boolean;
   } | null>(null);
   const stickerDrag = useRef<{
     kind: StickerDragKind;
@@ -327,15 +329,15 @@ function DrawingCanvas({
     setPreferredFontSizeId(id);
   };
 
-  const fillWhite = () => {
+  /** 잉크 레이어만 비움 (아래 사진 오버레이는 유지, 배경은 wrap) */
+  const clearInk = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
   };
 
@@ -375,46 +377,6 @@ function DrawingCanvas({
     setCanUndo(undoStack.current.length > 0);
   };
 
-  const drawImageOnCanvas = (src: string, replace: boolean): Promise<void> =>
-    new Promise((resolve, reject) => {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        reject(new Error(t('canvas.err.noCanvas')));
-        return;
-      }
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error(t('canvas.err.noContext')));
-        return;
-      }
-
-      void materializeImageSrc(src)
-        .then((safeSrc) => {
-          const img = new Image();
-          img.onload = () => {
-            const rect = canvas.getBoundingClientRect();
-            if (replace || !hasDrawn.current) {
-              fillWhite();
-            }
-
-            const scale =
-              Math.min(rect.width / img.width, rect.height / img.height) * 0.85;
-            const w = img.width * scale;
-            const h = img.height * scale;
-            const x = (rect.width - w) / 2;
-            const y = (rect.height - h) / 2;
-            ctx.drawImage(img, x, y, w, h);
-            hasDrawn.current = true;
-            resolve();
-          };
-          img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
-          img.src = safeSrc;
-        })
-        .catch((err) => {
-          reject(err instanceof Error ? err : new Error(t('canvas.err.imageLoad')));
-        });
-    });
-
   const exportDataUrl = (): string | undefined => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
@@ -427,18 +389,16 @@ function DrawingCanvas({
     }
 
     try {
-      if (photoLayers.length === 0 && stickerLayers.length === 0) {
-        return hasDrawn.current ? canvas.toDataURL('image/png') : undefined;
-      }
-
       const exportCanvas = document.createElement('canvas');
       exportCanvas.width = canvas.width;
       exportCanvas.height = canvas.height;
       const ctx = exportCanvas.getContext('2d');
       if (!ctx) return undefined;
 
-      ctx.drawImage(canvas, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
       photoLayers.forEach((layer) => bakePhotoToCanvas(layer, ctx));
+      ctx.drawImage(canvas, 0, 0);
       stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
 
       return exportCanvas.toDataURL('image/png');
@@ -504,21 +464,6 @@ function DrawingCanvas({
     hasDrawn.current = true;
   };
 
-  const bakeAllPhotos = () => {
-    const layers = photoLayersRef.current;
-    if (layers.length === 0) return;
-    layers.forEach((layer) => bakePhotoToCanvas(layer));
-    layers.forEach((l) => photoImages.current.delete(l.id));
-    setPhotoLayers([]);
-    setActivePhotoId(null);
-  };
-
-  const bakeAllStickers = () => {
-    stickerLayers.forEach((layer) => bakeStickerToCanvas(layer));
-    setStickerLayers([]);
-    setActiveStickerId(null);
-  };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -546,7 +491,7 @@ function DrawingCanvas({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      fillWhite();
+      clearInk();
       if (snapshot) {
         ctx.drawImage(snapshot, 0, 0, rect.width, rect.height);
       }
@@ -618,6 +563,7 @@ function DrawingCanvas({
           startY: pos.y,
           origin: { ...origin },
           startAngle: 0,
+          wasAlreadyActive: true,
         };
       }
       return;
@@ -797,6 +743,22 @@ function DrawingCanvas({
         return;
       }
       if (overlayPointers.current.size > 0) return;
+
+      const drag = photoDrag.current;
+      if (
+        drag &&
+        drag.kind === 'move' &&
+        drag.wasAlreadyActive &&
+        Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < 12
+      ) {
+        // 선택된 사진을 짧게 다시 탭 → ✓와 동일 (확정 후 바로 그리기)
+        setActivePhotoId(null);
+        setMode('pen');
+        setColorsOpen(true);
+        setFontOpen(false);
+        setStickerOpen(false);
+      }
+
       photoDrag.current = null;
       stickerDrag.current = null;
     };
@@ -815,7 +777,7 @@ function DrawingCanvas({
     toDataURL: exportDataUrl,
     clear: () => {
       clearUndoStack();
-      fillWhite();
+      clearInk();
       hasDrawn.current = false;
       photoImages.current.clear();
       setPhotoLayers([]);
@@ -826,15 +788,21 @@ function DrawingCanvas({
     hasContent: () =>
       hasDrawn.current || photoLayers.length > 0 || stickerLayers.length > 0,
     loadImage: async (src: string) => {
-      bakeAllPhotos();
-      bakeAllStickers();
-      // AI 그림을 새 기준으로 두고, 「뒤로」로 AI 자체가 사라지지 않게 함
-      await drawImageOnCanvas(src, true);
+      // AI·교체 이미지도 편집 가능한 사진 레이어로 (탭해서 다시 편집)
       clearUndoStack();
+      clearInk();
+      hasDrawn.current = false;
+      photoImages.current.clear();
+      setPhotoLayers([]);
+      setActivePhotoId(null);
+      setStickerLayers([]);
+      setActiveStickerId(null);
+      const safeSrc = await materializeImageSrc(src);
+      await addPhotoLayerAsync(safeSrc, 0.85, true);
     },
     loadEditableImage: async (src: string) => {
       clearUndoStack();
-      fillWhite();
+      clearInk();
       hasDrawn.current = false;
       photoImages.current.clear();
       setPhotoLayers([]);
@@ -846,19 +814,8 @@ function DrawingCanvas({
     },
   }));
 
-  /** ✓ — 사진을 캔버스에 합쳐 그 위에 펜으로 그릴 수 있게 함 */
+  /** ✓ — 선택 해제 후 바로 그 위에 펜으로 그릴 수 있게 */
   const confirmActivePhoto = () => {
-    const id = activePhotoIdRef.current ?? activePhotoId;
-    if (!id) {
-      setActivePhotoId(null);
-      return;
-    }
-    const layer = photoLayersRef.current.find((l) => l.id === id);
-    if (layer) {
-      bakePhotoToCanvas(layer);
-      photoImages.current.delete(id);
-      setPhotoLayers((prev) => prev.filter((l) => l.id !== id));
-    }
     setActivePhotoId(null);
     setMode('pen');
     setColorsOpen(true);
@@ -896,7 +853,12 @@ function DrawingCanvas({
   };
 
   const switchTool = (next: ToolMode, openColors: boolean) => {
-    confirmActiveOverlay();
+    // 사진 편집 중 펜/지우개 선택 = ✓와 동일하게 확정 후 그리기
+    if (activePhotoIdRef.current && (next === 'pen' || next === 'eraser')) {
+      setActivePhotoId(null);
+    } else {
+      confirmActiveOverlay();
+    }
     setMode(next);
     setStickerOpen(false);
     setFontOpen(false);
@@ -1003,7 +965,7 @@ function DrawingCanvas({
         photoImages.current.set(id, img);
         setPhotoLayers((prev) => [...prev, layer]);
         setActivePhotoId(select ? id : null);
-        setMode('pen');
+        setMode('none');
         setColorsOpen(false);
         setFontOpen(false);
         setStickerOpen(false);
@@ -1057,6 +1019,7 @@ function DrawingCanvas({
     e.stopPropagation();
     e.preventDefault();
     if (activeStickerId) setActiveStickerId(null);
+    const wasAlreadyActive = activePhotoIdRef.current === layer.id;
     setActivePhotoId(layer.id);
     activePhotoIdRef.current = layer.id;
     activeStickerIdRef.current = null;
@@ -1085,6 +1048,7 @@ function DrawingCanvas({
       startY: e.clientY,
       origin: { ...live },
       startAngle,
+      wasAlreadyActive,
     };
   };
 
@@ -1138,6 +1102,24 @@ function DrawingCanvas({
     beginOverlayPinch();
   };
 
+  /** 사진 밖(캔버스 빈 곳·도구 바깥)을 누르면 ✓와 동일 */
+  const handleWrapBackgroundDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (!activePhotoIdRef.current && !activeStickerIdRef.current) return;
+    const el = e.target as HTMLElement | null;
+    if (
+      el?.closest(
+        '.drawing__photo, .drawing__sticker-layer, .drawing__dock, button, .drawing__photo-handle, .drawing__sticker-rotate',
+      )
+    ) {
+      return;
+    }
+    if (activePhotoIdRef.current) {
+      confirmActivePhoto();
+      return;
+    }
+    setActiveStickerId(null);
+  };
+
   const getPos = (e: PointerEvent<HTMLCanvasElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -1174,10 +1156,6 @@ function DrawingCanvas({
     }
 
     confirmActiveOverlay();
-    // 남은 사진 오버레이는 캔버스에 합친 뒤 그 위에 그림
-    if ((mode === 'pen' || mode === 'eraser') && photoLayersRef.current.length > 0) {
-      bakeAllPhotos();
-    }
     if (mode === 'none') return;
 
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -1202,13 +1180,15 @@ function DrawingCanvas({
 
     ctx.save();
     if (mode === 'eraser') {
-      ctx.strokeStyle = '#ffffff';
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
       ctx.lineWidth = eraserWidth;
       ctx.globalAlpha = 1;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
     } else {
       const pen = strokeStyleForPen();
+      ctx.globalCompositeOperation = 'source-over';
       ctx.strokeStyle = color;
       ctx.globalAlpha = pen.alpha;
       ctx.lineCap = penKind === 'marker' ? 'square' : 'round';
@@ -1238,7 +1218,7 @@ function DrawingCanvas({
 
   const applyClearAll = () => {
     clearUndoStack();
-    fillWhite();
+    clearInk();
     hasDrawn.current = false;
     photoImages.current.clear();
     setPhotoLayers([]);
@@ -1251,10 +1231,13 @@ function DrawingCanvas({
   const editingOverlay = Boolean(activePhotoId || activeStickerId);
   const allowPageScroll =
     mode === 'none' && !fontOpen && !stickerOpen && !editingOverlay;
+  /** 선택 도구·사진 편집 중엔 아래 사진 레이어가 터치를 받음 */
+  const canvasPassThrough = mode === 'none' || Boolean(activePhotoId);
 
   const canvasClass = [
     'drawing__canvas',
     allowPageScroll ? 'drawing__canvas--idle' : '',
+    canvasPassThrough ? 'drawing__canvas--pass' : '',
     mode === 'eraser' ? 'drawing__canvas--eraser' : '',
     mode === 'sticker' ? 'drawing__canvas--sticker' : '',
   ]
@@ -1275,16 +1258,8 @@ function DrawingCanvas({
         className={`drawing__canvas-wrap${allowPageScroll ? ' drawing__canvas-wrap--scroll' : ''}`}
         ref={wrapRef}
         onPointerDownCapture={handleWrapPinchCapture}
+        onPointerDown={handleWrapBackgroundDown}
       >
-        <canvas
-          ref={canvasRef}
-          className={canvasClass}
-          onPointerDown={handleDown}
-          onPointerMove={handleMove}
-          onPointerUp={handleUp}
-          onPointerCancel={handleUp}
-        />
-
         <div className="drawing__photo-layers">
           {photoLayers.map((layer) => {
             const isActive = activePhotoId === layer.id;
@@ -1351,7 +1326,18 @@ function DrawingCanvas({
               </div>
             );
           })}
+        </div>
 
+        <canvas
+          ref={canvasRef}
+          className={canvasClass}
+          onPointerDown={handleDown}
+          onPointerMove={handleMove}
+          onPointerUp={handleUp}
+          onPointerCancel={handleUp}
+        />
+
+        <div className="drawing__sticker-layers">
           {stickerLayers.map((layer) => {
             const isActive = activeStickerId === layer.id;
             const box = layer.size * 1.35;

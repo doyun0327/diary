@@ -28,7 +28,14 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
+}
+
+.drawing__sticker-layers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
 }
 
 .drawing__photo {
@@ -61,8 +68,8 @@
 
 .drawing__photo-confirm {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 8px;
+  right: 8px;
   width: 28px;
   height: 28px;
   border: none;
@@ -78,8 +85,8 @@
 
 .drawing__photo-remove {
   position: absolute;
-  top: -10px;
-  left: -10px;
+  top: 8px;
+  left: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -101,8 +108,8 @@
 
 .drawing__photo-handle {
   position: absolute;
-  right: -8px;
-  bottom: -8px;
+  right: 6px;
+  bottom: 6px;
   width: 18px;
   height: 18px;
   border: 2px solid var(--color-accent);
@@ -166,6 +173,17 @@
   background: var(--color-accent);
 }
 
+/* 사진을 캔버스에 꽉 채우면 바깥 핸들이 잘리므로 안쪽에 둠 */
+.drawing__photo.active .drawing__sticker-rotate {
+  top: auto;
+  bottom: 8px;
+}
+
+.drawing__photo.active .drawing__sticker-rotate::before {
+  top: auto;
+  bottom: 100%;
+}
+
 .drawing__pen-kinds {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -204,11 +222,18 @@
 }
 
 .drawing__canvas {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   display: block;
   touch-action: none;
   cursor: crosshair;
+  background: transparent;
+}
+
+.drawing__canvas--pass {
+  pointer-events: none;
 }
 
 .drawing__canvas--idle {

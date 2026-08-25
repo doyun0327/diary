@@ -23,12 +23,14 @@ import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
+  FREE_AI_DRAWS_PER_DAY,
   consumeAiDrawCredit,
   consumeFreeAiDrawChance,
   getAiDrawCredits,
   getDiaryAccessState,
   getRemainingFreeAiDrawsToday,
   grantAiDrawCredits,
+  subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
   isAiCoachSeen,
@@ -39,7 +41,11 @@ import {
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
-import { requestSubscriptionPurchase } from '../utils/subscription';
+import {
+  requestSubscriptionPurchase,
+  refreshSubscriptionStatus,
+  syncSubscriptionFromNative,
+} from '../utils/subscription';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -109,6 +115,9 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
+  const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
+  const [accessTick, setAccessTick] = useState(0);
+  void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
@@ -128,7 +137,6 @@ function DiaryWritePage({
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const imageLoadedRef = useRef(false);
 
   useEffect(() => {
     onNativeSaveStateChange?.(!aiLoading);
@@ -202,12 +210,29 @@ function DiaryWritePage({
 
   useEffect(() => {
     const src = initialEntry?.imageUrl;
-    if (!src || imageLoadedRef.current) return;
-    imageLoadedRef.current = true;
-    // 수정 모드: 사진 레이어로 올려 클릭 시 확대·취소·삭제 가능하게
-    void canvasRef.current?.loadEditableImage(src).catch(() => {
-      void canvasRef.current?.loadImage(src);
-    });
+    if (!src) return;
+    let cancelled = false;
+    let attempts = 0;
+
+    const tryLoad = () => {
+      if (cancelled) return;
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        if (attempts++ < 60) {
+          window.requestAnimationFrame(tryLoad);
+        }
+        return;
+      }
+      // 수정 모드: 사진 레이어로 올려 탭 시 확대·이동·삭제 가능
+      void canvas.loadEditableImage(src).catch(() => {
+        if (!cancelled) void canvas.loadImage(src);
+      });
+    };
+
+    tryLoad();
+    return () => {
+      cancelled = true;
+    };
   }, [initialEntry?.imageUrl]);
 
   const leaveWithoutSaving = () => {
@@ -253,8 +278,52 @@ function DiaryWritePage({
     return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
   }, []);
 
+  // Pro 결제 반영되면 AI 광고 팝업 즉시 닫기 + 남은 횟수 갱신
+  useEffect(() => {
+    return subscribeDiaryAccess(() => {
+      setAccessTick((n) => n + 1);
+      if (getDiaryAccessState().isPremiumActive) {
+        setRewardPromptOpen(false);
+      }
+    });
+  }, []);
+
   const saveAndLeave = () => {
     formRef.current?.requestSubmit();
+  };
+
+  const aiRemaining = (() => {
+    if (writeQuota) {
+      return {
+        n: Math.max(0, writeQuota.limit - writeQuota.used),
+        limit: writeQuota.limit,
+      };
+    }
+    return {
+      n: getRemainingFreeAiDrawsToday(),
+      limit: FREE_AI_DRAWS_PER_DAY,
+    };
+  })();
+
+  const startAiDrawFlow = () => {
+    if (canvasRef.current?.hasContent()) {
+      setReplaceConfirmOpen(true);
+      return;
+    }
+    void (async () => {
+      if (AI_REWARD_AD_ENABLED) {
+        let access = getDiaryAccessState();
+        if (!access.isPremiumActive) {
+          await refreshSubscriptionStatus();
+          access = getDiaryAccessState();
+        }
+        if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
+          setRewardPromptOpen(true);
+          return;
+        }
+      }
+      await runAiDraw();
+    })();
   };
 
   const handleAiDraw = () => {
@@ -262,24 +331,17 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    if (canvasRef.current?.hasContent()) {
-      setReplaceConfirmOpen(true);
-      return;
-    }
-    if (AI_REWARD_AD_ENABLED) {
-      const access = getDiaryAccessState();
-      if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
-        setRewardPromptOpen(true);
-        return;
-      }
-    }
-    void runAiDraw();
+    setAiConfirmOpen(true);
   };
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
     if (AI_REWARD_AD_ENABLED) {
-      const access = getDiaryAccessState();
+      let access = getDiaryAccessState();
+      if (!access.isPremiumActive) {
+        await refreshSubscriptionStatus();
+        access = getDiaryAccessState();
+      }
       if (!access.isPremiumActive) {
         if (getRemainingFreeAiDrawsToday() <= 0) {
           setAiError(t('write.err.aiDailyLimit'));
@@ -384,14 +446,6 @@ function DiaryWritePage({
           </button>
           <span className="diary-write__nav-title">
             {isEdit ? t('write.title.edit') : t('write.title.new')}
-            {!isEdit && writeQuota ? (
-              <span className="diary-write__quota">
-                {t('quota.fraction', {
-                  used: Math.min(writeQuota.limit, writeQuota.used + 1),
-                  limit: writeQuota.limit,
-                })}
-              </span>
-            ) : null}
           </span>
           <button
             type="submit"
@@ -418,14 +472,6 @@ function DiaryWritePage({
           >
             {formatDate(date)}
           </button>
-          {!isEdit && writeQuota ? (
-            <span className="diary-write__quota-chip">
-              {t('quota.fraction', {
-                used: Math.min(writeQuota.limit, writeQuota.used + 1),
-                limit: writeQuota.limit,
-              })}
-            </span>
-          ) : null}
           {calendarOpen && (
             <CalendarPopup
               value={date}
@@ -579,6 +625,14 @@ function DiaryWritePage({
                     >
                       {aiLabel}
                     </button>
+                    {!isEdit && (
+                      <span className="diary-write__ai-remaining" aria-label={t('quota.fraction', { used: aiRemaining.n, limit: aiRemaining.limit })}>
+                        {t('quota.fraction', {
+                          used: aiRemaining.n,
+                          limit: aiRemaining.limit,
+                        })}
+                      </span>
+                    )}
                     {coach === 'ai' && (
                       <div className="diary-write__coach diary-write__coach--ai" role="status">
                         <p>{t('write.coach.ai')}</p>
@@ -635,6 +689,25 @@ function DiaryWritePage({
           onPrimary={saveAndLeave}
         />
       )}
+      {aiConfirmOpen && (
+        <AppModal
+          title={t('quota.drawConfirmTitle')}
+          lead={t('quota.drawConfirmLead', {
+            n: aiRemaining.n,
+            limit: aiRemaining.limit,
+          })}
+          onDismiss={() => setAiConfirmOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setAiConfirmOpen(false)}
+          primaryLabel={t('quota.drawConfirmOk')}
+          onPrimary={() => {
+            setAiConfirmOpen(false);
+            startAiDrawFlow();
+          }}
+        />
+      )}
       {replaceConfirmOpen && (
         <AppModal
           title={t('write.confirm.replaceTitle')}
@@ -659,6 +732,9 @@ function DiaryWritePage({
           onSecondary={() => {
             setRewardPromptOpen(false);
             requestSubscriptionPurchase();
+            // 결제 직후 상태 동기화 (엔타이틀먼트 반영 지연 대비)
+            window.setTimeout(() => syncSubscriptionFromNative(), 800);
+            window.setTimeout(() => syncSubscriptionFromNative(), 2500);
           }}
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
