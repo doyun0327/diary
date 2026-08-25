@@ -207,7 +207,7 @@ function App() {
     });
   }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t]);
 
-  usePushRegistration(!needsProfileSetup);
+  usePushRegistration(!needsProfileSetup, session?.userId ?? clientId);
 
   const openFromPush = useCallback(
     (payload: { type?: string; roomId: string; postId?: string }) => {
