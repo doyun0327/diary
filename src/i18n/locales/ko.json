@@ -470,7 +470,7 @@
       "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 받을 수 있어요",
       "adNotCompletedWrite": "광고를 끝까지 봐야 일기를 저장할 수 있어요",
       "adAppOnly": "앱에서만 광고를 볼 수 있어요",
-      "aiDailyLimit": "미구독자는 하루에 AI 그림을 2번까지 그릴 수 있어요"
+      "aiDailyLimit": "미구독자는 하루에 AI 그림을 5번까지 그릴 수 있어요"
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",
@@ -680,6 +680,7 @@
     "stickerRotate": "회전",
     "removeOverlay": "삭제",
     "photoCancel": "취소",
+    "photoConfirm": "완료",
     "undo": "뒤로"
   },
   "font": {

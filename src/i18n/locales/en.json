@@ -470,7 +470,7 @@
       "adNotCompleted": "Finish the ad to get one AI drawing",
       "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
-      "aiDailyLimit": "Non-subscribers can create up to 2 AI drawings per day"
+      "aiDailyLimit": "Non-subscribers can create up to 5 AI drawings per day"
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
@@ -680,6 +680,7 @@
     "stickerRotate": "Rotate",
     "removeOverlay": "Remove",
     "photoCancel": "Cancel",
+    "photoConfirm": "Done",
     "undo": "Undo"
   },
   "font": {

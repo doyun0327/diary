@@ -259,7 +259,8 @@ function App() {
     }
 
     const status = getDiaryAccessState(entries.length);
-    if (!status.canCreate) {
+    // 프리미엄 월 한도만 저장 차단. 무료는 일기 저장 무제한.
+    if (status.isPremiumActive && !status.canCreate) {
       setSubscriptionModal("write");
       return;
     }

@@ -505,8 +505,10 @@ function DrawingCanvas({
   };
 
   const bakeAllPhotos = () => {
-    photoLayers.forEach((layer) => bakePhotoToCanvas(layer));
-    photoLayers.forEach((l) => photoImages.current.delete(l.id));
+    const layers = photoLayersRef.current;
+    if (layers.length === 0) return;
+    layers.forEach((layer) => bakePhotoToCanvas(layer));
+    layers.forEach((l) => photoImages.current.delete(l.id));
     setPhotoLayers([]);
     setActivePhotoId(null);
   };
@@ -844,9 +846,24 @@ function DrawingCanvas({
     },
   }));
 
-  /** ✓ / 도구 전환 — 합치지 않고 선택만 해제 (다시 탭하면 이동·확대 가능) */
+  /** ✓ — 사진을 캔버스에 합쳐 그 위에 펜으로 그릴 수 있게 함 */
   const confirmActivePhoto = () => {
+    const id = activePhotoIdRef.current ?? activePhotoId;
+    if (!id) {
+      setActivePhotoId(null);
+      return;
+    }
+    const layer = photoLayersRef.current.find((l) => l.id === id);
+    if (layer) {
+      bakePhotoToCanvas(layer);
+      photoImages.current.delete(id);
+      setPhotoLayers((prev) => prev.filter((l) => l.id !== id));
+    }
     setActivePhotoId(null);
+    setMode('pen');
+    setColorsOpen(true);
+    setFontOpen(false);
+    setStickerOpen(false);
   };
 
   const confirmActiveSticker = () => {
@@ -1157,6 +1174,10 @@ function DrawingCanvas({
     }
 
     confirmActiveOverlay();
+    // 남은 사진 오버레이는 캔버스에 합친 뒤 그 위에 그림
+    if ((mode === 'pen' || mode === 'eraser') && photoLayersRef.current.length > 0) {
+      bakeAllPhotos();
+    }
     if (mode === 'none') return;
 
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -1306,8 +1327,8 @@ function DrawingCanvas({
                     <button
                       type="button"
                       className="drawing__photo-confirm"
-                      aria-label={t('canvas.photoCancel')}
-                      title={t('canvas.photoCancel')}
+                      aria-label={t('canvas.photoConfirm')}
+                      title={t('canvas.photoConfirm')}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();

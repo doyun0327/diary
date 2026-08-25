@@ -1,9 +1,10 @@
 export const FREE_ENTRY_GRANT = 5;
-/** true면 무료 5장 이후 신규 작성 시 구독 필요 */
-export const FREE_ENTRY_LIMIT_ENABLED = true;
+/** 무료 회원은 일기 작성·저장 무제한. AI 그림만 횟수 제한 */
+export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 1900;
-export const FREE_AI_DRAWS_PER_DAY = 2;
+/** 미구독자 AI 그림 일일 한도 */
+export const FREE_AI_DRAWS_PER_DAY = 5;
 /** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 */
 export const AI_REWARD_AD_ENABLED = true;
 

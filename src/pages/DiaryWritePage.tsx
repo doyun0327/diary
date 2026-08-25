@@ -24,13 +24,11 @@ import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferred
 import {
   AI_REWARD_AD_ENABLED,
   consumeAiDrawCredit,
-  consumeBonusDiarySlotIfNeeded,
   consumeFreeAiDrawChance,
   getAiDrawCredits,
   getDiaryAccessState,
   getRemainingFreeAiDrawsToday,
   grantAiDrawCredits,
-  grantBonusDiarySlots,
 } from '../utils/diaryAccess';
 import {
   isAiCoachSeen,
@@ -111,8 +109,6 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
-  const [rewardPromptKind, setRewardPromptKind] = useState<'ai' | 'write'>('ai');
-  const pendingSaveAfterAdRef = useRef(false);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
@@ -273,7 +269,6 @@ function DiaryWritePage({
     if (AI_REWARD_AD_ENABLED) {
       const access = getDiaryAccessState();
       if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
-        setRewardPromptKind('ai');
         setRewardPromptOpen(true);
         return;
       }
@@ -291,7 +286,6 @@ function DiaryWritePage({
           return;
         }
         if (!consumeAiDrawCredit()) {
-          setRewardPromptKind('ai');
           setRewardPromptOpen(true);
           return;
         }
@@ -326,8 +320,7 @@ function DiaryWritePage({
       setAiError(t('write.err.adAppOnly'));
       return;
     }
-    const kind = rewardPromptKind;
-    if (kind === 'ai' && getRemainingFreeAiDrawsToday() <= 0) {
+    if (getRemainingFreeAiDrawsToday() <= 0) {
       setRewardPromptOpen(false);
       setAiError(t('write.err.aiDailyLimit'));
       return;
@@ -336,17 +329,7 @@ function DiaryWritePage({
     setAiError(null);
     const ok = await requestAiRewardedAd();
     if (!ok) {
-      setAiError(
-        kind === 'write'
-          ? t('write.err.adNotCompletedWrite')
-          : t('write.err.adNotCompleted'),
-      );
-      return;
-    }
-    if (kind === 'write') {
-      grantBonusDiarySlots(1);
-      pendingSaveAfterAdRef.current = false;
-      formRef.current?.requestSubmit();
+      setAiError(t('write.err.adNotCompleted'));
       return;
     }
     grantAiDrawCredits(1);
@@ -367,20 +350,13 @@ function DiaryWritePage({
       return;
     }
 
+    // 프리미엄 월 한도만 저장 차단. 무료 회원은 저장 제한 없음.
     if (!isEdit) {
       const status = getDiaryAccessState(entriesCount);
-      if (!status.canCreate) {
-        if (status.isPremiumActive) {
-          onOpenWriteLimitModal?.();
-          return;
-        }
-        // 무료 한도 소진 → 광고로 1편 저장 해금
-        setRewardPromptKind('write');
-        setRewardPromptOpen(true);
-        pendingSaveAfterAdRef.current = true;
+      if (status.isPremiumActive && !status.canCreate) {
+        onOpenWriteLimitModal?.();
         return;
       }
-      consumeBonusDiarySlotIfNeeded(entriesCount);
     }
 
     setAiError(null);
@@ -674,26 +650,14 @@ function DiaryWritePage({
       )}
       {rewardPromptOpen && (
         <AppModal
-          title={
-            rewardPromptKind === 'write'
-              ? t('write.reward.saveTitle')
-              : t('write.ai.rewardTitle')
-          }
-          lead={
-            rewardPromptKind === 'write'
-              ? t('write.reward.saveLead')
-              : t('write.ai.rewardLead')
-          }
-          onDismiss={() => {
-            setRewardPromptOpen(false);
-            pendingSaveAfterAdRef.current = false;
-          }}
+          title={t('write.ai.rewardTitle')}
+          lead={t('write.ai.rewardLead')}
+          onDismiss={() => setRewardPromptOpen(false)}
           showClose={false}
           closeAriaLabel={t('common.close')}
           secondaryLabel={t('subscription.subscribeCta')}
           onSecondary={() => {
             setRewardPromptOpen(false);
-            pendingSaveAfterAdRef.current = false;
             requestSubscriptionPurchase();
           }}
           primaryLabel={t('write.ai.rewardCta')}
