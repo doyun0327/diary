@@ -9,7 +9,8 @@
   min-height: 100%;
   background: var(--color-bg);
   font-family: var(--ui-font);
-  overflow: hidden;
+  /* hidden이면 앱에서 달력 하단이 잘림 */
+  overflow: visible;
 }
 
 .diary-list__quota {

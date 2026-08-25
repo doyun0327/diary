@@ -6,7 +6,7 @@
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-card);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .mood-cal > * {
