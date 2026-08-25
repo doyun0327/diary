@@ -102,24 +102,19 @@
 
 .mood-cal__weekdays {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   margin-bottom: 8px;
   padding: 0 1px;
 }
 
 .mood-cal__weekdays span {
-  min-width: 0;
   text-align: center;
   font-family: var(--brand-font);
-  font-size: clamp(0.62rem, 2.6vw, 0.82rem);
+  font-size: 0.9rem;
   font-weight: 700;
-  line-height: 1.2;
   color: var(--color-text-muted);
   padding: 4px 0 8px;
   letter-spacing: 0.02em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .mood-cal__weekdays span:first-child {
@@ -134,9 +129,6 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
-  width: 100%;
-  container-type: inline-size;
-  container-name: mood-cal-days;
 }
 
 .mood-cal__day {
@@ -146,7 +138,7 @@
   height: auto;
   min-width: 0;
   min-height: 0;
-  padding: 2px;
+  padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,9 +148,8 @@
   border-radius: 16px;
   background: transparent;
   font-family: var(--brand-font);
-  font-size: clamp(0.68rem, 9cqi, 0.92rem);
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1;
   color: var(--color-text-muted);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -255,8 +246,6 @@
   aspect-ratio: var(--diary-drawing-ratio);
   padding: 0;
   border-radius: 8px;
-  font-size: clamp(0.62rem, 8.5cqi, 0.88rem);
-  line-height: 1;
 }
 
 .mood-cal--drawing .mood-cal__day.has-drawing {
