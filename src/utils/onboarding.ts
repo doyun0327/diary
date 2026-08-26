@@ -2,6 +2,7 @@ const CHARACTER_DONE_KEY = 'picture-diary-onboarding-character-done';
 const CHARACTER_COACH_KEY = 'picture-diary-onboarding-character-coach';
 const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
 const ROOM_COMMENT_COACH_KEY = 'picture-diary-onboarding-room-comment-coach';
+const ROOM_POKE_COACH_KEY = 'picture-diary-onboarding-room-poke-coach';
 const PROFILE_DONE_KEY = 'picture-diary-onboarding-profile-done';
 const INTRO_DONE_KEY = 'picture-diary-onboarding-intro-done';
 /** 레거시 유저 스킵 마이그레이션은 앱 생애 1회만 */
@@ -92,4 +93,12 @@ export function isRoomCommentCoachSeen(): boolean {
 
 export function markRoomCommentCoachSeen() {
   writeFlag(ROOM_COMMENT_COACH_KEY);
+}
+
+export function isRoomPokeCoachSeen(): boolean {
+  return readFlag(ROOM_POKE_COACH_KEY);
+}
+
+export function markRoomPokeCoachSeen() {
+  writeFlag(ROOM_POKE_COACH_KEY);
 }

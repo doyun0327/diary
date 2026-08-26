@@ -307,7 +307,8 @@
     "goHome": "Ir ao início",
     "openPostAria": "Abrir o diário {{title}} de {{author}}",
     "coach": {
-      "comment": "Deixe um comentário!"
+      "comment": "Deixe um comentário!",
+      "poke": "Toque na foto para cutucar um amigo!"
     },
     "backToRoom": "← Para a sala",
     "backToRoomAria": "Voltar à sala",

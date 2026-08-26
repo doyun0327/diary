@@ -308,7 +308,8 @@
     "goHome": "Zur Startseite",
     "openPostAria": "Tagebuch von {{author}} öffnen: {{title}}",
     "coach": {
-      "comment": "Hinterlasse einen Kommentar!"
+      "comment": "Hinterlasse einen Kommentar!",
+      "poke": "Tippe auf ein Profilbild zum Anstupsen!"
     },
     "backToRoom": "← Zum Raum",
     "backToRoomAria": "Zurück zum Raum",

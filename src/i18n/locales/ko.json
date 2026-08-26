@@ -320,7 +320,8 @@
     "goHome": "메인 화면으로",
     "openPostAria": "{{author}}의 일기 {{title}} 크게 보기",
     "coach": {
-      "comment": "댓글을 남겨보세요!"
+      "comment": "댓글을 남겨보세요!",
+      "poke": "프사를 누르면 친구에게 알림이 가요!"
     },
     "backToRoom": "← 방으로",
     "backToRoomAria": "방으로",

@@ -11,6 +11,8 @@ type RoomMemberAvatarsProps = {
   roomId: string;
   members: RoomMember[];
   currentUserId?: string | null;
+  showPokeCoach?: boolean;
+  onDismissPokeCoach?: () => void;
 };
 
 function memberAvatarSrc(member: RoomMember): string | null {
@@ -26,6 +28,8 @@ function RoomMemberAvatars({
   roomId,
   members,
   currentUserId,
+  showPokeCoach = false,
+  onDismissPokeCoach,
 }: RoomMemberAvatarsProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -84,6 +88,7 @@ function RoomMemberAvatars({
         body: t('rooms.pokePushBody', { name: member.nickname }),
       });
       lastPokeAt.current.set(member.userId, Date.now());
+      onDismissPokeCoach?.();
       showToast(t('rooms.pokeSent'));
     } catch (err) {
       showToast(err instanceof Error ? err.message : t('rooms.pokeFail'));
@@ -98,6 +103,19 @@ function RoomMemberAvatars({
 
   return (
     <div className="room-members" ref={rootRef}>
+      {showPokeCoach && (
+        <div className="room-members__coach" role="status">
+          <p>{t('rooms.coach.poke')}</p>
+          <button
+            type="button"
+            className="room-members__coach-dismiss"
+            aria-label={t('common.close')}
+            onClick={() => onDismissPokeCoach?.()}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="room-members__stack" role="list" aria-label={t('rooms.membersAria')}>
         {visible.map((member) => (
           <button

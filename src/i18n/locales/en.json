@@ -320,7 +320,8 @@
     "goHome": "Go to home",
     "openPostAria": "Open {{author}}’s diary {{title}}",
     "coach": {
-      "comment": "Leave a comment!"
+      "comment": "Leave a comment!",
+      "poke": "Tap a profile to send a nudge!"
     },
     "backToRoom": "← To room",
     "backToRoomAria": "Back to room",

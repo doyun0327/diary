@@ -8,7 +8,9 @@ import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomMemberAvatars from '../components/RoomMemberAvatars';
 import {
   isRoomCommentCoachSeen,
+  isRoomPokeCoachSeen,
   markRoomCommentCoachSeen,
+  markRoomPokeCoachSeen,
 } from '../utils/onboarding';
 import {
   getCachedRoomFeed,
@@ -33,6 +35,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
+  const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
   const [postsPage, setPostsPage] = useState(0);
 
   const postsPageCount = Math.max(1, Math.ceil(posts.length / ROOM_POSTS_PAGE_SIZE));
@@ -87,10 +90,19 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     setShowCoach(false);
   };
 
+  const dismissPokeCoach = () => {
+    markRoomPokeCoachSeen();
+    setShowPokeCoach(false);
+  };
+
   const handleOpenPost = (postId: string) => {
     if (showCoach) dismissCoach();
     onOpenPost(postId);
   };
+
+  const otherMembers =
+    room?.members.filter((m) => !userId || m.userId !== userId) ?? [];
+  const canShowPokeCoach = showPokeCoach && otherMembers.length > 0;
 
   return (
     <div className="rooms rooms--in-room">
@@ -112,19 +124,19 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
 
       {room && (
         <section className="rooms__list-wrap">
-          {posts.length > 0 && (
-            <div className="rooms__section-head">
-              <div className="rooms__section-head-main">
-                <h3>{t('rooms.sharedDiaries')}</h3>
-                <span className="rooms__section-count">{posts.length}</span>
-              </div>
-              <RoomMemberAvatars
-                roomId={roomId}
-                members={room.members}
-                currentUserId={userId}
-              />
+          <div className="rooms__section-head">
+            <div className="rooms__section-head-main">
+              <h3>{t('rooms.sharedDiaries')}</h3>
+              <span className="rooms__section-count">{posts.length}</span>
             </div>
-          )}
+            <RoomMemberAvatars
+              roomId={roomId}
+              members={room.members}
+              currentUserId={userId}
+              showPokeCoach={canShowPokeCoach}
+              onDismissPokeCoach={dismissPokeCoach}
+            />
+          </div>
           {posts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
               <p className="rooms__empty-title rooms__empty-title--multiline">

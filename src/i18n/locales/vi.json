@@ -307,7 +307,8 @@
     "goHome": "Về trang chủ",
     "openPostAria": "Mở nhật ký {{title}} của {{author}}",
     "coach": {
-      "comment": "Hãy để lại bình luận!"
+      "comment": "Hãy để lại bình luận!",
+      "poke": "Chạm ảnh đại diện để nhắc bạn bè!"
     },
     "backToRoom": "← Về phòng",
     "backToRoomAria": "Về phòng",

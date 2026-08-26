@@ -307,7 +307,8 @@
     "goHome": "回到主页",
     "openPostAria": "打开{{author}}的日记{{title}}",
     "coach": {
-      "comment": "留言试试吧！"
+      "comment": "留言试试吧！",
+      "poke": "点头像就能提醒朋友写日记!"
     },
     "backToRoom": "← 返回房间",
     "backToRoomAria": "返回房间",

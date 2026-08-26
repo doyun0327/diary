@@ -307,7 +307,8 @@
     "goHome": "Ke beranda",
     "openPostAria": "Buka diary {{title}} milik {{author}}",
     "coach": {
-      "comment": "Tinggalkan komentar!"
+      "comment": "Tinggalkan komentar!",
+      "poke": "Ketuk foto profil untuk mengirim colekan!"
     },
     "backToRoom": "← Ke ruang",
     "backToRoomAria": "Kembali ke ruang",

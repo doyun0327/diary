@@ -307,7 +307,8 @@
     "goHome": "ホームへ",
     "openPostAria": "{{author}}の日記「{{title}}」を開く",
     "coach": {
-      "comment": "コメントを残してみてね！"
+      "comment": "コメントを残してみてね！",
+      "poke": "プロフィールを押すと友だちに通知が届きます!"
     },
     "backToRoom": "← ルームへ",
     "backToRoomAria": "ルームへ",

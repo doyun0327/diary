@@ -307,7 +307,8 @@
     "goHome": "Accueil",
     "openPostAria": "Ouvrir le journal {{title}} de {{author}}",
     "coach": {
-      "comment": "Laissez un commentaire !"
+      "comment": "Laissez un commentaire !",
+      "poke": "Appuyez sur une photo pour envoyer un toc!"
     },
     "backToRoom": "← Au salon",
     "backToRoomAria": "Retour au salon",

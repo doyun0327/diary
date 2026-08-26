@@ -3,6 +3,56 @@
   flex-shrink: 0;
 }
 
+.room-members__coach {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 14;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: max-content;
+  max-width: min(240px, 78vw);
+  padding: 10px 10px 10px 12px;
+  border-radius: 14px;
+  background: #1a1a1a;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  text-align: left;
+  animation: room-members-panel-in 0.28s ease both;
+}
+
+.room-members__coach::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 100%;
+  border: 7px solid transparent;
+  border-top-color: #1a1a1a;
+}
+
+.room-members__coach p {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.room-members__coach-dismiss {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin: -2px -2px 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .room-members__stack {
   display: inline-flex;
   align-items: center;
