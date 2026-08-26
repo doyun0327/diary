@@ -190,6 +190,7 @@
   justify-content: flex-end;
   gap: 8px;
   margin-bottom: 10px;
+  overflow: visible;
 }
 
 .diary-write__section-head h2 {
@@ -201,6 +202,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  overflow: visible;
 }
 
 .diary-write__ai-actions {
@@ -208,6 +210,7 @@
   align-items: center;
   flex-shrink: 0;
   gap: 10px;
+  overflow: visible;
 }
 
 .diary-write__ai-hint {
@@ -229,6 +232,7 @@
   background: var(--color-bg-muted);
   border: 1px solid var(--color-border-soft);
   position: relative;
+  overflow: visible;
 }
 
 .diary-write__ai-remaining {
@@ -246,18 +250,19 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  overflow: visible;
 }
 
 .diary-write__coach {
   position: absolute;
   right: 0;
-  bottom: calc(100% + 10px);
-  z-index: 5;
+  top: calc(100% + 10px);
+  z-index: 20;
   display: flex;
   align-items: flex-start;
   gap: 6px;
   width: max-content;
-  max-width: min(220px, 70vw);
+  max-width: min(240px, 78vw);
   padding: 10px 10px 10px 12px;
   border-radius: 14px;
   background: #1a1a1a;
@@ -271,9 +276,9 @@
   content: '';
   position: absolute;
   right: 14px;
-  top: 100%;
+  bottom: 100%;
   border: 7px solid transparent;
-  border-top-color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
 }
 
 .diary-write__coach--ai::after {
@@ -304,7 +309,7 @@
 @keyframes diary-coach-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
