@@ -151,7 +151,11 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                 </div>
               )}
               <ul className="rooms__gallery">
-                {visiblePosts.map((post) => (
+                {visiblePosts.map((post) => {
+                  const author = room.members.find((m) => m.userId === post.authorUserId);
+                  const avatarUrl = author?.avatarUrl?.trim() || '';
+                  const initial = (post.authorNickname.trim() || '?').slice(0, 1).toUpperCase();
+                  return (
                   <li key={post.id}>
                     <button
                       type="button"
@@ -162,11 +166,21 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                         title: post.title || post.date,
                       })}
                     >
-                      <span className="rooms__gallery-author">{post.authorNickname}</span>
+                      <span className="rooms__gallery-author">
+                        <span className="rooms__gallery-avatar" aria-hidden>
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt="" />
+                          ) : (
+                            <span className="rooms__gallery-initial">{initial}</span>
+                          )}
+                        </span>
+                        <span className="rooms__gallery-name">{post.authorNickname}</span>
+                      </span>
                       <RoomDiaryPaper post={post} compact />
                     </button>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
               {posts.length > ROOM_POSTS_PAGE_SIZE && (
                 <PagePager

@@ -1292,15 +1292,51 @@
 
 .rooms__gallery-author {
   flex-shrink: 0;
-  height: 1.35em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: auto;
+  min-height: 1.35em;
   font-size: 0.95rem;
   font-weight: 800;
   color: var(--color-text);
+  padding: 0 2px;
+  text-align: left;
+}
+
+.rooms__gallery-avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-bg-muted);
+  color: var(--color-accent-text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border-soft) 80%, transparent);
+}
+
+.rooms__gallery-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rooms__gallery-initial {
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.rooms__gallery-name {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 0 2px;
-  text-align: left;
 }
 
 .rooms__paper {
