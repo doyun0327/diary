@@ -84,7 +84,7 @@ function RoomMemberAvatars({
         body: t('rooms.pokePushBody', { name: member.nickname }),
       });
       lastPokeAt.current.set(member.userId, Date.now());
-      showToast(t('rooms.pokeSent', { name: member.nickname }));
+      showToast(t('rooms.pokeSent'));
     } catch (err) {
       showToast(err instanceof Error ? err.message : t('rooms.pokeFail'));
     } finally {

@@ -308,7 +308,7 @@
     "pokeAction": "Poke",
     "pokeHint": "Poke {{name}}",
     "pokeAria": "Poke {{name}}",
-    "pokeSent": "Poked {{name}}!",
+    "pokeSent": "Poke sent!",
     "pokeSelf": "You can't poke yourself",
     "pokeWait": "Wait a moment before poking again",
     "pokeNeedLogin": "Sign in to poke",

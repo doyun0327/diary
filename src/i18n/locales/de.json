@@ -349,7 +349,8 @@
       "coverUpdate": "Cover konnte nicht aktualisiert werden"
     },
     "pokePushTitle": "Anstupsen!",
-    "pokePushBody": "{{name}}~ schreib ein Tagebuch"
+    "pokePushBody": "{{name}}~ schreib ein Tagebuch",
+    "pokeSent": "Anstupsen gesendet!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

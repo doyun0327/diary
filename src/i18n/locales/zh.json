@@ -348,7 +348,8 @@
       "coverUpdate": "无法更新封面"
     },
     "pokePushTitle": "戳一下!",
-    "pokePushBody": "{{name}}~来写日记吧"
+    "pokePushBody": "{{name}}~来写日记吧",
+    "pokeSent": "戳一下完成!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

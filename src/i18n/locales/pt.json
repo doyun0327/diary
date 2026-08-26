@@ -348,7 +348,8 @@
       "coverUpdate": "Não foi possível atualizar a capa"
     },
     "pokePushTitle": "Cutucar!",
-    "pokePushBody": "{{name}}~ vamos escrever o diário"
+    "pokePushBody": "{{name}}~ vamos escrever o diário",
+    "pokeSent": "Cutucada enviada!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

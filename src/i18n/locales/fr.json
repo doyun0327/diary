@@ -348,7 +348,8 @@
       "coverUpdate": "Impossible de mettre à jour la couverture"
     },
     "pokePushTitle": "Toc!",
-    "pokePushBody": "{{name}}~ écris ton journal"
+    "pokePushBody": "{{name}}~ écris ton journal",
+    "pokeSent": "Toc envoyé !"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

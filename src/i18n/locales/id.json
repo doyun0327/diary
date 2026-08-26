@@ -348,7 +348,8 @@
       "coverUpdate": "Tidak bisa memperbarui sampul"
     },
     "pokePushTitle": "Colek!",
-    "pokePushBody": "{{name}}~ ayo tulis diary"
+    "pokePushBody": "{{name}}~ ayo tulis diary",
+    "pokeSent": "Colek terkirim!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

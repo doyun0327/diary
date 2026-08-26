@@ -348,7 +348,8 @@
       "coverUpdate": "No se pudo actualizar la portada"
     },
     "pokePushTitle": "¡Toque!",
-    "pokePushBody": "{{name}}~ escribe tu diario"
+    "pokePushBody": "{{name}}~ escribe tu diario",
+    "pokeSent": "¡Toque enviado!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

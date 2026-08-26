@@ -348,7 +348,8 @@
       "coverUpdate": "カバーを更新できませんでした"
     },
     "pokePushTitle": "ぽちっ!",
-    "pokePushBody": "{{name}}〜日記書こう"
+    "pokePushBody": "{{name}}〜日記書こう",
+    "pokeSent": "ぽちっ完了!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

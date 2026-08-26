@@ -348,7 +348,8 @@
       "coverUpdate": "Không cập nhật được ảnh bìa"
     },
     "pokePushTitle": "Chọc!",
-    "pokePushBody": "{{name}}~ viết nhật ký đi"
+    "pokePushBody": "{{name}}~ viết nhật ký đi",
+    "pokeSent": "Đã chọc!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

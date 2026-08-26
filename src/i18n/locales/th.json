@@ -348,7 +348,8 @@
       "coverUpdate": "อัปเดตปกไม่ได้"
     },
     "pokePushTitle": "แคะ!",
-    "pokePushBody": "{{name}}~ มาเขียนไดอารี่กัน"
+    "pokePushBody": "{{name}}~ มาเขียนไดอารี่กัน",
+    "pokeSent": "แคะแล้ว!"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
