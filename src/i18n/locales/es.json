@@ -346,7 +346,9 @@
       "delete": "Error al eliminar",
       "coverImage": "No se pudo cargar la portada",
       "coverUpdate": "No se pudo actualizar la portada"
-    }
+    },
+    "pokePushTitle": "¡Toque!",
+    "pokePushBody": "{{name}}~ escribe tu diario"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

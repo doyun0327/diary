@@ -346,7 +346,9 @@
       "delete": "Xóa thất bại",
       "coverImage": "Không tải được ảnh bìa",
       "coverUpdate": "Không cập nhật được ảnh bìa"
-    }
+    },
+    "pokePushTitle": "Chọc!",
+    "pokePushBody": "{{name}}~ viết nhật ký đi"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

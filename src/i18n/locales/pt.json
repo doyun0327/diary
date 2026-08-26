@@ -346,7 +346,9 @@
       "delete": "Falha ao excluir",
       "coverImage": "Não foi possível carregar a capa",
       "coverUpdate": "Não foi possível atualizar a capa"
-    }
+    },
+    "pokePushTitle": "Cutucar!",
+    "pokePushBody": "{{name}}~ vamos escrever o diário"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

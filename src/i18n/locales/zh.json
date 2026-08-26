@@ -346,7 +346,9 @@
       "delete": "删除失败",
       "coverImage": "无法加载封面照片",
       "coverUpdate": "无法更新封面"
-    }
+    },
+    "pokePushTitle": "戳一下!",
+    "pokePushBody": "{{name}}~来写日记吧"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

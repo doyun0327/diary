@@ -1,0 +1,153 @@
+.room-members {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.room-members__stack {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.room-members__avatar,
+.room-members__more {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  margin-left: -9px;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface, #fff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border-soft) 70%, transparent);
+}
+
+.room-members__stack > :last-child {
+  margin-left: 0;
+}
+
+.room-members__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  background: var(--color-bg-muted);
+  color: var(--color-accent-text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.room-members__avatar:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.room-members__avatar.is-poking {
+  opacity: 0.55;
+}
+
+.room-members__avatar:disabled {
+  cursor: default;
+}
+
+.room-members__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.room-members__initial {
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.room-members__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.room-members__more:active {
+  transform: scale(0.96);
+}
+
+.room-members__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  min-width: min(240px, 72vw);
+  max-height: min(280px, 42vh);
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-float, 0 12px 32px rgba(0, 0, 0, 0.12));
+  animation: room-members-panel-in 0.18s ease both;
+}
+
+.room-members__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.room-members__row-btn {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.room-members__row-btn.is-poking {
+  opacity: 0.55;
+}
+
+.room-members__poke-label {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.room-members__toast {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 13;
+  max-width: min(220px, 70vw);
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 650;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  animation: room-members-panel-in 0.18s ease both;
+  pointer-events: none;
+}
+
+@keyframes room-members-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

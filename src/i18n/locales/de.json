@@ -347,7 +347,9 @@
       "delete": "Löschen fehlgeschlagen",
       "coverImage": "Cover-Foto konnte nicht geladen werden",
       "coverUpdate": "Cover konnte nicht aktualisiert werden"
-    }
+    },
+    "pokePushTitle": "Anstupsen!",
+    "pokePushBody": "{{name}}~ schreib ein Tagebuch"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

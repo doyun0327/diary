@@ -144,6 +144,24 @@ export function leaveRoom(roomId: string): Promise<void> {
   });
 }
 
+/** 멤버 찌르기 — 상대에게 푸시 (title/body는 앱 언어) */
+export function pokeMember(
+  roomId: string,
+  targetUserId: string,
+  body: { title: string; body: string },
+): Promise<void> {
+  return request<void>(
+    `/api/rooms/${encodeURIComponent(roomId)}/members/${encodeURIComponent(targetUserId)}/poke`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        title: body.title,
+        body: body.body,
+      }),
+    },
+  );
+}
+
 /** 방 삭제 (방장만) */
 export function deleteRoom(roomId: string): Promise<void> {
   return request<void>(`/api/rooms/${encodeURIComponent(roomId)}`, {

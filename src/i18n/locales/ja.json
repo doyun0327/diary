@@ -346,7 +346,9 @@
       "delete": "削除に失敗しました",
       "coverImage": "カバー写真を読み込めませんでした",
       "coverUpdate": "カバーを更新できませんでした"
-    }
+    },
+    "pokePushTitle": "ぽちっ!",
+    "pokePushBody": "{{name}}〜日記書こう"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

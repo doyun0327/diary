@@ -5,6 +5,7 @@ import * as roomsApi from '../api/roomsApi';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
+import RoomMemberAvatars from '../components/RoomMemberAvatars';
 import {
   isRoomCommentCoachSeen,
   markRoomCommentCoachSeen,
@@ -19,12 +20,13 @@ const ROOM_POSTS_PAGE_SIZE = 10;
 
 interface RoomPageProps {
   roomId: string;
+  userId?: string | null;
   onBack: () => void;
   onGoHome: () => void;
   onOpenPost: (postId: string) => void;
 }
 
-function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
+function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
@@ -112,8 +114,15 @@ function RoomPage({ roomId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
         <section className="rooms__list-wrap">
           {posts.length > 0 && (
             <div className="rooms__section-head">
-              <h3>{t('rooms.sharedDiaries')}</h3>
-              <span className="rooms__section-count">{posts.length}</span>
+              <div className="rooms__section-head-main">
+                <h3>{t('rooms.sharedDiaries')}</h3>
+                <span className="rooms__section-count">{posts.length}</span>
+              </div>
+              <RoomMemberAvatars
+                roomId={roomId}
+                members={room.members}
+                currentUserId={userId}
+              />
             </div>
           )}
           {posts.length === 0 && (

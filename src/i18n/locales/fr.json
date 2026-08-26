@@ -346,7 +346,9 @@
       "delete": "Échec de la suppression",
       "coverImage": "Impossible de charger la couverture",
       "coverUpdate": "Impossible de mettre à jour la couverture"
-    }
+    },
+    "pokePushTitle": "Toc!",
+    "pokePushBody": "{{name}}~ écris ton journal"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

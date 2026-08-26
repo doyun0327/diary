@@ -346,7 +346,9 @@
       "delete": "ลบล้มเหลว",
       "coverImage": "โหลดรูปปกไม่ได้",
       "coverUpdate": "อัปเดตปกไม่ได้"
-    }
+    },
+    "pokePushTitle": "แคะ!",
+    "pokePushBody": "{{name}}~ มาเขียนไดอารี่กัน"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

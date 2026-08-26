@@ -346,7 +346,9 @@
       "delete": "Hapus gagal",
       "coverImage": "Tidak bisa memuat foto sampul",
       "coverUpdate": "Tidak bisa memperbarui sampul"
-    }
+    },
+    "pokePushTitle": "Colek!",
+    "pokePushBody": "{{name}}~ ayo tulis diary"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

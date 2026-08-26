@@ -1170,9 +1170,17 @@
 
 .rooms__section-head {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rooms__section-head-main {
+  display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 14px;
+  min-width: 0;
 }
 
 .rooms__section-head h3 {

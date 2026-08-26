@@ -754,6 +754,7 @@ function App() {
         {page === "room" && activeRoomId && (
           <RoomPage
             roomId={activeRoomId}
+            userId={session?.userId ?? ""}
             onBack={() => {
               setActivePostId(null);
               setPage("rooms");
