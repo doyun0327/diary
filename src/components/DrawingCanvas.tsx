@@ -81,6 +81,20 @@ const COLORS = [
 const FONT_CATEGORIES = ['cute', 'neat'] as const;
 const PEN_KINDS: PenKind[] = ['ballpoint', 'gel', 'brush', 'marker', 'highlighter'];
 
+function hslToHex(h: number, s: number, l: number): string {
+  const sat = s / 100;
+  const light = l / 100;
+  const a = sat * Math.min(light, 1 - light);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const c = light - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * c)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 function PenKindIcon({ kind }: { kind: PenKind }) {
   const common = {
     width: 22,
@@ -244,6 +258,7 @@ function DrawingCanvas({
   const wrapRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hueWheelRef = useRef<HTMLDivElement>(null);
   const drawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const hasDrawn = useRef(false);
@@ -286,7 +301,10 @@ function DrawingCanvas({
   } | null>(null);
 
   const [color, setColor] = useState(COLORS[0]);
-  const [customColor, setCustomColor] = useState('#e91e63');
+  const [customColor, setCustomColor] = useState('#ef7a8a');
+  const [customPickerOpen, setCustomPickerOpen] = useState(false);
+  const [pickerHue, setPickerHue] = useState(350);
+  const [pickerLight, setPickerLight] = useState(62);
   const [mode, setMode] = useState<ToolMode>('none');
   const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
@@ -299,6 +317,35 @@ function DrawingCanvas({
   );
   const [eraserSizeId, setEraserSizeId] =
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
+
+  useEffect(() => {
+    if (!colorsOpen || mode !== 'pen' || fontOpen) {
+      setCustomPickerOpen(false);
+    }
+  }, [colorsOpen, mode, fontOpen]);
+
+  const applyPickerColor = (hue: number, light: number) => {
+    const next = hslToHex(hue, 58, light);
+    setPickerHue(hue);
+    setPickerLight(light);
+    setCustomColor(next);
+    setColor(next);
+  };
+
+  const handleHueWheelPointer = (e: PointerEvent<HTMLDivElement>) => {
+    const el = hueWheelRef.current;
+    if (!el) return;
+    if (e.type === 'pointerdown') {
+      el.setPointerCapture(e.pointerId);
+    }
+    const rect = el.getBoundingClientRect();
+    const dx = e.clientX - (rect.left + rect.width / 2);
+    const dy = e.clientY - (rect.top + rect.height / 2);
+    let hue = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+    if (hue < 0) hue += 360;
+    hue = Math.round(hue) % 360;
+    applyPickerColor(hue, pickerLight);
+  };
   const [internalFontId, setInternalFontId] = useState(DEFAULT_FONT_ID);
   const fontId = fontIdProp ?? internalFontId;
   const [internalFontSizeId, setInternalFontSizeId] = useState(DEFAULT_FONT_SIZE_ID);
@@ -1425,6 +1472,85 @@ function DrawingCanvas({
                   </button>
                 ))}
               </div>
+              {customPickerOpen && (
+                <div className="drawing__color-picker" role="dialog" aria-label={t('canvas.pickColorTitle')}>
+                  <div className="drawing__color-picker-head">
+                    <span className="drawing__color-picker-title">{t('canvas.pickColorTitle')}</span>
+                    <span
+                      className="drawing__color-picker-preview"
+                      style={{ backgroundColor: customColor }}
+                      aria-hidden
+                    />
+                    <button
+                      type="button"
+                      className="drawing__color-picker-done"
+                      onClick={() => setCustomPickerOpen(false)}
+                    >
+                      ✓
+                    </button>
+                  </div>
+                  <div className="drawing__color-picker-mix">
+                    <div
+                      ref={hueWheelRef}
+                      className="drawing__color-picker-wheel"
+                      role="slider"
+                      tabIndex={0}
+                      aria-label="hue"
+                      aria-valuemin={0}
+                      aria-valuemax={360}
+                      aria-valuenow={pickerHue}
+                      onPointerDown={handleHueWheelPointer}
+                      onPointerMove={(e) => {
+                        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+                        handleHueWheelPointer(e);
+                      }}
+                      onPointerUp={(e) => {
+                        try {
+                          e.currentTarget.releasePointerCapture(e.pointerId);
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                    >
+                      <span
+                        className="drawing__color-picker-wheel-arm"
+                        style={{ transform: `rotate(${pickerHue}deg)` }}
+                        aria-hidden
+                      >
+                        <span
+                          className="drawing__color-picker-wheel-knob"
+                          style={{ backgroundColor: hslToHex(pickerHue, 70, 55) }}
+                        />
+                      </span>
+                      <span
+                        className="drawing__color-picker-wheel-center"
+                        style={{ backgroundColor: customColor }}
+                        aria-hidden
+                      />
+                    </div>
+                    <div className="drawing__color-picker-light-wrap">
+                      <span className="drawing__color-picker-light-label" aria-hidden>
+                        밝기
+                      </span>
+                      <input
+                        type="range"
+                        className="drawing__color-picker-light"
+                        min={22}
+                        max={88}
+                        value={pickerLight}
+                        aria-label="lightness"
+                        style={{
+                          background: `linear-gradient(90deg, #1a1a1a, ${hslToHex(pickerHue, 58, 55)}, #fffef8)`,
+                        }}
+                        onChange={(e) => {
+                          const light = Number(e.target.value);
+                          applyPickerColor(pickerHue, light);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="drawing__colors" role="listbox" aria-label={t('canvas.pickColorTitle')}>
                 {COLORS.map((c) => (
                   <button
@@ -1433,30 +1559,26 @@ function DrawingCanvas({
                     role="option"
                     aria-selected={color === c}
                     className={`drawing__color ${color === c ? 'selected' : ''}`}
+                    style={{ backgroundColor: c }}
                     aria-label={t(`canvas.colorAria`, { c })}
-                    onClick={() => setColor(c)}
-                  >
-                    <span className="drawing__color-chip" style={{ backgroundColor: c }} />
-                  </button>
-                ))}
-                <label
-                  className={`drawing__color drawing__color--custom ${
-                    color === customColor ? 'selected' : ''
-                  }`}
-                  title={t('canvas.pickColorTitle')}
-                >
-                  <input
-                    type="color"
-                    value={customColor}
-                    onChange={(e) => {
-                      setCustomColor(e.target.value);
-                      setColor(e.target.value);
+                    onClick={() => {
+                      setCustomPickerOpen(false);
+                      setColor(c);
                     }}
                   />
-                  <span className="drawing__color-chip drawing__color-chip--spectrum" aria-hidden>
-                    <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
-                  </span>
-                </label>
+                ))}
+                <button
+                  type="button"
+                  className={`drawing__color drawing__color--custom ${
+                    color === customColor || customPickerOpen ? 'selected' : ''
+                  }`}
+                  title={t('canvas.pickColorTitle')}
+                  aria-label={t('canvas.pickColorTitle')}
+                  aria-expanded={customPickerOpen}
+                  onClick={() => setCustomPickerOpen((open) => !open)}
+                >
+                  <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
+                </button>
               </div>
             </>
           )}
