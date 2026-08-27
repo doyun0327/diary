@@ -770,6 +770,7 @@ function App() {
             onAvatarChange={setAvatarUrl}
             onClearLocalDiaries={clearLocalDiaries}
             onClose={() => setAccountOpen(false)}
+            onRequestReopen={() => setAccountOpen(true)}
           />,
           document.getElementById("root") ?? document.body,
         )}

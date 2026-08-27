@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   fetchMe,
   loginAsGuest,
@@ -21,6 +21,15 @@ export interface AuthSession {
 
 const SESSION_KEY = 'picture-diary-auth-session';
 const TOKEN_KEY = 'picture-diary-access-token';
+export const AUTH_CHANGE_EVENT = 'diary-auth-changed';
+
+function notifyAuthChanged() {
+  try {
+    window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+  } catch {
+    // ignore
+  }
+}
 
 function loadSession(): AuthSession | null {
   try {
@@ -43,6 +52,7 @@ function saveSession(session: AuthSession | null) {
   } catch {
     // ignore
   }
+  notifyAuthChanged();
 }
 
 function loadToken(): string | null {
@@ -88,6 +98,12 @@ function sessionFromAuth(
  */
 export function useAuthSession() {
   const [session, setSession] = useState<AuthSession | null>(loadSession);
+
+  useEffect(() => {
+    const sync = () => setSession(loadSession());
+    window.addEventListener(AUTH_CHANGE_EVENT, sync);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, sync);
+  }, []);
 
   const signInWithGoogleIdToken = useCallback(async (idToken: string) => {
     const current = loadSession();

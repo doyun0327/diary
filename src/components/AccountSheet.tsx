@@ -19,6 +19,8 @@ interface AccountSheetProps {
   /** 탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
   onClose: () => void;
+  /** 네이티브 Google 로그인 후 시트 다시 열기 */
+  onRequestReopen?: () => void;
 }
 
 const MAX_EDGE = 320;
@@ -95,6 +97,7 @@ function AccountSheet({
   onAvatarChange,
   onClearLocalDiaries,
   onClose,
+  onRequestReopen,
 }: AccountSheetProps) {
   const { t } = useTranslation();
   const { session, signInWithGoogleIdToken, signOut, deleteAccount, ensureGuestSession } =
@@ -231,20 +234,45 @@ function AccountSheet({
 
   const handleNativeGoogle = () => {
     if (authBusy) return;
+    // 최신 프로필 값 (시트 닫힌 뒤 클로저용)
+    const nickNow = nickname;
+    const avatarNow = avatarUrl;
+    const nameNow = nameDraft.trim() || nickNow;
     void (async () => {
-      setAuthBusy('google');
       setAuthError(null);
+      // AccountSheet가 Google 계정 선택창을 가리거나 지연시킴 → 먼저 닫기
+      onClose();
+      await new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 280);
+      });
       try {
         const { requestNativeGoogleSignIn } = await import('../lib/googleAuth');
         const idToken = await requestNativeGoogleSignIn();
-        await finishGoogleSignIn(idToken);
+        const next = await signInWithGoogleIdToken(idToken);
+        const name = next.displayName.trim();
+        if (name && !nickNow.trim()) {
+          onNicknameChange(name);
+          syncProfileToRooms({
+            nickname: name,
+            avatarUrl: next.photoUrl ?? avatarNow,
+          });
+        }
+        if (next.photoUrl && !avatarNow) {
+          onAvatarChange(next.photoUrl);
+          syncProfileToRooms({
+            nickname: name || nameNow,
+            avatarUrl: next.photoUrl,
+          });
+        }
+        onRequestReopen?.();
       } catch (err) {
         const reason = err instanceof Error ? err.message : '';
         const message = googleErrorMessage(reason);
-        if (message) setAuthError(message);
+        if (message) {
+          window.alert(message);
+        }
         console.warn('[google] native sign-in failed', err);
-      } finally {
-        setAuthBusy(null);
+        onRequestReopen?.();
       }
     })();
   };
