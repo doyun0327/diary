@@ -36,7 +36,6 @@ import {
 } from "./hooks/usePushRegistration";
 import {
   isAppIntroDone,
-  isCharacterSetupDone,
   isProfileSetupDone,
   markAppIntroDone,
   markProfileSetupDone,
@@ -82,7 +81,6 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [characterOpen, setCharacterOpen] = useState(false);
-  const [writeAfterCharacter, setWriteAfterCharacter] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
@@ -335,7 +333,6 @@ function App() {
     }
     if (characterOpen) {
       setCharacterOpen(false);
-      setWriteAfterCharacter(false);
       return true;
     }
     if (lockDisableOpen) {
@@ -479,15 +476,6 @@ function App() {
 
   const handleNewWrite = () => {
     openWritePage();
-  };
-
-  const handleStartFirstDiary = () => {
-    if (isCharacterSetupDone()) {
-      handleNewWrite();
-      return;
-    }
-    setWriteAfterCharacter(true);
-    setCharacterOpen(true);
   };
 
   const openRooms = () => {
@@ -678,7 +666,6 @@ function App() {
               setCalYear(year);
               setCalMonth(month);
             }}
-            onStartFirstDiary={handleStartFirstDiary}
           />
         )}
         {page === "write" && (
@@ -843,14 +830,9 @@ function App() {
             onChange={setCharacter}
             onClose={() => {
               setCharacterOpen(false);
-              setWriteAfterCharacter(false);
             }}
             onComplete={() => {
               setCharacterOpen(false);
-              if (writeAfterCharacter) {
-                setWriteAfterCharacter(false);
-                handleNewWrite();
-              }
             }}
           />,
           document.getElementById("root") ?? document.body,

@@ -14,8 +14,6 @@ interface DiaryListPageProps {
   viewYear: number;
   viewMonth: number;
   onViewChange: (year: number, month: number) => void;
-  /** 빈 홈에서 캐릭터·첫 그림 유도 */
-  onStartFirstDiary?: () => void;
 }
 
 function DiaryListPage({
@@ -24,7 +22,6 @@ function DiaryListPage({
   viewYear,
   viewMonth,
   onViewChange,
-  onStartFirstDiary,
 }: DiaryListPageProps) {
   const { t } = useTranslation();
   const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
@@ -73,15 +70,6 @@ function DiaryListPage({
         <div className="diary-list__empty-copy">
           <p>{t('diary.empty.line1')}</p>
           <p>{t('diary.empty.line2')}</p>
-          {onStartFirstDiary && (
-            <button
-              type="button"
-              className="diary-list__empty-cta"
-              onClick={onStartFirstDiary}
-            >
-              {t('diary.empty.cta')}
-            </button>
-          )}
         </div>
       ) : (
         <section ref={sectionRef} className="diary-list__section">
