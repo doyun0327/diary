@@ -2,8 +2,13 @@
  * 원격 이미지를 same-origin 취급 data URL로 바꿔 캔버스 export(toDataURL)가
  * tainted SecurityError 나지 않게 합니다.
  * data:/blob: 은 그대로 둡니다.
+ *
+ * @param fallbackToOriginal CORS 실패 시 원본 URL 반환(화면 표시용)
  */
-export async function materializeImageSrc(src: string): Promise<string> {
+export async function materializeImageSrc(
+  src: string,
+  opts?: { fallbackToOriginal?: boolean },
+): Promise<string> {
   const trimmed = src.trim();
   if (!trimmed) {
     throw new Error('이미지 주소가 비어 있어요');
@@ -28,8 +33,12 @@ export async function materializeImageSrc(src: string): Promise<string> {
     const blob = await res.blob();
     return await blobToDataUrl(blob);
   } catch {
-    // CORS 등으로 fetch 실패 시: 이미지 태그 + crossOrigin (버킷 CORS 필요)
-    return loadViaImageElement(trimmed);
+    try {
+      return await loadViaImageElement(trimmed);
+    } catch (err) {
+      if (opts?.fallbackToOriginal) return trimmed;
+      throw err;
+    }
   }
 }
 

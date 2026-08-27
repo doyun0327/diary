@@ -56,6 +56,7 @@ function DiaryDetailPage({
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
   const [sharing, setSharing] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackModal>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -77,12 +78,15 @@ function DiaryDetailPage({
     }
   }, [roomsPage, roomsPageCount]);
 
-  const handleDelete = () => {
+  const handleDeleteClick = () => {
     setMoreOpen(false);
-    if (confirm(t('detail.confirm.delete'))) {
-      onDelete(entry.id);
-      onBack();
-    }
+    setConfirmDelete(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setConfirmDelete(false);
+    onDelete(entry.id);
+    onBack();
   };
 
   const openShare = () => {
@@ -354,7 +358,7 @@ function DiaryDetailPage({
                     type="button"
                     role="menuitem"
                     className="danger"
-                    onClick={handleDelete}
+                    onClick={handleDeleteClick}
                   >
                     {t('detail.delete')}
                   </button>
@@ -419,6 +423,19 @@ function DiaryDetailPage({
             }
             setFeedback(null);
           }}
+        />
+      )}
+      {confirmDelete && (
+        <AppModal
+          title={t('detail.confirm.delete')}
+          onDismiss={() => setConfirmDelete(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setConfirmDelete(false)}
+          primaryDanger
+          primaryLabel={t('common.delete')}
+          onPrimary={handleDeleteConfirm}
         />
       )}
       {previewUrl && (

@@ -1,23 +1,48 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { DiaryEntry } from '../types/diary';
+import type { DiaryCanvasState, DiaryEntry } from '../types/diary';
 import { createId } from '../utils/id';
 import { getStoredMoodPackId, parseMoodPackId } from '../utils/moodPack';
 import {
   clearDiaryImages,
+  deleteDiaryCanvasJson,
   deleteDiaryImage,
+  getDiaryCanvasJson,
   getDiaryImage,
   isEmbeddedDataUrl,
+  putDiaryCanvasJson,
   putDiaryImage,
 } from '../utils/diaryImageStore';
 
 const STORAGE_KEY = 'picture-diary-entries';
 const DELETED_KEY = 'picture-diary-deleted-ids';
 
-/** localStorage에는 data URL을 넣지 않음 (용량 초과로 그림 유실 방지) */
+function canvasStateHasDataUrl(state: DiaryCanvasState | undefined): boolean {
+  if (!state) return false;
+  if (isEmbeddedDataUrl(state.inkUrl)) return true;
+  return (state.photos ?? []).some((p) => isEmbeddedDataUrl(p.src));
+}
+
+function canvasLayerCount(state: DiaryCanvasState | undefined): number {
+  if (!state) return 0;
+  return (
+    (state.photos?.length ?? 0) +
+    (state.stickers?.length ?? 0) +
+    (state.inkUrl ? 1 : 0)
+  );
+}
+
+/** localStorage에는 큰 data URL / 레이어 페이로드를 넣지 않음 */
 function toStorageEntry(entry: DiaryEntry): DiaryEntry {
-  if (!isEmbeddedDataUrl(entry.imageUrl)) return entry;
-  const { imageUrl: _omit, ...rest } = entry;
-  return rest;
+  let next: DiaryEntry = entry;
+  if (isEmbeddedDataUrl(next.imageUrl)) {
+    const { imageUrl: _omit, ...rest } = next;
+    next = rest;
+  }
+  if (next.canvasState && canvasStateHasDataUrl(next.canvasState)) {
+    const { canvasState: _omit, ...rest } = next;
+    next = rest;
+  }
+  return next;
 }
 
 function persistEntries(entries: DiaryEntry[]): boolean {
@@ -54,30 +79,57 @@ function stampMissingMoodPack(entries: DiaryEntry[]): DiaryEntry[] {
   return next;
 }
 
-/** LS의 data URL → IndexedDB 이관 + IDB에서 그림 복원 */
 async function hydrateEntries(entries: DiaryEntry[]): Promise<DiaryEntry[]> {
   let migrated = false;
   const next: DiaryEntry[] = [];
 
   for (const entry of entries) {
-    if (isEmbeddedDataUrl(entry.imageUrl)) {
+    let current = entry;
+
+    if (isEmbeddedDataUrl(current.imageUrl)) {
       try {
-        await putDiaryImage(entry.id, entry.imageUrl!);
+        await putDiaryImage(current.id, current.imageUrl!);
         migrated = true;
       } catch (err) {
-        console.error('[diary] migrate image failed', entry.id, err);
+        console.error('[diary] migrate image failed', current.id, err);
       }
-      next.push(entry);
-      continue;
+    } else if (!current.imageUrl) {
+      try {
+        const fromIdb = await getDiaryImage(current.id);
+        if (fromIdb) current = { ...current, imageUrl: fromIdb };
+      } catch (err) {
+        console.error('[diary] load image failed', current.id, err);
+      }
+    }
+
+    if (current.canvasState && canvasStateHasDataUrl(current.canvasState)) {
+      try {
+        await putDiaryCanvasJson(current.id, JSON.stringify(current.canvasState));
+        migrated = true;
+      } catch (err) {
+        console.error('[diary] migrate canvas failed', current.id, err);
+      }
     }
 
     try {
-      const fromIdb = await getDiaryImage(entry.id);
-      next.push(fromIdb ? { ...entry, imageUrl: fromIdb } : entry);
+      const raw = await getDiaryCanvasJson(current.id);
+      if (raw) {
+        const fromIdb = JSON.parse(raw) as DiaryCanvasState;
+        const idbPhotos = fromIdb.photos?.length ?? 0;
+        const curPhotos = current.canvasState?.photos?.length ?? 0;
+        if (
+          !current.canvasState ||
+          canvasLayerCount(fromIdb) > canvasLayerCount(current.canvasState) ||
+          idbPhotos > curPhotos
+        ) {
+          current = { ...current, canvasState: fromIdb };
+        }
+      }
     } catch (err) {
-      console.error('[diary] load image failed', entry.id, err);
-      next.push(entry);
+      console.error('[diary] load canvas failed', current.id, err);
     }
+
+    next.push(current);
   }
 
   if (migrated) {
@@ -86,13 +138,26 @@ async function hydrateEntries(entries: DiaryEntry[]): Promise<DiaryEntry[]> {
   return next;
 }
 
-async function persistEntryImage(entryId: string, imageUrl: string | undefined) {
+async function persistEntryMedia(
+  entryId: string,
+  imageUrl: string | undefined,
+  canvasState: DiaryCanvasState | undefined,
+) {
   if (isEmbeddedDataUrl(imageUrl)) {
     await putDiaryImage(entryId, imageUrl!);
+  }
+
+  if (!canvasState) {
+    await deleteDiaryCanvasJson(entryId);
     return;
   }
-  if (!imageUrl) {
-    await deleteDiaryImage(entryId);
+
+  try {
+    await putDiaryCanvasJson(entryId, JSON.stringify(canvasState));
+  } catch (err) {
+    console.warn('[diary] canvas full save failed, retry without ink', err);
+    const slim: DiaryCanvasState = { ...canvasState, inkUrl: undefined };
+    await putDiaryCanvasJson(entryId, JSON.stringify(slim));
   }
 }
 
@@ -115,7 +180,7 @@ function persistDeletedIds(ids: string[]) {
   }
 }
 
-/** 일기 목록: 메타는 localStorage, https 그림은 URL만 저장 / data URL은 IndexedDB 폴백 */
+/** 일기 목록: 메타는 localStorage, 그림·레이어는 IndexedDB/HTTPS */
 export function useDiary() {
   const [entries, setEntries] = useState<DiaryEntry[]>(() =>
     stampMissingMoodPack(loadEntriesRaw()),
@@ -151,7 +216,11 @@ export function useDiary() {
         updatedAt: now,
       };
       try {
-        await persistEntryImage(newEntry.id, newEntry.imageUrl);
+        await persistEntryMedia(
+          newEntry.id,
+          newEntry.imageUrl,
+          newEntry.canvasState,
+        );
       } catch (err) {
         console.error('[diary] save image failed', err);
         throw err instanceof Error ? err : new Error('그림 저장에 실패했어요');
@@ -175,9 +244,9 @@ export function useDiary() {
 
   const updateEntry = useCallback(
     async (id: string, patch: Partial<Omit<DiaryEntry, 'id' | 'createdAt'>>) => {
-      if ('imageUrl' in patch) {
+      if ('imageUrl' in patch || 'canvasState' in patch) {
         try {
-          await persistEntryImage(id, patch.imageUrl);
+          await persistEntryMedia(id, patch.imageUrl, patch.canvasState);
         } catch (err) {
           console.error('[diary] update image failed', err);
           throw err instanceof Error ? err : new Error('그림 저장에 실패했어요');
@@ -200,6 +269,7 @@ export function useDiary() {
 
   const removeEntry = useCallback((id: string) => {
     void deleteDiaryImage(id);
+    void deleteDiaryCanvasJson(id);
     setEntries((prev) => {
       const next = prev.filter((e) => e.id !== id);
       persistEntries(next);

@@ -1,4 +1,4 @@
-/** 일기 그림은 localStorage 용량(~5MB)을 쉽게 넘기므로 IndexedDB에 따로 보관 */
+/** 일기 그림·캔버스 레이어는 localStorage 용량을 넘기기 쉬워 IndexedDB에 보관 */
 
 const DB_NAME = 'picture-diary-images-v1';
 const STORE = 'images';
@@ -27,6 +27,10 @@ function idbReq<T>(req: IDBRequest<T>): Promise<T> {
   });
 }
 
+function canvasKey(entryId: string) {
+  return `${entryId}__canvas`;
+}
+
 export async function putDiaryImage(entryId: string, dataUrl: string): Promise<void> {
   if (!entryId || !dataUrl) return;
   const db = await openDb();
@@ -52,12 +56,56 @@ export async function getDiaryImage(entryId: string): Promise<string | undefined
   }
 }
 
+export async function putDiaryCanvasJson(
+  entryId: string,
+  json: string,
+): Promise<void> {
+  if (!entryId || !json) return;
+  const db = await openDb();
+  try {
+    const tx = db.transaction(STORE, 'readwrite');
+    await idbReq(
+      tx.objectStore(STORE).put({ id: canvasKey(entryId), dataUrl: json }),
+    );
+  } finally {
+    db.close();
+  }
+}
+
+export async function getDiaryCanvasJson(
+  entryId: string,
+): Promise<string | undefined> {
+  if (!entryId) return undefined;
+  const db = await openDb();
+  try {
+    const tx = db.transaction(STORE, 'readonly');
+    const row = await idbReq<ImageRecord | undefined>(
+      tx.objectStore(STORE).get(canvasKey(entryId)),
+    );
+    return row?.dataUrl || undefined;
+  } finally {
+    db.close();
+  }
+}
+
+export async function deleteDiaryCanvasJson(entryId: string): Promise<void> {
+  if (!entryId) return;
+  const db = await openDb();
+  try {
+    const tx = db.transaction(STORE, 'readwrite');
+    await idbReq(tx.objectStore(STORE).delete(canvasKey(entryId)));
+  } finally {
+    db.close();
+  }
+}
+
 export async function deleteDiaryImage(entryId: string): Promise<void> {
   if (!entryId) return;
   const db = await openDb();
   try {
     const tx = db.transaction(STORE, 'readwrite');
     await idbReq(tx.objectStore(STORE).delete(entryId));
+    await idbReq(tx.objectStore(STORE).delete(canvasKey(entryId)));
   } finally {
     db.close();
   }

@@ -15,6 +15,7 @@ import { FontSizePicker } from './FontPicker';
 import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
 import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
+import type { DiaryCanvasState } from '../types/diary';
 import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
 import './DrawingCanvas.css';
@@ -26,6 +27,9 @@ export interface DrawingCanvasHandle {
   loadImage: (src: string) => Promise<void>;
   /** 수정 가능 사진 레이어로 올림 — 클릭 시 확대·취소·삭제 */
   loadEditableImage: (src: string) => Promise<void>;
+  getCanvasState: () => DiaryCanvasState | null;
+  loadCanvasState: (state: DiaryCanvasState, fallbackSrc?: string) => Promise<void>;
+  prepareExport: () => Promise<void>;
   hasContent: () => boolean;
 }
 
@@ -259,6 +263,7 @@ function DrawingCanvas({
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hueWheelRef = useRef<HTMLDivElement>(null);
+  const suppressResizeRef = useRef(false);
   const drawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const hasDrawn = useRef(false);
@@ -388,6 +393,75 @@ function DrawingCanvas({
     ctx.restore();
   };
 
+  const ensureCanvasLayout = async (): Promise<DOMRect> => {
+    const canvas = canvasRef.current;
+    if (!canvas) throw new Error(t('canvas.err.noCanvas'));
+    let lastW = 0;
+    let stable = 0;
+    for (let i = 0; i < 60; i++) {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 40 && rect.height > 40) {
+        if (Math.abs(rect.width - lastW) < 0.5) stable += 1;
+        else {
+          stable = 0;
+          lastW = rect.width;
+        }
+        if (stable >= 2) {
+          const dpr = window.devicePixelRatio || 1;
+          const width = Math.round(rect.width * dpr);
+          const height = Math.round(rect.height * dpr);
+          if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+          }
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+          }
+          return rect;
+        }
+      }
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    }
+    return canvas.getBoundingClientRect();
+  };
+
+  const loadHtmlImage = (src: string) =>
+    new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
+      el.src = src;
+    });
+
+  const resolveLayerSrc = async (src: string) => {
+    try {
+      return await materializeImageSrc(src, { fallbackToOriginal: true });
+    } catch {
+      return src.trim();
+    }
+  };
+
+  const rematerializePhotosForExport = async () => {
+    const layers = photoLayersRef.current;
+    for (const layer of layers) {
+      if (!layer.src || layer.src.startsWith('data:') || layer.src.startsWith('blob:')) {
+        continue;
+      }
+      try {
+        const safe = await materializeImageSrc(layer.src);
+        const img = await loadHtmlImage(safe);
+        photoImages.current.set(layer.id, img);
+        layer.src = safe;
+      } catch (err) {
+        console.warn('[canvas] rematerialize photo failed', layer.id, err);
+      }
+    }
+    setPhotoLayers([...photoLayersRef.current]);
+  };
+
   const clearUndoStack = () => {
     undoStack.current = [];
     setCanUndo(false);
@@ -514,6 +588,7 @@ function DrawingCanvas({
     if (!canvas) return;
 
     const resize = () => {
+      if (suppressResizeRef.current) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
@@ -796,10 +871,10 @@ function DrawingCanvas({
         drag.wasAlreadyActive &&
         Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < 12
       ) {
-        // 선택된 사진을 짧게 다시 탭 → ✓와 동일 (확정 후 바로 그리기)
+        // 선택된 사진을 짧게 다시 탭 → ✓와 동일 (펜은 직접 눌러야 선택)
         setActivePhotoId(null);
-        setMode('pen');
-        setColorsOpen(true);
+        setMode('none');
+        setColorsOpen(false);
         setFontOpen(false);
         setStickerOpen(false);
       }
@@ -820,6 +895,7 @@ function DrawingCanvas({
 
   useImperativeHandle(ref, () => ({
     toDataURL: exportDataUrl,
+    prepareExport: rematerializePhotosForExport,
     clear: () => {
       clearUndoStack();
       clearInk();
@@ -834,8 +910,183 @@ function DrawingCanvas({
       hasDrawn.current ||
       photoLayersRef.current.length > 0 ||
       stickerLayersRef.current.length > 0,
+    getCanvasState: () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
+      const photos = photoLayersRef.current;
+      const stickers = stickerLayersRef.current;
+      const hasInk = hasDrawn.current;
+      if (photos.length === 0 && stickers.length === 0 && !hasInk) {
+        return null;
+      }
+      const vw = Math.max(1, rect.width);
+      const vh = Math.max(1, rect.height);
+      let inkUrl: string | undefined;
+      if (hasInk && canvas.width > 1 && canvas.height > 1) {
+        try {
+          // 투명 PNG, 최대 2×CSS — JPEG/trim 금지
+          const dprCap = Math.min(2, window.devicePixelRatio || 1);
+          const iw = Math.max(1, Math.round(vw * dprCap));
+          const ih = Math.max(1, Math.round(vh * dprCap));
+          if (iw === canvas.width && ih === canvas.height) {
+            inkUrl = canvas.toDataURL('image/png');
+          } else {
+            const inkCanvas = document.createElement('canvas');
+            inkCanvas.width = iw;
+            inkCanvas.height = ih;
+            const ictx = inkCanvas.getContext('2d');
+            if (ictx) {
+              ictx.drawImage(canvas, 0, 0, iw, ih);
+              inkUrl = inkCanvas.toDataURL('image/png');
+            }
+          }
+        } catch {
+          inkUrl = undefined;
+        }
+      }
+      return {
+        viewWidth: vw,
+        viewHeight: vh,
+        normalized: true,
+        photos: photos.map((p) => ({
+          ...p,
+          x: p.x / vw,
+          y: p.y / vh,
+          width: p.width / vw,
+          height: p.height / vh,
+        })),
+        stickers: stickers.map((s) => ({
+          ...s,
+          x: s.x / vw,
+          y: s.y / vh,
+          size: s.size / vw,
+        })),
+        inkUrl,
+      };
+    },
+    loadCanvasState: async (state: DiaryCanvasState, fallbackSrc?: string) => {
+      const canvas = canvasRef.current;
+      if (!canvas) throw new Error(t('canvas.err.noCanvas'));
+      suppressResizeRef.current = true;
+      try {
+        clearUndoStack();
+        clearInk();
+        hasDrawn.current = false;
+        photoImages.current.clear();
+        setPhotoLayers([]);
+        setActivePhotoId(null);
+        setStickerLayers([]);
+        setActiveStickerId(null);
+
+        const rect = await ensureCanvasLayout();
+        const dpr = window.devicePixelRatio || 1;
+        const sx = state.viewWidth > 1 ? rect.width / state.viewWidth : 1;
+        const sy = state.viewHeight > 1 ? rect.height / state.viewHeight : 1;
+        const normalized =
+          state.normalized === true ||
+          ((state.photos?.[0]?.width ?? 2) <= 1.5 &&
+            (state.photos?.[0]?.height ?? 2) <= 1.5);
+
+        if (state.inkUrl?.trim()) {
+          try {
+            const safeInk = await resolveLayerSrc(state.inkUrl.trim());
+            const img = await loadHtmlImage(safeInk);
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error(t('canvas.err.noContext'));
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.restore();
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            hasDrawn.current = true;
+          } catch (err) {
+            console.warn('[canvas] ink restore failed', err);
+          }
+        }
+
+        const nextPhotos: typeof photoLayers = [];
+        for (const p of state.photos ?? []) {
+          if (!p?.src?.trim()) continue;
+          try {
+            const safeSrc = await resolveLayerSrc(p.src.trim());
+            const img = await loadHtmlImage(safeSrc);
+            const id = p.id || createId();
+            photoImages.current.set(id, img);
+            nextPhotos.push({
+              id,
+              src: safeSrc,
+              x: normalized ? p.x * rect.width : p.x * sx,
+              y: normalized ? p.y * rect.height : p.y * sy,
+              width: normalized ? p.width * rect.width : p.width * sx,
+              height: normalized ? p.height * rect.height : p.height * sy,
+              aspect: p.aspect || img.width / Math.max(1, img.height),
+              rotation: p.rotation || 0,
+            });
+          } catch (err) {
+            console.warn('[canvas] photo restore failed', err);
+          }
+        }
+
+        if (nextPhotos.length === 0 && fallbackSrc?.trim()) {
+          try {
+            const safeSrc = await resolveLayerSrc(fallbackSrc.trim());
+            const img = await loadHtmlImage(safeSrc);
+            const id = createId();
+            const aspect = img.width / Math.max(1, img.height);
+            let width = rect.width * 0.85;
+            let height = width / aspect;
+            if (height > rect.height * 0.85) {
+              height = rect.height * 0.85;
+              width = height * aspect;
+            }
+            photoImages.current.set(id, img);
+            nextPhotos.push({
+              id,
+              src: safeSrc,
+              x: (rect.width - width) / 2,
+              y: (rect.height - height) / 2,
+              width,
+              height,
+              aspect,
+              rotation: 0,
+            });
+          } catch (err) {
+            console.warn('[canvas] fallback photo failed', err);
+          }
+        }
+
+        setPhotoLayers(nextPhotos);
+        setStickerLayers(
+          (state.stickers ?? [])
+            .filter((s) => s?.emoji)
+            .map((s) => ({
+              id: s.id || createId(),
+              emoji: s.emoji,
+              x: normalized ? s.x * rect.width : s.x * sx,
+              y: normalized ? s.y * rect.height : s.y * sy,
+              size: normalized ? s.size * rect.width : s.size * ((sx + sy) / 2),
+              rotation: s.rotation || 0,
+            })),
+        );
+        setMode('none');
+        setColorsOpen(false);
+        setFontOpen(false);
+        setStickerOpen(false);
+
+        if (
+          nextPhotos.length === 0 &&
+          !(state.stickers?.length) &&
+          !hasDrawn.current
+        ) {
+          throw new Error(t('canvas.err.imageLoad'));
+        }
+      } finally {
+        suppressResizeRef.current = false;
+      }
+    },
     loadImage: async (src: string) => {
-      // AI·교체 이미지도 편집 가능한 사진 레이어로 (탭해서 다시 편집)
       clearUndoStack();
       clearInk();
       hasDrawn.current = false;
@@ -844,7 +1095,8 @@ function DrawingCanvas({
       setActivePhotoId(null);
       setStickerLayers([]);
       setActiveStickerId(null);
-      const safeSrc = await materializeImageSrc(src);
+      await ensureCanvasLayout();
+      const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, true);
     },
     loadEditableImage: async (src: string) => {
@@ -856,26 +1108,27 @@ function DrawingCanvas({
       setActivePhotoId(null);
       setStickerLayers([]);
       setActiveStickerId(null);
-      const safeSrc = await materializeImageSrc(src);
+      await ensureCanvasLayout();
+      const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, false);
     },
   }));
 
-  /** ✓ — 선택 해제 후 바로 그 위에 펜으로 그릴 수 있게 */
+  /** ✓ — 선택만 해제. 펜은 도구에서 직접 눌러야 선택됨 */
   const confirmActivePhoto = () => {
     setActivePhotoId(null);
-    setMode('pen');
-    setColorsOpen(true);
+    setMode('none');
+    setColorsOpen(false);
     setFontOpen(false);
     setStickerOpen(false);
   };
 
   const confirmActiveSticker = () => {
     setActiveStickerId(null);
-    // ✓ 후엔 스티커 배치 종료 — 아무 데나 눌러도 더 이상 안 붙음
-    setMode('pen');
+    // ✓ 후엔 스티커 배치 종료 — 펜은 직접 눌러야 선택
+    setMode('none');
     setStickerOpen(false);
-    setColorsOpen(true);
+    setColorsOpen(false);
   };
 
   const removeActivePhoto = () => {
@@ -889,9 +1142,9 @@ function DrawingCanvas({
     if (!activeStickerId) return;
     setStickerLayers((prev) => prev.filter((l) => l.id !== activeStickerId));
     setActiveStickerId(null);
-    setMode('pen');
+    setMode('none');
     setStickerOpen(false);
-    setColorsOpen(true);
+    setColorsOpen(false);
   };
 
   const confirmActiveOverlay = () => {
@@ -954,8 +1207,8 @@ function DrawingCanvas({
         setColorsOpen(false);
         setFontOpen(false);
       } else {
-        setMode('pen');
-        setColorsOpen(true);
+        setMode('none');
+        setColorsOpen(false);
       }
       return next;
     });
@@ -1739,8 +1992,8 @@ function DrawingCanvas({
               className="sheet-close-btn"
               onClick={() => {
                 setStickerOpen(false);
-                setMode('pen');
-                setColorsOpen(true);
+                setMode('none');
+                setColorsOpen(false);
               }}
               aria-label={t('common.close')}
             >

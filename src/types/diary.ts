@@ -9,6 +9,39 @@ export type MoodPackId =
   | 'numbers'
   | 'numbers2';
 
+/** 수정 시 사진별로 다시 움직이도록 저장하는 레이어 */
+export interface DiaryCanvasPhoto {
+  id: string;
+  src: string;
+  /** normalized면 0~1, 아니면 CSS px */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  aspect: number;
+  rotation: number;
+}
+
+export interface DiaryCanvasSticker {
+  id: string;
+  emoji: string;
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
+}
+
+export interface DiaryCanvasState {
+  viewWidth: number;
+  viewHeight: number;
+  /** true면 좌표·크기가 view 대비 0~1 */
+  normalized?: boolean;
+  photos: DiaryCanvasPhoto[];
+  stickers: DiaryCanvasSticker[];
+  /** 펜 잉크만 — 반드시 투명 PNG (JPEG/trim 금지) */
+  inkUrl?: string;
+}
+
 /** 그림 일기 한 편 */
 export interface DiaryEntry {
   id: string;
@@ -18,8 +51,10 @@ export interface DiaryEntry {
   title: string;
   /** 일기 본문 */
   content: string;
-  /** 그림 이미지 (data URL 또는 이미지 경로) */
+  /** 미리보기용 합성 이미지 (data URL 또는 https) */
   imageUrl?: string;
+  /** 수정용 레이어 — 있으면 사진/펜을 각각 편집 */
+  canvasState?: DiaryCanvasState;
   /** 그날 고른 스티커 (기분 또는 숫자) */
   mood: DiarySticker;
   /** 이 일기를 쓸 때 쓰던 이모지 팩. 이후 꾸미기에서 바꿔도 유지 */

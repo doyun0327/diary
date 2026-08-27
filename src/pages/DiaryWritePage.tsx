@@ -40,7 +40,8 @@ import {
   markCharacterCoachSeen,
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
-import { resolveDiaryImageForSave } from '../utils/resolveDiaryImage';
+import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
+import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import {
   requestSubscriptionPurchase,
@@ -206,8 +207,9 @@ function DiaryWritePage({
   }, []);
 
   useEffect(() => {
+    const state = initialEntry?.canvasState;
     const src = initialEntry?.imageUrl;
-    if (!src) return;
+    if (!state && !src) return;
     let cancelled = false;
     let attempts = 0;
 
@@ -215,22 +217,62 @@ function DiaryWritePage({
       if (cancelled) return;
       const canvas = canvasRef.current;
       if (!canvas) {
-        if (attempts++ < 60) {
+        if (attempts++ < 90) {
           window.requestAnimationFrame(tryLoad);
         }
         return;
       }
-      // 수정 모드: 사진 레이어로 올려 탭 시 확대·이동·삭제 가능
-      void canvas.loadEditableImage(src).catch(() => {
-        if (!cancelled) void canvas.loadImage(src);
-      });
+      const hasLayers = Boolean(
+        state &&
+          ((state.photos?.length ?? 0) > 0 ||
+            (state.stickers?.length ?? 0) > 0 ||
+            state.inkUrl),
+      );
+      if (hasLayers && state) {
+        void canvas.loadCanvasState(state, src).catch(() => {
+          if (!cancelled && src) void canvas.loadEditableImage(src);
+        });
+        return;
+      }
+      if (src) {
+        void canvas.loadEditableImage(src).catch(() => {
+          if (!cancelled) void canvas.loadImage(src);
+        });
+      }
     };
 
     tryLoad();
     return () => {
       cancelled = true;
     };
-  }, [initialEntry?.imageUrl]);
+  }, [initialEntry?.imageUrl, initialEntry?.canvasState]);
+
+  const resolveCanvasStateForSave = async (
+    state: DiaryCanvasState | null,
+  ): Promise<DiaryCanvasState | undefined> => {
+    if (!state) return undefined;
+    const photos = [];
+    for (const p of state.photos) {
+      const src = await resolveDiaryImageForSave(p.src);
+      if (!src) continue;
+      photos.push({ ...p, src });
+    }
+    // 잉크는 trim/JPEG 금지 — 투명 PNG 유지
+    const inkUrl = state.inkUrl
+      ? await resolveInkImageForSave(state.inkUrl)
+      : undefined;
+    if (photos.length === 0 && state.stickers.length === 0 && !inkUrl) {
+      return undefined;
+    }
+    return {
+      viewWidth: state.viewWidth,
+      viewHeight: state.viewHeight,
+      normalized: state.normalized ?? true,
+      photos,
+      stickers: state.stickers,
+      inkUrl,
+    };
+  };
 
   const leaveWithoutSaving = () => {
     if (!isEdit) clearWriteDraft();
@@ -413,9 +455,13 @@ function DiaryWritePage({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     let imageUrl: string | undefined;
+    let canvasState: DiaryCanvasState | undefined;
     try {
+      await canvasRef.current?.prepareExport();
+      const rawState = canvasRef.current?.getCanvasState() ?? null;
+      canvasState = await resolveCanvasStateForSave(rawState);
       const raw = canvasRef.current?.toDataURL();
-      // 로그인 시 GCS, 아니면 압축 후 로컬(IndexedDB) 폴백
+      // 미리보기 합성본 — 로그인 시 GCS, 아니면 압축 후 로컬
       imageUrl = raw ? await resolveDiaryImageForSave(raw) : undefined;
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
@@ -437,6 +483,7 @@ function DiaryWritePage({
       fontId,
       fontSize: fontSizeId,
       imageUrl,
+      canvasState,
     });
   };
 
