@@ -1,8 +1,5 @@
 import { useCallback, useState } from 'react';
-import { syncDiaries } from '../api/diariesApi';
-import { getAccessToken } from './useAuthSession';
 import type { DiaryEntry } from '../types/diary';
-import { mergeDiaryEntries } from '../utils/diarySync';
 import { createId } from '../utils/id';
 import { getStoredMoodPackId, parseMoodPackId } from '../utils/moodPack';
 
@@ -59,7 +56,7 @@ function persistDeletedIds(ids: string[]) {
   }
 }
 
-/** 일기 목록을 localStorage에 저장/관리 + 클라우드 동기화 */
+/** 일기 목록을 localStorage에 저장/관리 (클라우드 sync 비활성) */
 export function useDiary() {
   const [entries, setEntries] = useState<DiaryEntry[]>(loadEntries);
   const [, setDeletedIds] = useState<string[]>(loadDeletedIds);
@@ -121,48 +118,6 @@ export function useDiary() {
     setEntries(next);
   }, []);
 
-  /**
-   * 서버와 LWW 동기화.
-   * @param since 마지막 성공 동기화 시각 (없으면 전체 pull)
-   */
-  const syncWithCloud = useCallback(async (since: string | null) => {
-    const token = getAccessToken();
-    if (!token) {
-      throw new Error('로그인이 필요해요');
-    }
-
-    const pendingDeletes = loadDeletedIds();
-    const localEntries = loadEntries();
-
-    const res = await syncDiaries(token, {
-      since,
-      entries: localEntries,
-      deletedIds: pendingDeletes,
-    });
-
-    const merged = mergeDiaryEntries(localEntries, res.entries ?? [], [
-      ...pendingDeletes,
-      ...(res.deletedIds ?? []),
-    ]);
-
-    persistEntries(merged);
-    setEntries(merged);
-
-    const sentDeletes = new Set(pendingDeletes);
-    setDeletedIds((prev) => {
-      const next = prev.filter(
-        (id) => !sentDeletes.has(id) && !merged.some((e) => e.id === id),
-      );
-      persistDeletedIds(next);
-      return next;
-    });
-
-    return {
-      serverTime: res.serverTime || new Date().toISOString(),
-      entryCount: merged.length,
-    };
-  }, []);
-
   const clearLocalDiaries = useCallback(() => {
     persistEntries([]);
     persistDeletedIds([]);
@@ -177,6 +132,5 @@ export function useDiary() {
     removeEntry,
     replaceEntries,
     clearLocalDiaries,
-    syncWithCloud,
   };
 }

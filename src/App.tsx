@@ -72,9 +72,8 @@ type SubscriptionModalReason = "write" | "search" | "export";
 
 function App() {
   const { t } = useTranslation();
-  const { entries, addEntry, updateEntry, removeEntry, syncWithCloud, clearLocalDiaries } =
-    useDiary();
-  const { session, markSynced, ensureGuestSession } = useAuthSession();
+  const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries } = useDiary();
+  const { session, ensureGuestSession } = useAuthSession();
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } =
     useClientProfile();
@@ -237,15 +236,6 @@ function App() {
     setPage("detail");
   };
 
-  const syncInBackground = () => {
-    if (!getAccessToken() || session?.provider !== "google") return;
-    void syncWithCloud(session?.lastSyncedAt ?? null)
-      .then((result) => markSynced(result.serverTime))
-      .catch((err) => {
-        console.warn("[sync] background failed", err);
-      });
-  };
-
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
     entry,
   ) => {
@@ -256,7 +246,6 @@ function App() {
       setEditingId(null);
       setPage("detail");
       void syncSharedDiaryAfterEdit(id, entry);
-      syncInBackground();
       return;
     }
 
@@ -270,7 +259,6 @@ function App() {
             applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
             addEntry(entry);
             setPage("home");
-            syncInBackground();
           })
           .catch(async (err) => {
             const message =
@@ -287,7 +275,6 @@ function App() {
             }
             addEntry(entry);
             setPage("home");
-            syncInBackground();
           });
         return;
       }
@@ -296,12 +283,10 @@ function App() {
 
     addEntry(entry);
     setPage("home");
-    syncInBackground();
   };
 
   const handleDelete = (id: string) => {
     removeEntry(id);
-    syncInBackground();
   };
 
   const handleEdit = () => {
@@ -777,7 +762,6 @@ function App() {
             clientId={clientId}
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
-            onSyncDiaries={syncWithCloud}
             onClearLocalDiaries={clearLocalDiaries}
             onClose={() => setAccountOpen(false)}
           />,

@@ -16,8 +16,6 @@ interface AccountSheetProps {
   clientId: string;
   onNicknameChange: (name: string) => void;
   onAvatarChange: (dataUrl: string | null) => void;
-  /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
-  onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
   /** 탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
   onClose: () => void;
@@ -95,12 +93,11 @@ function AccountSheet({
   clientId,
   onNicknameChange,
   onAvatarChange,
-  onSyncDiaries,
   onClearLocalDiaries,
   onClose,
 }: AccountSheetProps) {
   const { t } = useTranslation();
-  const { session, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
+  const { session, signInWithGoogleIdToken, signOut, deleteAccount, ensureGuestSession } =
     useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const googleHostRef = useRef<HTMLDivElement>(null);
@@ -155,12 +152,6 @@ function AccountSheet({
     try {
       const next = await signInWithGoogleIdToken(idToken);
       seedProfileFromAuth(next);
-      try {
-        const result = await onSyncDiaries(null);
-        markSynced(result.serverTime);
-      } catch {
-        // 로컬 로그인만 된 경우
-      }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : t('account.sync.errSignIn'));
     } finally {
