@@ -68,7 +68,6 @@ function DiaryListPage({
 
       {entries.length === 0 ? (
         <div className="diary-list__empty-copy">
-          <p>{t('diary.empty.line1')}</p>
           <p>{t('diary.empty.line2')}</p>
         </div>
       ) : (
