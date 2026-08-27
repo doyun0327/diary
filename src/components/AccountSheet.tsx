@@ -7,6 +7,7 @@ import {
   useAuthSession,
   type AuthSession,
 } from '../hooks/useAuthSession';
+import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
 import { isFlutterApp } from '../utils/nativeShare';
 import './AccountSheet.css';
 
@@ -16,6 +17,8 @@ interface AccountSheetProps {
   clientId: string;
   onNicknameChange: (name: string) => void;
   onAvatarChange: (dataUrl: string | null) => void;
+  /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
+  onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
   /** 탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
   onClose: () => void;
@@ -95,12 +98,13 @@ function AccountSheet({
   clientId,
   onNicknameChange,
   onAvatarChange,
+  onSyncDiaries,
   onClearLocalDiaries,
   onClose,
   onRequestReopen,
 }: AccountSheetProps) {
   const { t } = useTranslation();
-  const { session, signInWithGoogleIdToken, signOut, deleteAccount, ensureGuestSession } =
+  const { session, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
     useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const googleHostRef = useRef<HTMLDivElement>(null);
@@ -112,7 +116,13 @@ function AccountSheet({
   const [authError, setAuthError] = useState<string | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
   /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
-  const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(null);
+  const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem('picture-diary-pending-google-photo');
+    } catch {
+      return null;
+    }
+  });
   const [photoMenuOpen, setPhotoMenuOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const avatarWrapRef = useRef<HTMLDivElement>(null);
@@ -155,6 +165,12 @@ function AccountSheet({
     try {
       const next = await signInWithGoogleIdToken(idToken);
       seedProfileFromAuth(next);
+      try {
+        const result = await onSyncDiaries(null);
+        markSynced(result.serverTime);
+      } catch {
+        // 로컬 로그인만 된 경우
+      }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : t('account.sync.errSignIn'));
     } finally {
@@ -238,16 +254,17 @@ function AccountSheet({
     const nickNow = nickname;
     const avatarNow = avatarUrl;
     const nameNow = nameDraft.trim() || nickNow;
+    setAuthError(null);
+    setAuthBusy('google');
+
+    // 클릭 제스처 안에서 즉시 네이티브 호출 (지연·동적 import 하면 계정창이 안 뜸)
+    const signInPromise = requestNativeGoogleSignIn();
+    // 네이티브 화면이 보이도록 시트만 닫기
+    onClose();
+
     void (async () => {
-      setAuthError(null);
-      // AccountSheet가 Google 계정 선택창을 가리거나 지연시킴 → 먼저 닫기
-      onClose();
-      await new Promise<void>((resolve) => {
-        window.setTimeout(resolve, 280);
-      });
       try {
-        const { requestNativeGoogleSignIn } = await import('../lib/googleAuth');
-        const idToken = await requestNativeGoogleSignIn();
+        const idToken = await signInPromise;
         const next = await signInWithGoogleIdToken(idToken);
         const name = next.displayName.trim();
         if (name && !nickNow.trim()) {
@@ -257,12 +274,29 @@ function AccountSheet({
             avatarUrl: next.photoUrl ?? avatarNow,
           });
         }
-        if (next.photoUrl && !avatarNow) {
-          onAvatarChange(next.photoUrl);
-          syncProfileToRooms({
-            nickname: name || nameNow,
-            avatarUrl: next.photoUrl,
-          });
+        if (next.photoUrl) {
+          if (!avatarNow) {
+            onAvatarChange(next.photoUrl);
+            syncProfileToRooms({
+              nickname: name || nameNow,
+              avatarUrl: next.photoUrl,
+            });
+          } else if (next.photoUrl !== avatarNow) {
+            try {
+              sessionStorage.setItem(
+                'picture-diary-pending-google-photo',
+                next.photoUrl,
+              );
+            } catch {
+              // ignore
+            }
+          }
+        }
+        try {
+          const result = await onSyncDiaries(null);
+          markSynced(result.serverTime);
+        } catch {
+          // 로컬 로그인만 된 경우
         }
         onRequestReopen?.();
       } catch (err) {
@@ -273,6 +307,8 @@ function AccountSheet({
         }
         console.warn('[google] native sign-in failed', err);
         onRequestReopen?.();
+      } finally {
+        setAuthBusy(null);
       }
     })();
   };
@@ -305,9 +341,7 @@ function AccountSheet({
 
   const handleSignOut = () => {
     signOut();
-    void import('../lib/googleAuth').then(({ nativeGoogleSignOut }) => {
-      nativeGoogleSignOut();
-    });
+    nativeGoogleSignOut();
     // 친구 방용 게스트 세션 복구 (Google 없이도 공유 가능)
     const nick = nickname.trim() || t('common.anonymous');
     void ensureGuestSession(clientId, nick).catch(() => {
@@ -341,10 +375,20 @@ function AccountSheet({
     if (!pendingGooglePhoto) return;
     applyAuthPhoto(pendingGooglePhoto);
     setPendingGooglePhoto(null);
+    try {
+      sessionStorage.removeItem('picture-diary-pending-google-photo');
+    } catch {
+      // ignore
+    }
   };
 
   const cancelReplaceWithGooglePhoto = () => {
     setPendingGooglePhoto(null);
+    try {
+      sessionStorage.removeItem('picture-diary-pending-google-photo');
+    } catch {
+      // ignore
+    }
   };
 
   const saveName = () => {

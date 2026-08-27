@@ -3,6 +3,7 @@ import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { diaryFontStack, findFont, fontSizeCss } from './fonts';
 import { entryMoodPack, getMoodIconTransform, getMoodVisual } from './moodPack';
+import { materializeImageSrc } from './materializeImage';
 /** PDF/공유 offscreen 렌더 시 상세 paper 스타일 필요 (상세 페이지를 안 거친 경우 대비) */
 import '../pages/DiaryDetailPage.css';
 import '../components/MoodIcon.css';
@@ -193,6 +194,30 @@ async function waitForImages(root: HTMLElement): Promise<void> {
   );
 }
 
+/** 원격 img를 data URL로 바꿔 modern-screenshot / canvas export tainted 방지 */
+async function materializeImagesInElement(root: HTMLElement): Promise<void> {
+  const imgs = Array.from(root.querySelectorAll('img'));
+  await Promise.all(
+    imgs.map(async (img) => {
+      const src = (img.currentSrc || img.src || img.getAttribute('src') || '').trim();
+      if (!src) return;
+      if (
+        src.startsWith('data:') ||
+        src.startsWith('blob:') ||
+        src.startsWith('/') ||
+        !(src.startsWith('http://') || src.startsWith('https://'))
+      ) {
+        return;
+      }
+      try {
+        img.src = await materializeImageSrc(src);
+      } catch {
+        // 변환 실패 시 원본 유지 (캡처가 실패할 수 있음)
+      }
+    }),
+  );
+}
+
 function applyCaptureStyles(source: Element, cloned: Element, diaryFont: string) {
   if (!(source instanceof HTMLElement) || !(cloned instanceof HTMLElement)) return;
 
@@ -236,6 +261,7 @@ export async function captureDiaryPaperBlob(
   const diaryFont = getDiaryFontFamily(element, fontId);
   const fontName = primaryFontName(diaryFont);
 
+  await materializeImagesInElement(element);
   await waitForImages(element);
   await waitDocumentFonts();
   if (!loadedFontFaces.has(fontName)) {

@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { syncDiaries } from '../api/diariesApi';
+import { getAccessToken } from './useAuthSession';
 import type { DiaryCanvasState, DiaryEntry } from '../types/diary';
+import { mergeDiaryEntries } from '../utils/diarySync';
 import { createId } from '../utils/id';
 import { getStoredMoodPackId, parseMoodPackId } from '../utils/moodPack';
+import { resolveDiaryImageForSave } from '../utils/resolveDiaryImage';
 import {
   clearDiaryImages,
   deleteDiaryCanvasJson,
@@ -64,6 +68,10 @@ function loadEntriesRaw(): DiaryEntry[] {
   } catch {
     return [];
   }
+}
+
+function loadEntries(): DiaryEntry[] {
+  return stampMissingMoodPack(loadEntriesRaw());
 }
 
 function stampMissingMoodPack(entries: DiaryEntry[]): DiaryEntry[] {
@@ -180,7 +188,39 @@ function persistDeletedIds(ids: string[]) {
   }
 }
 
-/** 일기 목록: 메타는 localStorage, 그림·레이어는 IndexedDB/HTTPS */
+/** sync 전송용: https 그림만 담고 canvasState는 제외 */
+async function prepareEntriesForSync(
+  entries: DiaryEntry[],
+): Promise<DiaryEntry[]> {
+  const prepared: DiaryEntry[] = [];
+  for (const entry of entries) {
+    let imageUrl = entry.imageUrl;
+    if (!imageUrl || isEmbeddedDataUrl(imageUrl)) {
+      try {
+        const fromIdb = await getDiaryImage(entry.id);
+        if (fromIdb?.startsWith('http://') || fromIdb?.startsWith('https://')) {
+          imageUrl = fromIdb;
+        } else if (isEmbeddedDataUrl(fromIdb)) {
+          imageUrl = await resolveDiaryImageForSave(fromIdb);
+        }
+      } catch (err) {
+        console.warn('[diary] sync image prepare failed', entry.id, err);
+      }
+    } else if (isEmbeddedDataUrl(imageUrl)) {
+      imageUrl = await resolveDiaryImageForSave(imageUrl);
+    }
+
+    const { canvasState: _omit, ...rest } = entry;
+    prepared.push({
+      ...rest,
+      imageUrl:
+        imageUrl && !isEmbeddedDataUrl(imageUrl) ? imageUrl : undefined,
+    });
+  }
+  return prepared;
+}
+
+/** 일기 목록: 메타는 localStorage, 그림·레이어는 IndexedDB/HTTPS + 클라우드 동기화 */
 export function useDiary() {
   const [entries, setEntries] = useState<DiaryEntry[]>(() =>
     stampMissingMoodPack(loadEntriesRaw()),
@@ -287,6 +327,59 @@ export function useDiary() {
     setEntries(next);
   }, []);
 
+  /**
+   * 서버와 LWW 동기화.
+   * @param since 마지막 성공 동기화 시각 (없으면 전체 pull)
+   */
+  const syncWithCloud = useCallback(async (since: string | null) => {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error('로그인이 필요해요');
+    }
+
+    const pendingDeletes = loadDeletedIds();
+    const localEntries = await hydrateEntries(loadEntries());
+    const entriesForSync = await prepareEntriesForSync(localEntries);
+
+    // 업로드로 https가 생긴 항목은 로컬에도 반영
+    for (const synced of entriesForSync) {
+      if (!synced.imageUrl || isEmbeddedDataUrl(synced.imageUrl)) continue;
+      const local = localEntries.find((e) => e.id === synced.id);
+      if (local && local.imageUrl !== synced.imageUrl) {
+        local.imageUrl = synced.imageUrl;
+      }
+    }
+
+    const res = await syncDiaries(token, {
+      since,
+      entries: entriesForSync,
+      deletedIds: pendingDeletes,
+    });
+
+    const merged = mergeDiaryEntries(localEntries, res.entries ?? [], [
+      ...pendingDeletes,
+      ...(res.deletedIds ?? []),
+    ]);
+
+    const hydrated = await hydrateEntries(merged);
+    persistEntries(hydrated);
+    setEntries(hydrated);
+
+    const sentDeletes = new Set(pendingDeletes);
+    setDeletedIds((prev) => {
+      const next = prev.filter(
+        (id) => !sentDeletes.has(id) && !hydrated.some((e) => e.id === id),
+      );
+      persistDeletedIds(next);
+      return next;
+    });
+
+    return {
+      serverTime: res.serverTime || new Date().toISOString(),
+      entryCount: hydrated.length,
+    };
+  }, []);
+
   const clearLocalDiaries = useCallback(() => {
     void clearDiaryImages();
     persistEntries([]);
@@ -303,5 +396,6 @@ export function useDiary() {
     removeEntry,
     replaceEntries,
     clearLocalDiaries,
+    syncWithCloud,
   };
 }

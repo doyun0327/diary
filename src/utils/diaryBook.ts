@@ -3,6 +3,7 @@ import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { fontFamilyForEntry } from './fonts';
 import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
+import { materializeImageSrc } from './materializeImage';
 import { downloadToDevice } from './saveBlob';
 
 export { downloadViaAnchor as downloadBlob } from './saveBlob';
@@ -23,6 +24,40 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('그림을 불러오지 못했어요'));
     img.src = src;
+  });
+}
+
+/** http(s) 이미지는 data URL로 바꾼 뒤 로드 — PDF toBlob tainted 방지 */
+async function loadImageSafe(src: string): Promise<HTMLImageElement> {
+  const safe = await materializeImageSrc(src);
+  return loadImage(safe);
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    try {
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+            return;
+          }
+          reject(new Error('일기장 페이지를 만들 수 없어요'));
+        },
+        type,
+        quality,
+      );
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'SecurityError') {
+        reject(
+          new Error(
+            '프로필/그림 때문에 PDF를 만들지 못했어요. 잠시 후 다시 시도해 주세요',
+          ),
+        );
+        return;
+      }
+      reject(err instanceof Error ? err : new Error('일기장 페이지를 만들 수 없어요'));
+    }
   });
 }
 
@@ -133,16 +168,6 @@ function createPageCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingCo
   return { canvas, ctx };
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error('일기장 페이지를 만들 수 없어요'))),
-      type,
-      quality,
-    );
-  });
-}
-
 async function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -205,7 +230,7 @@ async function drawCoverAvatar(
 
   if (avatarUrl) {
     try {
-      const img = await loadImage(avatarUrl);
+      const img = await loadImageSafe(avatarUrl);
       const iw = img.naturalWidth || img.width;
       const ih = img.naturalHeight || img.height;
       const size = radius * 2;
