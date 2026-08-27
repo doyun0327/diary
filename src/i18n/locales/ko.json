@@ -460,7 +460,7 @@
       "characterAria": "AI 그림에 쓸 캐릭터 설정",
       "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요",
       "rewardTitle": "광고 보고 AI 그림 1회",
-      "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요. 「리워드 지급됨」이 뜰 때까지 닫지 마세요. 중간에 닫으면 처음부터 다시 봐야 해요.",
+      "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
       "rewardCta": "광고 보기",
       "adIncompleteTitle": "광고를 끝까지 봐 주세요"
     },
@@ -486,7 +486,7 @@
       "aiConvert": "이미지 변환에 실패했습니다",
       "saveImage": "그림을 저장 파일로 만들지 못했어요",
       "empty": "제목, 내용, 그림 중 하나는 넣어 주세요",
-      "adNotCompleted": "「리워드 지급됨」이 뜰 때까지 광고를 봐야 AI 그림을 그릴 수 있어요.",
+      "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 그릴 수 있어요.",
       "adNotCompletedWrite": "광고를 끝까지 봐야 일기를 저장할 수 있어요",
       "adAppOnly": "앱에서만 광고를 볼 수 있어요",
       "aiFreeLimit": "Pro 체험권으로 AI 그림을 2회 무료로 생성할 수 있어요.",

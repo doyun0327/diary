@@ -40,7 +40,6 @@ export async function requestAiRewardedAd(): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     let done = false;
     const prev = window.__onDiaryRewardedAd;
-    const timer = window.setTimeout(() => finish(false), 90000);
 
     const onCustom = (event: Event) => {
       const detail = (event as CustomEvent<{ ok?: boolean }>).detail;
@@ -50,7 +49,6 @@ export async function requestAiRewardedAd(): Promise<boolean> {
     function finish(ok: boolean) {
       if (done) return;
       done = true;
-      window.clearTimeout(timer);
       window.removeEventListener("diary-rewarded-ad-result", onCustom);
       window.__onDiaryRewardedAd = prev;
       resolve(ok);
