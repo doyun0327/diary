@@ -29,11 +29,13 @@ function loadEntries(): DiaryEntry[] {
   }
 }
 
-function persistEntries(entries: DiaryEntry[]) {
+function persistEntries(entries: DiaryEntry[]): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  } catch {
-    // ignore
+    return true;
+  } catch (err) {
+    console.error('[diary] localStorage persist failed', err);
+    return false;
   }
 }
 

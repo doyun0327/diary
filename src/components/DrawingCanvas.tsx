@@ -380,11 +380,9 @@ function DrawingCanvas({
   const exportDataUrl = (): string | undefined => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-    if (
-      !hasDrawn.current &&
-      photoLayers.length === 0 &&
-      stickerLayers.length === 0
-    ) {
+    const photos = photoLayersRef.current;
+    const stickers = stickerLayersRef.current;
+    if (!hasDrawn.current && photos.length === 0 && stickers.length === 0) {
       return undefined;
     }
 
@@ -397,9 +395,9 @@ function DrawingCanvas({
 
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-      photoLayers.forEach((layer) => bakePhotoToCanvas(layer, ctx));
+      photos.forEach((layer) => bakePhotoToCanvas(layer, ctx));
       ctx.drawImage(canvas, 0, 0);
-      stickerLayers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
+      stickers.forEach((layer) => bakeStickerToCanvas(layer, ctx));
 
       return exportCanvas.toDataURL('image/png');
     } catch (err) {
@@ -786,7 +784,9 @@ function DrawingCanvas({
       setActiveStickerId(null);
     },
     hasContent: () =>
-      hasDrawn.current || photoLayers.length > 0 || stickerLayers.length > 0,
+      hasDrawn.current ||
+      photoLayersRef.current.length > 0 ||
+      stickerLayersRef.current.length > 0,
     loadImage: async (src: string) => {
       // AI·교체 이미지도 편집 가능한 사진 레이어로 (탭해서 다시 편집)
       clearUndoStack();

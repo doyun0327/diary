@@ -40,6 +40,7 @@ import {
   markCharacterCoachSeen,
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
+import { compressDataUrlForDiary } from '../utils/shareImageUrl';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import {
   requestSubscriptionPurchase,
@@ -409,11 +410,13 @@ function DiaryWritePage({
     startAiDrawFlow();
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     let imageUrl: string | undefined;
     try {
-      imageUrl = canvasRef.current?.toDataURL();
+      const raw = canvasRef.current?.toDataURL();
+      // PNG 원본은 localStorage 한도를 넘어 재실행 후 그림이 사라질 수 있음
+      imageUrl = raw ? await compressDataUrlForDiary(raw) : undefined;
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
       return;
