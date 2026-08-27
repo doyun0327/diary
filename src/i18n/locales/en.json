@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Delete account",
       "title": "Are you sure you want to delete your account?",
-      "lead": "",
+      "lead": "Sign back in within one month to keep your data. After that you are treated as withdrawn and previous data stays hidden.",
       "confirm": "Delete"
     },
     "removePhoto": "Remove",
@@ -255,6 +255,8 @@
     "empty": "You're not in any rooms yet",
     "emptyLead": "Make a cozy room to stick diaries with friends.",
     "memberCount": "{{n}} members",
+    "withdrawnMember": "Withdrawn member",
+    "pokeWithdrawn": "You cannot poke a withdrawn member",
     "roomFallback": "Room",
     "copyInvite": "Invite",
     "copied": "Copied",
@@ -464,7 +466,8 @@
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",
-      "saveLead": "You've used your free diaries. Watch an ad to save one more."
+      "saveLead": "You've reached the limit. Watch an ad to save one more entry.",
+      "saveLeadPremium": "You've reached this month's limit of 50 entries. Watch an ad to save one more."
     },
     "confirm": {
       "replaceTitle": "AI drawing",
@@ -486,7 +489,8 @@
       "adNotCompleted": "Finish the ad to get one AI drawing",
       "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
-      "aiDailyLimit": "Non-subscribers can create up to 5 AI drawings per day"
+      "aiFreeLimit": "With your Pro trial, you can create 2 AI drawings for free.",
+      "aiDailyLimit": "With your Pro trial, you can create 2 AI drawings for free."
     },
     "coach": {
       "character": "Set yourself so AI can draw you",

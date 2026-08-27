@@ -6,6 +6,7 @@ import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import { getCachedRoomPost } from '../utils/roomCache';
+import { roomAuthorLabel } from '../utils/roomDisplay';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
@@ -136,7 +137,9 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
       {post && (
         <div className="rooms__post-expand">
-          <p className="rooms__post-by">{post.authorNickname}</p>
+          <p className="rooms__post-by">
+            {roomAuthorLabel(post.authorNickname, post.authorWithdrawn, t)}
+          </p>
           <RoomDiaryPaper post={post} className="rooms__paper--expand" />
         </div>
       )}
@@ -160,7 +163,9 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                 ].join(' ')}
               >
                 {showName && !isMine && (
-                  <strong className="rooms__comment-name">{c.authorNickname}</strong>
+                  <strong className="rooms__comment-name">
+                    {roomAuthorLabel(c.authorNickname, c.authorWithdrawn, t)}
+                  </strong>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>
               </li>

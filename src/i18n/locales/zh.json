@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "注销账号",
       "title": "要注销账号吗？",
-      "lead": "云端日记与房间活动将被删除并退出登录。本机本地日记会保留。",
+      "lead": "一个月内重新登录可继续使用原有数据。超过一个月将视为已注销，此前数据将不再显示。",
       "confirm": "注销"
     },
     "removePhoto": "删除",
@@ -255,6 +255,8 @@
     "empty": "还没有加入任何房间",
     "emptyLead": "要不要建个房间，和朋友一起贴日记？",
     "memberCount": "{{n}} 人",
+    "withdrawnMember": "已注销用户",
+    "pokeWithdrawn": "无法戳已注销用户",
     "roomFallback": "房间",
     "copyInvite": "邀请",
     "copied": "已复制",
@@ -469,7 +471,8 @@
       "empty": "请填写标题、正文或画作",
       "adNotCompleted": "请看完广告以获得一次 AI 绘画",
       "adAppOnly": "广告仅在 App 内可用",
-      "aiDailyLimit": "未订阅用户每天最多 2 次 AI 绘画"
+      "aiFreeLimit": "Pro 体验券可免费生成 2 次 AI 绘画。",
+      "aiDailyLimit": "Pro 体验券可免费生成 2 次 AI 绘画。"
     },
     "coach": {
       "character": "设定自己后，AI会按这个样子画画",

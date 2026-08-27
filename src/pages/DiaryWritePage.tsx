@@ -23,12 +23,12 @@ import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
-  FREE_AI_DRAWS_PER_DAY,
+  FREE_AI_DRAWS_TOTAL,
   consumeAiDrawCredit,
   consumeFreeAiDrawChance,
   getAiDrawCredits,
   getDiaryAccessState,
-  getRemainingFreeAiDrawsToday,
+  getRemainingFreeAiDraws,
   grantAiDrawCredits,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
@@ -67,12 +67,9 @@ interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
-  entriesCount: number;
   onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onOpenCharacter: () => void;
-  /** 작성 한도 초과 시 구독 모달 (프리미엄 월 한도 등) */
-  onOpenWriteLimitModal?: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean) => void;
   writeQuota?: { used: number; limit: number };
@@ -81,11 +78,9 @@ interface DiaryWritePageProps {
 function DiaryWritePage({
   character,
   initialEntry,
-  entriesCount,
   onSave,
   onCancel,
   onOpenCharacter,
-  onOpenWriteLimitModal,
   onNativeSaveStateChange,
   writeQuota,
 }: DiaryWritePageProps) {
@@ -300,8 +295,8 @@ function DiaryWritePage({
       };
     }
     return {
-      n: getRemainingFreeAiDrawsToday(),
-      limit: FREE_AI_DRAWS_PER_DAY,
+      n: getRemainingFreeAiDraws(),
+      limit: FREE_AI_DRAWS_TOTAL,
     };
   })();
 
@@ -317,7 +312,11 @@ function DiaryWritePage({
           await refreshSubscriptionStatus();
           access = getDiaryAccessState();
         }
-        if (!access.isPremiumActive && getAiDrawCredits() <= 0) {
+        if (
+          !access.isPremiumActive &&
+          getRemainingFreeAiDraws() <= 0 &&
+          getAiDrawCredits() <= 0
+        ) {
           setRewardPromptOpen(true);
           return;
         }
@@ -343,16 +342,19 @@ function DiaryWritePage({
         access = getDiaryAccessState();
       }
       if (!access.isPremiumActive) {
-        if (getRemainingFreeAiDrawsToday() <= 0) {
-          setAiError(t('write.err.aiDailyLimit'));
-          return;
-        }
-        if (!consumeAiDrawCredit()) {
+        const freeLeft = getRemainingFreeAiDraws();
+        if (freeLeft > 0) {
+          if (!consumeFreeAiDrawChance()) {
+            setAiError(t('write.err.aiFreeLimit'));
+            return;
+          }
+        } else if (getAiDrawCredits() > 0) {
+          if (!consumeAiDrawCredit()) {
+            setRewardPromptOpen(true);
+            return;
+          }
+        } else {
           setRewardPromptOpen(true);
-          return;
-        }
-        if (!consumeFreeAiDrawChance()) {
-          setAiError(t('write.err.aiDailyLimit'));
           return;
         }
       }
@@ -382,11 +384,6 @@ function DiaryWritePage({
       setAiError(t('write.err.adAppOnly'));
       return;
     }
-    if (getRemainingFreeAiDrawsToday() <= 0) {
-      setRewardPromptOpen(false);
-      setAiError(t('write.err.aiDailyLimit'));
-      return;
-    }
     setRewardPromptOpen(false);
     setAiError(null);
     const ok = await requestAiRewardedAd();
@@ -410,15 +407,6 @@ function DiaryWritePage({
     if (!title.trim() && !content.trim() && !imageUrl) {
       setAiError(t('write.err.empty'));
       return;
-    }
-
-    // 프리미엄 월 한도만 저장 차단. 무료 회원은 저장 제한 없음.
-    if (!isEdit) {
-      const status = getDiaryAccessState(entriesCount);
-      if (status.isPremiumActive && !status.canCreate) {
-        onOpenWriteLimitModal?.();
-        return;
-      }
     }
 
     setAiError(null);
@@ -602,19 +590,6 @@ function DiaryWritePage({
                         {HAIR_STYLE_OPTIONS.find((o) => o.value === character.hairStyle)?.emoji ?? '👤'}
                       </span>
                     </button>
-                    {coach === 'character' && (
-                      <div className="diary-write__coach" role="status">
-                        <p>{t('write.coach.character')}</p>
-                        <button
-                          type="button"
-                          className="diary-write__coach-dismiss"
-                          aria-label={t('common.close')}
-                          onClick={dismissCharacterCoach}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    )}
                   </div>
                   <div className="diary-write__coach-anchor diary-write__coach-anchor--ai">
                     <button
@@ -633,22 +608,35 @@ function DiaryWritePage({
                         })}
                       </span>
                     )}
-                    {coach === 'ai' && (
-                      <div className="diary-write__coach diary-write__coach--ai" role="status">
-                        <p>{t('write.coach.ai')}</p>
-                        <button
-                          type="button"
-                          className="diary-write__coach-dismiss"
-                          aria-label={t('common.close')}
-                          onClick={dismissAiCoach}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
+              {coach === 'character' && (
+                <div className="diary-write__coach" role="status">
+                  <p>{t('write.coach.character')}</p>
+                  <button
+                    type="button"
+                    className="diary-write__coach-dismiss"
+                    aria-label={t('common.close')}
+                    onClick={dismissCharacterCoach}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              {coach === 'ai' && (
+                <div className="diary-write__coach diary-write__coach--ai" role="status">
+                  <p>{t('write.coach.ai')}</p>
+                  <button
+                    type="button"
+                    className="diary-write__coach-dismiss"
+                    aria-label={t('common.close')}
+                    onClick={dismissAiCoach}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

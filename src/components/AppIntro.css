@@ -4,20 +4,18 @@
   z-index: 100;
   display: flex;
   flex-direction: column;
-  padding:
-    calc(12px + max(env(safe-area-inset-top, 0px), var(--diary-safe-top, 0px)))
-    12px
-    calc(16px + max(env(safe-area-inset-bottom, 0px), var(--diary-safe-bottom, 0px)));
-  background: #f4f4f4;
+  padding: 0;
+  /* intro PNG 배경(크림)과 맞춤 — 위아래 여백이 하얗게 안 보이게 */
+  background: #f7eedc;
 }
 
 .app-intro__viewport {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: var(--shadow-card);
+  border-radius: 0;
+  background: #f7eedc;
+  box-shadow: none;
   touch-action: pan-y;
 }
 
@@ -36,14 +34,17 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  margin: 0;
   box-sizing: border-box;
-  background: #fff;
+  background: #f7eedc;
+  overflow: hidden;
 }
 
 .app-intro__image {
   display: block;
   width: 100%;
   height: 100%;
+  /* 전체 이미지 표시 (잘림 없음) */
   object-fit: contain;
   object-position: center;
   user-select: none;
@@ -52,10 +53,16 @@
 }
 
 .app-intro__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(14px + max(env(safe-area-inset-bottom, 0px), var(--diary-safe-bottom, 0px)));
+  z-index: 2;
   display: flex;
   justify-content: center;
   gap: 7px;
-  margin: 14px 0 4px;
+  margin: 0;
+  pointer-events: none;
 }
 
 .app-intro__dot {
@@ -64,12 +71,13 @@
   padding: 0;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-text-muted) 32%, transparent);
+  background: rgba(0, 0, 0, 0.22);
   cursor: pointer;
+  pointer-events: auto;
   transition: width 0.2s ease, background 0.2s ease;
 }
 
 .app-intro__dot.is-active {
   width: 18px;
-  background: var(--color-accent);
+  background: #1a1a1a;
 }

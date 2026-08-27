@@ -267,9 +267,9 @@ export function parseMoodPackId(id: unknown): MoodPackId | undefined {
 
 export function getStoredMoodPackId(): MoodPackId {
   try {
-    return parseMoodPackId(localStorage.getItem(MOOD_PACK_STORAGE_KEY)) ?? 'smileys';
+    return parseMoodPackId(localStorage.getItem(MOOD_PACK_STORAGE_KEY)) ?? 'classic';
   } catch {
-    return 'smileys';
+    return 'classic';
   }
 }
 
@@ -341,5 +341,5 @@ function subscribeMoodPack(onStoreChange: () => void) {
 }
 
 export function useMoodPackId(): MoodPackId {
-  return useSyncExternalStore(subscribeMoodPack, getStoredMoodPackId, () => 'smileys' as MoodPackId);
+  return useSyncExternalStore(subscribeMoodPack, getStoredMoodPackId, () => 'classic' as MoodPackId);
 }

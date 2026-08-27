@@ -101,7 +101,7 @@ export async function logoutRemote(accessToken: string | null): Promise<void> {
   }
 }
 
-/** 클라우드 계정 탈퇴 (서버 users + 관련 데이터 삭제) */
+/** 클라우드 계정 탈퇴 (소프트 탈퇴 — GRACE 유예) */
 export async function deleteAccountRemote(accessToken: string): Promise<void> {
   const res = await fetch(apiUrl('/api/me'), {
     method: 'DELETE',

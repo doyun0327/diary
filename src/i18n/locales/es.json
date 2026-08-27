@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Eliminar cuenta",
       "title": "¿Eliminar la cuenta?",
-      "lead": "Se borrarán diarios en la nube y actividad en salas, y se cerrará la sesión. Los diarios de este dispositivo se quedan.",
+      "lead": "Puedes volver a iniciar sesión en un mes y conservar tus datos. Después se te trata como dado de baja y los datos anteriores quedan ocultos.",
       "confirm": "Eliminar"
     },
     "removePhoto": "Quitar",
@@ -255,6 +255,8 @@
     "empty": "Aún no estás en ninguna sala",
     "emptyLead": "Crea una sala acogedora para pegar diarios con amigos.",
     "memberCount": "{{n}} miembros",
+    "withdrawnMember": "Miembro dado de baja",
+    "pokeWithdrawn": "No puedes pinchar a un miembro dado de baja",
     "roomFallback": "Sala",
     "copyInvite": "Invitar",
     "copied": "Copiado",
@@ -469,7 +471,8 @@
       "empty": "Añade un título, texto o dibujo",
       "adNotCompleted": "Termina el anuncio para obtener un dibujo IA",
       "adAppOnly": "Los anuncios solo están en la app",
-      "aiDailyLimit": "Sin suscripción: hasta 2 dibujos IA al día"
+      "aiFreeLimit": "Con la prueba Pro puedes crear 2 dibujos IA gratis.",
+      "aiDailyLimit": "Con la prueba Pro puedes crear 2 dibujos IA gratis."
     },
     "coach": {
       "character": "Elige tu personaje para que la IA te dibuje",

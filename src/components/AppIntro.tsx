@@ -2,8 +2,8 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './AppIntro.css';
 
-/** 1·3·4·5 소개 → 9 (체험/혜택) */
-const INTRO_IMAGES = [1, 3, 4, 5, 9] as const;
+/** 1·2·3 소개 → 9 (체험/혜택) */
+const INTRO_IMAGES = [1, 2, 3, 9] as const;
 const SLIDE_COUNT = INTRO_IMAGES.length;
 
 type AppIntroProps = {

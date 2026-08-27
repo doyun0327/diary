@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Hapus akun",
       "title": "Hapus akun?",
-      "lead": "Diary cloud dan aktivitas ruang akan dihapus, lalu Anda keluar. Diary di perangkat ini tetap ada.",
+      "lead": "Anda bisa masuk lagi dalam satu bulan dan tetap memakai data. Setelah itu dianggap keluar dan data lama tetap disembunyikan.",
       "confirm": "Hapus"
     },
     "removePhoto": "Hapus",
@@ -255,6 +255,8 @@
     "empty": "Anda belum bergabung di ruang mana pun",
     "emptyLead": "Buat ruang nyaman untuk menempel diary bersama teman.",
     "memberCount": "{{n}} anggota",
+    "withdrawnMember": "Anggota yang keluar",
+    "pokeWithdrawn": "Tidak bisa menyenggol anggota yang keluar",
     "roomFallback": "Ruang",
     "copyInvite": "Undang",
     "copied": "Disalin",
@@ -469,7 +471,8 @@
       "empty": "Tambahkan judul, teks, atau gambar",
       "adNotCompleted": "Selesaikan iklan untuk mendapat satu gambar AI",
       "adAppOnly": "Iklan hanya tersedia di aplikasi",
-      "aiDailyLimit": "Non-pelanggan: maksimal 2 gambar AI per hari"
+      "aiFreeLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
+      "aiDailyLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis."
     },
     "coach": {
       "character": "Atur dirimu agar AI menggambarmu",

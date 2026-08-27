@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Konto löschen",
       "title": "Konto löschen?",
-      "lead": "Cloud-Tagebücher und Raumaktivitäten werden entfernt, und du wirst abgemeldet. Tagebücher auf diesem Gerät bleiben erhalten.",
+      "lead": "Innerhalb eines Monats kannst du dich wieder anmelden und deine Daten behalten. Danach giltst du als ausgetreten und frühere Daten bleiben verborgen.",
       "confirm": "Löschen"
     },
     "removePhoto": "Entfernen",
@@ -256,6 +256,8 @@
     "empty": "Du bist noch in keinem Raum",
     "emptyLead": "Leg einen Raum an, um Tagebücher mit Freunden zu teilen.",
     "memberCount": "{{n}} Mitglieder",
+    "withdrawnMember": "Ausgetretenes Mitglied",
+    "pokeWithdrawn": "Ausgetretene Mitglieder können nicht angestupst werden",
     "roomFallback": "Raum",
     "copyInvite": "Einladen",
     "copied": "Kopiert",
@@ -470,7 +472,8 @@
       "empty": "Füge Titel, Text oder Zeichnung hinzu",
       "adNotCompleted": "Schau die Werbung zu Ende, um eine KI-Zeichnung zu erhalten",
       "adAppOnly": "Werbung ist nur in der App verfügbar",
-      "aiDailyLimit": "Ohne Abo kannst du bis zu 2 KI-Zeichnungen pro Tag erstellen"
+      "aiFreeLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen.",
+      "aiDailyLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen."
     },
     "coach": {
       "character": "Leg dich fest, damit die KI dich zeichnen kann",

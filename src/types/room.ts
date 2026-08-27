@@ -6,6 +6,8 @@ export interface RoomMember {
   /** 프로필 사진 data URL 또는 http(s) URL */
   avatarUrl?: string | null;
   joinedAt: string;
+  /** 완전 탈퇴(유예 종료) — 표시명은 「탈퇴한 회원」 */
+  withdrawn?: boolean;
 }
 
 export interface RoomSummary {
@@ -39,6 +41,8 @@ export interface RoomPost {
   moodPack?: MoodPackId;
   imageUrl?: string;
   createdAt: string;
+  /** 완전 탈퇴 작성자 */
+  authorWithdrawn?: boolean;
 }
 
 export interface RoomComment {
@@ -48,6 +52,7 @@ export interface RoomComment {
   authorNickname: string;
   text: string;
   createdAt: string;
+  authorWithdrawn?: boolean;
 }
 
 export interface CreateRoomPostBody {

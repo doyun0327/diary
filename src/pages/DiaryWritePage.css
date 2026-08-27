@@ -90,6 +90,8 @@
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border-soft);
+  /* auto면 절대 위치 코치 툴팁이 잘림 → y만 스크롤, x는 보이게 */
+  overflow-x: visible;
   overflow-y: auto;
 }
 
@@ -190,6 +192,7 @@
   justify-content: flex-end;
   gap: 8px;
   margin-bottom: 10px;
+  width: 100%;
   overflow: visible;
 }
 
@@ -200,7 +203,8 @@
 .diary-write__ai-block {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
+  width: 100%;
   gap: 8px;
   overflow: visible;
 }
@@ -208,6 +212,7 @@
 .diary-write__ai-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
   gap: 10px;
   overflow: visible;
@@ -233,6 +238,7 @@
   border: 1px solid var(--color-border-soft);
   position: relative;
   overflow: visible;
+  z-index: 30;
 }
 
 .diary-write__ai-remaining {
@@ -253,16 +259,20 @@
   overflow: visible;
 }
 
+/* 아이콘 아래 + 화면(작성 영역) 가운데 — absolute/왼쪽 뻗침으로 잘리지 않게 */
 .diary-write__coach {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 10px);
-  z-index: 20;
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  bottom: auto;
+  z-index: 40;
   display: flex;
   align-items: flex-start;
   gap: 6px;
   width: max-content;
-  max-width: min(240px, 78vw);
+  max-width: min(280px, 100%);
+  margin: 4px auto 2px;
   padding: 10px 10px 10px 12px;
   border-radius: 14px;
   background: #1a1a1a;
@@ -270,19 +280,24 @@
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
   text-align: left;
   animation: diary-coach-in 0.28s var(--ease-out, ease);
+  pointer-events: auto;
 }
 
 .diary-write__coach::after {
   content: '';
   position: absolute;
-  right: 14px;
+  left: 50%;
+  right: auto;
   bottom: 100%;
+  top: auto;
+  transform: translateX(-50%);
   border: 7px solid transparent;
   border-bottom-color: #1a1a1a;
 }
 
 .diary-write__coach--ai::after {
-  right: 36px;
+  left: 50%;
+  right: auto;
 }
 
 .diary-write__coach p {
@@ -290,6 +305,8 @@
   font-size: 0.8rem;
   font-weight: 650;
   line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .diary-write__coach-dismiss {

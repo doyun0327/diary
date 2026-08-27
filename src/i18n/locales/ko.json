@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "회원 탈퇴",
       "title": "정말 탈퇴하시겠습니까?",
-      "lead": "",
+      "lead": "한 달 동안은 다시 로그인하면 데이터를 그대로 쓸 수 있어요. 한 달이 지나면 탈퇴 회원으로 처리되어 이전 데이터는 보이지 않아요.",
       "confirm": "탈퇴하기"
     },
     "removePhoto": "삭제",
@@ -255,6 +255,8 @@
     "empty": "아직 참여한 방이 없어요",
     "emptyLead": "친구랑 일기 붙여 둘 방을 하나 만들어 볼까요?",
     "memberCount": "멤버 {{n}}",
+    "withdrawnMember": "탈퇴한 회원",
+    "pokeWithdrawn": "탈퇴한 회원에게는 찌를 수 없어요",
     "roomFallback": "방",
     "copyInvite": "초대하기",
     "copied": "복사됨",
@@ -308,7 +310,7 @@
     "pokeAction": "찌르기",
     "pokeHint": "{{name}} 찌르기",
     "pokeAria": "{{name}} 찌르기",
-    "pokeSent": "찌르기 완료!",
+    "pokeSent": "{{name}}에게 찔렀어요!",
     "pokeSelf": "나를 찌를 순 없어요",
     "pokeWait": "조금만 뒤에 다시 찔러 보세요",
     "pokeNeedLogin": "로그인 후 찔러 보세요",
@@ -320,8 +322,7 @@
     "goHome": "메인 화면으로",
     "openPostAria": "{{author}}의 일기 {{title}} 크게 보기",
     "coach": {
-      "comment": "댓글을 남겨보세요!",
-      "poke": "프사를 누르면 친구에게 알림이 가요!"
+      "comment": "댓글을 남겨보세요!"
     },
     "backToRoom": "← 방으로",
     "backToRoomAria": "방으로",
@@ -464,7 +465,8 @@
     },
     "reward": {
       "saveTitle": "광고 보고 일기 1편 저장",
-      "saveLead": "무료 일기를 모두 썼어요. 광고를 보면 일기 1편을 더 저장할 수 있어요."
+      "saveLead": "한도에 도달했어요. 광고를 보면 일기 1편을 더 작성 할 수 있어요.",
+      "saveLeadPremium": "이번 달 작성 한도(50장)에 도달했어요. 광고를 보면 일기 1편을 더 작성할 수 있어요."
     },
     "confirm": {
       "replaceTitle": "AI 그림",
@@ -486,7 +488,8 @@
       "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 받을 수 있어요",
       "adNotCompletedWrite": "광고를 끝까지 봐야 일기를 저장할 수 있어요",
       "adAppOnly": "앱에서만 광고를 볼 수 있어요",
-      "aiDailyLimit": "미구독자는 하루에 AI 그림을 5번까지 그릴 수 있어요"
+      "aiFreeLimit": "Pro 체험권으로 AI 그림을 2회 무료로 생성할 수 있어요.",
+      "aiDailyLimit": "Pro 체험권으로 AI 그림을 2회 무료로 생성할 수 있어요."
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",

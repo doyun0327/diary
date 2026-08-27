@@ -16,6 +16,7 @@ import {
   getCachedRoomFeed,
   setCachedRoomFeed,
 } from '../utils/roomCache';
+import { roomAuthorLabel } from '../utils/roomDisplay';
 import './RoomsPages.css';
 
 const ROOM_POSTS_PAGE_SIZE = 10;
@@ -165,8 +166,14 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
               <ul className="rooms__gallery">
                 {visiblePosts.map((post) => {
                   const author = room.members.find((m) => m.userId === post.authorUserId);
-                  const avatarUrl = author?.avatarUrl?.trim() || '';
-                  const initial = (post.authorNickname.trim() || '?').slice(0, 1).toUpperCase();
+                  const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
+                  const authorName = roomAuthorLabel(
+                    post.authorNickname,
+                    withdrawn,
+                    t,
+                  );
+                  const avatarUrl = withdrawn ? '' : author?.avatarUrl?.trim() || '';
+                  const initial = (authorName || '?').slice(0, 1).toUpperCase();
                   return (
                   <li key={post.id}>
                     <button
@@ -174,7 +181,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                       className="rooms__gallery-item"
                       onClick={() => handleOpenPost(post.id)}
                       aria-label={t('rooms.openPostAria', {
-                        author: post.authorNickname,
+                        author: authorName,
                         title: post.title || post.date,
                       })}
                     >
@@ -186,7 +193,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                             <span className="rooms__gallery-initial">{initial}</span>
                           )}
                         </span>
-                        <span className="rooms__gallery-name">{post.authorNickname}</span>
+                        <span className="rooms__gallery-name">{authorName}</span>
                       </span>
                       <RoomDiaryPaper post={post} compact />
                     </button>

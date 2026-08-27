@@ -18,6 +18,8 @@ interface AccountSheetProps {
   onAvatarChange: (dataUrl: string | null) => void;
   /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
   onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
+  /** 탈퇴 시 이 기기 로컬 일기 비우기 */
+  onClearLocalDiaries?: () => void;
   onClose: () => void;
 }
 
@@ -94,6 +96,7 @@ function AccountSheet({
   onNicknameChange,
   onAvatarChange,
   onSyncDiaries,
+  onClearLocalDiaries,
   onClose,
 }: AccountSheetProps) {
   const { t } = useTranslation();
@@ -297,6 +300,7 @@ function AccountSheet({
     setAuthBusy('google');
     try {
       await deleteAccount();
+      onClearLocalDiaries?.();
       setWithdrawOpen(false);
       const nick = nickname.trim() || t('common.anonymous');
       void ensureGuestSession(clientId, nick).catch(() => {
@@ -615,6 +619,7 @@ function AccountSheet({
       {withdrawOpen ? (
         <AppModal
           title={t('account.withdraw.title')}
+          lead={t('account.withdraw.lead')}
           onDismiss={() => setWithdrawOpen(false)}
           secondaryLabel={t('common.cancel')}
           onSecondary={() => setWithdrawOpen(false)}

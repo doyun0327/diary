@@ -3,8 +3,10 @@ export const FREE_ENTRY_GRANT = 5;
 export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 1900;
-/** 미구독자 AI 그림 일일 한도 */
-export const FREE_AI_DRAWS_PER_DAY = 5;
+/** 미구독자 AI 그림 평생 무료 한도 (테스트: 2) */
+export const FREE_AI_DRAWS_TOTAL = 2;
+/** @deprecated FREE_AI_DRAWS_TOTAL */
+export const FREE_AI_DRAWS_PER_DAY = FREE_AI_DRAWS_TOTAL;
 /** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 */
 export const AI_REWARD_AD_ENABLED = true;
 /** 설치 후 검색·보내기 무료 체험 기간 */
@@ -51,8 +53,8 @@ type AccessState = {
   monthlyLimitUsed: number;
   monthKey: string | null;
   aiDrawCredits: number;
-  aiCreditDayKey: string | null;
-  aiDrawUsedToday: number;
+  /** 미구독자 평생 무료 AI 그림 사용 횟수 */
+  aiFreeDrawsUsed: number;
   /** 광고로 받은 추가 일기 저장 슬롯 (무료 한도 소진 후) */
   bonusDiarySlots: number;
 };
@@ -73,8 +75,13 @@ function getMonthKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getDayKey(date = new Date()) {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+function readAiFreeDrawsUsed(
+  parsed: Partial<AccessState & { aiDrawUsedToday?: number }>,
+) {
+  return Math.max(
+    0,
+    Number(parsed.aiFreeDrawsUsed ?? parsed.aiDrawUsedToday ?? 0),
+  );
 }
 
 function loadAccessState(): AccessState {
@@ -86,14 +93,13 @@ function loadAccessState(): AccessState {
         monthlyLimitUsed: 0,
         monthKey: getMonthKey(),
         aiDrawCredits: 0,
-        aiCreditDayKey: getDayKey(),
-        aiDrawUsedToday: 0,
+        aiFreeDrawsUsed: 0,
         bonusDiarySlots: 0,
       };
     }
 
     const parsed = JSON.parse(raw) as Partial<
-      AccessState & { adRewardBalance?: number }
+      AccessState & { adRewardBalance?: number; aiDrawUsedToday?: number }
     >;
     return {
       premiumUntil:
@@ -102,11 +108,7 @@ function loadAccessState(): AccessState {
       monthKey:
         typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
       aiDrawCredits: Math.max(0, Number(parsed.aiDrawCredits ?? 0)),
-      aiCreditDayKey:
-        typeof parsed.aiCreditDayKey === "string"
-          ? parsed.aiCreditDayKey
-          : getDayKey(),
-      aiDrawUsedToday: Math.max(0, Number(parsed.aiDrawUsedToday ?? 0)),
+      aiFreeDrawsUsed: readAiFreeDrawsUsed(parsed),
       bonusDiarySlots: Math.max(0, Number(parsed.bonusDiarySlots ?? 0)),
     };
   } catch {
@@ -115,8 +117,7 @@ function loadAccessState(): AccessState {
       monthlyLimitUsed: 0,
       monthKey: getMonthKey(),
       aiDrawCredits: 0,
-      aiCreditDayKey: getDayKey(),
-      aiDrawUsedToday: 0,
+      aiFreeDrawsUsed: 0,
       bonusDiarySlots: 0,
     };
   }
@@ -323,27 +324,28 @@ export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
-function normalizeAiCreditDay(state: AccessState) {
-  const dayKey = getDayKey();
-  if (state.aiCreditDayKey !== dayKey) {
-    state.aiCreditDayKey = dayKey;
-    state.aiDrawCredits = 0;
-    state.aiDrawUsedToday = 0;
-  }
+function normalizeAiCredits(state: AccessState) {
+  state.aiDrawCredits = Math.max(0, state.aiDrawCredits);
+  state.aiFreeDrawsUsed = Math.max(0, state.aiFreeDrawsUsed);
 }
 
-export function getRemainingFreeAiDrawsToday() {
+export function getRemainingFreeAiDraws() {
   const state = loadAccessState();
-  normalizeAiCreditDay(state);
+  normalizeAiCredits(state);
   saveAccessState(state);
-  return Math.max(0, FREE_AI_DRAWS_PER_DAY - state.aiDrawUsedToday);
+  return Math.max(0, FREE_AI_DRAWS_TOTAL - state.aiFreeDrawsUsed);
+}
+
+/** @deprecated getRemainingFreeAiDraws */
+export function getRemainingFreeAiDrawsToday() {
+  return getRemainingFreeAiDraws();
 }
 
 export function consumeFreeAiDrawChance() {
   const state = loadAccessState();
-  normalizeAiCreditDay(state);
-  if (state.aiDrawUsedToday >= FREE_AI_DRAWS_PER_DAY) return false;
-  state.aiDrawUsedToday += 1;
+  normalizeAiCredits(state);
+  if (state.aiFreeDrawsUsed >= FREE_AI_DRAWS_TOTAL) return false;
+  state.aiFreeDrawsUsed += 1;
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;
@@ -351,14 +353,14 @@ export function consumeFreeAiDrawChance() {
 
 export function getAiDrawCredits() {
   const state = loadAccessState();
-  normalizeAiCreditDay(state);
+  normalizeAiCredits(state);
   saveAccessState(state);
   return state.aiDrawCredits;
 }
 
 export function grantAiDrawCredits(count = 1) {
   const state = loadAccessState();
-  normalizeAiCreditDay(state);
+  normalizeAiCredits(state);
   state.aiDrawCredits = Math.max(0, state.aiDrawCredits + Math.max(0, count));
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
@@ -367,7 +369,7 @@ export function grantAiDrawCredits(count = 1) {
 
 export function consumeAiDrawCredit() {
   const state = loadAccessState();
-  normalizeAiCreditDay(state);
+  normalizeAiCredits(state);
   if (state.aiDrawCredits <= 0) return false;
   state.aiDrawCredits -= 1;
   saveAccessState(state);

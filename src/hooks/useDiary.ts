@@ -163,12 +163,20 @@ export function useDiary() {
     };
   }, []);
 
+  const clearLocalDiaries = useCallback(() => {
+    persistEntries([]);
+    persistDeletedIds([]);
+    setEntries([]);
+    setDeletedIds([]);
+  }, []);
+
   return {
     entries,
     addEntry,
     updateEntry,
     removeEntry,
     replaceEntries,
+    clearLocalDiaries,
     syncWithCloud,
   };
 }

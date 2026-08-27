@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Supprimer le compte",
       "title": "Supprimer le compte ?",
-      "lead": "Les journaux cloud et l’activité des salles seront supprimés, et vous serez déconnecté. Les journaux locaux restent.",
+      "lead": "Reconnectez-vous dans le mois pour conserver vos données. Ensuite, vous êtes considéré comme désinscrit et les anciennes données restent masquées.",
       "confirm": "Supprimer"
     },
     "removePhoto": "Supprimer",
@@ -255,6 +255,8 @@
     "empty": "Vous n'êtes encore dans aucun salon",
     "emptyLead": "Créez un salon cosy pour coller des journaux entre amis.",
     "memberCount": "{{n}} membres",
+    "withdrawnMember": "Membre désinscrit",
+    "pokeWithdrawn": "Impossible de poke un membre désinscrit",
     "roomFallback": "Salon",
     "copyInvite": "Inviter",
     "copied": "Copié",
@@ -469,7 +471,8 @@
       "empty": "Ajoutez un titre, un texte ou un dessin",
       "adNotCompleted": "Terminez la pub pour obtenir un dessin IA",
       "adAppOnly": "Les pubs sont disponibles uniquement dans l’app",
-      "aiDailyLimit": "Sans abonnement : jusqu’à 2 dessins IA par jour"
+      "aiFreeLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement.",
+      "aiDailyLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement."
     },
     "coach": {
       "character": "Définis-toi pour que l’IA te dessine",

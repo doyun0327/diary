@@ -72,7 +72,7 @@ type SubscriptionModalReason = "write" | "search" | "export";
 
 function App() {
   const { t } = useTranslation();
-  const { entries, addEntry, updateEntry, removeEntry, syncWithCloud } =
+  const { entries, addEntry, updateEntry, removeEntry, syncWithCloud, clearLocalDiaries } =
     useDiary();
   const { session, markSynced, ensureGuestSession } = useAuthSession();
   const { character, setCharacter } = useCharacter();
@@ -261,11 +261,6 @@ function App() {
     }
 
     const status = getDiaryAccessState(entries.length);
-    // 프리미엄 월 한도만 저장 차단. 무료는 일기 저장 무제한.
-    if (status.isPremiumActive && !status.canCreate) {
-      setSubscriptionModal("write");
-      return;
-    }
 
     if (status.isPremiumActive) {
       const token = getAccessToken();
@@ -287,10 +282,9 @@ function App() {
               } catch {
                 // ignore
               }
-              setSubscriptionModal("write");
-              return;
+            } else {
+              consumeDiaryUsage();
             }
-            consumeDiaryUsage();
             addEntry(entry);
             setPage("home");
             syncInBackground();
@@ -493,12 +487,6 @@ function App() {
   };
 
   const handleNewWrite = () => {
-    const status = getDiaryAccessState(entries.length);
-    // 프리미엄 월 한도만 작성 진입에서 막음. 무료 한도 소진 후에도 그림 일기는 열 수 있음.
-    if (status.isPremiumActive && !status.canCreate) {
-      setSubscriptionModal("write");
-      return;
-    }
     openWritePage();
   };
 
@@ -707,11 +695,9 @@ function App() {
             key={editingId ?? "new"}
             character={character}
             initialEntry={editingEntry}
-            entriesCount={entries.length}
             onSave={handleSave}
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
-            onOpenWriteLimitModal={() => setSubscriptionModal("write")}
             onNativeSaveStateChange={setWriteSaveEnabled}
             writeQuota={
               accessStatus.isPremiumActive
@@ -792,6 +778,7 @@ function App() {
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
             onSyncDiaries={syncWithCloud}
+            onClearLocalDiaries={clearLocalDiaries}
             onClose={() => setAccountOpen(false)}
           />,
           document.getElementById("root") ?? document.body,

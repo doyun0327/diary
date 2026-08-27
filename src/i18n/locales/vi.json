@@ -170,7 +170,7 @@
     "withdraw": {
       "button": "Xóa tài khoản",
       "title": "Xóa tài khoản?",
-      "lead": "Nhật ký đám mây và hoạt động phòng sẽ bị xóa, bạn sẽ đăng xuất. Nhật ký trên máy vẫn giữ.",
+      "lead": "Trong một tháng bạn có thể đăng nhập lại và giữ dữ liệu. Sau đó bạn được coi là đã rút và dữ liệu cũ sẽ bị ẩn.",
       "confirm": "Xóa"
     },
     "removePhoto": "Xóa",
@@ -255,6 +255,8 @@
     "empty": "Bạn chưa tham gia phòng nào",
     "emptyLead": "Tạo một phòng ấm cúng để dán nhật ký cùng bạn bè nhé.",
     "memberCount": "{{n}} thành viên",
+    "withdrawnMember": "Thành viên đã rút",
+    "pokeWithdrawn": "Không thể chọc thành viên đã rút",
     "roomFallback": "Phòng",
     "copyInvite": "Mời",
     "copied": "Đã sao chép",
@@ -469,7 +471,8 @@
       "empty": "Thêm tiêu đề, nội dung hoặc bức vẽ",
       "adNotCompleted": "Xem hết quảng cáo để nhận một lần vẽ AI",
       "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
-      "aiDailyLimit": "Chưa đăng ký: tối đa 2 lần vẽ AI mỗi ngày"
+      "aiFreeLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
+      "aiDailyLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí."
     },
     "coach": {
       "character": "Chọn nhân vật để AI vẽ đúng bạn",
