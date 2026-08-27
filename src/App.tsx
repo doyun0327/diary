@@ -239,50 +239,56 @@ function App() {
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
     entry,
   ) => {
-    if (editingId) {
-      const id = editingId;
-      updateEntry(id, entry);
-      setSelectedId(id);
-      setEditingId(null);
-      setPage("detail");
-      void syncSharedDiaryAfterEdit(id, entry);
-      return;
-    }
+    void (async () => {
+      try {
+        if (editingId) {
+          const id = editingId;
+          await updateEntry(id, entry);
+          setSelectedId(id);
+          setEditingId(null);
+          setPage("detail");
+          void syncSharedDiaryAfterEdit(id, entry);
+          return;
+        }
 
-    const status = getDiaryAccessState(entries.length);
+        const status = getDiaryAccessState(entries.length);
 
-    if (status.isPremiumActive) {
-      const token = getAccessToken();
-      if (token) {
-        void consumeMonthlyUsage(token)
-          .then((usage) => {
-            applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-            addEntry(entry);
-            setPage("home");
-          })
-          .catch(async (err) => {
-            const message =
-              err instanceof Error ? err.message : String(err);
-            if (message.includes("409")) {
-              try {
-                const usage = await fetchMonthlyUsage(token);
-                applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-              } catch {
-                // ignore
+        if (status.isPremiumActive) {
+          const token = getAccessToken();
+          if (token) {
+            try {
+              const usage = await consumeMonthlyUsage(token);
+              applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+            } catch (err) {
+              const message =
+                err instanceof Error ? err.message : String(err);
+              if (message.includes("409")) {
+                try {
+                  const usage = await fetchMonthlyUsage(token);
+                  applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+                } catch {
+                  // ignore
+                }
+              } else {
+                consumeDiaryUsage();
               }
-            } else {
-              consumeDiaryUsage();
             }
-            addEntry(entry);
+            await addEntry(entry);
             setPage("home");
-          });
-        return;
-      }
-      consumeDiaryUsage();
-    }
+            return;
+          }
+          consumeDiaryUsage();
+        }
 
-    addEntry(entry);
-    setPage("home");
+        await addEntry(entry);
+        setPage("home");
+      } catch (err) {
+        console.error("[diary] save failed", err);
+        window.alert(
+          err instanceof Error ? err.message : "일기 저장에 실패했어요",
+        );
+      }
+    })();
   };
 
   const handleDelete = (id: string) => {

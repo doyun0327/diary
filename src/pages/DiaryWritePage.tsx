@@ -40,7 +40,7 @@ import {
   markCharacterCoachSeen,
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
-import { compressDataUrlForDiary } from '../utils/shareImageUrl';
+import { resolveDiaryImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import {
   requestSubscriptionPurchase,
@@ -415,8 +415,8 @@ function DiaryWritePage({
     let imageUrl: string | undefined;
     try {
       const raw = canvasRef.current?.toDataURL();
-      // PNG 원본은 localStorage 한도를 넘어 재실행 후 그림이 사라질 수 있음
-      imageUrl = raw ? await compressDataUrlForDiary(raw) : undefined;
+      // 로그인 시 GCS, 아니면 압축 후 로컬(IndexedDB) 폴백
+      imageUrl = raw ? await resolveDiaryImageForSave(raw) : undefined;
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
       return;
