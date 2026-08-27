@@ -110,6 +110,7 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
+  const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
   void accessTick;
@@ -300,6 +301,13 @@ function DiaryWritePage({
     };
   })();
 
+  const needsAiRewardAd = () => {
+    if (!AI_REWARD_AD_ENABLED) return false;
+    const access = getDiaryAccessState();
+    if (access.isPremiumActive) return false;
+    return getRemainingFreeAiDraws() <= 0 && getAiDrawCredits() <= 0;
+  };
+
   const startAiDrawFlow = () => {
     if (canvasRef.current?.hasContent()) {
       setReplaceConfirmOpen(true);
@@ -328,6 +336,11 @@ function DiaryWritePage({
   const handleAiDraw = () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
+      return;
+    }
+    // 무료 체험·크레딧 소진 시 확인창 없이 바로 광고 안내
+    if (needsAiRewardAd()) {
+      setRewardPromptOpen(true);
       return;
     }
     setAiConfirmOpen(true);
@@ -385,14 +398,15 @@ function DiaryWritePage({
       return;
     }
     setRewardPromptOpen(false);
+    setAdIncompleteOpen(false);
     setAiError(null);
     const ok = await requestAiRewardedAd();
     if (!ok) {
-      setAiError(t('write.err.adNotCompleted'));
+      setAdIncompleteOpen(true);
       return;
     }
     grantAiDrawCredits(1);
-    void runAiDraw();
+    startAiDrawFlow();
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -724,6 +738,19 @@ function DiaryWritePage({
             window.setTimeout(() => syncSubscriptionFromNative(), 800);
             window.setTimeout(() => syncSubscriptionFromNative(), 2500);
           }}
+          primaryLabel={t('write.ai.rewardCta')}
+          onPrimary={() => void handleWatchAd()}
+        />
+      )}
+      {adIncompleteOpen && (
+        <AppModal
+          title={t('write.ai.adIncompleteTitle')}
+          lead={t('write.err.adNotCompleted')}
+          onDismiss={() => setAdIncompleteOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.close')}
+          onSecondary={() => setAdIncompleteOpen(false)}
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
         />

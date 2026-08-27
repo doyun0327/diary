@@ -450,7 +450,8 @@
       "characterTitle": "這個角色會成為畫中的主角",
       "rewardTitle": "看廣告獲得 1 次 AI 繪畫",
       "rewardLead": "完整觀看廣告可解鎖一次 AI 繪畫。",
-      "rewardCta": "看廣告"
+      "rewardCta": "看廣告",
+      "adIncompleteTitle": "請看完廣告"
     },
     "confirm": {
       "replaceTitle": "AI 畫",
@@ -469,7 +470,7 @@
       "aiConvert": "圖片轉換失敗",
       "saveImage": "無法匯出畫作",
       "empty": "請填寫標題、正文或畫作",
-      "adNotCompleted": "請看完廣告以獲得一次 AI 繪畫",
+      "adNotCompleted": "需要看完廣告才能用 AI 畫畫。",
       "adAppOnly": "廣告僅在 App 內可用",
       "aiFreeLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。",
       "aiDailyLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。"

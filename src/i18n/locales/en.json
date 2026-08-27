@@ -461,8 +461,9 @@
       "characterAria": "Character for AI drawing",
       "characterTitle": "This character becomes the protagonist",
       "rewardTitle": "Watch an ad for 1 AI draw",
-      "rewardLead": "Watch the ad to the end to unlock one AI drawing.",
-      "rewardCta": "Watch ad"
+      "rewardLead": "Watch the ad until you see \"Reward granted\". Don't close early — you'll have to start over.",
+      "rewardCta": "Watch ad",
+      "adIncompleteTitle": "Please finish the ad"
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",
@@ -486,7 +487,7 @@
       "aiConvert": "Image conversion failed",
       "saveImage": "Couldn't export the drawing",
       "empty": "Add a title, text, or drawing",
-      "adNotCompleted": "Finish the ad to get one AI drawing",
+      "adNotCompleted": "Watch until you see \"Reward granted\" to draw with AI.",
       "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
       "aiFreeLimit": "With your Pro trial, you can create 2 AI drawings for free.",

@@ -450,7 +450,8 @@
       "characterTitle": "Nhân vật này sẽ thành nhân vật chính",
       "rewardTitle": "Xem quảng cáo để vẽ AI 1 lần",
       "rewardLead": "Xem hết quảng cáo để mở khóa một lần vẽ AI.",
-      "rewardCta": "Xem quảng cáo"
+      "rewardCta": "Xem quảng cáo",
+      "adIncompleteTitle": "Hãy xem hết quảng cáo"
     },
     "confirm": {
       "replaceTitle": "Tranh AI",
@@ -469,7 +470,7 @@
       "aiConvert": "Chuyển đổi ảnh thất bại",
       "saveImage": "Không xuất được bức vẽ",
       "empty": "Thêm tiêu đề, nội dung hoặc bức vẽ",
-      "adNotCompleted": "Xem hết quảng cáo để nhận một lần vẽ AI",
+      "adNotCompleted": "Bạn cần xem hết quảng cáo mới vẽ được bằng AI.",
       "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
       "aiFreeLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
       "aiDailyLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí."

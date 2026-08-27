@@ -450,7 +450,8 @@
       "characterTitle": "Karakter ini menjadi tokoh utama",
       "rewardTitle": "Tonton iklan untuk 1 gambar AI",
       "rewardLead": "Tonton iklan sampai selesai untuk membuka satu gambar AI.",
-      "rewardCta": "Tonton iklan"
+      "rewardCta": "Tonton iklan",
+      "adIncompleteTitle": "Selesaikan iklan"
     },
     "confirm": {
       "replaceTitle": "Gambar AI",
@@ -469,7 +470,7 @@
       "aiConvert": "Konversi gambar gagal",
       "saveImage": "Tidak bisa mengekspor gambar",
       "empty": "Tambahkan judul, teks, atau gambar",
-      "adNotCompleted": "Selesaikan iklan untuk mendapat satu gambar AI",
+      "adNotCompleted": "Anda harus menonton iklan sampai selesai untuk menggambar dengan AI.",
       "adAppOnly": "Iklan hanya tersedia di aplikasi",
       "aiFreeLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
       "aiDailyLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis."

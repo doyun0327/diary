@@ -450,7 +450,8 @@
       "characterTitle": "このキャラクターが主人公になります",
       "rewardTitle": "広告を見てAI描画1回",
       "rewardLead": "広告を最後まで見るとAI描画が1回使えます。",
-      "rewardCta": "広告を見る"
+      "rewardCta": "広告を見る",
+      "adIncompleteTitle": "広告を最後まで見てください"
     },
     "confirm": {
       "replaceTitle": "AIの絵",
@@ -469,7 +470,7 @@
       "aiConvert": "画像変換に失敗しました",
       "saveImage": "絵を書き出せませんでした",
       "empty": "タイトル・本文・絵のいずれかを入力してください",
-      "adNotCompleted": "広告を最後まで見てAI描画を受け取ってください",
+      "adNotCompleted": "広告を最後まで見ないとAI絵を描けません。",
       "adAppOnly": "広告はアプリでのみ利用できます",
       "aiFreeLimit": "Pro体験券でAI描画を2回無料で生成できます。",
       "aiDailyLimit": "Pro体験券でAI描画を2回無料で生成できます。"

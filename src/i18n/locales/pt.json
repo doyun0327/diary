@@ -450,7 +450,8 @@
       "characterTitle": "Este personagem será o protagonista",
       "rewardTitle": "Assista a um anúncio por 1 desenho IA",
       "rewardLead": "Assista ao anúncio até o fim para liberar um desenho IA.",
-      "rewardCta": "Ver anúncio"
+      "rewardCta": "Ver anúncio",
+      "adIncompleteTitle": "Termine o anúncio"
     },
     "confirm": {
       "replaceTitle": "Desenho da IA",
@@ -469,7 +470,7 @@
       "aiConvert": "Falha na conversão da imagem",
       "saveImage": "Não foi possível exportar o desenho",
       "empty": "Adicione um título, texto ou desenho",
-      "adNotCompleted": "Termine o anúncio para receber um desenho IA",
+      "adNotCompleted": "E preciso ver o anuncio ate o fim para desenhar com IA.",
       "adAppOnly": "Anúncios só estão disponíveis no app",
       "aiFreeLimit": "Com o teste Pro, você pode criar 2 desenhos IA grátis.",
       "aiDailyLimit": "Com o teste Pro, você pode criar 2 desenhos IA grátis."
