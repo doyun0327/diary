@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomMember } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
-import { roomAuthorLabel } from '../utils/roomDisplay';
 import './RoomMemberAvatars.css';
 
 const VISIBLE_MAX = 7;
@@ -17,13 +16,12 @@ type RoomMemberAvatarsProps = {
 };
 
 function memberAvatarSrc(member: RoomMember): string | null {
-  if (member.withdrawn) return null;
   const url = member.avatarUrl?.trim();
   return url || null;
 }
 
-function memberInitial(label: string): string {
-  return (label.trim() || '?').slice(0, 1).toUpperCase();
+function memberInitial(member: RoomMember): string {
+  return (member.nickname.trim() || '?').slice(0, 1).toUpperCase();
 }
 
 function RoomMemberAvatars({
@@ -66,14 +64,7 @@ function RoomMemberAvatars({
     toastTimer.current = window.setTimeout(() => setToast(null), 1800);
   };
 
-  const labelOf = (member: RoomMember) =>
-    roomAuthorLabel(member.nickname, member.withdrawn, t);
-
   const poke = async (member: RoomMember) => {
-    if (member.withdrawn) {
-      showToast(t('rooms.pokeWithdrawn'));
-      return;
-    }
     if (!currentUserId) {
       showToast(t('rooms.pokeNeedLogin'));
       return;
@@ -90,12 +81,11 @@ function RoomMemberAvatars({
     }
     if (pokingId) return;
 
-    const name = labelOf(member);
     setPokingId(member.userId);
     try {
       await roomsApi.pokeMember(roomId, member.userId, {
         title: t('rooms.pokePushTitle'),
-        body: t('rooms.pokePushBody', { name }),
+        body: t('rooms.pokePushBody', { name: member.nickname }),
       });
       lastPokeAt.current.set(member.userId, Date.now());
       onDismissPokeCoach?.();
@@ -127,31 +117,26 @@ function RoomMemberAvatars({
         </div>
       )}
       <div className="room-members__stack" role="list" aria-label={t('rooms.membersAria')}>
-        {visible.map((member) => {
-          const name = labelOf(member);
-          return (
-            <button
-              key={member.userId}
-              type="button"
-              className={`room-members__avatar${pokingId === member.userId ? ' is-poking' : ''}${
-                member.withdrawn ? ' is-withdrawn' : ''
-              }`}
-              role="listitem"
-              title={member.withdrawn ? name : t('rooms.pokeHint', { name })}
-              aria-label={member.withdrawn ? name : t('rooms.pokeAria', { name })}
-              disabled={pokingId === member.userId || Boolean(member.withdrawn)}
-              onClick={() => void poke(member)}
-            >
-              {memberAvatarSrc(member) ? (
-                <img src={memberAvatarSrc(member)!} alt="" />
-              ) : (
-                <span className="room-members__initial" aria-hidden>
-                  {memberInitial(name)}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        {visible.map((member) => (
+          <button
+            key={member.userId}
+            type="button"
+            className={`room-members__avatar${pokingId === member.userId ? ' is-poking' : ''}`}
+            role="listitem"
+            title={t('rooms.pokeHint', { name: member.nickname })}
+            aria-label={t('rooms.pokeAria', { name: member.nickname })}
+            disabled={pokingId === member.userId}
+            onClick={() => void poke(member)}
+          >
+            {memberAvatarSrc(member) ? (
+              <img src={memberAvatarSrc(member)!} alt="" />
+            ) : (
+              <span className="room-members__initial" aria-hidden>
+                {memberInitial(member)}
+              </span>
+            )}
+          </button>
+        ))}
         {overflow && (
           <button
             type="button"
@@ -168,34 +153,29 @@ function RoomMemberAvatars({
       {expanded && overflow && (
         <div className="room-members__panel" role="dialog" aria-label={t('rooms.membersPanelAria')}>
           <ul className="room-members__list">
-            {members.map((member) => {
-              const name = labelOf(member);
-              return (
-                <li key={member.userId}>
-                  <button
-                    type="button"
-                    className={`rooms__member room-members__row-btn${
-                      pokingId === member.userId ? ' is-poking' : ''
-                    }`}
-                    onClick={() => void poke(member)}
-                    disabled={pokingId === member.userId || Boolean(member.withdrawn)}
-                    aria-label={member.withdrawn ? name : t('rooms.pokeAria', { name })}
-                  >
-                    <span className="rooms__member-avatar">
-                      {memberAvatarSrc(member) ? (
-                        <img src={memberAvatarSrc(member)!} alt="" />
-                      ) : (
-                        memberInitial(name)
-                      )}
-                    </span>
-                    <span className="rooms__member-name">{name}</span>
-                    {!member.withdrawn && (
-                      <span className="room-members__poke-label">{t('rooms.pokeAction')}</span>
+            {members.map((member) => (
+              <li key={member.userId}>
+                <button
+                  type="button"
+                  className={`rooms__member room-members__row-btn${
+                    pokingId === member.userId ? ' is-poking' : ''
+                  }`}
+                  onClick={() => void poke(member)}
+                  disabled={pokingId === member.userId}
+                  aria-label={t('rooms.pokeAria', { name: member.nickname })}
+                >
+                  <span className="rooms__member-avatar">
+                    {memberAvatarSrc(member) ? (
+                      <img src={memberAvatarSrc(member)!} alt="" />
+                    ) : (
+                      memberInitial(member)
                     )}
-                  </button>
-                </li>
-              );
-            })}
+                  </span>
+                  <span className="rooms__member-name">{member.nickname}</span>
+                  <span className="room-members__poke-label">{t('rooms.pokeAction')}</span>
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
       )}
