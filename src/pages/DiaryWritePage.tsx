@@ -69,7 +69,9 @@ interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
-  onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (
+    entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>,
+  ) => void | Promise<void>;
   onCancel: () => void;
   onOpenCharacter: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
@@ -117,6 +119,7 @@ function DiaryWritePage({
   const [accessTick, setAccessTick] = useState(0);
   void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
     date: initialEntry?.date ?? today(),
@@ -464,7 +467,7 @@ function DiaryWritePage({
       // 친구방 공유·로컬 표시용 합성본 — 8/26처럼 data URL 유지 (GCS 업로드는 sync 시)
       imageUrl = raw || undefined;
     } catch (err) {
-      setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
+      setSaveError(err instanceof Error ? err.message : t('write.err.saveImage'));
       return;
     }
     if (!title.trim() && !content.trim() && !imageUrl) {
@@ -473,18 +476,25 @@ function DiaryWritePage({
     }
 
     setAiError(null);
+    setSaveError(null);
     clearWriteDraft();
-    onSave({
-      date,
-      title: title.trim(),
-      content: content.trim(),
-      mood,
-      moodPack: writePackId,
-      fontId,
-      fontSize: fontSizeId,
-      imageUrl,
-      canvasState,
-    });
+    try {
+      await onSave({
+        date,
+        title: title.trim(),
+        content: content.trim(),
+        mood,
+        moodPack: writePackId,
+        fontId,
+        fontSize: fontSizeId,
+        imageUrl,
+        canvasState,
+      });
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : t('write.err.saveFailed'),
+      );
+    }
   };
 
   const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
@@ -803,6 +813,16 @@ function DiaryWritePage({
           onSecondary={() => setAdIncompleteOpen(false)}
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
+        />
+      )}
+      {saveError && (
+        <AppModal
+          title={saveError}
+          onDismiss={() => setSaveError(null)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          primaryLabel={t('common.close')}
+          onPrimary={() => setSaveError(null)}
         />
       )}
     </form>

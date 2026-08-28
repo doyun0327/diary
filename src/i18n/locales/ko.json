@@ -494,6 +494,7 @@
       "aiUrl": "이미지 URL을 불러오지 못했습니다",
       "aiConvert": "이미지 변환에 실패했습니다",
       "saveImage": "그림을 저장 파일로 만들지 못했어요",
+      "saveFailed": "일기 저장에 실패했어요",
       "empty": "제목, 내용, 그림 중 하나는 넣어 주세요",
       "adNotCompleted": "광고를 끝까지 봐야 AI 그림을 그릴 수 있어요.",
       "adNotCompletedWrite": "광고를 끝까지 봐야 일기를 저장할 수 있어요",

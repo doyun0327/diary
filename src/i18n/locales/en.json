@@ -494,6 +494,7 @@
       "aiUrl": "Couldn't load image URL",
       "aiConvert": "Image conversion failed",
       "saveImage": "Couldn't export the drawing",
+      "saveFailed": "Couldn't save the diary entry",
       "empty": "Add a title, text, or drawing",
       "adNotCompleted": "Watch the ad to the end to draw with AI.",
       "adNotCompletedWrite": "Finish the ad to save this diary",
