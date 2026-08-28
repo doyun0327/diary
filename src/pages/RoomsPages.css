@@ -1426,9 +1426,11 @@
 }
 
 .rooms__paper--compact .diary-detail__image {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   width: 100%;
-  aspect-ratio: var(--diary-drawing-ratio);
+  min-height: 0;
+  max-height: 38%;
+  aspect-ratio: auto;
   margin: 0;
   border-radius: var(--radius-md);
   box-shadow: none;
