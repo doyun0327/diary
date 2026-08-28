@@ -43,11 +43,7 @@ import { clearWriteDraft } from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
-import {
-  requestSubscriptionPurchase,
-  refreshSubscriptionStatus,
-  syncSubscriptionFromNative,
-} from '../utils/subscription';
+import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import './DiaryWritePage.css';
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
@@ -359,24 +355,16 @@ function DiaryWritePage({
       setReplaceConfirmOpen(true);
       return;
     }
-    void (async () => {
-      if (AI_REWARD_AD_ENABLED) {
-        let access = getDiaryAccessState();
-        if (!access.isPremiumActive) {
-          await refreshSubscriptionStatus();
-          access = getDiaryAccessState();
-        }
-        if (
-          !access.isPremiumActive &&
-          getRemainingFreeAiDraws() <= 0 &&
-          getAiDrawCredits() <= 0
-        ) {
-          setRewardPromptOpen(true);
-          return;
-        }
-      }
-      await runAiDraw();
-    })();
+    if (
+      AI_REWARD_AD_ENABLED &&
+      !getDiaryAccessState().isPremiumActive &&
+      getRemainingFreeAiDraws() <= 0 &&
+      getAiDrawCredits() <= 0
+    ) {
+      setRewardPromptOpen(true);
+      return;
+    }
+    void runAiDraw();
   };
 
   const handleAiDraw = () => {
@@ -394,13 +382,13 @@ function DiaryWritePage({
 
   const runAiDraw = async () => {
     setReplaceConfirmOpen(false);
-    if (AI_REWARD_AD_ENABLED) {
-      let access = getDiaryAccessState();
-      if (!access.isPremiumActive) {
-        await refreshSubscriptionStatus();
-        access = getDiaryAccessState();
-      }
-      if (!access.isPremiumActive) {
+    setAiError(null);
+    setActiveAiLottie(pickRandomLottie(aiLottiePool));
+    setAiLottieKey((key) => key + 1);
+    setAiLoading(true);
+
+    try {
+      if (AI_REWARD_AD_ENABLED && !getDiaryAccessState().isPremiumActive) {
         const freeLeft = getRemainingFreeAiDraws();
         if (freeLeft > 0) {
           if (!consumeFreeAiDrawChance()) {
@@ -417,12 +405,7 @@ function DiaryWritePage({
           return;
         }
       }
-    }
-    setAiError(null);
-    setActiveAiLottie(pickRandomLottie(aiLottiePool));
-    setAiLottieKey((key) => key + 1);
-    setAiLoading(true);
-    try {
+
       const { imageUrl } = await generateDiaryImage({
         title,
         content,
@@ -793,10 +776,7 @@ function DiaryWritePage({
           secondaryLabel={t('subscription.subscribeCta')}
           onSecondary={() => {
             setRewardPromptOpen(false);
-            requestSubscriptionPurchase();
-            // 결제 직후 상태 동기화 (엔타이틀먼트 반영 지연 대비)
-            window.setTimeout(() => syncSubscriptionFromNative(), 800);
-            window.setTimeout(() => syncSubscriptionFromNative(), 2500);
+            void requestSubscriptionPurchaseAndSync();
           }}
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}

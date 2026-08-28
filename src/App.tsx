@@ -60,7 +60,7 @@ import {
 import {
   identifySubscriptionUser,
   installSubscriptionBridge,
-  requestSubscriptionPurchase,
+  requestSubscriptionPurchaseAndSync,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
 import "./App.css";
@@ -906,7 +906,9 @@ function App() {
               if (!isFlutterApp()) return;
               if (subscribing) return;
               setSubscribing(true);
-              requestSubscriptionPurchase();
+              void requestSubscriptionPurchaseAndSync().finally(() =>
+                setSubscribing(false),
+              );
             }}
             closeAriaLabel={t("common.close")}
           >

@@ -73,7 +73,23 @@ flutter run --dart-define=REVENUECAT_GOOGLE_KEY=goog_xxx --dart-define=REVENUECA
 | `subscriptionPurchase` | 월 구독 결제 |
 | `subscriptionRestore` | 구매 복원 |
 
-WebView 콜백: `window.__onDiarySubscriptionStatus({ active, expiresAt })`
+WebView 콜백:
+
+- `window.__onDiarySubscriptionStatus({ active, expiresAt, productId? })` — 일반 동기화
+- **`window.__onDiarySubscriptionPurchaseComplete({ active, expiresAt, productId? })`** — **결제 완료 직후 필수** (Pro 즉시 반영)
+
+결제 성공 시 Flutter에서 `__onDiarySubscriptionPurchaseComplete` 를 호출한 뒤, 필요하면 `subscriptionSync` 로 한 번 더 맞춥니다.
+
+```dart
+// RevenueCat purchase 성공 직후 (예시)
+await webController.runJavaScript('''
+  window.__onDiarySubscriptionPurchaseComplete?.({
+    active: true,
+    expiresAt: ${expiresAtMs},
+    productId: "pageby_monthly"
+  });
+''');
+```
 
 ---
 

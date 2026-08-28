@@ -13,6 +13,12 @@ declare global {
       expiresAt: number | null;
       productId?: string | null;
     }) => void;
+    /** 결제 완료 직후 Flutter → WebView (Pro 상태 즉시 반영) */
+    __onDiarySubscriptionPurchaseComplete?: (payload: {
+      active: boolean;
+      expiresAt: number | null;
+      productId?: string | null;
+    }) => void;
     __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
   }
 }
