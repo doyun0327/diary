@@ -40,6 +40,7 @@ import {
   markCharacterCoachSeen,
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
+import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import {
@@ -68,9 +69,7 @@ interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
-  onSave: (
-    entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>,
-  ) => void | Promise<void>;
+  onSave: (entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
   onOpenCharacter: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
@@ -118,9 +117,6 @@ function DiaryWritePage({
   const [accessTick, setAccessTick] = useState(0);
   void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveProgress, setSaveProgress] = useState(0);
-  const [saveProgressLabel, setSaveProgressLabel] = useState('');
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
     date: initialEntry?.date ?? today(),
@@ -141,8 +137,8 @@ function DiaryWritePage({
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    onNativeSaveStateChange?.(!aiLoading && !saving);
-  }, [aiLoading, saving, onNativeSaveStateChange]);
+    onNativeSaveStateChange?.(!aiLoading);
+  }, [aiLoading, onNativeSaveStateChange]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -251,17 +247,31 @@ function DiaryWritePage({
     };
   }, [initialEntry?.imageUrl, initialEntry?.canvasState]);
 
-  const resolveCanvasStateForSave = (
+  const resolveCanvasStateForSave = async (
     state: DiaryCanvasState | null,
-  ): DiaryCanvasState | undefined => {
+  ): Promise<DiaryCanvasState | undefined> => {
     if (!state) return undefined;
-    const hasLayers =
-      (state.photos?.length ?? 0) > 0 ||
-      (state.stickers?.length ?? 0) > 0 ||
-      Boolean(state.inkUrl?.trim());
-    if (!hasLayers) return undefined;
-    // 로컬(IDB)만 — GCS 업로드는 sync 시 prepareEntriesForSync
-    return state;
+    const photos = [];
+    for (const p of state.photos) {
+      const src = await resolveDiaryImageForSave(p.src);
+      if (!src) continue;
+      photos.push({ ...p, src });
+    }
+    // 잉크는 trim/JPEG 금지 — 투명 PNG 유지
+    const inkUrl = state.inkUrl
+      ? await resolveInkImageForSave(state.inkUrl)
+      : undefined;
+    if (photos.length === 0 && state.stickers.length === 0 && !inkUrl) {
+      return undefined;
+    }
+    return {
+      viewWidth: state.viewWidth,
+      viewHeight: state.viewHeight,
+      normalized: state.normalized ?? true,
+      photos,
+      stickers: state.stickers,
+      inkUrl,
+    };
   };
 
   const leaveWithoutSaving = () => {
@@ -444,74 +454,43 @@ function DiaryWritePage({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (saving || aiLoading) return;
-
-    const bumpProgress = (pct: number, label: string) => {
-      setSaveProgress(pct);
-      setSaveProgressLabel(label);
-    };
-
-    setSaving(true);
-    bumpProgress(10, t('write.savingPrep'));
     let imageUrl: string | undefined;
     let canvasState: DiaryCanvasState | undefined;
     try {
       await canvasRef.current?.prepareExport();
-      bumpProgress(35, t('write.savingPrep'));
       const rawState = canvasRef.current?.getCanvasState() ?? null;
-      canvasState = resolveCanvasStateForSave(rawState);
-      bumpProgress(55, t('write.savingImage'));
+      canvasState = await resolveCanvasStateForSave(rawState);
       const raw = canvasRef.current?.toDataURL();
+      // 친구방 공유·로컬 표시용 합성본 — 8/26처럼 data URL 유지 (GCS 업로드는 sync 시)
       imageUrl = raw || undefined;
-      bumpProgress(72, t('write.savingImage'));
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
-      setSaving(false);
-      setSaveProgress(0);
-      setSaveProgressLabel('');
       return;
     }
     if (!title.trim() && !content.trim() && !imageUrl) {
       setAiError(t('write.err.empty'));
-      setSaving(false);
-      setSaveProgress(0);
-      setSaveProgressLabel('');
       return;
     }
 
     setAiError(null);
     clearWriteDraft();
-    bumpProgress(88, t('write.saving'));
-    try {
-      await onSave({
-        date,
-        title: title.trim(),
-        content: content.trim(),
-        mood,
-        moodPack: writePackId,
-        fontId,
-        fontSize: fontSizeId,
-        imageUrl,
-        canvasState,
-      });
-      bumpProgress(100, t('write.savingDone'));
-    } catch (err) {
-      setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
-      setSaving(false);
-      setSaveProgress(0);
-      setSaveProgressLabel('');
-    }
+    onSave({
+      date,
+      title: title.trim(),
+      content: content.trim(),
+      mood,
+      moodPack: writePackId,
+      fontId,
+      fontSize: fontSizeId,
+      imageUrl,
+      canvasState,
+    });
   };
 
   const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
 
   return (
-    <form
-      ref={formRef}
-      className={`diary-write${saving ? ' diary-write--saving' : ''}`}
-      onSubmit={handleSubmit}
-      aria-busy={saving}
-    >
+    <form ref={formRef} className="diary-write" onSubmit={handleSubmit}>
       {!isFlutterApp() && (
         <nav className="diary-write__nav">
           <button type="button" className="diary-write__nav-btn" onClick={handleCancel}>
@@ -523,9 +502,9 @@ function DiaryWritePage({
           <button
             type="submit"
             className="diary-write__nav-btn diary-write__nav-btn--save"
-            disabled={aiLoading || saving}
+            disabled={aiLoading}
           >
-            {saving ? t('write.saving') : isEdit ? t('write.saveEdit') : t('write.save')}
+            {isEdit ? t('write.saveEdit') : t('write.save')}
           </button>
         </nav>
       )}
@@ -825,26 +804,6 @@ function DiaryWritePage({
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
         />
-      )}
-      {saving && (
-        <div className="diary-write__save-overlay" role="status" aria-live="polite">
-          <div className="diary-write__save-panel">
-            <p className="diary-write__save-label">{saveProgressLabel || t('write.saving')}</p>
-            <div
-              className="diary-write__save-progress"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={saveProgress}
-              aria-label={saveProgressLabel || t('write.saving')}
-            >
-              <span
-                className="diary-write__save-progress-fill"
-                style={{ width: `${saveProgress}%` }}
-              />
-            </div>
-          </div>
-        </div>
       )}
     </form>
   );

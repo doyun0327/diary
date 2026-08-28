@@ -247,7 +247,7 @@ function App() {
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
     entry,
   ) => {
-    return (async () => {
+    void (async () => {
       try {
         if (editingId) {
           const id = editingId;
@@ -295,9 +295,9 @@ function App() {
         syncInBackground();
       } catch (err) {
         console.error("[diary] save failed", err);
-        throw err instanceof Error
-          ? err
-          : new Error("일기 저장에 실패했어요");
+        window.alert(
+          err instanceof Error ? err.message : "일기 저장에 실패했어요",
+        );
       }
     })();
   };
