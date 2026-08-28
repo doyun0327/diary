@@ -8,7 +8,7 @@ import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
 import { shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
-import { compressDataUrlForShare } from '../utils/shareImageUrl';
+import { resolveEntryImageForRoomShare } from '../utils/resolveRoomShareImage';
 import { getCachedRoomsList, invalidateRoomFeed, setCachedRoomsList } from '../utils/roomCache';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
@@ -172,9 +172,8 @@ function DiaryDetailPage({
       return;
     }
 
-    const imageUrl = entry.imageUrl
-      ? await compressDataUrlForShare(entry.imageUrl).catch(() => entry.imageUrl)
-      : undefined;
+    const imageUrl = await resolveEntryImageForRoomShare(entry);
+    const shareNick = nickname.trim() || t('common.anonymous');
 
     const body = {
       diaryId: entry.id,
@@ -184,6 +183,8 @@ function DiaryDetailPage({
       mood: entry.mood,
       moodPack: entry.moodPack,
       imageUrl,
+      pushTitle: shareNick,
+      pushBody: t('rooms.sharePushBody'),
     };
 
     const okNames: string[] = [];

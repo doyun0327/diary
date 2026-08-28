@@ -461,8 +461,8 @@ function DiaryWritePage({
       const rawState = canvasRef.current?.getCanvasState() ?? null;
       canvasState = await resolveCanvasStateForSave(rawState);
       const raw = canvasRef.current?.toDataURL();
-      // 미리보기 합성본 — 로그인 시 GCS, 아니면 압축 후 로컬
-      imageUrl = raw ? await resolveDiaryImageForSave(raw) : undefined;
+      // 친구방 공유·로컬 표시용 합성본 — 8/26처럼 data URL 유지 (GCS 업로드는 sync 시)
+      imageUrl = raw || undefined;
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.saveImage'));
       return;

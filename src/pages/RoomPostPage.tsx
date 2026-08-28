@@ -6,7 +6,9 @@ import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import { getCachedRoomPost } from '../utils/roomCache';
+import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
+import { useClientProfile } from '../hooks/useClientProfile';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
@@ -29,6 +31,7 @@ function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
 
 function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const { t } = useTranslation();
+  const { nickname } = useClientProfile();
   const cachedPost = useMemo(
     () => getCachedRoomPost(roomId, postId),
     [roomId, postId],
@@ -73,8 +76,9 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   }, [roomId, postId, t]);
 
   useEffect(() => {
+    markRoomPostSeen(roomId, postId);
     void refresh();
-  }, [refresh]);
+  }, [refresh, roomId, postId]);
 
   const handleComment = async () => {
     const body = text.trim();
@@ -82,7 +86,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setBusy(true);
     setError(null);
     try {
-      const created = await roomsApi.createComment(roomId, postId, body);
+      const commentNick = nickname.trim() || t('common.anonymous');
+      const created = await roomsApi.createComment(roomId, postId, body, {
+        pushTitle: commentNick,
+        pushBody: t('rooms.commentPushBody'),
+      });
       setComments((prev) => [...prev, created]);
       setText('');
     } catch (err) {

@@ -63,4 +63,8 @@ export interface CreateRoomPostBody {
   mood: DiarySticker;
   moodPack?: MoodPackId;
   imageUrl?: string;
+  /** 푸시 제목 — 공유한 사람 닉네임 (앱 언어) */
+  pushTitle?: string;
+  /** 푸시 본문 — 앱 언어 */
+  pushBody?: string;
 }

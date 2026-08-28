@@ -1290,6 +1290,36 @@
   transform: scale(0.98);
 }
 
+.rooms__gallery-body {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.rooms__gallery-new {
+  position: absolute;
+  top: -5px;
+  right: -3px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+  pointer-events: none;
+  transform: rotate(10deg);
+  background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
+  box-shadow:
+    0 3px 8px color-mix(in srgb, #ee5a24 40%, transparent),
+    0 0 0 1.5px color-mix(in srgb, #fff 35%, transparent) inset;
+}
+
 .rooms__gallery-author {
   flex-shrink: 0;
   display: inline-flex;

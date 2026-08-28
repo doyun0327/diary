@@ -16,6 +16,11 @@ import {
   getCachedRoomFeed,
   setCachedRoomFeed,
 } from '../utils/roomCache';
+import {
+  isRoomPostUnread,
+  markRoomPostSeen,
+  syncRoomPostsSeenBaseline,
+} from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
 import './RoomsPages.css';
 
@@ -38,6 +43,14 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
   const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
   const [postsPage, setPostsPage] = useState(0);
+  const [seenTick, setSeenTick] = useState(0);
+
+  const unreadPostIds = useMemo(() => {
+    void seenTick;
+    return new Set(
+      posts.filter((p) => isRoomPostUnread(roomId, p.id)).map((p) => p.id),
+    );
+  }, [posts, roomId, seenTick]);
 
   const postsPageCount = Math.max(1, Math.ceil(posts.length / ROOM_POSTS_PAGE_SIZE));
   const visiblePosts = useMemo(() => {
@@ -60,6 +73,11 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     if (cached) {
       setRoom(cached.room);
       setPosts(cached.posts);
+      syncRoomPostsSeenBaseline(
+        roomId,
+        cached.posts.map((p) => p.id),
+      );
+      setSeenTick((n) => n + 1);
       setLoading(false);
     } else {
       setLoading(true);
@@ -73,6 +91,11 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
       setRoom(detail);
       setPosts(feed);
       setCachedRoomFeed(roomId, detail, feed);
+      syncRoomPostsSeenBaseline(
+        roomId,
+        feed.map((p) => p.id),
+      );
+      setSeenTick((n) => n + 1);
     } catch (err) {
       if (!cached) {
         setError(err instanceof Error ? err.message : t('rooms.err.load'));
@@ -98,6 +121,8 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
 
   const handleOpenPost = (postId: string) => {
     if (showCoach) dismissCoach();
+    markRoomPostSeen(roomId, postId);
+    setSeenTick((n) => n + 1);
     onOpenPost(postId);
   };
 
@@ -174,6 +199,8 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                   );
                   const avatarUrl = withdrawn ? '' : author?.avatarUrl?.trim() || '';
                   const initial = (authorName || '?').slice(0, 1).toUpperCase();
+                  const isOwnPost = Boolean(userId && post.authorUserId === userId);
+                  const showNew = !isOwnPost && unreadPostIds.has(post.id);
                   return (
                   <li key={post.id}>
                     <button
@@ -195,7 +222,17 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                         </span>
                         <span className="rooms__gallery-name">{authorName}</span>
                       </span>
-                      <RoomDiaryPaper post={post} compact />
+                      <span className="rooms__gallery-body">
+                        <RoomDiaryPaper post={post} compact />
+                        {showNew ? (
+                          <span
+                            className="rooms__gallery-new"
+                            aria-label={t('rooms.postNewAria')}
+                          >
+                            {t('rooms.postNew')}
+                          </span>
+                        ) : null}
+                      </span>
                     </button>
                   </li>
                   );

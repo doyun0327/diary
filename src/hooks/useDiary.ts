@@ -35,13 +35,9 @@ function canvasLayerCount(state: DiaryCanvasState | undefined): number {
   );
 }
 
-/** localStorage에는 큰 data URL / 레이어 페이로드를 넣지 않음 */
+/** localStorage에는 canvasState data URL만 제외 (imageUrl은 친구방 공유를 위해 유지) */
 function toStorageEntry(entry: DiaryEntry): DiaryEntry {
   let next: DiaryEntry = entry;
-  if (isEmbeddedDataUrl(next.imageUrl)) {
-    const { imageUrl: _omit, ...rest } = next;
-    next = rest;
-  }
   if (next.canvasState && canvasStateHasDataUrl(next.canvasState)) {
     const { canvasState: _omit, ...rest } = next;
     next = rest;

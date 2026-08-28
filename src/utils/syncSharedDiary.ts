@@ -2,7 +2,7 @@ import * as roomsApi from '../api/roomsApi';
 import { getAccessToken } from '../hooks/useAuthSession';
 import type { DiaryEntry } from '../types/diary';
 import { invalidateRoomFeed } from './roomCache';
-import { compressDataUrlForShare } from './shareImageUrl';
+import { resolveEntryImageForRoomShare } from './resolveRoomShareImage';
 
 type SharedDiaryFields = Pick<
   DiaryEntry,
@@ -17,12 +17,10 @@ export async function syncSharedDiaryAfterEdit(
   if (!getAccessToken() || !diaryId.trim()) return;
 
   try {
-    const raw = entry.imageUrl?.trim();
-    const imageUrl = raw
-      ? raw.startsWith('data:')
-        ? await compressDataUrlForShare(raw).catch(() => raw)
-        : raw
-      : undefined;
+    const imageUrl = await resolveEntryImageForRoomShare({
+      id: diaryId,
+      imageUrl: entry.imageUrl,
+    });
 
     const res = await roomsApi.updateSharedDiary(diaryId, {
       title: entry.title,

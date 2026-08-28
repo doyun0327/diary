@@ -317,10 +317,14 @@
     "pokeFail": "Couldn't send poke",
     "pokePushTitle": "Poke!",
     "pokePushBody": "{{name}}~ let's write a diary",
+    "sharePushBody": "Shared a diary!",
+    "commentPushBody": "Left a comment!",
     "sharedEmpty": "No shared diaries yet.\nOpen a diary and tap Share → Friend rooms.",
     "sharePrompt": "Want to share a diary?",
     "goHome": "Go to home",
     "openPostAria": "Open {{author}}’s diary {{title}}",
+    "postNew": "N",
+    "postNewAria": "New diary",
     "coach": {
       "comment": "Leave a comment!",
       "poke": "Tap a profile to send a nudge!"

@@ -228,9 +228,14 @@ export function createComment(
   roomId: string,
   postId: string,
   text: string,
+  push?: { pushTitle?: string; pushBody?: string },
 ): Promise<RoomComment> {
   return request<RoomComment>(`/api/rooms/${roomId}/posts/${postId}/comments`, {
     method: 'POST',
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({
+      text,
+      pushTitle: push?.pushTitle,
+      pushBody: push?.pushBody,
+    }),
   });
 }
