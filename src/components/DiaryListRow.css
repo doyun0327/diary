@@ -71,9 +71,10 @@
 }
 
 .diary-row__thumb {
-  flex: 0 0 44px;
+  flex: 0 0 auto;
   width: 44px;
-  height: 44px;
+  aspect-ratio: var(--diary-drawing-ratio);
+  height: auto;
   padding: 3px;
   box-sizing: border-box;
   border-radius: 11px;
@@ -87,6 +88,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 44px;
+  aspect-ratio: var(--diary-drawing-ratio);
+  height: auto;
   font-size: 0.9rem;
   opacity: 0.28;
   background: var(--color-bg-muted);

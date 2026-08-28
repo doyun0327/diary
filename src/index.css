@@ -11,7 +11,7 @@
     'Noto Sans', sans-serif;
   --diary-font-size: 1.2rem;
   --diary-ruled-lh: 2.15em;
-  --diary-drawing-ratio: 1 / 1.55;
+  --diary-drawing-ratio: 1 / 1.55; /* 일기 그림 영역 공통 비율 (작은 그림도 프레임 유지) */
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
   /* Mono — white / gray / black */

@@ -20,14 +20,17 @@ export async function compressDataUrlForShare(
   }
 }
 
-/** 일기 저장용. PNG 원본은 localStorage 한도를 쉽게 넘김 */
+/** 일기 저장·GCS 업로드용. 캔버스 프레임은 유지하고 용량만 줄임 (trim은 썸네일 전용) */
 export async function compressDataUrlForDiary(
   src: string | undefined | null,
+  options?: { trim?: boolean },
 ): Promise<string | undefined> {
   if (!src?.trim()) return undefined;
   try {
-    const trimmed = await trimDrawingForThumb(src.trim());
-    return await resizeToJpeg(trimmed, DIARY_MAX_EDGE, DIARY_JPEG_QUALITY);
+    const base = options?.trim
+      ? await trimDrawingForThumb(src.trim())
+      : src.trim();
+    return await resizeToJpeg(base, DIARY_MAX_EDGE, DIARY_JPEG_QUALITY);
   } catch {
     return src.trim();
   }

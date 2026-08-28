@@ -9,6 +9,7 @@
   position: relative;
   width: 100%;
   height: auto;
+  flex-shrink: 0;
   aspect-ratio: var(--diary-drawing-ratio);
   border-radius: var(--radius-lg);
   overflow: hidden;

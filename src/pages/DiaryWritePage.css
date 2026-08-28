@@ -461,6 +461,8 @@
 
 .diary-write__canvas-wrap {
   position: relative;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .diary-write__draw {
