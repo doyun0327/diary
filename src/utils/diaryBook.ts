@@ -198,7 +198,6 @@ export type CoverOptions = {
   avatarUrl?: string | null;
   rangeStart?: string;
   rangeEnd?: string;
-  slot?: BookSlot;
 };
 
 function coverDateLabel(
@@ -270,7 +269,7 @@ export async function renderCoverPage(
   const muted = themeColor('--color-text-muted', '#6b6b6b');
   const border = themeColor('--color-border-soft', '#ebebeb');
 
-  const frame = drawBookFrame(ctx, bg, surface, border, options?.slot);
+  const frame = drawBookFrame(ctx, bg, surface, border);
   const cx = frame.x + frame.w / 2;
   const padX = Math.round(frame.w * 0.08);
   const padY = Math.round(frame.h * 0.08);
@@ -361,7 +360,7 @@ export async function buildBookPages(entries: DiaryEntry[]): Promise<BookPage[]>
   for (const entry of sorted) {
     rest.push(await renderEntryBookPage(entry));
   }
-  const cover = await renderCoverBookPage(sorted, { slot: rest[0]?.slot });
+  const cover = await renderCoverBookPage(sorted);
   return [cover, ...rest];
 }
 

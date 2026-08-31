@@ -4,8 +4,6 @@ import { useLottie } from 'lottie-react';
 import type { DiaryEntry } from '../types/diary';
 import { exportPdfFilename } from '../utils/dateRange';
 import {
-  BOOK_H,
-  BOOK_W,
   buildPdfFromBookPages,
   renderCoverBookPage,
   renderEntryBookPage,
@@ -54,24 +52,16 @@ function BookCover({
   avatarUrl,
   rangeStart,
   rangeEnd,
-  slot,
 }: {
   entries: DiaryEntry[];
   avatarUrl?: string | null;
   rangeStart?: string;
   rangeEnd?: string;
-  slot?: { w: number; h: number };
 }) {
   const range = coverDateLabel(entries, rangeStart, rangeEnd);
-  const style = slot
-    ? {
-        width: `${(slot.w / BOOK_W) * 100}%`,
-        height: `${(slot.h / BOOK_H) * 100}%`,
-      }
-    : undefined;
 
   return (
-    <div className="diary-book__cover" style={style}>
+    <div className="diary-book__cover">
       <p className="diary-book__cover-brand">PageBy</p>
       {avatarUrl ? (
         <img className="diary-book__cover-avatar" src={avatarUrl} alt="" />
@@ -233,7 +223,6 @@ function DiaryBookViewer({
         avatarUrl,
         rangeStart,
         rangeEnd,
-        slot: pagesRef.current[1]?.slot,
       });
       const rest = pagesRef.current
         .map((p, i) => (i === 0 ? cover : p))
@@ -334,7 +323,6 @@ function DiaryBookViewer({
                   avatarUrl={avatarUrl}
                   rangeStart={rangeStart}
                   rangeEnd={rangeEnd}
-                  slot={pages[1]?.slot}
                 />
               </div>
             ) : current ? (

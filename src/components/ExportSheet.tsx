@@ -15,7 +15,6 @@ import MonthYearPicker from './MonthYearPicker';
 import './ExportSheet.css';
 
 type Preset = 'thisMonth' | 'lastMonth' | 'custom';
-type MonthField = 'start' | 'end';
 
 interface ExportSheetProps {
   entries: DiaryEntry[];
@@ -25,29 +24,32 @@ interface ExportSheetProps {
 
 function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
   const { t } = useTranslation();
-  const initial = thisMonthRange();
-  const [start, setStart] = useState(initial.start);
-  const [end, setEnd] = useState(initial.end);
-  const [choiceFor, setChoiceFor] = useState<MonthField | null>(null);
-  const [picker, setPicker] = useState<MonthField | null>(null);
+  const initialYm = yearMonthFromYmd(thisMonthRange().start);
+  const [year, setYear] = useState(initialYm.year);
+  const [month, setMonth] = useState(initialYm.month);
+  const [choiceOpen, setChoiceOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const applyPreset = (next: Preset, field: MonthField) => {
+  const start = monthStartYmd(year, month);
+  const end = monthEndYmd(year, month);
+
+  const applyPreset = (next: Preset) => {
     if (next === 'thisMonth') {
-      const r = thisMonthRange();
-      setStart(r.start);
-      setEnd(r.end);
-      setChoiceFor(null);
+      const ym = yearMonthFromYmd(thisMonthRange().start);
+      setYear(ym.year);
+      setMonth(ym.month);
+      setChoiceOpen(false);
       return;
     }
     if (next === 'lastMonth') {
-      const r = lastMonthRange();
-      setStart(r.start);
-      setEnd(r.end);
-      setChoiceFor(null);
+      const ym = yearMonthFromYmd(lastMonthRange().start);
+      setYear(ym.year);
+      setMonth(ym.month);
+      setChoiceOpen(false);
       return;
     }
-    setChoiceFor(null);
-    setPicker(field);
+    setChoiceOpen(false);
+    setPickerOpen(true);
   };
 
   const filtered = useMemo(
@@ -59,9 +61,6 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
     if (filtered.length === 0) return;
     onOpenBook(filtered, { start, end });
   };
-
-  const startYm = yearMonthFromYmd(start);
-  const endYm = yearMonthFromYmd(end);
 
   return (
     <div className="export-sheet" role="dialog" aria-label={t('export.aria')}>
@@ -79,30 +78,20 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
           </button>
         </header>
 
-        <p className="export-sheet__period-label">{t('export.period')}</p>
-        <div className="export-sheet__range" role="group" aria-label={t('export.period')}>
+        <p className="export-sheet__period-label">{t('export.month')}</p>
+        <div className="export-sheet__range" role="group" aria-label={t('export.month')}>
           <button
             type="button"
-            className="export-sheet__box"
-            aria-label={t('export.start')}
-            aria-expanded={choiceFor === 'start'}
-            onClick={() => setChoiceFor('start')}
+            className="export-sheet__box export-sheet__box--single"
+            aria-label={t('export.month')}
+            aria-expanded={choiceOpen}
+            onClick={() => setChoiceOpen(true)}
           >
-            {formatYearMonth(startYm.year, startYm.month)}
-          </button>
-          <span className="export-sheet__tilde" aria-hidden>
-            ~
-          </span>
-          <button
-            type="button"
-            className="export-sheet__box"
-            aria-label={t('export.end')}
-            aria-expanded={choiceFor === 'end'}
-            onClick={() => setChoiceFor('end')}
-          >
-            {formatYearMonth(endYm.year, endYm.month)}
+            {formatYearMonth(year, month)}
           </button>
         </div>
+
+        <p className="export-sheet__hint">{t('export.monthHint')}</p>
 
         <p className="export-sheet__count">
           {filtered.length > 0
@@ -122,41 +111,41 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
         </div>
       </div>
 
-      {choiceFor && (
+      {choiceOpen && (
         <div className="export-sheet__choice">
           <button
             type="button"
             className="export-sheet__choice-backdrop"
             aria-label={t('common.close')}
-            onClick={() => setChoiceFor(null)}
+            onClick={() => setChoiceOpen(false)}
           />
           <div
             className="export-sheet__choice-panel"
             role="dialog"
             aria-label={t('export.presetsAria')}
           >
-            <button type="button" onClick={() => applyPreset('thisMonth', choiceFor)}>
+            <button type="button" onClick={() => applyPreset('thisMonth')}>
               {t('export.thisMonth')}
             </button>
-            <button type="button" onClick={() => applyPreset('lastMonth', choiceFor)}>
+            <button type="button" onClick={() => applyPreset('lastMonth')}>
               {t('export.lastMonth')}
             </button>
-            <button type="button" onClick={() => applyPreset('custom', choiceFor)}>
+            <button type="button" onClick={() => applyPreset('custom')}>
               {t('export.custom')}
             </button>
           </div>
         </div>
       )}
 
-      {picker && (
+      {pickerOpen && (
         <MonthYearPicker
-          year={picker === 'start' ? startYm.year : endYm.year}
-          month={picker === 'start' ? startYm.month : endYm.month}
-          onClose={() => setPicker(null)}
-          onSelect={(year, month) => {
-            if (picker === 'start') setStart(monthStartYmd(year, month));
-            else setEnd(monthEndYmd(year, month));
-            setPicker(null);
+          year={year}
+          month={month}
+          onClose={() => setPickerOpen(false)}
+          onSelect={(nextYear, nextMonth) => {
+            setYear(nextYear);
+            setMonth(nextMonth);
+            setPickerOpen(false);
           }}
         />
       )}

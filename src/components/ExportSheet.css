@@ -72,10 +72,12 @@
 
 .export-sheet__range {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  grid-template-columns: 1fr;
+  margin-bottom: 8px;
+}
+
+.export-sheet__box--single {
+  width: 100%;
 }
 
 .export-sheet__box {
