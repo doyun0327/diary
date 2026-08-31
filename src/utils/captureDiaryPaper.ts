@@ -167,6 +167,8 @@ export type CapturePaperOptions = {
   scale?: number;
   type?: string;
   quality?: number;
+  /** 그림 영역(.diary-detail__image) 가로 비율 — PDF 등 (1=100%, 0.3≈70% 축소) */
+  imageScale?: number;
 };
 
 async function waitForImages(root: HTMLElement): Promise<void> {
@@ -317,6 +319,7 @@ export async function captureDiaryPaperBlob(
 export function mountOffscreenDiaryPaper(
   entry: DiaryEntry,
   width = OFFSCREEN_PAPER_WIDTH,
+  options?: Pick<CapturePaperOptions, 'imageScale'>,
 ): { paper: HTMLElement; dispose: () => void } {
   const font = diaryFontStack(findFont(entry.fontId).family);
   const packId = entryMoodPack(entry);
@@ -381,10 +384,27 @@ export function mountOffscreenDiaryPaper(
   if (entry.imageUrl) {
     const wrap = document.createElement('div');
     wrap.className = 'diary-detail__image';
+    const imageScale = options?.imageScale ?? 1;
+    if (imageScale > 0 && imageScale < 1) {
+      wrap.style.width = `${imageScale * 100}%`;
+      wrap.style.marginLeft = 'auto';
+      wrap.style.marginRight = 'auto';
+    }
     const img = document.createElement('img');
     img.src = entry.imageUrl;
     img.alt = '';
     wrap.appendChild(img);
+    paper.appendChild(wrap);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'diary-detail__image diary-detail__image--empty';
+    wrap.setAttribute('aria-hidden', 'true');
+    const imageScale = options?.imageScale ?? 1;
+    if (imageScale > 0 && imageScale < 1) {
+      wrap.style.width = `${imageScale * 100}%`;
+      wrap.style.marginLeft = 'auto';
+      wrap.style.marginRight = 'auto';
+    }
     paper.appendChild(wrap);
   }
 
@@ -416,7 +436,9 @@ export async function captureDiaryEntryPaperBlob(
   if (paperElement) {
     return captureDiaryPaperBlob(paperElement, entry.fontId, options);
   }
-  const { paper, dispose } = mountOffscreenDiaryPaper(entry);
+  const { paper, dispose } = mountOffscreenDiaryPaper(entry, OFFSCREEN_PAPER_WIDTH, {
+    imageScale: options?.imageScale,
+  });
   try {
     return await captureDiaryPaperBlob(paper, entry.fontId, options);
   } finally {

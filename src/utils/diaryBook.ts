@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
 import { fontFamilyForEntry } from './fonts';
-import { captureDiaryEntryPaperBlob } from './captureDiaryPaper';
+import { captureDiaryEntryPaperBlob, type CapturePaperOptions } from './captureDiaryPaper';
 import { materializeImageSrc } from './materializeImage';
 import { downloadToDevice } from './saveBlob';
 
@@ -16,6 +16,12 @@ const BOOK_CAPTURE = {
   scale: 1.2,
   type: 'image/jpeg',
   quality: 0.8,
+} as const;
+
+/** PDF 저장 전용 — 그림 영역 약 70% 축소(30% 크기) + JPEG 품질 */
+const BOOK_PDF_CAPTURE = {
+  quality: 0.85,
+  imageScale: 0.3,
 } as const;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -198,6 +204,8 @@ export type CoverOptions = {
   avatarUrl?: string | null;
   rangeStart?: string;
   rangeEnd?: string;
+  /** PDF 등 — 1페이지 일기 paper와 같은 안쪽 영역 */
+  slot?: BookSlot;
 };
 
 function coverDateLabel(
@@ -269,7 +277,8 @@ export async function renderCoverPage(
   const muted = themeColor('--color-text-muted', '#6b6b6b');
   const border = themeColor('--color-border-soft', '#ebebeb');
 
-  const frame = drawBookFrame(ctx, bg, surface, border);
+  const inner = options?.slot ?? frameRect();
+  const frame = drawBookFrame(ctx, bg, surface, border, inner);
   const cx = frame.x + frame.w / 2;
   const padX = Math.round(frame.w * 0.08);
   const padY = Math.round(frame.h * 0.08);
@@ -332,8 +341,14 @@ export async function renderCoverBookPage(
   return pageFromBlob(blob, '표지');
 }
 
-export async function renderEntryBookPage(entry: DiaryEntry): Promise<BookPage> {
-  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, BOOK_CAPTURE);
+export async function renderEntryBookPage(
+  entry: DiaryEntry,
+  captureOptions?: CapturePaperOptions,
+): Promise<BookPage> {
+  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, {
+    ...BOOK_CAPTURE,
+    ...captureOptions,
+  });
   const paperUrl = URL.createObjectURL(paperBlob);
   try {
     const img = await loadImage(paperUrl);
@@ -358,9 +373,9 @@ export async function buildBookPages(entries: DiaryEntry[]): Promise<BookPage[]>
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const rest: BookPage[] = [];
   for (const entry of sorted) {
-    rest.push(await renderEntryBookPage(entry));
+    rest.push(await renderEntryBookPage(entry, BOOK_PDF_CAPTURE));
   }
-  const cover = await renderCoverBookPage(sorted);
+  const cover = await renderCoverBookPage(sorted, { slot: rest[0]?.slot });
   return [cover, ...rest];
 }
 

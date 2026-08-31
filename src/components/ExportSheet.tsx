@@ -78,20 +78,17 @@ function ExportSheet({ entries, onClose, onOpenBook }: ExportSheetProps) {
           </button>
         </header>
 
-        <p className="export-sheet__period-label">{t('export.month')}</p>
-        <div className="export-sheet__range" role="group" aria-label={t('export.month')}>
+        <div className="export-sheet__range" role="group" aria-label={t('export.period')}>
           <button
             type="button"
             className="export-sheet__box export-sheet__box--single"
-            aria-label={t('export.month')}
+            aria-label={t('export.period')}
             aria-expanded={choiceOpen}
             onClick={() => setChoiceOpen(true)}
           >
             {formatYearMonth(year, month)}
           </button>
         </div>
-
-        <p className="export-sheet__hint">{t('export.monthHint')}</p>
 
         <p className="export-sheet__count">
           {filtered.length > 0

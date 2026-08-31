@@ -223,6 +223,7 @@ function DiaryBookViewer({
         avatarUrl,
         rangeStart,
         rangeEnd,
+        slot: pagesRef.current[1]?.slot,
       });
       const rest = pagesRef.current
         .map((p, i) => (i === 0 ? cover : p))

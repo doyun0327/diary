@@ -9,7 +9,8 @@ import { shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
 import { resolveEntryImageForRoomShare } from '../utils/resolveRoomShareImage';
-import { getCachedRoomsList, invalidateRoomFeed, setCachedRoomsList } from '../utils/roomCache';
+import { getCachedRoomsList, invalidateRoomFeed } from '../utils/roomCache';
+import { prefetchRoomsList } from '../utils/roomPrefetch';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
@@ -61,6 +62,22 @@ function DiaryDetailPage({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const knownRoomsRef = useRef(new Map<string, RoomSummary>());
+  const shareImagePromiseRef = useRef<Promise<string | undefined> | null>(null);
+
+  const resetShareImagePrep = () => {
+    shareImagePromiseRef.current = null;
+  };
+
+  const prepareShareImage = () => {
+    if (!shareImagePromiseRef.current) {
+      shareImagePromiseRef.current = resolveEntryImageForRoomShare(entry);
+    }
+    return shareImagePromiseRef.current;
+  };
+
+  useEffect(() => {
+    resetShareImagePrep();
+  }, [entry.id]);
 
   useEffect(() => {
     return () => {
@@ -84,6 +101,8 @@ function DiaryDetailPage({
     setShareStep('menu');
     setSelectedRoomIds([]);
     setSharedRoomIds([]);
+    void prefetchRoomsList(0, SHARE_ROOMS_PAGE_SIZE);
+    void prepareShareImage();
     setShareOpen(true);
   };
 
@@ -93,52 +112,65 @@ function DiaryDetailPage({
     setShareStep('menu');
     setSelectedRoomIds([]);
     setSharedRoomIds([]);
+    resetShareImagePrep();
   };
 
   const loadRoomsPage = async (
     page: number,
     opts?: { includeShared?: boolean },
   ) => {
-    setRoomsLoading(true);
+    const cached = getCachedRoomsList(page, SHARE_ROOMS_PAGE_SIZE);
+    if (cached) {
+      cached.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
+      setRooms(cached.content);
+      setRoomsPage(cached.page);
+      setRoomsPageCount(Math.max(1, cached.totalPages));
+      setRoomsLoading(false);
+    } else {
+      setRoomsLoading(true);
+    }
+
     try {
       if (!getAccessToken()) {
         const nick = nickname.trim() || t('common.anonymous');
         await ensureGuestSession(clientId, nick);
       }
 
-      const cached = getCachedRoomsList(page, SHARE_ROOMS_PAGE_SIZE);
-      if (cached) {
-        cached.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
-        setRooms(cached.content);
-        setRoomsPage(cached.page);
-        setRoomsPageCount(Math.max(1, cached.totalPages));
-      }
-
-      const resultPromise = roomsApi.listRooms({
-        page,
-        size: SHARE_ROOMS_PAGE_SIZE,
-      });
       const sharedPromise = opts?.includeShared
         ? roomsApi.listRoomsSharingDiary(entry.id).catch(() => [] as string[])
         : null;
 
-      const result = await resultPromise;
-      setCachedRoomsList(result);
-      result.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
-      setRooms(result.content);
-      setRoomsPage(result.page);
-      setRoomsPageCount(Math.max(1, result.totalPages));
-      if (sharedPromise) {
-        setSharedRoomIds(await sharedPromise);
+      if (cached) {
+        if (sharedPromise) {
+          setSharedRoomIds(await sharedPromise);
+        }
+        return;
+      }
+
+      const [result, sharedIds] = await Promise.all([
+        prefetchRoomsList(page, SHARE_ROOMS_PAGE_SIZE),
+        sharedPromise ?? Promise.resolve(null),
+      ]);
+
+      if (result) {
+        result.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
+        setRooms(result.content);
+        setRoomsPage(result.page);
+        setRoomsPageCount(Math.max(1, result.totalPages));
+      }
+      if (sharedIds) {
+        setSharedRoomIds(sharedIds);
       }
     } catch (err) {
-      setFeedback({
-        kind: 'info',
-        title: err instanceof Error ? err.message : t('detail.err.roomsList'),
-      });
-      setRooms([]);
-      setRoomsPage(0);
-      setRoomsPageCount(1);
+      if (!cached) {
+        setFeedback({
+          kind: 'info',
+          title: err instanceof Error ? err.message : t('detail.err.roomsList'),
+        });
+        setRooms([]);
+        setRoomsPage(0);
+        setRoomsPageCount(1);
+      }
       if (opts?.includeShared) {
         setSharedRoomIds([]);
       }
@@ -147,13 +179,14 @@ function DiaryDetailPage({
     }
   };
 
-  const openRoomStep = async () => {
+  const openRoomStep = () => {
     setShareStep('rooms');
     setSelectedRoomIds([]);
     setSharedRoomIds([]);
     setRoomsPage(0);
     knownRoomsRef.current.clear();
-    await loadRoomsPage(0, { includeShared: true });
+    void prepareShareImage();
+    void loadRoomsPage(0, { includeShared: true });
   };
 
   const onShareRoomsPageChange = (nextPage: number) => {
@@ -180,10 +213,15 @@ function DiaryDetailPage({
     setFeedback(null);
 
     try {
-      if (!getAccessToken()) {
-        const nick = nickname.trim() || t('common.anonymous');
-        await ensureGuestSession(clientId, nick);
-      }
+      const nick = nickname.trim() || t('common.anonymous');
+      const [, imageUrl] = await Promise.all([
+        (async () => {
+          if (!getAccessToken()) {
+            await ensureGuestSession(clientId, nick);
+          }
+        })(),
+        prepareShareImage(),
+      ]);
     } catch (err) {
       setSharing(false);
       setFeedback({
@@ -193,8 +231,8 @@ function DiaryDetailPage({
       return;
     }
 
-    const imageUrl = await resolveEntryImageForRoomShare(entry);
     const shareNick = nickname.trim() || t('common.anonymous');
+    const imageUrl = await prepareShareImage();
 
     const body = {
       diaryId: entry.id,

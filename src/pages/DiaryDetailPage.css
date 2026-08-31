@@ -239,6 +239,10 @@
   aspect-ratio: var(--diary-drawing-ratio);
 }
 
+.diary-detail__image--empty {
+  background: var(--color-bg-soft);
+}
+
 .diary-detail__section {
   display: flex;
   flex-direction: column;
