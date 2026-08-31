@@ -378,7 +378,8 @@ function DiaryWritePage({
       setRewardPromptOpen(true);
       return;
     }
-    setAiConfirmOpen(true);
+    // 테스트: 확인창 없이 바로 생성 (광고 스킵은 AI_REWARD_AD_ENABLED=false)
+    startAiDrawFlow();
   };
 
   const runAiDraw = async () => {

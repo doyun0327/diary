@@ -7,8 +7,8 @@ export const MONTHLY_PRICE_KRW = 1900;
 export const FREE_AI_DRAWS_TOTAL = 2;
 /** @deprecated FREE_AI_DRAWS_TOTAL */
 export const FREE_AI_DRAWS_PER_DAY = FREE_AI_DRAWS_TOTAL;
-/** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 */
-export const AI_REWARD_AD_ENABLED = true;
+/** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 — 테스트 중 false */
+export const AI_REWARD_AD_ENABLED = false;
 /** 설치 후 검색·보내기 무료 체험 기간 */
 export const FEATURE_TRIAL_DAYS = 7;
 const FEATURE_TRIAL_MS = FEATURE_TRIAL_DAYS * 24 * 60 * 60 * 1000;

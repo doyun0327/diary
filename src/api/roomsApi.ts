@@ -4,6 +4,7 @@ import type {
   RoomDetail,
   RoomPost,
   RoomSummary,
+  RoomSummaryPage,
 } from '../types/room';
 import { apiUrl, isRemoteApi } from './config';
 import {
@@ -59,10 +60,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
-export function listRooms(): Promise<RoomSummary[]> {
-  return request<RoomSummary[]>('/api/rooms');
+export function listRooms(opts?: {
+  page?: number;
+  size?: number;
+}): Promise<RoomSummaryPage> {
+  const page = opts?.page ?? 0;
+  const size = opts?.size ?? 10;
+  const qs = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+  return request<RoomSummaryPage>(`/api/rooms?${qs.toString()}`);
 }
-
 /** 방장: 방 이름·커버 변경 */
 export function updateRoomCover(
   roomId: string,

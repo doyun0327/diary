@@ -1,4 +1,4 @@
-import type { RoomDetail, RoomPost, RoomSummary } from '../types/room';
+import type { RoomDetail, RoomPost, RoomSummaryPage } from '../types/room';
 
 const FEED_TTL_MS = 60_000;
 const LIST_TTL_MS = 30_000;
@@ -9,8 +9,15 @@ type RoomFeedEntry = {
   at: number;
 };
 
+type RoomsListCache = {
+  page: number;
+  size: number;
+  data: RoomSummaryPage;
+  at: number;
+};
+
 const feedByRoomId = new Map<string, RoomFeedEntry>();
-let roomsList: { data: RoomSummary[]; at: number } | null = null;
+let roomsList: RoomsListCache | null = null;
 
 export function getCachedRoomFeed(roomId: string): RoomFeedEntry | null {
   const hit = feedByRoomId.get(roomId);
@@ -40,8 +47,12 @@ export function invalidateRoomFeed(roomId: string): void {
   feedByRoomId.delete(roomId);
 }
 
-export function getCachedRoomsList(): RoomSummary[] | null {
+export function getCachedRoomsList(
+  page = 0,
+  size = 10,
+): RoomSummaryPage | null {
   if (!roomsList) return null;
+  if (roomsList.page !== page || roomsList.size !== size) return null;
   if (Date.now() - roomsList.at > LIST_TTL_MS) {
     roomsList = null;
     return null;
@@ -49,8 +60,13 @@ export function getCachedRoomsList(): RoomSummary[] | null {
   return roomsList.data;
 }
 
-export function setCachedRoomsList(data: RoomSummary[]): void {
-  roomsList = { data, at: Date.now() };
+export function setCachedRoomsList(data: RoomSummaryPage): void {
+  roomsList = {
+    page: data.page,
+    size: data.size,
+    data,
+    at: Date.now(),
+  };
 }
 
 export function invalidateRoomsList(): void {

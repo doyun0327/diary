@@ -6,6 +6,7 @@ import { getAccessToken } from "../hooks/useAuthSession";
 import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
+import PagePager from "../components/PagePager";
 import { shareViaNative } from "../utils/nativeShare";
 import {
   coverClassName,
@@ -16,9 +17,12 @@ import {
 import { letterAvatarDataUrl } from "../utils/letterAvatar";
 import {
   getCachedRoomsList,
+  invalidateRoomsList,
   setCachedRoomsList,
 } from "../utils/roomCache";
 import "./RoomsPages.css";
+
+const HUB_PAGE_SIZE = 10;
 
 interface RoomsHubPageProps {
   nickname: string;
@@ -31,15 +35,6 @@ interface RoomsHubPageProps {
 }
 
 type SheetKind = "create" | "join" | "edit" | null;
-
-function sortRoomsNewestFirst(list: RoomSummary[]): RoomSummary[] {
-  return [...list].sort((a, b) => {
-    const tb = Date.parse(b.createdAt) || 0;
-    const ta = Date.parse(a.createdAt) || 0;
-    if (tb !== ta) return tb - ta;
-    return b.id.localeCompare(a.id);
-  });
-}
 
 function canShare(nickname: string) {
   return Boolean(nickname.trim());
@@ -78,6 +73,8 @@ function RoomsHubPage({
 }: RoomsHubPageProps) {
   const { t } = useTranslation();
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
+  const [page, setPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetKind>(null);
@@ -117,10 +114,15 @@ function RoomsHubPage({
     }
   };
 
-  const refresh = async () => {
-    const cached = shareReady ? getCachedRoomsList() : null;
+  const refresh = async (pageOverride?: number) => {
+    const targetPage = pageOverride ?? page;
+    const cached = shareReady
+      ? getCachedRoomsList(targetPage, HUB_PAGE_SIZE)
+      : null;
     if (cached) {
-      setRooms(sortRoomsNewestFirst(cached));
+      setRooms(cached.content);
+      setPage(cached.page);
+      setPageCount(Math.max(1, cached.totalPages));
       setLoading(false);
     } else {
       setLoading(true);
@@ -129,16 +131,24 @@ function RoomsHubPage({
     try {
       if (!shareReady) {
         setRooms([]);
+        setPage(0);
+        setPageCount(1);
         return;
       }
       await ensureAuth();
-      const list = await roomsApi.listRooms();
-      setCachedRoomsList(list);
-      setRooms(sortRoomsNewestFirst(list));
+      const result = await roomsApi.listRooms({
+        page: targetPage,
+        size: HUB_PAGE_SIZE,
+      });
+      setCachedRoomsList(result);
+      setRooms(result.content);
+      setPage(result.page);
+      setPageCount(Math.max(1, result.totalPages));
     } catch (err) {
       if (!cached) {
         setError(err instanceof Error ? err.message : t("rooms.err.list"));
         setRooms([]);
+        setPageCount(1);
       }
     } finally {
       setLoading(false);
@@ -146,9 +156,14 @@ function RoomsHubPage({
   };
 
   useEffect(() => {
-    void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- ?��로필 �?비될 ?�� ?��?�� 로드
+    void refresh(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 프로필 준비될 때 다시 로드
   }, [shareReady, nickname, clientId]);
+
+  const onRoomsPageChange = (nextPage: number) => {
+    if (nextPage === page || loading) return;
+    void refresh(nextPage);
+  };
 
   const openSheet = (kind: Exclude<SheetKind, null>) => {
     setError(null);
@@ -239,22 +254,20 @@ function RoomsHubPage({
         rememberRoomCover(editingRoomId, { preset: null, url: coverUrl });
       }
       setRooms((prev) =>
-        sortRoomsNewestFirst(
-          prev.map((r) =>
-            r.id === editingRoomId
-              ? {
-                  ...r,
-                  ...updated,
-                  name: updated.name ?? name,
-                  coverPreset: editCoverDirty
-                    ? null
-                    : (updated.coverPreset ?? r.coverPreset),
-                  coverUrl: editCoverDirty
-                    ? (updated.coverUrl ?? coverUrl)
-                    : (updated.coverUrl ?? r.coverUrl),
-                }
-              : r,
-          ),
+        prev.map((r) =>
+          r.id === editingRoomId
+            ? {
+                ...r,
+                ...updated,
+                name: updated.name ?? name,
+                coverPreset: editCoverDirty
+                  ? null
+                  : (updated.coverPreset ?? r.coverPreset),
+                coverUrl: editCoverDirty
+                  ? (updated.coverUrl ?? coverUrl)
+                  : (updated.coverUrl ?? r.coverUrl),
+              }
+            : r,
         ),
       );
       setSheet(null);
@@ -293,7 +306,8 @@ function RoomsHubPage({
       setCoverUrl(null);
       setSheet(null);
       setCreatedRoom({ id: room.id, inviteCode: room.inviteCode });
-      await refresh();
+      invalidateRoomsList();
+      await refresh(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("rooms.err.create"));
     } finally {
@@ -363,7 +377,8 @@ function RoomsHubPage({
       const room = await roomsApi.joinRoom(code, nickname.trim(), profileAvatar());
       setInviteCode("");
       setSheet(null);
-      await refresh();
+      invalidateRoomsList();
+      await refresh(0);
       onOpenRoom(room.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("rooms.err.join"));
@@ -384,7 +399,8 @@ function RoomsHubPage({
         await roomsApi.leaveRoom(roomAction.id);
       }
       setRoomAction(null);
-      await refresh();
+      invalidateRoomsList();
+      await refresh(0);
     } catch (err) {
       setError(
         err instanceof Error
@@ -603,6 +619,13 @@ function RoomsHubPage({
               );
             })}
           </ul>
+          <PagePager
+            className="rooms__pager"
+            page={page}
+            pageCount={pageCount}
+            onPageChange={onRoomsPageChange}
+            disabled={loading}
+          />
         </>
       )}
 

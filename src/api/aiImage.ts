@@ -175,16 +175,7 @@ export async function generateDiaryImage(input: {
 
   console.info('[AI] status:', response.status);
 
-  if (response.status === 202) {
-    const accepted = (await response.json()) as DrawPayload;
-    if (!accepted.jobId) {
-      throw new Error('그림 작업 ID를 받지 못했어요');
-    }
-    console.info('[AI] queued jobId=', accepted.jobId);
-    return pollDrawJob(accepted.jobId, input.onProgress);
-  }
-
-  if (!response.ok) {
+  if (!response.ok && response.status !== 202) {
     let message = `그림 생성 실패: HTTP ${response.status}`;
     if (response.status === 429) {
       message = '그림 요청이 많아요. 잠시 후 다시 시도해 주세요';
@@ -196,9 +187,17 @@ export async function generateDiaryImage(input: {
     throw new Error(message);
   }
 
-  // legacy sync 200
-  input.onProgress?.('image');
   const data = (await response.json()) as DrawPayload;
   console.info('[AI] response keys:', Object.keys(data));
+
+  // 비동기 큐: 202 또는 body에 jobId만 있는 경우(프록시가 200으로 바꿀 때 포함)
+  const st = (data.status || '').toLowerCase();
+  if (data.jobId && (response.status === 202 || st === 'queued' || st === 'running')) {
+    console.info('[AI] queued jobId=', data.jobId);
+    return pollDrawJob(data.jobId, input.onProgress);
+  }
+
+  // legacy sync 200 (이미지 바로 포함)
+  input.onProgress?.('image');
   return parseImageResult(data);
 }

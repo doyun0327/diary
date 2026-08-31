@@ -24,6 +24,15 @@ export interface RoomSummary {
   coverUrl?: string | null;
 }
 
+/** GET /api/rooms 페이지 응답 */
+export interface RoomSummaryPage {
+  content: RoomSummary[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export interface RoomDetail extends RoomSummary {
   members: RoomMember[];
 }

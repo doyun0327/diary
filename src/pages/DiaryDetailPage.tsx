@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
@@ -52,6 +52,7 @@ function DiaryDetailPage({
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [roomsLoading, setRoomsLoading] = useState(false);
   const [roomsPage, setRoomsPage] = useState(0);
+  const [roomsPageCount, setRoomsPageCount] = useState(1);
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
   const [sharing, setSharing] = useState(false);
@@ -59,24 +60,13 @@ function DiaryDetailPage({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
-
-  const roomsPageCount = Math.max(1, Math.ceil(rooms.length / SHARE_ROOMS_PAGE_SIZE));
-  const pagedRooms = useMemo(() => {
-    const start = roomsPage * SHARE_ROOMS_PAGE_SIZE;
-    return rooms.slice(start, start + SHARE_ROOMS_PAGE_SIZE);
-  }, [rooms, roomsPage]);
+  const knownRoomsRef = useRef(new Map<string, RoomSummary>());
 
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
-
-  useEffect(() => {
-    if (roomsPage > 0 && roomsPage >= roomsPageCount) {
-      setRoomsPage(Math.max(0, roomsPageCount - 1));
-    }
-  }, [roomsPage, roomsPageCount]);
 
   const handleDeleteClick = () => {
     setMoreOpen(false);
@@ -105,11 +95,10 @@ function DiaryDetailPage({
     setSharedRoomIds([]);
   };
 
-  const openRoomStep = async () => {
-    setShareStep('rooms');
-    setSelectedRoomIds([]);
-    setSharedRoomIds([]);
-    setRoomsPage(0);
+  const loadRoomsPage = async (
+    page: number,
+    opts?: { includeShared?: boolean },
+  ) => {
     setRoomsLoading(true);
     try {
       if (!getAccessToken()) {
@@ -117,17 +106,31 @@ function DiaryDetailPage({
         await ensureGuestSession(clientId, nick);
       }
 
-      const cached = getCachedRoomsList();
-      if (cached) setRooms(cached);
+      const cached = getCachedRoomsList(page, SHARE_ROOMS_PAGE_SIZE);
+      if (cached) {
+        cached.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
+        setRooms(cached.content);
+        setRoomsPage(cached.page);
+        setRoomsPageCount(Math.max(1, cached.totalPages));
+      }
 
-      const [list, already] = await Promise.all([
-        roomsApi.listRooms(),
-        roomsApi.listRoomsSharingDiary(entry.id).catch(() => [] as string[]),
-      ]);
-      setCachedRoomsList(list);
-      setRooms(list);
-      setSharedRoomIds(already);
-      setRoomsPage(0);
+      const resultPromise = roomsApi.listRooms({
+        page,
+        size: SHARE_ROOMS_PAGE_SIZE,
+      });
+      const sharedPromise = opts?.includeShared
+        ? roomsApi.listRoomsSharingDiary(entry.id).catch(() => [] as string[])
+        : null;
+
+      const result = await resultPromise;
+      setCachedRoomsList(result);
+      result.content.forEach((r) => knownRoomsRef.current.set(r.id, r));
+      setRooms(result.content);
+      setRoomsPage(result.page);
+      setRoomsPageCount(Math.max(1, result.totalPages));
+      if (sharedPromise) {
+        setSharedRoomIds(await sharedPromise);
+      }
     } catch (err) {
       setFeedback({
         kind: 'info',
@@ -135,10 +138,27 @@ function DiaryDetailPage({
       });
       setRooms([]);
       setRoomsPage(0);
-      setSharedRoomIds([]);
+      setRoomsPageCount(1);
+      if (opts?.includeShared) {
+        setSharedRoomIds([]);
+      }
     } finally {
       setRoomsLoading(false);
     }
+  };
+
+  const openRoomStep = async () => {
+    setShareStep('rooms');
+    setSelectedRoomIds([]);
+    setSharedRoomIds([]);
+    setRoomsPage(0);
+    knownRoomsRef.current.clear();
+    await loadRoomsPage(0, { includeShared: true });
+  };
+
+  const onShareRoomsPageChange = (nextPage: number) => {
+    if (nextPage === roomsPage || roomsLoading || sharing) return;
+    void loadRoomsPage(nextPage);
   };
 
   const toggleRoom = (roomId: string) => {
@@ -150,9 +170,10 @@ function DiaryDetailPage({
 
   const shareToSelectedRooms = async () => {
     if (sharing || selectedRoomIds.length === 0) return;
-    const targets = rooms.filter(
-      (r) => selectedRoomIds.includes(r.id) && !sharedRoomIds.includes(r.id),
-    );
+    const targets = selectedRoomIds
+      .filter((id) => !sharedRoomIds.includes(id))
+      .map((id) => knownRoomsRef.current.get(id))
+      .filter((r): r is RoomSummary => Boolean(r));
     if (targets.length === 0) return;
 
     setSharing(true);
@@ -506,7 +527,7 @@ function DiaryDetailPage({
                 {!roomsLoading && rooms.length > 0 && (
                   <>
                     <div className="diary-detail__room-grid" role="list">
-                      {pagedRooms.map((room) => {
+                      {rooms.map((room) => {
                         const selected = selectedRoomIds.includes(room.id);
                         const alreadyShared = sharedRoomIds.includes(room.id);
                         const cover = resolveRoomCover(
@@ -548,13 +569,13 @@ function DiaryDetailPage({
                         );
                       })}
                     </div>
-                    {rooms.length > SHARE_ROOMS_PAGE_SIZE && (
+                    {roomsPageCount > 1 && (
                       <PagePager
                         className="diary-detail__room-pager"
                         page={roomsPage}
                         pageCount={roomsPageCount}
-                        onPageChange={setRoomsPage}
-                        disabled={sharing}
+                        onPageChange={onShareRoomsPageChange}
+                        disabled={sharing || roomsLoading}
                       />
                     )}
                   </>

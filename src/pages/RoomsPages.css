@@ -528,6 +528,10 @@
   padding-top: 8px;
 }
 
+.rooms__pager {
+  margin: 18px 0 8px;
+}
+
 .rooms__polaroid {
   position: relative;
   display: flex;
