@@ -362,6 +362,52 @@
   color: var(--color-text-muted);
 }
 
+.account-sheet__synced-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.account-sheet__synced-row .account-sheet__account-synced {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-sheet__upload-icon-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.account-sheet__upload-icon-btn:hover:not(:disabled) {
+  background: var(--color-bg-soft);
+}
+
+.account-sheet__upload-icon-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.account-sheet__upload-icon-btn--busy svg {
+  animation: account-sheet-upload-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes account-sheet-upload-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
 .account-sheet__btn {
   padding: 10px 14px;
   border: 1px solid var(--color-border);

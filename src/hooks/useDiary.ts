@@ -190,6 +190,11 @@ async function prepareEntriesForSync(
 ): Promise<DiaryEntry[]> {
   const prepared: DiaryEntry[] = [];
   for (const entry of entries) {
+    const id = entry.id?.trim();
+    const date = entry.date?.trim();
+    const mood = String(entry.mood ?? '').trim();
+    if (!id || !date || !mood) continue;
+
     let imageUrl = entry.imageUrl;
     if (!imageUrl || isEmbeddedDataUrl(imageUrl)) {
       try {
@@ -203,17 +208,42 @@ async function prepareEntriesForSync(
         console.warn('[diary] sync image prepare failed', entry.id, err);
       }
     } else if (isEmbeddedDataUrl(imageUrl)) {
-      imageUrl = await resolveDiaryImageForSave(imageUrl);
+      try {
+        imageUrl = await resolveDiaryImageForSave(imageUrl);
+      } catch (err) {
+        console.warn('[diary] sync image upload failed', entry.id, err);
+        imageUrl = undefined;
+      }
     }
 
-    const { canvasState: _omit, ...rest } = entry;
+    const createdAt = toIsoOrNow(entry.createdAt);
+    const updatedAt = toIsoOrNow(entry.updatedAt, createdAt);
+
     prepared.push({
-      ...rest,
+      id,
+      date,
+      title: entry.title ?? '',
+      content: entry.content ?? '',
+      mood: mood as DiaryEntry['mood'],
+      moodPack: entry.moodPack,
+      fontId: entry.fontId,
+      fontSize: entry.fontSize,
+      createdAt,
+      updatedAt,
       imageUrl:
-        imageUrl && !isEmbeddedDataUrl(imageUrl) ? imageUrl : undefined,
+        imageUrl &&
+        (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
+          ? imageUrl
+          : undefined,
     });
   }
   return prepared;
+}
+
+function toIsoOrNow(value: string | undefined | null, fallback?: string): string {
+  if (value && !Number.isNaN(Date.parse(value))) return new Date(value).toISOString();
+  if (fallback && !Number.isNaN(Date.parse(fallback))) return new Date(fallback).toISOString();
+  return new Date().toISOString();
 }
 
 /** 일기 목록: 메타는 localStorage, 그림·레이어는 IndexedDB/HTTPS + 클라우드 동기화 */
@@ -261,18 +291,27 @@ export function useDiary() {
         console.error('[diary] save image failed', err);
         throw err instanceof Error ? err : new Error('그림 저장에 실패했어요');
       }
+      const next = [newEntry, ...loadEntries().filter((e) => e.id !== newEntry.id)];
+      if (!persistEntries(next)) {
+        console.error('[diary] meta persist failed after add');
+      }
       setEntries((prev) => {
-        const next = [newEntry, ...prev];
-        if (!persistEntries(next)) {
-          console.error('[diary] meta persist failed after add');
-        }
-        return next;
+        // 로컬스토리지에 없는 이미지/캔버스는 메모리 prev에서 유지
+        const byId = new Map(prev.map((e) => [e.id, e]));
+        return next.map((e) => {
+          if (e.id === newEntry.id) return newEntry;
+          const old = byId.get(e.id);
+          if (!old) return e;
+          return {
+            ...e,
+            imageUrl: e.imageUrl ?? old.imageUrl,
+            canvasState: e.canvasState ?? old.canvasState,
+          };
+        });
       });
-      setDeletedIds((prev) => {
-        const next = prev.filter((id) => id !== newEntry.id);
-        persistDeletedIds(next);
-        return next;
-      });
+      const deletedNext = loadDeletedIds().filter((id) => id !== newEntry.id);
+      persistDeletedIds(deletedNext);
+      setDeletedIds(deletedNext);
       return newEntry;
     },
     [],
@@ -288,8 +327,9 @@ export function useDiary() {
           throw err instanceof Error ? err : new Error('그림 저장에 실패했어요');
         }
       }
+      let next: DiaryEntry[] = [];
       setEntries((prev) => {
-        const next = prev.map((e) =>
+        next = prev.map((e) =>
           e.id === id
             ? { ...e, ...patch, updatedAt: new Date().toISOString() }
             : e,

@@ -76,6 +76,11 @@ export function getAccessToken(): string | null {
   return loadToken();
 }
 
+/** localStorage의 현재 세션 (React state보다 최신일 수 있음) */
+export function getAuthSession(): AuthSession | null {
+  return loadSession();
+}
+
 function sessionFromAuth(
   provider: AuthProvider,
   auth: Awaited<ReturnType<typeof loginAsGuest>>,

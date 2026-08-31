@@ -19,7 +19,7 @@ interface AccountSheetProps {
   onAvatarChange: (dataUrl: string | null) => void;
   /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
   onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
-  /** 탈퇴 시 이 기기 로컬 일기 비우기 */
+  /** Google 로그아웃·탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
   onClose: () => void;
   /** 네이티브 Google 로그인 후 시트 다시 열기 */
@@ -111,7 +111,7 @@ function AccountSheet({
   const onGoogleTokenRef = useRef<(idToken: string) => void>(() => {});
   const [nameDraft, setNameDraft] = useState(nickname);
   const [busy, setBusy] = useState(false);
-  const [authBusy, setAuthBusy] = useState<'google' | null>(null);
+  const [authBusy, setAuthBusy] = useState<'google' | 'sync' | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
@@ -339,7 +339,30 @@ function AccountSheet({
     }
   };
 
+  const handleUploadNow = async () => {
+    if (authBusy) return;
+    setAuthBusy('sync');
+    setAuthError(null);
+    try {
+      const result = await onSyncDiaries(null);
+      markSynced(result.serverTime);
+    } catch (err) {
+      console.warn('[account] upload failed', err);
+      const message =
+        err instanceof Error && err.message.trim()
+          ? err.message
+          : t('account.sync.errSync');
+      setAuthError(message);
+    } finally {
+      setAuthBusy(null);
+    }
+  };
+
   const handleSignOut = () => {
+    // 계정 전환 시 이전 Google 계정 일기가 다음 계정으로 올라가지 않도록 로컬 비움
+    if (cloudSignedIn) {
+      onClearLocalDiaries?.();
+    }
     signOut();
     nativeGoogleSignOut();
     // 친구 방용 게스트 세션 복구 (Google 없이도 공유 가능)
@@ -499,14 +522,46 @@ function AccountSheet({
             {session?.email ? (
               <p className="account-sheet__account-email">{session.email}</p>
             ) : null}
-            <p className="account-sheet__account-synced">
-              {t('account.sync.lastSyncedAt', {
-                time: formatLastSyncedAt(
-                  session?.lastSyncedAt ?? null,
-                  t('account.sync.never'),
-                ),
-              })}
-            </p>
+            <div className="account-sheet__synced-row">
+              <p className="account-sheet__account-synced">
+                {t('account.sync.lastSyncedAt', {
+                  time: formatLastSyncedAt(
+                    session?.lastSyncedAt ?? null,
+                    t('account.sync.never'),
+                  ),
+                })}
+              </p>
+              <button
+                type="button"
+                className={`account-sheet__upload-icon-btn${authBusy === 'sync' ? ' account-sheet__upload-icon-btn--busy' : ''}`}
+                disabled={authBusy !== null}
+                aria-label={
+                  authBusy === 'sync' ? t('account.sync.syncing') : t('account.sync.syncNow')
+                }
+                title={
+                  authBusy === 'sync' ? t('account.sync.syncing') : t('account.sync.syncNow')
+                }
+                onClick={() => void handleUploadNow()}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M12 16V6" />
+                  <path d="m8 10 4-4 4 4" />
+                  <path d="M4 18h16" />
+                </svg>
+              </button>
+            </div>
+            {authError ? <p className="account-sheet__error">{authError}</p> : null}
           </div>
         ) : null}
       </div>

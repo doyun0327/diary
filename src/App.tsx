@@ -29,7 +29,7 @@ import { useDiary } from "./hooks/useDiary";
 import { useCharacter } from "./hooks/useCharacter";
 import { useClientProfile } from "./hooks/useClientProfile";
 import { useScreenLock } from "./hooks/useScreenLock";
-import { getAccessToken, useAuthSession } from "./hooks/useAuthSession";
+import { getAccessToken, getAuthSession, useAuthSession } from "./hooks/useAuthSession";
 import {
   usePushOpenHandler,
   usePushRegistration,
@@ -235,12 +235,22 @@ function App() {
     setPage("detail");
   };
 
+  const syncChainRef = useRef<Promise<void>>(Promise.resolve());
+
+  /** Google 로그인 중이면 저장·삭제 직후 바로 서버 업로드 (연속 호출은 순서대로) */
   const syncInBackground = () => {
-    if (!getAccessToken() || session?.provider !== "google") return;
-    void syncWithCloud(session?.lastSyncedAt ?? null)
-      .then((result) => markSynced(result.serverTime))
+    const auth = getAuthSession();
+    if (!getAccessToken() || auth?.provider !== "google") return;
+
+    syncChainRef.current = syncChainRef.current
+      .then(async () => {
+        const latest = getAuthSession();
+        if (!getAccessToken() || latest?.provider !== "google") return;
+        const result = await syncWithCloud(latest.lastSyncedAt ?? null);
+        markSynced(result.serverTime);
+      })
       .catch((err) => {
-        console.warn("[sync] background failed", err);
+        console.warn("[sync] upload failed", err);
       });
   };
 
