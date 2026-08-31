@@ -500,34 +500,6 @@
   min-height: 280px;
 }
 
-.diary-write__ai-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--sheet-bg) 82%, transparent);
-  backdrop-filter: blur(6px);
-  z-index: 5;
-  overflow: hidden;
-}
-
-.diary-write__ai-lottie {
-  width: min(180px, 55%);
-  height: auto;
-}
-
-.diary-write__ai-loading-text {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-accent-text);
-}
-
 .diary-write__ai-pick {
   display: grid;
   grid-template-columns: 1fr 1fr;

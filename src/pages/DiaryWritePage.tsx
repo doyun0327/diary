@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLottie } from 'lottie-react';
 import type { DiaryEntry, DiarySticker } from '../types/diary';
 import { isMood, isNumberSticker, MOODS, NUMBER_STICKERS } from '../types/diary';
 import {
@@ -12,6 +11,7 @@ import {
   useMoodPackId,
 } from '../utils/moodPack';
 import type { CharacterProfile } from '../types/character';
+import AiLoadingWait from '../components/AiLoadingWait';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
@@ -45,15 +45,6 @@ import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import './DiaryWritePage.css';
-
-function AiLoadingLottie({ animationData }: { animationData: object }) {
-  const { View } = useLottie({
-    animationData,
-    loop: true,
-    autoplay: true,
-  });
-  return <div className="diary-write__ai-lottie">{View}</div>;
-}
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
 
@@ -665,12 +656,11 @@ function DiaryWritePage({
               onFontSizeChange={setFontSizeId}
             />
             {aiLoading && (
-              <div className="diary-write__ai-loading" aria-busy="true" aria-label={t('write.ai.drawStep')}>
-                {activeAiLottie && (
-                  <AiLoadingLottie key={aiLottieKey} animationData={activeAiLottie} />
-                )}
-                <p className="diary-write__ai-loading-text">{t('write.ai.statusDraw')}</p>
-              </div>
+              <AiLoadingWait
+                animationData={activeAiLottie}
+                lottieKey={aiLottieKey}
+                statusText={t('write.ai.statusDraw')}
+              />
             )}
             </div>
           </div>

@@ -66,17 +66,50 @@ function parseImageResult(data: DrawPayload): AiDrawResult {
     return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
   }
 
-  throw new Error('백엔드 응답에 이미지가 없습니다');
+  throw aiError('백엔드 응답에 이미지가 없습니다');
+}
+
+function humanizeAiError(message: string): string {
+  const lower = message.toLowerCase();
+  if (
+    lower.includes('quota exceeded') ||
+    lower.includes('exceeded your current quota') ||
+    lower.includes('free_tier_requests')
+  ) {
+    const retryMatch = message.match(/retry in ([\d.]+)\s*s/i);
+    if (retryMatch) {
+      const sec = Math.max(1, Math.ceil(Number.parseFloat(retryMatch[1])));
+      if (sec <= 180) {
+        return `AI 사용 한도에 잠시 걸렸어요. ${sec}초 후에 다시 시도해 주세요.`;
+      }
+    }
+    return 'AI 사용 한도에 걸렸어요. 1~2분 후에 다시 시도해 주세요.';
+  }
+  if (lower.includes('rate limit') || lower.includes('rate-limit')) {
+    return '그림 요청이 많아요. 잠시 후 다시 시도해 주세요';
+  }
+  if (
+    lower.includes('generativelanguage.googleapis.com') ||
+    lower.includes('google.dev/gemini') ||
+    lower.includes('model: gemini')
+  ) {
+    return 'AI 서버가 바빠서 그림을 만들지 못했어요. 잠시 후 다시 시도해 주세요.';
+  }
+  return message;
+}
+
+function aiError(message: string): Error {
+  return new Error(humanizeAiError(message));
 }
 
 async function readErrorMessage(response: Response, fallback: string): Promise<string> {
   try {
     const err = (await response.json()) as { message?: string };
-    if (err.message) return err.message;
+    if (err.message) return humanizeAiError(err.message);
   } catch {
     // ignore
   }
-  return fallback;
+  return humanizeAiError(fallback);
 }
 
 async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => void): Promise<AiDrawResult> {
@@ -110,7 +143,7 @@ async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => voi
       return parseImageResult(data);
     }
     if (status === 'failed') {
-      throw new Error(data.message?.trim() || '그림 생성에 실패했습니다');
+      throw aiError(data.message?.trim() || '그림 생성에 실패했습니다');
     }
 
     await sleep(POLL_INTERVAL_MS);
@@ -184,7 +217,7 @@ export async function generateDiaryImage(input: {
         'AI 그림 API가 아직 준비되지 않았어요 (501). 백엔드 SD 3.5 연동을 확인해 주세요';
     }
     message = await readErrorMessage(response, message);
-    throw new Error(message);
+    throw aiError(message);
   }
 
   const data = (await response.json()) as DrawPayload;

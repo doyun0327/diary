@@ -212,9 +212,10 @@ function DiaryDetailPage({
     setSharing(true);
     setFeedback(null);
 
+    let imageUrl: string | undefined;
     try {
       const nick = nickname.trim() || t('common.anonymous');
-      const [, imageUrl] = await Promise.all([
+      [, imageUrl] = await Promise.all([
         (async () => {
           if (!getAccessToken()) {
             await ensureGuestSession(clientId, nick);
@@ -232,7 +233,6 @@ function DiaryDetailPage({
     }
 
     const shareNick = nickname.trim() || t('common.anonymous');
-    const imageUrl = await prepareShareImage();
 
     const body = {
       diaryId: entry.id,
