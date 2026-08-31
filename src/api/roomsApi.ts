@@ -112,6 +112,18 @@ export function updateSharedDiary(
   );
 }
 
+/** 원본 일기 삭제 → 내가 공유한 방 게시글 전부 제거 */
+export function deleteSharedDiary(
+  diaryId: string,
+): Promise<{ deleted: number; roomIds: string[] }> {
+  return request<{ deleted: number; roomIds: string[] }>(
+    `/api/rooms/shared-diaries/${encodeURIComponent(diaryId)}`,
+    {
+      method: 'DELETE',
+    },
+  );
+}
+
 export function createRoom(
   name: string,
   nickname?: string,

@@ -44,7 +44,10 @@ import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import { clearWriteDraft } from "./utils/writeDraft";
-import { syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
+import {
+  syncSharedDiaryAfterDelete,
+  syncSharedDiaryAfterEdit,
+} from "./utils/syncSharedDiary";
 import {
   applyMonthlyUsageFromServer,
   consumeDiaryUsage,
@@ -314,6 +317,7 @@ function App() {
 
   const handleDelete = (id: string) => {
     removeEntry(id);
+    void syncSharedDiaryAfterDelete(id);
     syncInBackground();
   };
 

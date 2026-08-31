@@ -38,3 +38,17 @@ export async function syncSharedDiaryAfterEdit(
     console.warn('[rooms] shared diary sync failed', err);
   }
 }
+
+/** 일기 삭제 후, 친구방에 공유된 동일 일기 게시글을 서버에서 제거 */
+export async function syncSharedDiaryAfterDelete(diaryId: string): Promise<void> {
+  if (!getAccessToken() || !diaryId.trim()) return;
+
+  try {
+    const res = await roomsApi.deleteSharedDiary(diaryId);
+    for (const roomId of res.roomIds ?? []) {
+      invalidateRoomFeed(roomId);
+    }
+  } catch (err) {
+    console.warn('[rooms] shared diary delete failed', err);
+  }
+}
