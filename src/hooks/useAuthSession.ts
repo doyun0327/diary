@@ -136,6 +136,10 @@ export function useAuthSession() {
     if (current?.provider === 'google' && loadToken()) {
       return current;
     }
+    // 이미 게스트 JWT가 있으면 매번 /auth/guest 호출하지 않음
+    if (current?.provider === 'guest' && loadToken()) {
+      return current;
+    }
     const auth = await loginAsGuest(clientId.trim(), nick);
     const next = sessionFromAuth('guest', auth, current?.lastSyncedAt ?? null);
     saveToken(auth.accessToken);

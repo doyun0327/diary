@@ -18,8 +18,8 @@ import { letterAvatarDataUrl } from "../utils/letterAvatar";
 import {
   getCachedRoomsList,
   invalidateRoomsList,
-  setCachedRoomsList,
 } from "../utils/roomCache";
+import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
@@ -124,9 +124,10 @@ function RoomsHubPage({
       setPage(cached.page);
       setPageCount(Math.max(1, cached.totalPages));
       setLoading(false);
-    } else {
-      setLoading(true);
+      return;
     }
+
+    setLoading(true);
     setError(null);
     try {
       if (!shareReady) {
@@ -136,20 +137,16 @@ function RoomsHubPage({
         return;
       }
       await ensureAuth();
-      const result = await roomsApi.listRooms({
-        page: targetPage,
-        size: HUB_PAGE_SIZE,
-      });
-      setCachedRoomsList(result);
-      setRooms(result.content);
-      setPage(result.page);
-      setPageCount(Math.max(1, result.totalPages));
-    } catch (err) {
-      if (!cached) {
-        setError(err instanceof Error ? err.message : t("rooms.err.list"));
-        setRooms([]);
-        setPageCount(1);
+      const result = await prefetchRoomsList(targetPage, HUB_PAGE_SIZE);
+      if (result) {
+        setRooms(result.content);
+        setPage(result.page);
+        setPageCount(Math.max(1, result.totalPages));
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("rooms.err.list"));
+      setRooms([]);
+      setPageCount(1);
     } finally {
       setLoading(false);
     }
@@ -495,6 +492,7 @@ function RoomsHubPage({
                   <button
                     type="button"
                     className="rooms__polaroid-main"
+                    onPointerDown={() => void prefetchRoomFeed(room.id)}
                     onClick={() => onOpenRoom(room.id)}
                   >
                     {cover.kind === "image" ? (

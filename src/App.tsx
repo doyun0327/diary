@@ -44,10 +44,8 @@ import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth } from "./utils/date";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import { clearWriteDraft } from "./utils/writeDraft";
-import {
-  syncSharedDiaryAfterDelete,
-  syncSharedDiaryAfterEdit,
-} from "./utils/syncSharedDiary";
+import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
+import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import {
   applyMonthlyUsageFromServer,
   consumeDiaryUsage,
@@ -204,7 +202,9 @@ function App() {
     if (needsProfileSetup) return;
     if (getAccessToken()) return;
     const nick = nickname.trim() || t("common.anonymous");
-    void ensureGuestSession(clientId, nick).catch((err) => {
+    void ensureGuestSession(clientId, nick)
+      .then(() => prefetchRoomsList())
+      .catch((err) => {
       console.warn("[guest] auto session failed", err);
     });
   }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t]);
@@ -510,6 +510,7 @@ function App() {
   };
 
   const openRooms = () => {
+    void prefetchRoomsList();
     setActiveRoomId(null);
     setActivePostId(null);
     setPage("rooms");
@@ -740,6 +741,7 @@ function App() {
             onOpenAccount={() => setAccountOpen(true)}
             onBack={() => setPage("home")}
             onOpenRoom={(roomId) => {
+              void prefetchRoomFeed(roomId);
               setActiveRoomId(roomId);
               setActivePostId(null);
               setPage("room");

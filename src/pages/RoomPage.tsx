@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
-import * as roomsApi from '../api/roomsApi';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
@@ -14,8 +13,8 @@ import {
 } from '../utils/onboarding';
 import {
   getCachedRoomFeed,
-  setCachedRoomFeed,
 } from '../utils/roomCache';
+import { prefetchRoomFeed } from '../utils/roomPrefetch';
 import {
   isRoomPostUnread,
   markRoomPostSeen,
@@ -79,27 +78,25 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
       );
       setSeenTick((n) => n + 1);
       setLoading(false);
-    } else {
-      setLoading(true);
+      return;
     }
+
+    setLoading(true);
     setError(null);
     try {
-      const [detail, feed] = await Promise.all([
-        roomsApi.getRoom(roomId),
-        roomsApi.listRoomPosts(roomId),
-      ]);
-      setRoom(detail);
-      setPosts(feed);
-      setCachedRoomFeed(roomId, detail, feed);
-      syncRoomPostsSeenBaseline(
-        roomId,
-        feed.map((p) => p.id),
-      );
-      setSeenTick((n) => n + 1);
-    } catch (err) {
-      if (!cached) {
-        setError(err instanceof Error ? err.message : t('rooms.err.load'));
+      await prefetchRoomFeed(roomId);
+      const fresh = getCachedRoomFeed(roomId);
+      if (fresh) {
+        setRoom(fresh.room);
+        setPosts(fresh.posts);
+        syncRoomPostsSeenBaseline(
+          roomId,
+          fresh.posts.map((p) => p.id),
+        );
+        setSeenTick((n) => n + 1);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('rooms.err.load'));
     } finally {
       setLoading(false);
     }
