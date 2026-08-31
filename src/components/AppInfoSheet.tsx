@@ -15,6 +15,7 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('main');
 
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -79,6 +80,7 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
             </li>
           </ul>
         )}
+
 
         {view === 'legal' && (
           <div className="app-info__doc">

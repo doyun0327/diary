@@ -123,14 +123,19 @@
   text-align: left;
   font-family: inherit;
   cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+  box-sizing: border-box;
 }
+
+a.app-info__row:active,
+button.app-info__row:active {
+  transform: scale(0.99);
+}
+
 
 .app-info__row--static {
   cursor: default;
-}
-
-button.app-info__row:active {
-  transform: scale(0.99);
 }
 
 .app-info__row-label {

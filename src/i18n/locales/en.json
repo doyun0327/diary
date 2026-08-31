@@ -185,7 +185,7 @@
     },
     "sync": {
       "label": "Keep diaries across devices with Google",
-      "hint": "Sign in with Google to keep diaries in your app account and continue on another device.",
+      "hint": "Sign in to continue on another device.",
       "continueGoogle": "Continue with Google",
       "continueApple": "Continue with Apple",
       "signingIn": "Signing in…",

@@ -230,6 +230,30 @@
   color: var(--color-text-muted);
 }
 
+.account-sheet__block--sync {
+  margin-top: 4px;
+}
+
+.account-sheet__sync-intro {
+  margin-bottom: 12px;
+}
+
+.account-sheet__label--sync {
+  margin-bottom: 4px;
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-size: 0.92rem;
+  color: var(--color-text);
+}
+
+.account-sheet__sync-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 .account-sheet__label {
   display: block;
   margin: 0 0 6px;

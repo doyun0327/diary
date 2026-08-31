@@ -654,8 +654,13 @@ function AccountSheet({
           <>
             {photoSection}
             {nameSection}
-            <section className="account-sheet__block">
-              <p className="account-sheet__label">{t('account.sync.label')}</p>
+            <section className="account-sheet__block account-sheet__block--sync">
+              <div className="account-sheet__sync-intro">
+                <p className="account-sheet__label account-sheet__label--sync">
+                  {t('account.sync.label')}
+                </p>
+                <p className="account-sheet__sync-hint">{t('account.sync.hint')}</p>
+              </div>
               <div className="account-sheet__oauth">
                 <div
                   className={`account-sheet__google-slot${authBusy === 'google' ? ' is-busy' : ''}${!googleReady ? ' is-loading' : ''}${flutterNative ? ' is-native' : ''}`}
@@ -702,7 +707,6 @@ function AccountSheet({
                   ) : null}
                 </div>
                 {authError ? <p className="account-sheet__error">{authError}</p> : null}
-                <p className="account-sheet__sync-note">{t('account.sync.autoNote')}</p>
               </div>
             </section>
           </>
