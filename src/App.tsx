@@ -317,6 +317,9 @@ function App() {
 
   const handleDelete = (id: string) => {
     removeEntry(id);
+    setSelectedId(null);
+    setEditingId(null);
+    setPage("home");
     void syncSharedDiaryAfterDelete(id);
     syncInBackground();
   };

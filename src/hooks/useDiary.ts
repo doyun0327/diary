@@ -392,8 +392,11 @@ export function useDiary() {
       deletedIds: pendingDeletes,
     });
 
-    const merged = mergeDiaryEntries(localEntries, res.entries ?? [], [
-      ...pendingDeletes,
+    // 삭제·저장이 동기화 도중 일어날 수 있어 merge 직전에 최신 로컬을 다시 읽음
+    const latestDeletes = loadDeletedIds();
+    const latestLocal = await hydrateEntries(loadEntries());
+    const merged = mergeDiaryEntries(latestLocal, res.entries ?? [], [
+      ...latestDeletes,
       ...(res.deletedIds ?? []),
     ]);
 
@@ -402,10 +405,15 @@ export function useDiary() {
     setEntries(hydrated);
 
     const sentDeletes = new Set(pendingDeletes);
+    const serverEntryIds = new Set((res.entries ?? []).map((e) => e.id));
+    const serverDeleted = new Set(res.deletedIds ?? []);
     setDeletedIds((prev) => {
-      const next = prev.filter(
-        (id) => !sentDeletes.has(id) && !hydrated.some((e) => e.id === id),
-      );
+      const next = prev.filter((id) => {
+        if (!sentDeletes.has(id)) return true;
+        if (serverDeleted.has(id)) return false;
+        if (!serverEntryIds.has(id)) return false;
+        return true;
+      });
       persistDeletedIds(next);
       return next;
     });
