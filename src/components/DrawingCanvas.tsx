@@ -25,6 +25,8 @@ export interface DrawingCanvasHandle {
   clear: () => void;
   /** 캔버스에 그려 넣음 (AI 교체 등) */
   loadImage: (src: string) => Promise<void>;
+  /** 여러 사진 레이어를 나란히 올림 (AI 이전+새 선택 등) */
+  loadImages: (srcs: string[]) => Promise<void>;
   /** 수정 가능 사진 레이어로 올림 — 클릭 시 확대·취소·삭제 */
   loadEditableImage: (src: string) => Promise<void>;
   getCanvasState: () => DiaryCanvasState | null;
@@ -1098,6 +1100,55 @@ function DrawingCanvas({
       await ensureCanvasLayout();
       const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, true);
+    },
+    loadImages: async (srcs: string[]) => {
+      if (srcs.length === 0) return;
+      clearUndoStack();
+      clearInk();
+      hasDrawn.current = false;
+      photoImages.current.clear();
+      setPhotoLayers([]);
+      setActivePhotoId(null);
+      setStickerLayers([]);
+      setActiveStickerId(null);
+      await ensureCanvasLayout();
+
+      const canvas = canvasRef.current;
+      if (!canvas) throw new Error(t('canvas.err.noCanvas'));
+      const rect = canvas.getBoundingClientRect();
+      const n = srcs.length;
+      const fit = n > 1 ? 0.38 : 0.85;
+      const layers: PhotoLayer[] = [];
+
+      for (let i = 0; i < srcs.length; i++) {
+        const safeSrc = await resolveLayerSrc(srcs[i]);
+        const img = await loadHtmlImage(safeSrc);
+        const aspect = img.width / Math.max(1, img.height);
+        let width = rect.width * fit;
+        let height = width / aspect;
+        if (height > rect.height * fit) {
+          height = rect.height * fit;
+          width = height * aspect;
+        }
+        let x: number;
+        const y = (rect.height - height) / 2;
+        if (n > 1) {
+          const slotW = rect.width / n;
+          x = slotW * i + (slotW - width) / 2;
+        } else {
+          x = (rect.width - width) / 2;
+        }
+        const id = createId();
+        photoImages.current.set(id, img);
+        layers.push({ id, src: safeSrc, x, y, width, height, aspect, rotation: 0 });
+      }
+
+      setPhotoLayers(layers);
+      setActivePhotoId(null);
+      setMode('none');
+      setColorsOpen(false);
+      setFontOpen(false);
+      setStickerOpen(false);
     },
     loadEditableImage: async (src: string) => {
       clearUndoStack();

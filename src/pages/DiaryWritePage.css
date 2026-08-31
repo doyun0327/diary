@@ -528,6 +528,67 @@
   color: var(--color-accent-text);
 }
 
+.diary-write__ai-pick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+
+.diary-write__ai-pick-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px;
+  border: 2px solid color-mix(in srgb, var(--color-accent-text) 18%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--sheet-bg);
+  cursor: pointer;
+  text-align: center;
+}
+
+.diary-write__ai-pick-item--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.diary-write__ai-pick-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: calc(var(--radius-md) - 4px);
+  background: color-mix(in srgb, var(--color-accent-text) 6%, transparent);
+}
+
+.diary-write__ai-pick-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-accent-text);
+}
+
+.diary-write__ai-pick-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  opacity: 0;
+}
+
+.diary-write__ai-pick-item--selected .diary-write__ai-pick-check {
+  opacity: 1;
+}
+
 .diary-write__content {
   flex: 1;
   min-height: 140px;

@@ -471,7 +471,13 @@
       "rewardTitle": "Watch an ad for 1 AI draw",
       "rewardLead": "Watch the ad to the end to unlock one AI drawing.",
       "rewardCta": "Watch ad",
-      "adIncompleteTitle": "Please finish the ad"
+      "adIncompleteTitle": "Please finish the ad",
+      "pickTitle": "Which drawing to keep?",
+      "pickLead": "Pick one or both images to add to the canvas.",
+      "pickPrevious": "Previous",
+      "pickNew": "New",
+      "pickConfirm": "Add",
+      "pickSelectOne": "Select at least one image"
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",

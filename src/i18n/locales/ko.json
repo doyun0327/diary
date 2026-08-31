@@ -471,7 +471,13 @@
       "rewardTitle": "광고 보고 AI 그림 1회",
       "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
       "rewardCta": "광고 보기",
-      "adIncompleteTitle": "광고를 끝까지 봐 주세요"
+      "adIncompleteTitle": "광고를 끝까지 봐 주세요",
+      "pickTitle": "어떤 그림을 넣을까요?",
+      "pickLead": "원하는 그림을 골라 주세요. 둘 다 선택할 수도 있어요.",
+      "pickPrevious": "이전 그림",
+      "pickNew": "새 그림",
+      "pickConfirm": "넣기",
+      "pickSelectOne": "그림을 하나 이상 선택해 주세요"
     },
     "reward": {
       "saveTitle": "광고 보고 일기 1편 저장",

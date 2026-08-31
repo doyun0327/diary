@@ -108,10 +108,15 @@ function DiaryWritePage({
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
-  const [replaceConfirmOpen, setReplaceConfirmOpen] = useState(false);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
+  const [aiPickOpen, setAiPickOpen] = useState(false);
+  const [aiPickPrevious, setAiPickPrevious] = useState<string | null>(null);
+  const [aiPickNew, setAiPickNew] = useState<string | null>(null);
+  const [aiPickSelected, setAiPickSelected] = useState<Set<'previous' | 'new'>>(
+    () => new Set(['previous', 'new']),
+  );
   const [accessTick, setAccessTick] = useState(0);
   void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
@@ -351,10 +356,6 @@ function DiaryWritePage({
   };
 
   const startAiDrawFlow = () => {
-    if (canvasRef.current?.hasContent()) {
-      setReplaceConfirmOpen(true);
-      return;
-    }
     if (
       AI_REWARD_AD_ENABLED &&
       !getDiaryAccessState().isPremiumActive &&
@@ -381,7 +382,6 @@ function DiaryWritePage({
   };
 
   const runAiDraw = async () => {
-    setReplaceConfirmOpen(false);
     setAiError(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
@@ -406,18 +406,74 @@ function DiaryWritePage({
         }
       }
 
+      let previousSnapshot: string | null = null;
+      if (canvasRef.current?.hasContent()) {
+        await canvasRef.current.prepareExport();
+        previousSnapshot = canvasRef.current.toDataURL() ?? null;
+      }
+
       const { imageUrl } = await generateDiaryImage({
         title,
         content,
         character,
       });
-      await canvasRef.current?.loadImage(imageUrl);
-      drawingTouchedRef.current = true;
-      dismissAiCoach();
+
+      if (previousSnapshot) {
+        setAiPickPrevious(previousSnapshot);
+        setAiPickNew(imageUrl);
+        setAiPickSelected(new Set(['previous', 'new']));
+        setAiPickOpen(true);
+      } else {
+        await canvasRef.current?.loadImage(imageUrl);
+        drawingTouchedRef.current = true;
+        dismissAiCoach();
+      }
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  const dismissAiPick = () => {
+    setAiPickOpen(false);
+    setAiPickPrevious(null);
+    setAiPickNew(null);
+  };
+
+  const toggleAiPick = (choice: 'previous' | 'new') => {
+    setAiPickSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(choice)) next.delete(choice);
+      else next.add(choice);
+      return next;
+    });
+  };
+
+  const applyAiPick = async () => {
+    if (!aiPickPrevious || !aiPickNew) {
+      dismissAiPick();
+      return;
+    }
+    if (aiPickSelected.size === 0) {
+      setAiError(t('write.ai.pickSelectOne'));
+      return;
+    }
+
+    const selected = [...aiPickSelected];
+    dismissAiPick();
+
+    try {
+      if (selected.length === 1) {
+        const src = selected[0] === 'previous' ? aiPickPrevious : aiPickNew;
+        await canvasRef.current?.loadImage(src);
+      } else {
+        await canvasRef.current?.loadImages([aiPickPrevious, aiPickNew]);
+      }
+      drawingTouchedRef.current = true;
+      dismissAiCoach();
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
     }
   };
 
@@ -753,19 +809,6 @@ function DiaryWritePage({
           }}
         />
       )}
-      {replaceConfirmOpen && (
-        <AppModal
-          title={t('write.confirm.replaceTitle')}
-          lead={t('write.confirm.replaceWithAi')}
-          onDismiss={() => setReplaceConfirmOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setReplaceConfirmOpen(false)}
-          primaryLabel={t('write.confirm.replaceOk')}
-          onPrimary={() => void runAiDraw()}
-        />
-      )}
       {rewardPromptOpen && (
         <AppModal
           title={t('write.ai.rewardTitle')}
@@ -794,6 +837,43 @@ function DiaryWritePage({
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
         />
+      )}
+      {aiPickOpen && aiPickPrevious && aiPickNew && (
+        <AppModal
+          title={t('write.ai.pickTitle')}
+          lead={t('write.ai.pickLead')}
+          onDismiss={dismissAiPick}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={dismissAiPick}
+          primaryLabel={t('write.ai.pickConfirm')}
+          onPrimary={() => void applyAiPick()}
+        >
+          <div className="diary-write__ai-pick">
+            {(['previous', 'new'] as const).map((choice) => {
+              const src = choice === 'previous' ? aiPickPrevious : aiPickNew;
+              const label =
+                choice === 'previous' ? t('write.ai.pickPrevious') : t('write.ai.pickNew');
+              const checked = aiPickSelected.has(choice);
+              return (
+                <button
+                  key={choice}
+                  type="button"
+                  className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
+                  aria-pressed={checked}
+                  onClick={() => toggleAiPick(choice)}
+                >
+                  <img src={src} alt="" className="diary-write__ai-pick-thumb" />
+                  <span className="diary-write__ai-pick-label">{label}</span>
+                  <span className="diary-write__ai-pick-check" aria-hidden="true">
+                    {checked ? '✓' : ''}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </AppModal>
       )}
       {saveError && (
         <AppModal
