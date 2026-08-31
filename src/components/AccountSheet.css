@@ -248,7 +248,7 @@
 
 .account-sheet__sync-hint {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 500;
   line-height: 1.4;
   color: var(--color-text-muted);
