@@ -20,6 +20,11 @@
   overscroll-behavior-y: contain;
 }
 
+/* 상세·친구방 등 전체 화면 오버레이 — 바깥 main 스크롤이 본문을 밀어 가리지 않게 */
+.app main.app-main--overlay {
+  overflow: hidden;
+}
+
 @keyframes app-fade-in {
   from {
     opacity: 0;

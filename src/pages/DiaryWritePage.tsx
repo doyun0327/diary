@@ -17,7 +17,7 @@ import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { HAIR_STYLE_OPTIONS } from '../types/character';
-import { generateDiaryImage } from '../api/aiImage';
+import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
@@ -69,13 +69,18 @@ function scrollWritingFieldIntoView(el: HTMLElement | null) {
   });
 }
 
-/** 본문 높이 = 글 줄 수 + 빈 줄 1줄 (매 줄마다 다음 줄이 보이게) */
-function syncContentTextareaHeight(el: HTMLTextAreaElement | null) {
+/** 본문 높이 = 글 줄 수 (+ 입력 중일 때만 빈 줄 1줄) */
+function syncContentTextareaHeight(
+  el: HTMLTextAreaElement | null,
+  options?: { extraBlankLine?: boolean },
+) {
   if (!el) return;
   const lh = Number.parseFloat(getComputedStyle(el).lineHeight);
   if (!Number.isFinite(lh) || lh <= 0) return;
-  el.style.height = '0px';
-  el.style.height = `${el.scrollHeight + lh}px`;
+  el.style.removeProperty('height');
+  const contentHeight = el.scrollHeight;
+  const extra = options?.extraBlankLine ? lh : 0;
+  el.style.height = `${contentHeight + extra}px`;
 }
 interface DiaryWritePageProps {
   character: CharacterProfile;
@@ -119,6 +124,7 @@ function DiaryWritePage({
   const [canvasCollapsed, setCanvasCollapsed] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
   const [aiError, setAiError] = useState<string | null>(null);
   const [tipOpen, setTipOpen] = useState(false);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
@@ -418,6 +424,7 @@ function DiaryWritePage({
 
   const runAiDraw = async () => {
     setAiError(null);
+    setAiProgress('waiting');
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
@@ -451,6 +458,7 @@ function DiaryWritePage({
         title,
         content,
         character,
+        onProgress: setAiProgress,
       });
 
       const nextHistory = [...aiGeneratedImages, imageUrl];
@@ -597,10 +605,17 @@ function DiaryWritePage({
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-    syncContentTextareaHeight(e.target);
+    syncContentTextareaHeight(e.target, { extraBlankLine: true });
   };
 
-  const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
+  const aiStatusKey =
+    aiProgress === 'waiting'
+      ? 'write.ai.statusWaiting'
+      : aiProgress === 'drawing'
+        ? 'write.ai.statusDrawing'
+        : 'write.ai.statusFinishing';
+  const aiLabel = aiLoading ? t(aiStatusKey) : t('write.ai.button');
+  const aiStatusText = t(aiStatusKey);
 
   return (
     <form ref={formRef} className="diary-write" onSubmit={handleSubmit}>
@@ -734,7 +749,8 @@ function DiaryWritePage({
               <AiLoadingWait
                 animationData={activeAiLottie}
                 lottieKey={aiLottieKey}
-                statusText={t('write.ai.statusDraw')}
+                statusText={aiStatusText}
+                step={aiProgress}
               />
             )}
             </div>

@@ -14,6 +14,7 @@ import { prefetchRoomsList } from '../utils/roomPrefetch';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
+import DiaryDetailImage from '../components/DiaryDetailImage';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
@@ -448,9 +449,10 @@ function DiaryDetailPage({
         {entry.title && <h2 className="diary-detail__title">{entry.title}</h2>}
 
         {entry.imageUrl ? (
-          <div className="diary-detail__image">
-            <img src={entry.imageUrl} alt={entry.title ? t('detail.imageAltTitle', { title: entry.title }) : t('detail.imageAlt', { date: entry.date })} />
-          </div>
+          <DiaryDetailImage
+            src={entry.imageUrl}
+            alt={entry.title ? t('detail.imageAltTitle', { title: entry.title }) : t('detail.imageAlt', { date: entry.date })}
+          />
         ) : (
           <div className="diary-detail__image diary-detail__image--emoji">
             <MoodIcon mood={entry.mood} packId={entry.moodPack} size={80} />

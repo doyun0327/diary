@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, DiarySticker } from '../types/diary';
 import { isMood } from '../types/diary';
@@ -24,7 +25,7 @@ function toDateString(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-const CALENDAR_CELLS = 42;
+const CALENDAR_MAX_WEEKS = 6;
 
 function MoodCalendar({
   entries,
@@ -40,12 +41,13 @@ function MoodCalendar({
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const todayStr = toDateString(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekCount = Math.ceil((firstWeekday + daysInMonth) / 7);
 
   const cells: (number | null)[] = [
     ...Array<null>(firstWeekday).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
-  while (cells.length < CALENDAR_CELLS) cells.push(null);
+  while (cells.length < weekCount * 7) cells.push(null);
 
   const markByDate = new Map<string, DayMark>();
   for (const entry of entries) {
@@ -86,7 +88,15 @@ function MoodCalendar({
         ))}
       </div>
 
-      <div className="mood-cal__days">
+      <div
+        className="mood-cal__days"
+        style={
+          {
+            '--cal-weeks': weekCount,
+            '--cal-max-weeks': CALENDAR_MAX_WEEKS,
+          } as CSSProperties
+        }
+      >
         {cells.map((day, i) => {
           if (day === null) {
             return <span key={`blank-${i}`} className="mood-cal__day mood-cal__day--blank" aria-hidden />;

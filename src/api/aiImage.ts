@@ -16,8 +16,10 @@ export function extractSceneLine(content: string): string {
     .trim();
 }
 
-/** UI 진행 단계 (백엔드는 큐 접수 → 이미지 생성) */
-export type AiProgress = 'prompt' | 'image';
+/** UI 진행 단계 — 백엔드 queued / running / done 과 대응 */
+export type AiProgress = 'waiting' | 'drawing' | 'finishing';
+
+export const AI_PROGRESS_STEPS: AiProgress[] = ['waiting', 'drawing', 'finishing'];
 
 export interface AiDrawResult {
   imageUrl: string;
@@ -114,7 +116,7 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
 
 async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => void): Promise<AiDrawResult> {
   const started = Date.now();
-  onProgress?.('image');
+  onProgress?.('waiting');
 
   while (Date.now() - started < POLL_TIMEOUT_MS) {
     let response: Response;
@@ -140,10 +142,18 @@ async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => voi
     console.info('[AI] poll jobId=', jobId, 'status=', status);
 
     if (status === 'done') {
+      onProgress?.('finishing');
+      await sleep(450);
       return parseImageResult(data);
     }
     if (status === 'failed') {
       throw aiError(data.message?.trim() || '그림 생성에 실패했습니다');
+    }
+
+    if (status === 'running') {
+      onProgress?.('drawing');
+    } else {
+      onProgress?.('waiting');
     }
 
     await sleep(POLL_INTERVAL_MS);
@@ -187,7 +197,7 @@ export async function generateDiaryImage(input: {
   console.info('[AI] ===== POST /api/ai/draw =====');
   console.info('[AI] body:', payload);
 
-  input.onProgress?.('prompt');
+  input.onProgress?.('waiting');
 
   let response: Response;
   try {
@@ -232,6 +242,8 @@ export async function generateDiaryImage(input: {
   }
 
   // legacy sync 200 (이미지 바로 포함)
-  input.onProgress?.('image');
+  input.onProgress?.('drawing');
+  input.onProgress?.('finishing');
+  await sleep(450);
   return parseImageResult(data);
 }

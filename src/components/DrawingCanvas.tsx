@@ -277,6 +277,7 @@ function DrawingCanvas({
   const langFonts = fontsForLanguage(resolveAppLanguage(i18n.language));
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const dockBarRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stickerPanelRef = useRef<HTMLDivElement>(null);
@@ -366,6 +367,28 @@ function DrawingCanvas({
     const active = tabs.querySelector<HTMLElement>('.drawing__sticker-tab.active');
     active?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
   }, [stickerCategoryId, stickerOpen]);
+
+  /** 도구줄(dock-bar) 높이만큼 그리기 영역·저장에서 제외 */
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const dockBar = dockBarRef.current;
+    if (!wrap || !dockBar) return;
+
+    const syncDockReserve = () => {
+      const barH = dockBar.getBoundingClientRect().height;
+      const reserve = Math.ceil(barH + 16);
+      wrap.style.setProperty('--drawing-dock-reserve', `${reserve}px`);
+    };
+
+    syncDockReserve();
+    const ro = new ResizeObserver(syncDockReserve);
+    ro.observe(dockBar);
+    window.addEventListener('resize', syncDockReserve);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', syncDockReserve);
+    };
+  }, []);
 
   const applyPickerColor = (hue: number, light: number) => {
     const next = hslToHex(hue, 58, light);
@@ -993,22 +1016,7 @@ function DrawingCanvas({
       let inkUrl: string | undefined;
       if (hasInk && canvas.width > 1 && canvas.height > 1) {
         try {
-          // 투명 PNG, 최대 2×CSS — JPEG/trim 금지
-          const dprCap = Math.min(2, window.devicePixelRatio || 1);
-          const iw = Math.max(1, Math.round(vw * dprCap));
-          const ih = Math.max(1, Math.round(vh * dprCap));
-          if (iw === canvas.width && ih === canvas.height) {
-            inkUrl = canvas.toDataURL('image/png');
-          } else {
-            const inkCanvas = document.createElement('canvas');
-            inkCanvas.width = iw;
-            inkCanvas.height = ih;
-            const ictx = inkCanvas.getContext('2d');
-            if (ictx) {
-              ictx.drawImage(canvas, 0, 0, iw, ih);
-              inkUrl = inkCanvas.toDataURL('image/png');
-            }
-          }
+          inkUrl = canvas.toDataURL('image/png');
         } catch {
           inkUrl = undefined;
         }
@@ -1100,7 +1108,12 @@ function DrawingCanvas({
           }
         }
 
-        if (nextPhotos.length === 0 && fallbackSrc?.trim()) {
+        if (
+          nextPhotos.length === 0 &&
+          fallbackSrc?.trim() &&
+          !hasDrawn.current &&
+          !(state.stickers?.length)
+        ) {
           try {
             const safeSrc = await resolveLayerSrc(fallbackSrc.trim());
             const img = await loadHtmlImage(safeSrc);
@@ -1709,6 +1722,7 @@ function DrawingCanvas({
         onPointerDownCapture={handleWrapPinchCapture}
         onPointerDown={handleWrapBackgroundDown}
       >
+        <div className="drawing__canvas-stage">
         <div className="drawing__photo-layers">
           {photoLayers.map((layer) => {
             const isActive = activePhotoId === layer.id;
@@ -1867,6 +1881,7 @@ function DrawingCanvas({
             );
           })}
         </div>
+        </div>
 
         <div className="drawing__dock">
           {colorsOpen && mode === 'pen' && !editingOverlay && !fontOpen && (
@@ -2024,7 +2039,7 @@ function DrawingCanvas({
             </div>
           )}
 
-          <div className="drawing__dock-bar">
+          <div className="drawing__dock-bar" ref={dockBarRef}>
             <button
               type="button"
               className="drawing__dock-btn drawing__dock-btn--icon"

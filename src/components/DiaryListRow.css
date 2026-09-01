@@ -72,14 +72,15 @@
 
 .diary-row__thumb {
   flex: 0 0 auto;
+  align-self: center;
   width: 44px;
-  aspect-ratio: var(--diary-drawing-ratio);
   height: auto;
+  max-height: calc(44px * 1.38);
   padding: 3px;
   box-sizing: border-box;
   border-radius: 11px;
   object-fit: contain;
-  object-position: center;
+  object-position: center top;
   background: #ffffff;
   box-shadow: inset 0 0 0 1px var(--color-border-soft);
 }
@@ -88,10 +89,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
   width: 44px;
-  aspect-ratio: var(--diary-drawing-ratio);
-  height: auto;
+  height: calc(44px * 1.38);
+  flex: 0 0 auto;
+  padding: 3px;
+  box-sizing: border-box;
+  border-radius: 11px;
   font-size: 0.9rem;
   opacity: 0.28;
   background: var(--color-bg-muted);
+  box-shadow: inset 0 0 0 1px var(--color-border-soft);
 }

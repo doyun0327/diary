@@ -1,13 +1,15 @@
 .diary-detail {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 20;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   -webkit-overflow-scrolling: touch;
-  padding: 0 0 calc(32px + env(safe-area-inset-bottom));
-  margin: 0;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
   background: var(--color-bg);
 }
 
@@ -35,7 +37,9 @@
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
   /* 메인: 앱헤더↔달력과 동일 (diary-list padding-top: 10px) */
-  padding: 10px 0 16px;
+  /* 하단 여백은 스크롤 영역 안 — Flutter WebView safe-bottom(env 0) 대응 */
+  padding: 10px 0 calc(24px + max(env(safe-area-inset-bottom, 0px), var(--diary-safe-bottom, 0px)));
+  scroll-padding-bottom: calc(16px + max(env(safe-area-inset-bottom, 0px), var(--diary-safe-bottom, 0px)));
 }
 
 .diary-detail__back {
@@ -214,10 +218,6 @@
 .diary-detail__image {
   margin: 0;
   width: 100%;
-  aspect-ratio: var(--diary-drawing-ratio);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--color-border-soft);
@@ -225,21 +225,32 @@
   box-shadow: 0 4px 16px rgba(90, 60, 40, 0.06);
 }
 
+.diary-detail__image:has(> img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  line-height: 0;
+}
+
 .diary-detail__image img {
   width: 100%;
-  height: 100%;
+  height: auto;
   border-radius: 0;
   border: none;
   display: block;
-  object-fit: contain;
-  object-position: center;
+  vertical-align: top;
 }
 
 .diary-detail__image--emoji {
-  aspect-ratio: var(--diary-drawing-ratio);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: var(--diary-drawing-stage-ratio);
+  min-height: 120px;
 }
 
 .diary-detail__image--empty {
+  aspect-ratio: var(--diary-drawing-stage-ratio);
   background: var(--color-bg-soft);
 }
 

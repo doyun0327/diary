@@ -1,12 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from '../utils/date';
+import { useCroppedDiaryImage } from '../hooks/useCroppedDiaryImage';
 import MoodIcon from './MoodIcon';
 import './DiaryListRow.css';
 
 interface DiaryListRowProps {
   entry: DiaryEntry;
   onClick: () => void;
+}
+
+function DiaryRowThumb({ src, alt }: { src: string; alt: string }) {
+  const displaySrc = useCroppedDiaryImage(src);
+  return <img className="diary-row__thumb" src={displaySrc} alt={alt} decoding="async" />;
 }
 
 function DiaryListRow({ entry, onClick }: DiaryListRowProps) {
@@ -23,8 +29,7 @@ function DiaryListRow({ entry, onClick }: DiaryListRowProps) {
         <span className="diary-row__preview">{preview}</span>
       </span>
       {entry.imageUrl ? (
-        <img
-          className="diary-row__thumb"
+        <DiaryRowThumb
           src={entry.imageUrl}
           alt={t('diary.card.imageAlt', { date: entry.date })}
         />

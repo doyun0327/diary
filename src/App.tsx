@@ -740,7 +740,16 @@ function App() {
           },
         }}
       />
-      <main>
+      <main
+        className={
+          page === "detail" ||
+          page === "rooms" ||
+          page === "room" ||
+          page === "room-post"
+            ? "app-main--overlay"
+            : undefined
+        }
+      >
         {page === "home" && (
           <DiaryListPage
             entries={entries}

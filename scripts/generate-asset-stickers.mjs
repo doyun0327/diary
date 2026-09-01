@@ -23,6 +23,13 @@ export const PACK_STICKER_CATEGORY = {
 export function isAssetStickerSrc(value: string): boolean {
   return value.startsWith('/stikers/');
 }
+
+/** public/stikers 파일명에 공백·괄호가 있어도 브라우저에서 로드되게 인코딩 */
+export function toAssetStickerUrl(src: string): string {
+  if (!isAssetStickerSrc(src)) return src;
+  const parts = src.split('/').filter(Boolean);
+  return \`/\${parts.map(encodeURIComponent).join('/')}\`;
+}
 `;
 
 fs.writeFileSync(outFile, content, 'utf8');

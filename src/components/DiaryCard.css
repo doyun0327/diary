@@ -19,7 +19,7 @@
 }
 
 .diary-card__image {
-  aspect-ratio: var(--diary-drawing-ratio);
+  aspect-ratio: var(--diary-drawing-stage-ratio);
   display: flex;
   align-items: center;
   justify-content: center;
