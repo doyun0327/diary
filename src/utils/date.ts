@@ -30,3 +30,8 @@ export function today(): string {
   const d = String(now.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
+
+/** 달력·동기화용 YYYY-MM */
+export function monthKey(year: number, monthIndex: number): string {
+  return `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+}

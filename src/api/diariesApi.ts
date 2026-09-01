@@ -5,7 +5,16 @@ export interface DiarySyncRequest {
   since: string | null;
   entries: DiaryEntry[];
   deletedIds: string[];
+  /** YYYY-MM — 해당 월만 pull */
+  month?: string | null;
 }
+
+export type SyncCloudOptions = {
+  /** YYYY-MM — 없으면 서버가 전체 pull */
+  month?: string | null;
+  /** true면 업로드 없이 해당 월만 받기 */
+  pullOnly?: boolean;
+};
 
 export interface DiarySyncResponse {
   serverTime: string;
@@ -54,6 +63,7 @@ export async function syncDiaries(
       since: body.since,
       entries: body.entries,
       deletedIds: body.deletedIds,
+      month: body.month ?? null,
     }),
   });
   if (!res.ok) {

@@ -1,0 +1,45 @@
+.cloud-sync-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  background: var(--color-overlay);
+  backdrop-filter: blur(2px);
+}
+
+.cloud-sync-loading__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 280px;
+  padding: 28px 24px 24px;
+  border-radius: var(--radius-xl);
+  background: var(--sheet-bg);
+  box-shadow: var(--shadow-float);
+}
+
+.cloud-sync-loading__lottie {
+  flex-shrink: 0;
+  width: min(140px, 36vw);
+  height: min(140px, 36vw);
+}
+
+.cloud-sync-loading__lottie > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.cloud-sync-loading__text {
+  margin: 0;
+  font-family: var(--brand-font);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-text);
+}

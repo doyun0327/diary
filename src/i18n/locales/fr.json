@@ -212,7 +212,8 @@
       "errGoogleNetwork": "Vérifiez le réseau et réessayez",
       "errGoogleToken": "Jeton Google introuvable. Vérifiez le SHA-1 et l’ID client Web",
       "errSync": "Sync impossible",
-      "noAccountPhoto": "Ce compte n'a pas de photo"
+      "noAccountPhoto": "Ce compte n'a pas de photo",
+      "loadingDiaries": "Chargement de ton journal…"
     },
     "ok": {
       "nameSaved": "Nom enregistré",

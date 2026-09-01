@@ -212,7 +212,8 @@
       "errGoogleNetwork": "请检查网络后重试",
       "errGoogleToken": "未获取到 Google令牌。请检查 SHA-1 和 Web 客户端 ID",
       "errSync": "无法同步",
-      "noAccountPhoto": "此账号没有头像"
+      "noAccountPhoto": "此账号没有头像",
+      "loadingDiaries": "正在加载日记…"
     },
     "ok": {
       "nameSaved": "昵称已保存",

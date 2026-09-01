@@ -212,7 +212,8 @@
       "errGoogleNetwork": "Kiểm tra mạng và thử lại",
       "errGoogleToken": "Không lấy được mã Google. Kiểm tra SHA-1 và Web Client ID",
       "errSync": "Không đồng bộ được",
-      "noAccountPhoto": "Tài khoản này không có ảnh đại diện"
+      "noAccountPhoto": "Tài khoản này không có ảnh đại diện",
+      "loadingDiaries": "Đang tải nhật ký…"
     },
     "ok": {
       "nameSaved": "Đã lưu tên",

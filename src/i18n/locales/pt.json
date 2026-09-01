@@ -212,7 +212,8 @@
       "errGoogleNetwork": "Verifique a rede e tente de novo",
       "errGoogleToken": "Não obteve o token do Google. Confira o SHA-1 e o Web Client ID",
       "errSync": "Não foi possível sincronizar",
-      "noAccountPhoto": "Esta conta não tem foto de perfil"
+      "noAccountPhoto": "Esta conta não tem foto de perfil",
+      "loadingDiaries": "Carregando seu diário…"
     },
     "ok": {
       "nameSaved": "Nome salvo",

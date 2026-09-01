@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { syncDiaries } from '../api/diariesApi';
+import { syncDiaries, type SyncCloudOptions } from '../api/diariesApi';
 import { getAccessToken } from './useAuthSession';
 import type { DiaryCanvasState, DiaryEntry } from '../types/diary';
 import { mergeDiaryEntries } from '../utils/diarySync';
@@ -365,31 +365,37 @@ export function useDiary() {
 
   /**
    * 서버와 LWW 동기화.
-   * @param since 마지막 성공 동기화 시각 (없으면 전체 pull)
+   * @param since 마지막 성공 동기화 시각 (없으면 해당 월 전체 pull)
+   * @param options.month YYYY-MM — 해당 월만 pull
+   * @param options.pullOnly true면 로컬 업로드 없이 pull만
    */
-  const syncWithCloud = useCallback(async (since: string | null) => {
+  const syncWithCloud = useCallback(async (since: string | null, options?: SyncCloudOptions) => {
     const token = getAccessToken();
     if (!token) {
       throw new Error('로그인이 필요해요');
     }
 
-    const pendingDeletes = loadDeletedIds();
+    const pullOnly = options?.pullOnly === true;
+    const pendingDeletes = pullOnly ? [] : loadDeletedIds();
     const localEntries = await hydrateEntries(loadEntries());
-    const entriesForSync = await prepareEntriesForSync(localEntries);
+    const entriesForSync = pullOnly ? [] : await prepareEntriesForSync(localEntries);
 
-    // 업로드로 https가 생긴 항목은 로컬에도 반영
-    for (const synced of entriesForSync) {
-      if (!synced.imageUrl || isEmbeddedDataUrl(synced.imageUrl)) continue;
-      const local = localEntries.find((e) => e.id === synced.id);
-      if (local && local.imageUrl !== synced.imageUrl) {
-        local.imageUrl = synced.imageUrl;
+    if (!pullOnly) {
+      // 업로드로 https가 생긴 항목은 로컬에도 반영
+      for (const synced of entriesForSync) {
+        if (!synced.imageUrl || isEmbeddedDataUrl(synced.imageUrl)) continue;
+        const local = localEntries.find((e) => e.id === synced.id);
+        if (local && local.imageUrl !== synced.imageUrl) {
+          local.imageUrl = synced.imageUrl;
+        }
       }
     }
 
     const res = await syncDiaries(token, {
-      since,
+      since: pullOnly ? null : since,
       entries: entriesForSync,
       deletedIds: pendingDeletes,
+      month: options?.month ?? null,
     });
 
     // 삭제·저장이 동기화 도중 일어날 수 있어 merge 직전에 최신 로컬을 다시 읽음
@@ -407,16 +413,27 @@ export function useDiary() {
     const sentDeletes = new Set(pendingDeletes);
     const serverEntryIds = new Set((res.entries ?? []).map((e) => e.id));
     const serverDeleted = new Set(res.deletedIds ?? []);
-    setDeletedIds((prev) => {
-      const next = prev.filter((id) => {
-        if (!sentDeletes.has(id)) return true;
-        if (serverDeleted.has(id)) return false;
-        if (!serverEntryIds.has(id)) return false;
-        return true;
+    if (!pullOnly) {
+      setDeletedIds((prev) => {
+        const next = prev.filter((id) => {
+          if (!sentDeletes.has(id)) return true;
+          if (serverDeleted.has(id)) return false;
+          if (!serverEntryIds.has(id)) return false;
+          return true;
+        });
+        persistDeletedIds(next);
+        return next;
       });
-      persistDeletedIds(next);
-      return next;
-    });
+    } else if (serverDeleted.size > 0) {
+      setDeletedIds((prev) => {
+        const next = [...prev];
+        for (const id of serverDeleted) {
+          if (!next.includes(id)) next.push(id);
+        }
+        persistDeletedIds(next);
+        return next;
+      });
+    }
 
     return {
       serverTime: res.serverTime || new Date().toISOString(),

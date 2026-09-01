@@ -10,6 +10,7 @@ import {
 import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
 import { isFlutterApp } from '../utils/nativeShare';
 import './AccountSheet.css';
+import type { SyncCloudOptions } from '../api/diariesApi';
 
 interface AccountSheetProps {
   nickname: string;
@@ -17,13 +18,20 @@ interface AccountSheetProps {
   clientId: string;
   onNicknameChange: (name: string) => void;
   onAvatarChange: (dataUrl: string | null) => void;
-  /** 서버와 일기 동기화. lastSyncedAt(since) 전달 */
-  onSyncDiaries: (since: string | null) => Promise<{ serverTime: string; entryCount: number }>;
+  /** 서버와 일기 동기화 */
+  onSyncDiaries: (
+    since: string | null,
+    options?: SyncCloudOptions,
+  ) => Promise<{ serverTime: string; entryCount: number }>;
+  /** 메인 달력에 보이는 YYYY-MM */
+  syncMonth: string;
+  /** 로그인·동기화 후 달 fetch 중복 방지 */
+  onMonthSynced?: (month: string) => void;
   /** Google 로그아웃·탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
   onClose: () => void;
-  /** 네이티브 Google 로그인 후 시트 다시 열기 */
-  onRequestReopen?: () => void;
+  /** Google 로그인 후 일기 동기화 중 전체 화면 로딩 */
+  onCloudSyncLoadingChange?: (loading: boolean) => void;
 }
 
 const MAX_EDGE = 320;
@@ -99,9 +107,11 @@ function AccountSheet({
   onNicknameChange,
   onAvatarChange,
   onSyncDiaries,
+  syncMonth,
+  onMonthSynced,
   onClearLocalDiaries,
   onClose,
-  onRequestReopen,
+  onCloudSyncLoadingChange,
 }: AccountSheetProps) {
   const { t } = useTranslation();
   const { session, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
@@ -162,18 +172,21 @@ function AccountSheet({
   const finishGoogleSignIn = async (idToken: string) => {
     setAuthBusy('google');
     setAuthError(null);
+    onCloudSyncLoadingChange?.(true);
     try {
       const next = await signInWithGoogleIdToken(idToken);
       seedProfileFromAuth(next);
       try {
-        const result = await onSyncDiaries(null);
+        const result = await onSyncDiaries(null, { month: syncMonth });
         markSynced(result.serverTime);
+        onMonthSynced?.(syncMonth);
       } catch {
         // 로컬 로그인만 된 경우
       }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : t('account.sync.errSignIn'));
     } finally {
+      onCloudSyncLoadingChange?.(false);
       setAuthBusy(null);
     }
   };
@@ -265,6 +278,7 @@ function AccountSheet({
     void (async () => {
       try {
         const idToken = await signInPromise;
+        onCloudSyncLoadingChange?.(true);
         const next = await signInWithGoogleIdToken(idToken);
         const name = next.displayName.trim();
         if (name && !nickNow.trim()) {
@@ -293,12 +307,13 @@ function AccountSheet({
           }
         }
         try {
-          const result = await onSyncDiaries(null);
+          const result = await onSyncDiaries(null, { month: syncMonth });
           markSynced(result.serverTime);
+          onMonthSynced?.(syncMonth);
         } catch {
           // 로컬 로그인만 된 경우
         }
-        onRequestReopen?.();
+        onCloudSyncLoadingChange?.(false);
       } catch (err) {
         const reason = err instanceof Error ? err.message : '';
         const message = googleErrorMessage(reason);
@@ -306,7 +321,7 @@ function AccountSheet({
           window.alert(message);
         }
         console.warn('[google] native sign-in failed', err);
-        onRequestReopen?.();
+        onCloudSyncLoadingChange?.(false);
       } finally {
         setAuthBusy(null);
       }
@@ -344,8 +359,9 @@ function AccountSheet({
     setAuthBusy('sync');
     setAuthError(null);
     try {
-      const result = await onSyncDiaries(null);
+      const result = await onSyncDiaries(null, { month: syncMonth });
       markSynced(result.serverTime);
+      onMonthSynced?.(syncMonth);
     } catch (err) {
       console.warn('[account] upload failed', err);
       const message =

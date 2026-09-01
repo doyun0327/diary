@@ -212,7 +212,8 @@
       "errGoogleNetwork": "ネットワークを確認して再試行してください",
       "errGoogleToken": "Googleトークンを取得できませんでした。SHA-1とWebクライアントIDを確認してください",
       "errSync": "同期できませんでした",
-      "noAccountPhoto": "このアカウントにプロフィール写真がありません"
+      "noAccountPhoto": "このアカウントにプロフィール写真がありません",
+      "loadingDiaries": "日記を読み込んでいます"
     },
     "ok": {
       "nameSaved": "ニックネームを保存しました",

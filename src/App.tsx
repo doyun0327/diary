@@ -16,6 +16,7 @@ import DecorateSheet from "./components/DecorateSheet";
 import AppInfoSheet from "./components/AppInfoSheet";
 import SearchSheet from "./components/SearchSheet";
 import AppModal from "./components/AppModal";
+import CloudSyncLoadingOverlay from "./components/CloudSyncLoadingOverlay";
 import SubscriptionBenefitsSwipe from "./components/SubscriptionBenefitsSwipe";
 import { applyStoredFont } from "./components/FontPicker";
 import DiaryBookViewer from "./components/DiaryBookViewer";
@@ -41,7 +42,8 @@ import {
   markProfileSetupDone,
 } from "./utils/onboarding";
 import type { DiaryEntry } from "./types/diary";
-import { formatYearMonth } from "./utils/date";
+import { formatYearMonth, monthKey } from "./utils/date";
+import type { SyncCloudOptions } from "./api/diariesApi";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import { clearWriteDraft } from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
@@ -72,7 +74,7 @@ type SubscriptionModalReason = "write" | "search" | "export";
 
 function App() {
   const { t } = useTranslation();
-  const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries, syncWithCloud } =
+  const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries, syncWithCloud, ready } =
     useDiary();
   const { session, markSynced, ensureGuestSession } = useAuthSession();
   const { character, setCharacter } = useCharacter();
@@ -103,6 +105,7 @@ function App() {
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
+  const [cloudSyncLoading, setCloudSyncLoading] = useState(false);
   void accessTick;
 
   const accessStatus = getDiaryAccessState(entries.length);
@@ -239,23 +242,73 @@ function App() {
   };
 
   const syncChainRef = useRef<Promise<void>>(Promise.resolve());
+  const startupSyncQueuedRef = useRef(false);
+  const prevCalendarMonthRef = useRef<string | null>(null);
 
-  /** Google 로그인 중이면 저장·삭제 직후 바로 서버 업로드 (연속 호출은 순서대로) */
-  const syncInBackground = () => {
+  const viewMonthKey = monthKey(calYear, calMonth);
+
+  /** Google 로그인 중이면 서버와 LWW 동기화 (업·다운로드) */
+  const queueCloudSync = useCallback(
+    (options?: SyncCloudOptions) => {
+      const auth = getAuthSession();
+      if (!getAccessToken() || auth?.provider !== "google") return;
+
+      syncChainRef.current = syncChainRef.current
+        .then(async () => {
+          const latest = getAuthSession();
+          if (!getAccessToken() || latest?.provider !== "google") return;
+          const pullOnly = options?.pullOnly === true;
+          const month = options?.month ?? viewMonthKey;
+          const result = await syncWithCloud(pullOnly ? null : latest.lastSyncedAt ?? null, {
+            month,
+            pullOnly,
+          });
+          markSynced(result.serverTime);
+        })
+        .catch((err) => {
+          console.warn("[sync] cloud sync failed", err);
+        });
+    },
+    [syncWithCloud, markSynced, viewMonthKey],
+  );
+
+  useEffect(() => {
+    if (session?.provider !== "google") {
+      startupSyncQueuedRef.current = false;
+      prevCalendarMonthRef.current = null;
+    }
+  }, [session?.provider, session?.userId]);
+
+  /** 앱 켤 때 — 현재 달만 동기화 */
+  useEffect(() => {
+    if (!ready || startupSyncQueuedRef.current) return;
+    const auth = getAuthSession();
+    if (!getAccessToken() || auth?.provider !== "google") return;
+    startupSyncQueuedRef.current = true;
+    prevCalendarMonthRef.current = viewMonthKey;
+    queueCloudSync({ month: viewMonthKey });
+  }, [ready, queueCloudSync, viewMonthKey]);
+
+  /** 달력에서 다른 달로 이동할 때 — 해당 달만 받기 */
+  useEffect(() => {
+    if (!ready || page !== "home") return;
     const auth = getAuthSession();
     if (!getAccessToken() || auth?.provider !== "google") return;
 
-    syncChainRef.current = syncChainRef.current
-      .then(async () => {
-        const latest = getAuthSession();
-        if (!getAccessToken() || latest?.provider !== "google") return;
-        const result = await syncWithCloud(latest.lastSyncedAt ?? null);
-        markSynced(result.serverTime);
-      })
-      .catch((err) => {
-        console.warn("[sync] upload failed", err);
-      });
-  };
+    if (prevCalendarMonthRef.current === null) {
+      prevCalendarMonthRef.current = viewMonthKey;
+      return;
+    }
+    if (prevCalendarMonthRef.current === viewMonthKey) return;
+
+    prevCalendarMonthRef.current = viewMonthKey;
+    queueCloudSync({ month: viewMonthKey, pullOnly: true });
+  }, [calYear, calMonth, ready, page, queueCloudSync, viewMonthKey]);
+
+  /** 저장·삭제 직후 — 현재 달 기준 동기화 */
+  const syncInBackground = useCallback(() => {
+    queueCloudSync({ month: viewMonthKey });
+  }, [queueCloudSync, viewMonthKey]);
 
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
     entry,
@@ -789,10 +842,20 @@ function App() {
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
             onSyncDiaries={syncWithCloud}
+            syncMonth={viewMonthKey}
+            onMonthSynced={(month) => {
+              prevCalendarMonthRef.current = month;
+              startupSyncQueuedRef.current = true;
+            }}
             onClearLocalDiaries={clearLocalDiaries}
             onClose={() => setAccountOpen(false)}
-            onRequestReopen={() => setAccountOpen(true)}
+            onCloudSyncLoadingChange={setCloudSyncLoading}
           />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {cloudSyncLoading &&
+        createPortal(
+          <CloudSyncLoadingOverlay message={t("account.sync.loadingDiaries")} />,
           document.getElementById("root") ?? document.body,
         )}
       {languageOpen &&

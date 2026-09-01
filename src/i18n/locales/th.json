@@ -212,7 +212,8 @@
       "errGoogleNetwork": "ตรวจสอบเครือข่ายแล้วลองใหม่",
       "errGoogleToken": "ไม่ได้โทเค็น Google ตรวจสอบ SHA-1 และ Web Client ID",
       "errSync": "ซิงค์ไม่ได้",
-      "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์"
+      "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์",
+      "loadingDiaries": "กำลังโหลดไดอารี่…"
     },
     "ok": {
       "nameSaved": "บันทึกชื่อแล้ว",

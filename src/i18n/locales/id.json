@@ -212,7 +212,8 @@
       "errGoogleNetwork": "Periksa jaringan dan coba lagi",
       "errGoogleToken": "Token Google tidak didapat. Periksa SHA-1 dan Web Client ID",
       "errSync": "Gagal sinkron",
-      "noAccountPhoto": "Akun ini tidak punya foto profil"
+      "noAccountPhoto": "Akun ini tidak punya foto profil",
+      "loadingDiaries": "Memuat diary…"
     },
     "ok": {
       "nameSaved": "Nama disimpan",

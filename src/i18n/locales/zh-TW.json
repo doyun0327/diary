@@ -212,7 +212,8 @@
       "errGoogleNetwork": "請檢查網路後重試",
       "errGoogleToken": "未取得 Google 權杖。請檢查 SHA-1 和 Web 用戶端 ID",
       "errSync": "無法同步",
-      "noAccountPhoto": "此賬號沒有頭像"
+      "noAccountPhoto": "此賬號沒有頭像",
+      "loadingDiaries": "正在載入日記…"
     },
     "ok": {
       "nameSaved": "暱稱已保存",
