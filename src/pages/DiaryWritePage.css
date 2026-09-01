@@ -500,52 +500,6 @@
   min-height: 280px;
 }
 
-.diary-write__ai-mode {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 8px 0 4px;
-}
-
-.diary-write__ai-mode-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  padding: 14px 14px;
-  border: 2px solid color-mix(in srgb, var(--color-border-soft) 88%, transparent);
-  border-radius: var(--radius-md);
-  background: var(--sheet-bg);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.diary-write__ai-mode-btn:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--sheet-bg));
-}
-
-.diary-write__ai-mode-btn--full {
-  border-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
-}
-
-.diary-write__ai-mode-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-}
-
-.diary-write__ai-mode-desc {
-  font-size: 0.8rem;
-  font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: -0.02em;
-  color: var(--color-text-muted);
-}
-
 .diary-write__ai-pick {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));

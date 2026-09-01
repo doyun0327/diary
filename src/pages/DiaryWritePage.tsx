@@ -17,7 +17,7 @@ import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { HAIR_STYLE_OPTIONS } from '../types/character';
-import { generateDiaryImage, type AiDrawSceneMode } from '../api/aiImage';
+import { generateDiaryImage } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
@@ -108,7 +108,6 @@ function DiaryWritePage({
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
-  const [aiModeOpen, setAiModeOpen] = useState(false);
   const [aiPickOpen, setAiPickOpen] = useState(false);
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
@@ -358,23 +357,6 @@ function DiaryWritePage({
     return getRemainingFreeAiDraws() <= 0 && getAiDrawCredits() <= 0;
   };
 
-  const openAiModePicker = () => {
-    if (
-      AI_REWARD_AD_ENABLED &&
-      !getDiaryAccessState().isPremiumActive &&
-      getRemainingFreeAiDraws() <= 0 &&
-      getAiDrawCredits() <= 0
-    ) {
-      setRewardPromptOpen(true);
-      return;
-    }
-    setAiModeOpen(true);
-  };
-
-  const startAiDrawFlow = (sceneMode: AiDrawSceneMode) => {
-    void runAiDraw(sceneMode);
-  };
-
   const handleAiDraw = () => {
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
@@ -384,10 +366,10 @@ function DiaryWritePage({
       setRewardPromptOpen(true);
       return;
     }
-    openAiModePicker();
+    void runAiDraw();
   };
 
-  const runAiDraw = async (sceneMode: AiDrawSceneMode) => {
+  const runAiDraw = async () => {
     setAiError(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
@@ -422,7 +404,6 @@ function DiaryWritePage({
         title,
         content,
         character,
-        sceneMode,
       });
 
       const nextHistory = [...aiGeneratedImages, imageUrl];
@@ -514,7 +495,7 @@ function DiaryWritePage({
       return;
     }
     grantAiDrawCredits(1);
-    openAiModePicker();
+    void runAiDraw();
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -812,39 +793,6 @@ function DiaryWritePage({
           onPrimary={saveAndLeave}
         />
       )}
-      {aiModeOpen && (
-        <AppModal
-          title={t('write.ai.modeTitle')}
-          onDismiss={() => setAiModeOpen(false)}
-          showClose
-          closeAriaLabel={t('common.close')}
-        >
-          <div className="diary-write__ai-mode">
-            <button
-              type="button"
-              className="diary-write__ai-mode-btn"
-              onClick={() => {
-                setAiModeOpen(false);
-                startAiDrawFlow('wacky');
-              }}
-            >
-              <span className="diary-write__ai-mode-name">{t('write.ai.modeWacky')}</span>
-              <span className="diary-write__ai-mode-desc">{t('write.ai.modeWackyDesc')}</span>
-            </button>
-            <button
-              type="button"
-              className="diary-write__ai-mode-btn diary-write__ai-mode-btn--full"
-              onClick={() => {
-                setAiModeOpen(false);
-                startAiDrawFlow('full');
-              }}
-            >
-              <span className="diary-write__ai-mode-name">{t('write.ai.modeFull')}</span>
-              <span className="diary-write__ai-mode-desc">{t('write.ai.modeFullDesc')}</span>
-            </button>
-          </div>
-        </AppModal>
-      )}
       {aiConfirmOpen && (
         <AppModal
           title={t('quota.drawConfirmTitle')}
@@ -860,7 +808,7 @@ function DiaryWritePage({
           primaryLabel={t('quota.drawConfirmOk')}
           onPrimary={() => {
             setAiConfirmOpen(false);
-            openAiModePicker();
+            void runAiDraw();
           }}
         />
       )}
