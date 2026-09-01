@@ -141,6 +141,8 @@ function DiaryWritePage({
   void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
     date: initialEntry?.date ?? today(),
@@ -162,17 +164,21 @@ function DiaryWritePage({
   const paperRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  /** 수정 모드 — AI 선택지에 넣을 원본 그림 (캔버스 로드 전에도 사용) */
+  const editOriginalImageRef = useRef<string | null>(initialEntry?.imageUrl ?? null);
 
   useEffect(() => {
-    onNativeSaveStateChange?.(!aiLoading);
-  }, [aiLoading, onNativeSaveStateChange]);
+    savingRef.current = saving;
+    onNativeSaveStateChange?.(!aiLoading && !saving);
+  }, [aiLoading, saving, onNativeSaveStateChange]);
 
   useEffect(() => {
+    editOriginalImageRef.current = initialEntry?.imageUrl ?? null;
     setAiGeneratedImages([]);
     setAiPickOptions([]);
     setAiPickSelected(new Set());
     setAiPickOpen(false);
-  }, [initialEntry?.id]);
+  }, [initialEntry?.id, initialEntry?.imageUrl]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -188,10 +194,13 @@ function DiaryWritePage({
   }, [writePackId, isEdit]);
 
   useEffect(() => {
-    const onNativeSave = () => formRef.current?.requestSubmit();
+    const onNativeSave = () => {
+      if (savingRef.current || aiLoading) return;
+      formRef.current?.requestSubmit();
+    };
     window.addEventListener('diary-write-save', onNativeSave);
     return () => window.removeEventListener('diary-write-save', onNativeSave);
-  }, []);
+  }, [aiLoading]);
 
   useEffect(() => {
     const vv = window.visualViewport;
@@ -359,7 +368,7 @@ function DiaryWritePage({
       setLeaveConfirmOpen(false);
       return;
     }
-    if (aiLoading) return;
+    if (aiLoading || saving) return;
     if (isDirty()) {
       setLeaveConfirmOpen(true);
       return;
@@ -422,6 +431,14 @@ function DiaryWritePage({
     void runAiDraw();
   };
 
+  const capturePreviousSnapshot = async (): Promise<string | null> => {
+    if (canvasRef.current?.hasContent()) {
+      await canvasRef.current.prepareExport();
+      return canvasRef.current.toDataURL() ?? null;
+    }
+    return editOriginalImageRef.current ?? initialEntry?.imageUrl ?? null;
+  };
+
   const runAiDraw = async () => {
     setAiError(null);
     setAiProgress('waiting');
@@ -449,10 +466,7 @@ function DiaryWritePage({
       }
 
       let previousSnapshot: string | null = null;
-      if (canvasRef.current?.hasContent()) {
-        await canvasRef.current.prepareExport();
-        previousSnapshot = canvasRef.current.toDataURL() ?? null;
-      }
+      previousSnapshot = await capturePreviousSnapshot();
 
       const { imageUrl } = await generateDiaryImage({
         title,
@@ -470,7 +484,7 @@ function DiaryWritePage({
         dismissAiCoach();
       } else {
         const options: AiPickOption[] = [];
-        if (previousSnapshot && nextHistory.length === 1) {
+        if (previousSnapshot) {
           options.push({ src: previousSnapshot, kind: 'canvas' });
         }
         nextHistory.forEach((src, index) => {
@@ -555,6 +569,7 @@ function DiaryWritePage({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (saving || aiLoading) return;
     let imageUrl: string | undefined;
     let canvasState: DiaryCanvasState | undefined;
     try {
@@ -576,6 +591,7 @@ function DiaryWritePage({
     setAiError(null);
     setSaveError(null);
     clearWriteDraft();
+    setSaving(true);
     try {
       await onSave({
         date,
@@ -592,6 +608,8 @@ function DiaryWritePage({
       setSaveError(
         err instanceof Error ? err.message : t('write.err.saveFailed'),
       );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -630,7 +648,7 @@ function DiaryWritePage({
           <button
             type="submit"
             className="diary-write__nav-btn diary-write__nav-btn--save"
-            disabled={aiLoading}
+            disabled={aiLoading || saving}
           >
             {isEdit ? t('write.saveEdit') : t('write.save')}
           </button>

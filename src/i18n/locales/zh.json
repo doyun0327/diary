@@ -204,6 +204,8 @@
       "okSignedIn": "已登录。日记保存在账号中，换设备也能继续查看。",
       "okSignedInSynced": "已登录并同步日记",
       "okSignedOut": "已退出",
+      "okUploaded": "已上传",
+      "okUpToDate": "已是最新状态",
       "okSynced": "已同步（预览）",
       "errSignIn": "无法登录",
       "errGoogleNative": "Google 登录失败",
@@ -602,6 +604,7 @@
       "sns": "正在分享我的日记"
     },
     "err": {
+      "network": "请检查网络。",
       "roomShare": "无法分享到房间",
       "build": "无法创建分享图",
       "convert": "分享图转换失败",

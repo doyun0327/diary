@@ -204,6 +204,8 @@
       "okSignedIn": "Đã đăng nhập. Nhật ký lưu trong tài khoản trên mọi thiết bị.",
       "okSignedInSynced": "Đã đăng nhập và đồng bộ nhật ký",
       "okSignedOut": "Đã đăng xuất",
+      "okUploaded": "Đã tải lên",
+      "okUpToDate": "Đã là bản mới nhất",
       "okSynced": "Đã đồng bộ (xem trước)",
       "errSignIn": "Không đăng nhập được",
       "errGoogleNative": "Đăng nhập Google thất bại",
@@ -602,6 +604,7 @@
       "sns": "Đang chia sẻ nhật ký của tôi"
     },
     "err": {
+      "network": "Vui lòng kiểm tra mạng của bạn.",
       "roomShare": "Không chia sẻ được vào phòng",
       "build": "Không tạo được ảnh chia sẻ",
       "convert": "Chuyển đổi ảnh chia sẻ thất bại",

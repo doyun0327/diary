@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { syncDiaries, type SyncCloudOptions } from '../api/diariesApi';
+import { syncDiaries, type DiarySyncResult, type SyncCloudOptions } from '../api/diariesApi';
 import { getAccessToken } from './useAuthSession';
 import type { DiaryCanvasState, DiaryEntry } from '../types/diary';
 import { mergeDiaryEntries } from '../utils/diarySync';
@@ -182,6 +182,31 @@ function persistDeletedIds(ids: string[]) {
   } catch {
     // ignore
   }
+}
+
+function syncFingerprint(entries: DiaryEntry[]): string {
+  return [...entries]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map(
+      (e) =>
+        `${e.id}|${e.updatedAt}|${e.date}|${e.title}|${e.content}|${e.mood}|${e.imageUrl ?? ''}`,
+    )
+    .join('\n');
+}
+
+async function hasPendingImageUploads(entries: DiaryEntry[]): Promise<boolean> {
+  for (const entry of entries) {
+    if (entry.imageUrl && isEmbeddedDataUrl(entry.imageUrl)) return true;
+    try {
+      const fromIdb = await getDiaryImage(entry.id);
+      if (!fromIdb) continue;
+      if (isEmbeddedDataUrl(fromIdb)) return true;
+      if (!fromIdb.startsWith('http://') && !fromIdb.startsWith('https://')) return true;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
 }
 
 /** sync 전송용: https 그림만 담고 canvasState는 제외 */
@@ -378,6 +403,8 @@ export function useDiary() {
     const pullOnly = options?.pullOnly === true;
     const pendingDeletes = pullOnly ? [] : loadDeletedIds();
     const localEntries = await hydrateEntries(loadEntries());
+    const hadDeletes = !pullOnly && pendingDeletes.length > 0;
+    const hadUploads = !pullOnly && (await hasPendingImageUploads(localEntries));
     const entriesForSync = pullOnly ? [] : await prepareEntriesForSync(localEntries);
 
     if (!pullOnly) {
@@ -435,10 +462,14 @@ export function useDiary() {
       });
     }
 
+    const hadRemoteChanges =
+      syncFingerprint(latestLocal) !== syncFingerprint(hydrated);
+
     return {
       serverTime: res.serverTime || new Date().toISOString(),
       entryCount: hydrated.length,
-    };
+      upToDate: !hadDeletes && !hadUploads && !hadRemoteChanges,
+    } satisfies DiarySyncResult;
   }, []);
 
   const clearLocalDiaries = useCallback(() => {

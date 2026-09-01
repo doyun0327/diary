@@ -204,6 +204,8 @@
       "okSignedIn": "Sesión iniciada. Los diarios quedan en tu cuenta en todos los dispositivos.",
       "okSignedInSynced": "Sesión iniciada y diario sincronizado",
       "okSignedOut": "Sesión cerrada",
+      "okUploaded": "Subido",
+      "okUpToDate": "Ya está actualizado",
       "okSynced": "Sincronizado (vista previa)",
       "errSignIn": "No se pudo iniciar sesión",
       "errGoogleNative": "Error al iniciar sesión con Google",
@@ -602,6 +604,7 @@
       "sns": "Compartiendo mi diario"
     },
     "err": {
+      "network": "Comprueba tu conexión de red.",
       "roomShare": "No se pudo compartir en la sala",
       "build": "No se puede crear la imagen para compartir",
       "convert": "Falló la conversión de la imagen",

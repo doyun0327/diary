@@ -204,6 +204,8 @@
       "okSignedIn": "Conectado. Os diários ficam na conta em todos os dispositivos.",
       "okSignedInSynced": "Entrou e sincronizou o diário",
       "okSignedOut": "Desconectado",
+      "okUploaded": "Enviado",
+      "okUpToDate": "Já está atualizado",
       "okSynced": "Sincronizado (prévia)",
       "errSignIn": "Não foi possível entrar",
       "errGoogleNative": "Falha no login com Google",
@@ -602,6 +604,7 @@
       "sns": "Compartilhando meu diário"
     },
     "err": {
+      "network": "Verifique sua conexão de rede.",
       "roomShare": "Não foi possível compartilhar na sala",
       "build": "Não foi possível criar a imagem de compartilhamento",
       "convert": "Falha na conversão da imagem",

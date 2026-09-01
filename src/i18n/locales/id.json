@@ -204,6 +204,8 @@
       "okSignedIn": "Sudah masuk. Diary tersimpan di akun di semua perangkat.",
       "okSignedInSynced": "Masuk dan diary tersinkron",
       "okSignedOut": "Keluar",
+      "okUploaded": "Diunggah",
+      "okUpToDate": "Sudah terbaru",
       "okSynced": "Tersinkron (pratinjau)",
       "errSignIn": "Gagal masuk",
       "errGoogleNative": "Login Google gagal",
@@ -602,6 +604,7 @@
       "sns": "Membagikan diary saya"
     },
     "err": {
+      "network": "Periksa jaringan Anda.",
       "roomShare": "Tidak bisa bagikan ke ruang",
       "build": "Tidak bisa membuat gambar bagikan",
       "convert": "Konversi gambar bagikan gagal",

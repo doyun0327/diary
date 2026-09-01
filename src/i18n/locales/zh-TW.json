@@ -204,6 +204,8 @@
       "okSignedIn": "已登入。日記保存在帳號中，換裝置也能繼續查看。",
       "okSignedInSynced": "已登入並同步日記",
       "okSignedOut": "已退出",
+      "okUploaded": "已上傳",
+      "okUpToDate": "已是最新狀態",
       "okSynced": "已同步（預覽）",
       "errSignIn": "無法登錄",
       "errGoogleNative": "Google 登入失敗",
@@ -602,6 +604,7 @@
       "sns": "正在分享我的日記"
     },
     "err": {
+      "network": "請檢查網路。",
       "roomShare": "無法分享到房間",
       "build": "無法創建分享圖",
       "convert": "分享圖轉換失敗",

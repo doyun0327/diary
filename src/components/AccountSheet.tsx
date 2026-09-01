@@ -10,7 +10,7 @@ import {
 import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
 import { isFlutterApp } from '../utils/nativeShare';
 import './AccountSheet.css';
-import type { SyncCloudOptions } from '../api/diariesApi';
+import type { DiarySyncResult, SyncCloudOptions } from '../api/diariesApi';
 
 interface AccountSheetProps {
   nickname: string;
@@ -22,7 +22,7 @@ interface AccountSheetProps {
   onSyncDiaries: (
     since: string | null,
     options?: SyncCloudOptions,
-  ) => Promise<{ serverTime: string; entryCount: number }>;
+  ) => Promise<DiarySyncResult>;
   /** 메인 달력에 보이는 YYYY-MM */
   syncMonth: string;
   /** 로그인·동기화 후 달 fetch 중복 방지 */
@@ -124,6 +124,7 @@ function AccountSheet({
   const [authBusy, setAuthBusy] = useState<'google' | 'sync' | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
   /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
   const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(() => {
@@ -168,6 +169,12 @@ function AccountSheet({
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, [photoMenuOpen]);
+
+  useEffect(() => {
+    if (!authSuccess) return;
+    const timer = window.setTimeout(() => setAuthSuccess(null), 4000);
+    return () => window.clearTimeout(timer);
+  }, [authSuccess]);
 
   const finishGoogleSignIn = async (idToken: string) => {
     setAuthBusy('google');
@@ -358,10 +365,14 @@ function AccountSheet({
     if (authBusy) return;
     setAuthBusy('sync');
     setAuthError(null);
+    setAuthSuccess(null);
     try {
       const result = await onSyncDiaries(null, { month: syncMonth });
       markSynced(result.serverTime);
       onMonthSynced?.(syncMonth);
+      setAuthSuccess(
+        result.upToDate ? t('account.sync.okUpToDate') : t('account.sync.okUploaded'),
+      );
     } catch (err) {
       console.warn('[account] upload failed', err);
       const message =
@@ -578,6 +589,7 @@ function AccountSheet({
               </button>
             </div>
             {authError ? <p className="account-sheet__error">{authError}</p> : null}
+            {authSuccess ? <p className="account-sheet__success">{authSuccess}</p> : null}
           </div>
         ) : null}
       </div>

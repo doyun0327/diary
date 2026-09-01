@@ -22,6 +22,13 @@ export interface DiarySyncResponse {
   deletedIds: string[];
 }
 
+export interface DiarySyncResult {
+  serverTime: string;
+  entryCount: number;
+  /** 업로드·pull 할 변경 없이 완료 */
+  upToDate: boolean;
+}
+
 function authHeaders(accessToken: string): HeadersInit {
   return {
     Accept: 'application/json',

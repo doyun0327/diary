@@ -204,6 +204,8 @@
       "okSignedIn": "Connecté. Vos journaux restent dans le compte sur tous vos appareils.",
       "okSignedInSynced": "Connecté et journal synchronisé",
       "okSignedOut": "Déconnecté",
+      "okUploaded": "Téléversement terminé",
+      "okUpToDate": "Déjà à jour",
       "okSynced": "Synchronisé (aperçu)",
       "errSignIn": "Connexion impossible",
       "errGoogleNative": "Échec de la connexion Google",
@@ -602,6 +604,7 @@
       "sns": "Partage de mon journal"
     },
     "err": {
+      "network": "Vérifiez votre connexion réseau.",
       "roomShare": "Impossible de partager dans le salon",
       "build": "Impossible de créer l'image de partage",
       "convert": "Échec de la conversion de l'image de partage",

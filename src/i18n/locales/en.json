@@ -205,6 +205,8 @@
       "okSignedIn": "Signed in. Diaries are kept in your app account across devices.",
       "okSignedInSynced": "Signed in and updated your diaries across devices",
       "okSignedOut": "Signed out",
+      "okUploaded": "Uploaded",
+      "okUpToDate": "Already up to date",
       "okSynced": "Uploaded {{count}} diaries",
       "errSignIn": "Couldn't sign in",
       "errGoogleNative": "Google sign-in failed",
@@ -606,6 +608,7 @@
       "sns": "Sharing my diary"
     },
     "err": {
+      "network": "Please check your network.",
       "roomShare": "Couldn't share to room",
       "build": "Can't create share image",
       "convert": "Share image conversion failed",

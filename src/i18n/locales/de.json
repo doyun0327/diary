@@ -204,6 +204,8 @@
       "okSignedIn": "Angemeldet. Tagebücher bleiben geräteübergreifend im Konto.",
       "okSignedInSynced": "Angemeldet und Tagebuch synchronisiert",
       "okSignedOut": "Abgemeldet",
+      "okUploaded": "Hochgeladen",
+      "okUpToDate": "Bereits auf dem neuesten Stand",
       "okSynced": "{{count}} Tagebücher synchronisiert",
       "errSignIn": "Anmeldung fehlgeschlagen",
       "errGoogleNative": "Google-Anmeldung fehlgeschlagen",
@@ -603,6 +605,7 @@
       "sns": "Mein Tagebuch teilen"
     },
     "err": {
+      "network": "Bitte überprüfe deine Netzwerkverbindung.",
       "roomShare": "Teilen im Raum fehlgeschlagen",
       "build": "Teilbild kann nicht erstellt werden",
       "convert": "Teilbild-Konvertierung fehlgeschlagen",

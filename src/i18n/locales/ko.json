@@ -205,6 +205,8 @@
       "okSignedIn": "로그인했어요. 이 앱 계정에 일기가 보관돼 다른 기기에서도 이어 볼 수 있어요.",
       "okSignedInSynced": "로그인하고 기기 일기를 맞췄어요",
       "okSignedOut": "로그아웃했어요",
+      "okUploaded": "업로드했어요",
+      "okUpToDate": "이미 최신 상태예요",
       "okSynced": "일기 {{count}}편을 업로드했어요",
       "errSignIn": "로그인하지 못했어요",
       "errGoogleNative": "Google 로그인에 실패했어요",
@@ -606,6 +608,7 @@
       "sns": "내 diary를 SNS로 공유해요"
     },
     "err": {
+      "network": "네트워크를 확인해 주세요.",
       "roomShare": "방에 공유하지 못했어요",
       "build": "공유 이미지를 만들 수 없어요",
       "convert": "공유 이미지 변환에 실패했어요",

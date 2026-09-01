@@ -20,6 +20,7 @@ import {
   invalidateRoomsList,
 } from "../utils/roomCache";
 import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
+import { isNetworkError, resolveNetworkErrorTitle } from "../utils/networkError";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
@@ -109,7 +110,8 @@ function RoomsHubPage({
     if (getAccessToken()) return;
     try {
       await ensureGuestSession(clientId, nickname.trim());
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) throw err;
       throw new Error(t("rooms.err.guestAuth"));
     }
   };
@@ -144,7 +146,13 @@ function RoomsHubPage({
         setPageCount(Math.max(1, result.totalPages));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("rooms.err.list"));
+      setError(
+        resolveNetworkErrorTitle(
+          err,
+          t("share.err.network"),
+          t("rooms.err.list"),
+        ),
+      );
       setRooms([]);
       setPageCount(1);
     } finally {

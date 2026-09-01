@@ -169,6 +169,14 @@
   color: #b42318;
 }
 
+.account-sheet__success {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-accent-text);
+}
+
 .account-sheet__oauth-btn:disabled {
   opacity: 0.5;
   cursor: default;

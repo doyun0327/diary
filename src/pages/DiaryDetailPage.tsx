@@ -11,6 +11,7 @@ import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
 import { resolveEntryImageForRoomShare } from '../utils/resolveRoomShareImage';
 import { getCachedRoomsList, invalidateRoomFeed } from '../utils/roomCache';
 import { prefetchRoomsList } from '../utils/roomPrefetch';
+import { isNetworkError, resolveNetworkErrorTitle } from '../utils/networkError';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
@@ -57,6 +58,7 @@ function DiaryDetailPage({
   const [roomsPageCount, setRoomsPageCount] = useState(1);
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
+  const [roomsLoadError, setRoomsLoadError] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackModal>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -127,8 +129,10 @@ function DiaryDetailPage({
       setRoomsPage(cached.page);
       setRoomsPageCount(Math.max(1, cached.totalPages));
       setRoomsLoading(false);
+      setRoomsLoadError(null);
     } else {
       setRoomsLoading(true);
+      setRoomsLoadError(null);
     }
 
     try {
@@ -158,15 +162,22 @@ function DiaryDetailPage({
         setRooms(result.content);
         setRoomsPage(result.page);
         setRoomsPageCount(Math.max(1, result.totalPages));
+        setRoomsLoadError(null);
       }
       if (sharedIds) {
         setSharedRoomIds(sharedIds);
       }
     } catch (err) {
+      const title = resolveNetworkErrorTitle(
+        err,
+        t('share.err.network'),
+        t('detail.err.roomsList'),
+      );
       if (!cached) {
+        setRoomsLoadError(title);
         setFeedback({
           kind: 'info',
-          title: err instanceof Error ? err.message : t('detail.err.roomsList'),
+          title,
         });
         setRooms([]);
         setRoomsPage(0);
@@ -185,6 +196,7 @@ function DiaryDetailPage({
     setSelectedRoomIds([]);
     setSharedRoomIds([]);
     setRoomsPage(0);
+    setRoomsLoadError(null);
     knownRoomsRef.current.clear();
     void prepareShareImage();
     void loadRoomsPage(0, { includeShared: true });
@@ -228,7 +240,11 @@ function DiaryDetailPage({
       setSharing(false);
       setFeedback({
         kind: 'info',
-        title: err instanceof Error ? err.message : t('detail.err.roomsList'),
+        title: resolveNetworkErrorTitle(
+          err,
+          t('share.err.network'),
+          t('detail.err.roomsList'),
+        ),
       });
       return;
     }
@@ -281,7 +297,14 @@ function DiaryDetailPage({
           title: t('share.ok.partial', { n: okNames.length, fails: failNames.join(', ') }),
         });
       } else {
-        setFeedback({ kind: 'info', title: t('share.err.roomShare') });
+        const allNetwork = results.every(
+          (result) =>
+            result.status === 'rejected' && isNetworkError(result.reason),
+        );
+        setFeedback({
+          kind: 'info',
+          title: allNetwork ? t('share.err.network') : t('share.err.roomShare'),
+        });
       }
     } finally {
       setSharing(false);
@@ -561,7 +584,7 @@ function DiaryDetailPage({
                 {roomsLoading && <p className="diary-detail__room-empty">{t('share.roomsLoading')}</p>}
                 {!roomsLoading && rooms.length === 0 && (
                   <p className="diary-detail__room-empty">
-                    {t('share.roomsEmpty')}
+                    {roomsLoadError ?? t('share.roomsEmpty')}
                   </p>
                 )}
                 {!roomsLoading && rooms.length > 0 && (
