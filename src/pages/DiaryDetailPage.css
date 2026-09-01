@@ -262,7 +262,7 @@
 .diary-detail__content {
   margin: 0;
   min-height: 140px;
-  padding: 4px 4px 8px;
+  padding: 0 4px 8px;
   border: none;
   border-radius: 0;
   font-family: var(--diary-font);

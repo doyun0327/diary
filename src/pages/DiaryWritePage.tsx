@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, DiarySticker } from '../types/diary';
@@ -57,6 +57,25 @@ type AiPickOption = {
 function pickRandomLottie(pool: object[]): object | null {
   if (pool.length === 0) return null;
   return pool[Math.floor(Math.random() * pool.length)] ?? null;
+}
+
+function scrollWritingFieldIntoView(el: HTMLElement | null) {
+  if (!el) return;
+  const run = () => {
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  };
+  requestAnimationFrame(() => {
+    window.setTimeout(run, 320);
+  });
+}
+
+/** 본문 높이 = 글 줄 수 + 빈 줄 1줄 (매 줄마다 다음 줄이 보이게) */
+function syncContentTextareaHeight(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  const lh = Number.parseFloat(getComputedStyle(el).lineHeight);
+  if (!Number.isFinite(lh) || lh <= 0) return;
+  el.style.height = '0px';
+  el.style.height = `${el.scrollHeight + lh}px`;
 }
 interface DiaryWritePageProps {
   character: CharacterProfile;
@@ -134,6 +153,9 @@ function DiaryWritePage({
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const paperRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     onNativeSaveStateChange?.(!aiLoading);
@@ -164,6 +186,31 @@ function DiaryWritePage({
     window.addEventListener('diary-write-save', onNativeSave);
     return () => window.removeEventListener('diary-write-save', onNativeSave);
   }, []);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const paper = paperRef.current;
+    if (!vv || !paper) return;
+
+    const syncKeyboardInset = () => {
+      const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      paper.style.setProperty('--diary-keyboard-inset', `${inset}px`);
+    };
+
+    vv.addEventListener('resize', syncKeyboardInset);
+    vv.addEventListener('scroll', syncKeyboardInset);
+    syncKeyboardInset();
+
+    return () => {
+      vv.removeEventListener('resize', syncKeyboardInset);
+      vv.removeEventListener('scroll', syncKeyboardInset);
+      paper.style.removeProperty('--diary-keyboard-inset');
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    syncContentTextareaHeight(contentRef.current);
+  }, [content, fontId, fontSizeId]);
 
   useEffect(() => {
     if (isEdit) {
@@ -540,6 +587,19 @@ function DiaryWritePage({
     }
   };
 
+  const handleTitleFocus = () => {
+    scrollWritingFieldIntoView(titleRef.current);
+  };
+
+  const handleContentFocus = () => {
+    scrollWritingFieldIntoView(contentRef.current);
+  };
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+    syncContentTextareaHeight(e.target);
+  };
+
   const aiLabel = aiLoading ? t('write.ai.drawStep') : t('write.ai.button');
 
   return (
@@ -563,6 +623,7 @@ function DiaryWritePage({
       )}
 
       <div
+        ref={paperRef}
         className={`diary-write__paper${canvasCollapsed ? ' diary-write__paper--canvas-collapsed' : ''}`}
         style={{
           ['--diary-font' as string]: diaryFontStack(findFont(fontId).family),
@@ -620,10 +681,12 @@ function DiaryWritePage({
 
           <div className="diary-write__title-row">
             <input
+              ref={titleRef}
               type="text"
               className="diary-write__title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              onFocus={handleTitleFocus}
               placeholder={t('write.titlePlaceholder')}
               maxLength={40}
             />
@@ -773,9 +836,11 @@ function DiaryWritePage({
           )}
 
           <textarea
+            ref={contentRef}
             className="diary-write__content"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={handleContentChange}
+            onFocus={handleContentFocus}
             placeholder={t('write.contentPlaceholder')}
           />
           {aiError && <p className="diary-write__ai-error">{aiError}</p>}

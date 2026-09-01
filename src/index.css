@@ -10,7 +10,7 @@
   --diary-font: 'Gaegu', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans Thai',
     'Noto Sans', sans-serif;
   --diary-font-size: 1.2rem;
-  --diary-ruled-lh: 2.15em;
+  --diary-ruled-lh: 2.35;
   --diary-drawing-ratio: 1 / 1.55; /* 일기 그림 영역 공통 비율 (작은 그림도 프레임 유지) */
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
@@ -325,22 +325,38 @@ select {
   cursor: default;
 }
 
-/* 일기 본문 가로줄 — 언어·폰트와 무관하게 em 기준으로 줄 위에 글자가 앉음 */
+/* 일기 본문 가로줄 — 실제 line-height(lh)와 동기화해 줄마다 글자가 줄 위에 앉음 */
 .diary-write__content,
 .diary-detail__content {
   line-height: var(--diary-ruled-lh);
   background-color: transparent;
-  background-image: linear-gradient(
+  background-image: repeating-linear-gradient(
     to bottom,
-    transparent calc(var(--diary-ruled-lh) - 1px),
-    color-mix(in srgb, var(--color-border) 70%, transparent) 0
+    transparent,
+    transparent calc(var(--diary-ruled-lh) * 1em - 1px),
+    color-mix(in srgb, var(--color-border) 70%, transparent) calc(var(--diary-ruled-lh) * 1em - 1px),
+    color-mix(in srgb, var(--color-border) 70%, transparent) calc(var(--diary-ruled-lh) * 1em)
   );
-  background-size: 100% var(--diary-ruled-lh);
+  background-size: 100% calc(var(--diary-ruled-lh) * 1em);
   background-repeat: repeat-y;
   background-origin: content-box;
   background-clip: content-box;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+@supports (background-size: 1lh) {
+  .diary-write__content,
+  .diary-detail__content {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent calc(1lh - 1px),
+      color-mix(in srgb, var(--color-border) 70%, transparent) calc(1lh - 1px),
+      color-mix(in srgb, var(--color-border) 70%, transparent) 1lh
+    );
+    background-size: 100% 1lh;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

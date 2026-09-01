@@ -87,12 +87,14 @@
   min-height: 0;
   margin: 12px;
   padding: 18px;
+  padding-bottom: calc(18px + var(--diary-keyboard-inset, 0px));
   border-radius: var(--radius-xl);
   background: var(--color-surface);
   border: 1px solid var(--color-border-soft);
   /* auto면 절대 위치 코치 툴팁이 잘림 → y만 스크롤, x는 보이게 */
   overflow-x: visible;
   overflow-y: auto;
+  scroll-padding-bottom: calc(24px + var(--diary-keyboard-inset, 0px));
 }
 
 .diary-write__meta {
@@ -562,16 +564,27 @@
 }
 
 .diary-write__content {
-  flex: 1;
-  min-height: 140px;
-  padding: 4px 4px 8px;
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: calc(var(--diary-ruled-lh) * 2em);
+  padding: 0 4px 0;
   border: none;
   border-radius: 0;
   font-family: var(--diary-font);
   font-size: var(--diary-font-size, 1.2rem);
   color: var(--color-text);
   background-attachment: local;
+  background-origin: padding-box;
+  background-clip: padding-box;
+  overflow: hidden;
   resize: none;
+  appearance: none;
+}
+
+@supports (min-height: 2lh) {
+  .diary-write__content {
+    min-height: 2lh;
+  }
 }
 
 .diary-write__content:focus {
