@@ -830,7 +830,8 @@
     "sport": "スポーツ",
     "clothes": "衣類",
     "shape": "かたち",
-    "flag": "国旗"
+    "flag": "国旗",
+    "pack": "イラスト"
   },
   "lock": {
     "title": "Screen lock",

@@ -14,7 +14,9 @@ import {
 import { FontSizePicker } from './FontPicker';
 import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
-import { STICKER_CATEGORIES, type StickerCategoryId } from '../utils/stickers';
+import { isAssetStickerSrc, toAssetStickerUrl } from '../utils/assetStickers';
+import { getEmojiStickerImageUrl } from '../utils/emojiStickerImage';
+import { STICKER_CATEGORIES, stickerItemValue, type StickerCategoryId } from '../utils/stickers';
 import type { DiaryCanvasState } from '../types/diary';
 import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
@@ -59,6 +61,7 @@ interface PhotoLayer {
 interface StickerLayer {
   id: string;
   emoji: string;
+  imageSrc?: string;
   /** center x */
   x: number;
   /** center y */
@@ -249,7 +252,19 @@ const MAX_STICKER_SIZE = 140;
 const MIN_PHOTO_SIZE = 40;
 const MAX_UNDO = 30;
 const EMOJI_FONT =
-  '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+  '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
+
+function stickerDisplaySrc(value: string): string | null {
+  if (isAssetStickerSrc(value)) return toAssetStickerUrl(value);
+  return getEmojiStickerImageUrl(value);
+}
+
+function layerDisplaySrc(layer: StickerLayer): string | null {
+  if (layer.imageSrc) {
+    return isAssetStickerSrc(layer.imageSrc) ? toAssetStickerUrl(layer.imageSrc) : layer.imageSrc;
+  }
+  return getEmojiStickerImageUrl(layer.emoji);
+}
 
 function DrawingCanvas({
   ref,
@@ -264,6 +279,8 @@ function DrawingCanvas({
   const wrapRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const stickerPanelRef = useRef<HTMLDivElement>(null);
+  const stickerTabsRef = useRef<HTMLDivElement>(null);
   const hueWheelRef = useRef<HTMLDivElement>(null);
   const suppressResizeRef = useRef(false);
   const drawing = useRef(false);
@@ -274,6 +291,7 @@ function DrawingCanvas({
   const photoImages = useRef<Map<string, HTMLImageElement>>(new Map());
   const photoLayersRef = useRef<PhotoLayer[]>([]);
   const stickerLayersRef = useRef<StickerLayer[]>([]);
+  const stickerImages = useRef<Map<string, HTMLImageElement>>(new Map());
   const activePhotoIdRef = useRef<string | null>(null);
   const activeStickerIdRef = useRef<string | null>(null);
   const overlayPointers = useRef<Map<number, { x: number; y: number }>>(
@@ -319,8 +337,8 @@ function DrawingCanvas({
   const [fontOpen, setFontOpen] = useState(false);
   const [stickerCategoryId, setStickerCategoryId] =
     useState<StickerCategoryId>('face');
-  const [selectedSticker, setSelectedSticker] = useState<string>(
-    STICKER_CATEGORIES[0].items[0],
+  const [selectedSticker, setSelectedSticker] = useState<string>(() =>
+    stickerItemValue(STICKER_CATEGORIES[0].items[0]),
   );
   const [eraserSizeId, setEraserSizeId] =
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
@@ -330,6 +348,24 @@ function DrawingCanvas({
       setCustomPickerOpen(false);
     }
   }, [colorsOpen, mode, fontOpen]);
+
+  useEffect(() => {
+    if (!stickerOpen) return;
+    const panel = stickerPanelRef.current;
+    if (!panel) return;
+    const frame = window.requestAnimationFrame(() => {
+      panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [stickerOpen]);
+
+  useEffect(() => {
+    if (!stickerOpen) return;
+    const tabs = stickerTabsRef.current;
+    if (!tabs) return;
+    const active = tabs.querySelector<HTMLElement>('.drawing__sticker-tab.active');
+    active?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  }, [stickerCategoryId, stickerOpen]);
 
   const applyPickerColor = (hue: number, light: number) => {
     const next = hslToHex(hue, 58, light);
@@ -555,6 +591,20 @@ function DrawingCanvas({
     hasDrawn.current = true;
   };
 
+  const ensureStickerImage = (src: string): Promise<HTMLImageElement> => {
+    const cached = stickerImages.current.get(src);
+    if (cached) return Promise.resolve(cached);
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        stickerImages.current.set(src, img);
+        resolve(img);
+      };
+      img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
+      img.src = isAssetStickerSrc(src) ? toAssetStickerUrl(src) : src;
+    });
+  };
+
   const bakeStickerToCanvas = (layer: StickerLayer, targetCtx?: CanvasRenderingContext2D) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -562,6 +612,22 @@ function DrawingCanvas({
     if (!ctx) return;
 
     const dpr = targetCtx ? (canvas.width / canvas.getBoundingClientRect().width || 1) : 1;
+    if (layer.imageSrc) {
+      const img = stickerImages.current.get(layer.imageSrc);
+      if (!img) return;
+      const half = layer.size / 2;
+      ctx.save();
+      if (targetCtx) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      ctx.translate(layer.x, layer.y);
+      ctx.rotate(layer.rotation);
+      ctx.drawImage(img, -half, -half, layer.size, layer.size);
+      ctx.restore();
+      hasDrawn.current = true;
+      return;
+    }
+
     if (targetCtx) {
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -959,10 +1025,13 @@ function DrawingCanvas({
           height: p.height / vh,
         })),
         stickers: stickers.map((s) => ({
-          ...s,
+          id: s.id,
+          emoji: s.emoji,
+          ...(s.imageSrc ? { imageSrc: s.imageSrc } : {}),
           x: s.x / vw,
           y: s.y / vh,
           size: s.size / vw,
+          rotation: s.rotation,
         })),
         inkUrl,
       };
@@ -1060,18 +1129,29 @@ function DrawingCanvas({
         }
 
         setPhotoLayers(nextPhotos);
-        setStickerLayers(
-          (state.stickers ?? [])
-            .filter((s) => s?.emoji)
-            .map((s) => ({
-              id: s.id || createId(),
-              emoji: s.emoji,
-              x: normalized ? s.x * rect.width : s.x * sx,
-              y: normalized ? s.y * rect.height : s.y * sy,
-              size: normalized ? s.size * rect.width : s.size * ((sx + sy) / 2),
-              rotation: s.rotation || 0,
-            })),
-        );
+        const nextStickers: StickerLayer[] = [];
+        for (const s of state.stickers ?? []) {
+          if (!s?.emoji && !s?.imageSrc) continue;
+          const imageSrc = s.imageSrc ?? getEmojiStickerImageUrl(s.emoji) ?? undefined;
+          if (imageSrc) {
+            try {
+              await ensureStickerImage(imageSrc);
+            } catch (err) {
+              console.warn('[canvas] sticker image failed', err);
+              continue;
+            }
+          }
+          nextStickers.push({
+            id: s.id || createId(),
+            emoji: imageSrc ? '' : (s.emoji ?? ''),
+            imageSrc,
+            x: normalized ? s.x * rect.width : s.x * sx,
+            y: normalized ? s.y * rect.height : s.y * sy,
+            size: normalized ? s.size * rect.width : s.size * ((sx + sy) / 2),
+            rotation: s.rotation || 0,
+          });
+        }
+        setStickerLayers(nextStickers);
         setMode('none');
         setColorsOpen(false);
         setFontOpen(false);
@@ -1332,19 +1412,37 @@ function DrawingCanvas({
     });
   };
 
-  const placeStickerLayer = (emoji: string, x: number, y: number) => {
+  const placeStickerLayer = (value: string, x: number, y: number) => {
     confirmActiveOverlay();
-    const id = createId();
-    const layer: StickerLayer = {
-      id,
-      emoji,
-      x,
-      y,
-      size: DEFAULT_STICKER_SIZE,
-      rotation: 0,
+    const imageSrc = isAssetStickerSrc(value)
+      ? value
+      : (getEmojiStickerImageUrl(value) ?? undefined);
+
+    const addLayer = () => {
+      const id = createId();
+      const layer: StickerLayer = {
+        id,
+        emoji: imageSrc ? '' : value,
+        imageSrc,
+        x,
+        y,
+        size: DEFAULT_STICKER_SIZE,
+        rotation: 0,
+      };
+      setStickerLayers((prev) => [...prev, layer]);
+      setActiveStickerId(id);
     };
-    setStickerLayers((prev) => [...prev, layer]);
-    setActiveStickerId(id);
+
+    if (imageSrc) {
+      void ensureStickerImage(imageSrc)
+        .then(addLayer)
+        .catch(() => {
+          alert(t('canvas.err.imageLoad'));
+        });
+      return;
+    }
+
+    addLayer();
   };
 
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -1692,6 +1790,7 @@ function DrawingCanvas({
           {stickerLayers.map((layer) => {
             const isActive = activeStickerId === layer.id;
             const box = layer.size * 1.35;
+            const displaySrc = layerDisplaySrc(layer);
             return (
               <div
                 key={layer.id}
@@ -1707,7 +1806,17 @@ function DrawingCanvas({
                 onPointerDown={(e) => startStickerDrag(e, 'move', layer)}
               >
                 <span className="drawing__sticker-emoji" aria-hidden>
-                  {layer.emoji}
+                  {displaySrc ? (
+                    <img
+                      src={displaySrc}
+                      alt=""
+                      className="drawing__sticker-img"
+                      style={{ width: layer.size, height: layer.size }}
+                      draggable={false}
+                    />
+                  ) : (
+                    layer.emoji
+                  )}
                 </span>
                 {isActive && (
                   <>
@@ -1994,6 +2103,73 @@ function DrawingCanvas({
         </div>
       </div>
 
+      {stickerOpen && (
+        <div className="drawing__sticker-panel" ref={stickerPanelRef}>
+          <div className="drawing__sticker-panel-header">
+            <div className="drawing__sticker-panel-head">
+              <span>{t('canvas.stickerSheetTitle')}</span>
+              <button
+                type="button"
+                className="sheet-close-btn"
+                onClick={() => {
+                  setStickerOpen(false);
+                  setMode('none');
+                  setColorsOpen(false);
+                }}
+                aria-label={t('common.close')}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+
+            <div
+              className="drawing__sticker-tabs"
+              ref={stickerTabsRef}
+              role="tablist"
+              aria-label={t('canvas.stickerCatsAria')}
+            >
+              {STICKER_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={stickerCategoryId === cat.id}
+                  aria-label={t(`stickers.${cat.id}`)}
+                  title={t(`stickers.${cat.id}`)}
+                  className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}`}
+                  onClick={() => setStickerCategoryId(cat.id)}
+                >
+                  {cat.icon}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="drawing__stickers" role="tabpanel">
+            {(
+              STICKER_CATEGORIES.find((c) => c.id === stickerCategoryId)?.items ?? []
+            ).map((item, index) => {
+              const value = stickerItemValue(item);
+              const previewSrc = stickerDisplaySrc(value);
+              return (
+                <button
+                  key={`${stickerCategoryId}-${value}-${index}`}
+                  type="button"
+                  className={`${selectedSticker === value ? 'selected' : ''}${previewSrc ? ' drawing__stickers-btn--image' : ''}`}
+                  onClick={() => pickSticker(value)}
+                >
+                  {previewSrc ? (
+                    <img src={previewSrc} alt="" className="drawing__sticker-thumb" />
+                  ) : (
+                    value
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {fontOpen && (
         <div className="drawing__font-panel">
           <div className="drawing__sticker-panel-head">
@@ -2030,58 +2206,6 @@ function DrawingCanvas({
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {stickerOpen && (
-        <div className="drawing__sticker-panel">
-          <div className="drawing__sticker-panel-head">
-            <span>{t('canvas.stickerSheetTitle')}</span>
-            <button
-              type="button"
-              className="sheet-close-btn"
-              onClick={() => {
-                setStickerOpen(false);
-                setMode('none');
-                setColorsOpen(false);
-              }}
-              aria-label={t('common.close')}
-            >
-              <CloseIcon />
-            </button>
-          </div>
-
-          <div className="drawing__sticker-tabs" role="tablist" aria-label={t('canvas.stickerCatsAria')}>
-            {STICKER_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                role="tab"
-                aria-selected={stickerCategoryId === cat.id}
-                aria-label={t(`stickers.${cat.id}`)}
-                title={t(`stickers.${cat.id}`)}
-                className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}`}
-                onClick={() => setStickerCategoryId(cat.id)}
-              >
-                {cat.icon}
-              </button>
-            ))}
-          </div>
-
-          <div className="drawing__stickers" role="tabpanel">
-            {(
-              STICKER_CATEGORIES.find((c) => c.id === stickerCategoryId)?.items ?? []
-            ).map((emoji, index) => (
-              <button
-                key={`${stickerCategoryId}-${emoji}-${index}`}
-                type="button"
-                className={selectedSticker === emoji ? 'selected' : ''}
-                onClick={() => pickSticker(emoji)}
-              >
-                {emoji}
-              </button>
-            ))}
           </div>
         </div>
       )}

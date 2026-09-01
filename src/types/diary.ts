@@ -25,6 +25,7 @@ export interface DiaryCanvasPhoto {
 export interface DiaryCanvasSticker {
   id: string;
   emoji: string;
+  imageSrc?: string;
   x: number;
   y: number;
   size: number;

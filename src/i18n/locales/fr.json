@@ -830,7 +830,8 @@
     "sport": "Sports",
     "clothes": "Vêtements",
     "shape": "Formes",
-    "flag": "Drapeaux"
+    "flag": "Drapeaux",
+    "pack": "Illustrations"
   },
   "lock": {
     "title": "Screen lock",

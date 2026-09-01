@@ -1,4 +1,6 @@
-export const STICKER_CATEGORIES = [
+import { PACK_STICKER_CATEGORY } from './assetStickers';
+
+const BASE_STICKER_CATEGORIES = [
   {
     "id": "face",
     "label": "표정",
@@ -655,4 +657,12 @@ export const STICKER_CATEGORIES = [
   }
 ] as const;
 
+export type StickerItem = string | { readonly src: string };
+
+export const STICKER_CATEGORIES = [...BASE_STICKER_CATEGORIES, PACK_STICKER_CATEGORY] as const;
+
 export type StickerCategoryId = (typeof STICKER_CATEGORIES)[number]['id'];
+
+export function stickerItemValue(item: StickerItem): string {
+  return typeof item === 'string' ? item : item.src;
+}

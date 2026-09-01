@@ -830,7 +830,8 @@
     "sport": "Olahraga",
     "clothes": "Pakaian",
     "shape": "Bentuk",
-    "flag": "Bendera"
+    "flag": "Bendera",
+    "pack": "Ilustrasi"
   },
   "lock": {
     "title": "Screen lock",

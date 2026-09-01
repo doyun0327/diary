@@ -830,7 +830,8 @@
     "sport": "운동",
     "clothes": "의류",
     "shape": "도형",
-    "flag": "국기"
+    "flag": "국기",
+    "pack": "일러스트"
   },
   "lock": {
     "title": "화면 잠금",

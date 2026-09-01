@@ -830,7 +830,8 @@
     "sport": "Thể thao",
     "clothes": "Quần áo",
     "shape": "Hình dạng",
-    "flag": "Cờ"
+    "flag": "Cờ",
+    "pack": "Hình minh họa"
   },
   "lock": {
     "title": "Screen lock",

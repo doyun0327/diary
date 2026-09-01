@@ -830,7 +830,8 @@
     "sport": "Deportes",
     "clothes": "Ropa",
     "shape": "Formas",
-    "flag": "Banderas"
+    "flag": "Banderas",
+    "pack": "Ilustraciones"
   },
   "lock": {
     "title": "Screen lock",

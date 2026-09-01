@@ -830,7 +830,8 @@
     "sport": "运动",
     "clothes": "服饰",
     "shape": "形状",
-    "flag": "国旗"
+    "flag": "国旗",
+    "pack": "插画"
   },
   "lock": {
     "title": "Screen lock",
