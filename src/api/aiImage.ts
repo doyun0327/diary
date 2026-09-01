@@ -160,10 +160,14 @@ async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => voi
  *
  * 구버전 동기 200 응답도 그대로 지원.
  */
+/** wacky = LLM 없음, full = Gemini 장면 해석 */
+export type AiDrawSceneMode = 'wacky' | 'full';
+
 export async function generateDiaryImage(input: {
   title?: string;
   content: string;
   character?: CharacterProfile;
+  sceneMode?: AiDrawSceneMode;
   onProgress?: (step: AiProgress) => void;
 }): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
@@ -181,6 +185,7 @@ export async function generateDiaryImage(input: {
     diaryLine,
     title: title || undefined,
     character,
+    sceneMode: input.sceneMode ?? 'wacky',
   };
 
   console.info('[AI] ===== POST /api/ai/draw =====');

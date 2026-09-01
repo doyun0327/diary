@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "Chọc!",
     "pokePushBody": "{{name}}~ viết nhật ký đi",
-    "pokeSent": "Đã chọc!"
+    "pokeSent": "Đã chọc!",
+    "membersAria": "Thành viên phòng",
+    "membersMoreAria": "Xem thêm {{n}} thành viên",
+    "membersPanelAria": "Danh sách thành viên",
+    "pokeAction": "Chọc",
+    "pokeHint": "Chọc {{name}}",
+    "pokeAria": "Chọc {{name}}",
+    "pokeSelf": "Bạn không thể tự chọc mình",
+    "pokeWait": "Đợi một chút rồi chọc lại",
+    "pokeNeedLogin": "Đăng nhập để chọc",
+    "pokeFail": "Không gửi được chọc",
+    "sharePushBody": "Đã chia sẻ nhật ký!",
+    "commentPushBody": "Đã bình luận!",
+    "postNew": "N",
+    "postNewAria": "Nhật ký mới"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "Dùng thử quyền lợi PRO miễn phí 7 ngày!",
+    "trialSub": "5 ảnh AI · Tìm kiếm · Xuất"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "Xem quảng cáo để vẽ AI 1 lần",
       "rewardLead": "Xem hết quảng cáo để mở khóa một lần vẽ AI.",
       "rewardCta": "Xem quảng cáo",
-      "adIncompleteTitle": "Hãy xem hết quảng cáo"
+      "adIncompleteTitle": "Hãy xem hết quảng cáo",
+      "modeTitle": "Chọn chế độ nào?",
+      "modeWacky": "Chế độ vui nhộn",
+      "modeWackyDesc": "Vẽ nhanh. Đôi khi có thể hơi lạ.",
+      "modeFull": "Chế độ tinh tế",
+      "modeFullDesc": "Hiểu nội dung nhật ký và vẽ chi tiết hơn.",
+      "starHint": "Chạm vào các ngôi sao rơi",
+      "starScore": "{{count}} ngôi",
+      "starTap": "Bắt sao",
+      "puzzleHint": "Chạm mảnh cạnh ô trống",
+      "puzzleDone": "Xong!",
+      "puzzleAria": "Xếp hình trượt",
+      "puzzleTile": "Mảnh {{n}}",
+      "pickTitle": "Giữ hình nào?",
+      "pickLead": "Chọn hình bạn muốn. Có thể chọn nhiều hình.",
+      "pickPrevious": "Hình trước",
+      "pickNth": "Hình {{n}}",
+      "pickNew": "Hình mới",
+      "pickConfirm": "Thêm",
+      "pickSelectOne": "Chọn ít nhất một hình"
     },
     "confirm": {
       "replaceTitle": "Tranh AI",
@@ -473,11 +508,22 @@
       "adNotCompleted": "Bạn cần xem hết quảng cáo mới vẽ được bằng AI.",
       "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
       "aiFreeLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
-      "aiDailyLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí."
+      "aiDailyLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
+      "saveFailed": "Không lưu được nhật ký",
+      "adNotCompletedWrite": "Xem hết quảng cáo để lưu nhật ký này"
     },
     "coach": {
       "character": "Chọn nhân vật để AI vẽ đúng bạn",
       "ai": "Viết nhật ký rồi để AI vẽ nhé"
+    },
+    "saving": "Đang lưu…",
+    "savingPrep": "Đang chuẩn bị hình…",
+    "savingImage": "Đang lưu hình…",
+    "savingDone": "Xong!",
+    "reward": {
+      "saveTitle": "Xem quảng cáo để lưu 1 nhật ký",
+      "saveLead": "Đã đạt giới hạn. Xem quảng cáo để lưu thêm 1 bài.",
+      "saveLeadPremium": "Đã đạt giới hạn tháng (50 bài). Xem quảng cáo để lưu thêm 1 bài."
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "Xem sổ nhật ký",
     "err": {
       "pdf": "Lưu PDF thất bại"
-    }
+    },
+    "month": "Tháng cần xuất",
+    "monthHint": "Bạn có thể xuất từng tháng một"
   },
   "book": {
     "dialogAria": "Xem sổ nhật ký",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "Xoay",
     "removeOverlay": "Gỡ",
-    "undo": "Hoàn tác"
+    "undo": "Hoàn tác",
+    "photoCancel": "Hủy",
+    "photoConfirm": "Xong"
   },
   "font": {
     "dialogAria": "Chọn phông chữ",

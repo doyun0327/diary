@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "Colek!",
     "pokePushBody": "{{name}}~ ayo tulis diary",
-    "pokeSent": "Colek terkirim!"
+    "pokeSent": "Colek terkirim!",
+    "membersAria": "Anggota ruang",
+    "membersMoreAria": "Tampilkan {{n}} anggota lagi",
+    "membersPanelAria": "Daftar anggota",
+    "pokeAction": "Colek",
+    "pokeHint": "Colek {{name}}",
+    "pokeAria": "Colek {{name}}",
+    "pokeSelf": "Kamu tidak bisa mencolek diri sendiri",
+    "pokeWait": "Tunggu sebentar sebelum mencolek lagi",
+    "pokeNeedLogin": "Masuk untuk mencolek",
+    "pokeFail": "Gagal mengirim colek",
+    "sharePushBody": "Membagikan diary!",
+    "commentPushBody": "Meninggalkan komentar!",
+    "postNew": "N",
+    "postNewAria": "Diary baru"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "Nikmati benefit PRO gratis selama 7 hari!",
+    "trialSub": "5 gambar AI · Pencarian · Ekspor"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "Tonton iklan untuk 1 gambar AI",
       "rewardLead": "Tonton iklan sampai selesai untuk membuka satu gambar AI.",
       "rewardCta": "Tonton iklan",
-      "adIncompleteTitle": "Selesaikan iklan"
+      "adIncompleteTitle": "Selesaikan iklan",
+      "modeTitle": "Mode apa?",
+      "modeWacky": "Mode kocak",
+      "modeWackyDesc": "Gambar cepat. Kadang hasilnya agak aneh.",
+      "modeFull": "Mode halus",
+      "modeFullDesc": "Menafsirkan diary-mu dan menggambar lebih detail.",
+      "starHint": "Ketuk bintang yang jatuh",
+      "starScore": "{{count}} tertangkap",
+      "starTap": "Tangkap bintang",
+      "puzzleHint": "Ketuk ubin di samping ruang kosong",
+      "puzzleDone": "Selesai!",
+      "puzzleAria": "Puzzle geser",
+      "puzzleTile": "Potongan {{n}}",
+      "pickTitle": "Gambar mana yang dipakai?",
+      "pickLead": "Pilih gambar yang kamu mau. Bisa lebih dari satu.",
+      "pickPrevious": "Sebelumnya",
+      "pickNth": "Ke-{{n}}",
+      "pickNew": "Baru",
+      "pickConfirm": "Tambahkan",
+      "pickSelectOne": "Pilih minimal satu gambar"
     },
     "confirm": {
       "replaceTitle": "Gambar AI",
@@ -473,11 +508,22 @@
       "adNotCompleted": "Anda harus menonton iklan sampai selesai untuk menggambar dengan AI.",
       "adAppOnly": "Iklan hanya tersedia di aplikasi",
       "aiFreeLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
-      "aiDailyLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis."
+      "aiDailyLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
+      "saveFailed": "Gagal menyimpan diary",
+      "adNotCompletedWrite": "Selesaikan iklan untuk menyimpan diary ini"
     },
     "coach": {
       "character": "Atur dirimu agar AI menggambarmu",
       "ai": "Tulis diary, lalu biarkan AI menggambar"
+    },
+    "saving": "Menyimpan…",
+    "savingPrep": "Menyiapkan gambar…",
+    "savingImage": "Menyimpan gambar…",
+    "savingDone": "Selesai!",
+    "reward": {
+      "saveTitle": "Tonton iklan untuk simpan 1 diary",
+      "saveLead": "Batas tercapai. Tonton iklan untuk simpan satu lagi.",
+      "saveLeadPremium": "Batas bulanan (50 entri) tercapai. Tonton iklan untuk simpan satu lagi."
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "Lihat buku diary",
     "err": {
       "pdf": "Gagal menyimpan PDF"
-    }
+    },
+    "month": "Bulan untuk diekspor",
+    "monthHint": "Kamu bisa mengekspor satu bulan sekaligus"
   },
   "book": {
     "dialogAria": "Tampilan buku diary",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "Putar",
     "removeOverlay": "Hapus",
-    "undo": "Urungkan"
+    "undo": "Urungkan",
+    "photoCancel": "Batal",
+    "photoConfirm": "Selesai"
   },
   "font": {
     "dialogAria": "Pilih font",

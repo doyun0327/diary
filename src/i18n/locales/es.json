@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "¡Toque!",
     "pokePushBody": "{{name}}~ escribe tu diario",
-    "pokeSent": "¡Toque enviado!"
+    "pokeSent": "¡Toque enviado!",
+    "membersAria": "Miembros de la sala",
+    "membersMoreAria": "Mostrar {{n}} miembros más",
+    "membersPanelAria": "Lista de miembros",
+    "pokeAction": "Toque",
+    "pokeHint": "Toque a {{name}}",
+    "pokeAria": "Toque a {{name}}",
+    "pokeSelf": "No puedes tocarte a ti mismo",
+    "pokeWait": "Espera un momento antes de tocar de nuevo",
+    "pokeNeedLogin": "Inicia sesión para tocar",
+    "pokeFail": "No se pudo enviar el toque",
+    "sharePushBody": "¡Compartió un diario!",
+    "commentPushBody": "¡Dejó un comentario!",
+    "postNew": "N",
+    "postNewAria": "Diario nuevo"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "¡Prueba PRO gratis durante 7 días!",
+    "trialSub": "5 dibujos IA · Búsqueda · Exportar"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "Mira un anuncio por 1 dibujo IA",
       "rewardLead": "Mira el anuncio hasta el final para desbloquear un dibujo IA.",
       "rewardCta": "Ver anuncio",
-      "adIncompleteTitle": "Termina el anuncio"
+      "adIncompleteTitle": "Termina el anuncio",
+      "modeTitle": "¿Qué modo?",
+      "modeWacky": "Modo loco",
+      "modeWackyDesc": "Dibuja rápido. A veces puede quedar un poco raro.",
+      "modeFull": "Modo delicado",
+      "modeFullDesc": "Interpreta tu diario y dibuja con más detalle.",
+      "starHint": "Toca las estrellas que caen",
+      "starScore": "{{count}} atrapadas",
+      "starTap": "Atrapar estrella",
+      "puzzleHint": "Toca una pieza junto al espacio vacío",
+      "puzzleDone": "¡Hecho!",
+      "puzzleAria": "Puzzle deslizante",
+      "puzzleTile": "Pieza {{n}}",
+      "pickTitle": "¿Qué dibujo conservar?",
+      "pickLead": "Elige las imágenes que quieras. Puedes seleccionar varias.",
+      "pickPrevious": "Anterior",
+      "pickNth": "N.º {{n}}",
+      "pickNew": "Nuevo",
+      "pickConfirm": "Añadir",
+      "pickSelectOne": "Selecciona al menos una imagen"
     },
     "confirm": {
       "replaceTitle": "Dibujo IA",
@@ -473,11 +508,22 @@
       "adNotCompleted": "Debes ver el anuncio hasta el final para dibujar con IA.",
       "adAppOnly": "Los anuncios solo están en la app",
       "aiFreeLimit": "Con la prueba Pro puedes crear 2 dibujos IA gratis.",
-      "aiDailyLimit": "Con la prueba Pro puedes crear 2 dibujos IA gratis."
+      "aiDailyLimit": "Con la prueba Pro puedes crear 2 dibujos IA gratis.",
+      "saveFailed": "No se pudo guardar el diario",
+      "adNotCompletedWrite": "Termina el anuncio para guardar este diario"
     },
     "coach": {
       "character": "Elige tu personaje para que la IA te dibuje",
       "ai": "Escribe el diario y deja que la IA dibuje"
+    },
+    "saving": "Guardando…",
+    "savingPrep": "Preparando dibujo…",
+    "savingImage": "Guardando imagen…",
+    "savingDone": "¡Listo!",
+    "reward": {
+      "saveTitle": "Ver un anuncio para guardar 1 diario",
+      "saveLead": "Has alcanzado el límite. Mira un anuncio para guardar uno más.",
+      "saveLeadPremium": "Has alcanzado el límite mensual (50 entradas). Mira un anuncio para guardar una más."
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "Ver libro de diario",
     "err": {
       "pdf": "Error al guardar PDF"
-    }
+    },
+    "month": "Mes a exportar",
+    "monthHint": "Puedes exportar un mes a la vez"
   },
   "book": {
     "dialogAria": "Vista de libro de diario",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "Girar",
     "removeOverlay": "Quitar",
-    "undo": "Deshacer"
+    "undo": "Deshacer",
+    "photoCancel": "Cancelar",
+    "photoConfirm": "Listo"
   },
   "font": {
     "dialogAria": "Elegir fuente",

@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "戳一下!",
     "pokePushBody": "{{name}}~來寫日記吧",
-    "pokeSent": "戳一下完成!"
+    "pokeSent": "戳一下完成!",
+    "membersAria": "房間成員",
+    "membersMoreAria": "再顯示 {{n}} 位成員",
+    "membersPanelAria": "成員列表",
+    "pokeAction": "戳一下",
+    "pokeHint": "戳 {{name}}",
+    "pokeAria": "戳 {{name}}",
+    "pokeSelf": "不能戳自己",
+    "pokeWait": "請稍後再戳",
+    "pokeNeedLogin": "登入後才能戳",
+    "pokeFail": "戳失敗",
+    "sharePushBody": "分享了日記！",
+    "commentPushBody": "留言了！",
+    "postNew": "N",
+    "postNewAria": "新日記"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "免費體驗 7 天 PRO 福利！",
+    "trialSub": "AI 繪圖 5 次 · 搜尋 · 匯出"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "看廣告獲得 1 次 AI 繪畫",
       "rewardLead": "完整觀看廣告可解鎖一次 AI 繪畫。",
       "rewardCta": "看廣告",
-      "adIncompleteTitle": "請看完廣告"
+      "adIncompleteTitle": "請看完廣告",
+      "modeTitle": "要用哪種模式？",
+      "modeWacky": "搞怪模式",
+      "modeWackyDesc": "快速繪製，有時結果可能有點奇怪。",
+      "modeFull": "細膩模式",
+      "modeFullDesc": "解讀日記內容，畫得更細緻。",
+      "starHint": "點擊掉落的星星",
+      "starScore": "接到 {{count}} 顆",
+      "starTap": "接星星",
+      "puzzleHint": "點空白旁邊的拼圖塊",
+      "puzzleDone": "完成！",
+      "puzzleAria": "滑動拼圖",
+      "puzzleTile": "拼圖 {{n}}",
+      "pickTitle": "要保留哪張圖？",
+      "pickLead": "選擇想要的圖片，可選多張。",
+      "pickPrevious": "之前的圖",
+      "pickNth": "第 {{n}} 張",
+      "pickNew": "新圖",
+      "pickConfirm": "加入",
+      "pickSelectOne": "請至少選一張圖"
     },
     "confirm": {
       "replaceTitle": "AI 畫",
@@ -473,11 +508,22 @@
       "adNotCompleted": "需要看完廣告才能用 AI 畫畫。",
       "adAppOnly": "廣告僅在 App 內可用",
       "aiFreeLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。",
-      "aiDailyLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。"
+      "aiDailyLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。",
+      "saveFailed": "無法儲存日記",
+      "adNotCompletedWrite": "看完廣告才能儲存這篇日記"
     },
     "coach": {
       "character": "設定自己後，AI會按這個樣子畫畫",
       "ai": "寫好日記後，用AI來畫畫吧"
+    },
+    "saving": "儲存中…",
+    "savingPrep": "準備圖片中…",
+    "savingImage": "儲存圖片中…",
+    "savingDone": "完成！",
+    "reward": {
+      "saveTitle": "看廣告以儲存 1 篇日記",
+      "saveLead": "已達上限。看廣告可再儲存 1 篇。",
+      "saveLeadPremium": "已達本月上限（50 篇）。看廣告可再儲存 1 篇。"
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "查看日記本",
     "err": {
       "pdf": "PDF 保存失敗"
-    }
+    },
+    "month": "要匯出的月份",
+    "monthHint": "一次只能匯出一個月"
   },
   "book": {
     "dialogAria": "日記本視圖",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "旋轉",
     "removeOverlay": "移除",
-    "undo": "撤銷"
+    "undo": "撤銷",
+    "photoCancel": "取消",
+    "photoConfirm": "完成"
   },
   "font": {
     "dialogAria": "選擇字體",

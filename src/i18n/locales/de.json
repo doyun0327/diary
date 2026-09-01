@@ -353,7 +353,21 @@
     },
     "pokePushTitle": "Anstupsen!",
     "pokePushBody": "{{name}}~ schreib ein Tagebuch",
-    "pokeSent": "Anstupsen gesendet!"
+    "pokeSent": "Anstupsen gesendet!",
+    "membersAria": "Raummitglieder",
+    "membersMoreAria": "{{n}} weitere Mitglieder anzeigen",
+    "membersPanelAria": "Mitgliederliste",
+    "pokeAction": "Anstupsen",
+    "pokeHint": "{{name}} anstupsen",
+    "pokeAria": "{{name}} anstupsen",
+    "pokeSelf": "Du kannst dich nicht selbst anstupsen",
+    "pokeWait": "Warte kurz, bevor du erneut stuppst",
+    "pokeNeedLogin": "Zum Anstupsen anmelden",
+    "pokeFail": "Anstupsen fehlgeschlagen",
+    "sharePushBody": "Hat ein Tagebuch geteilt!",
+    "commentPushBody": "Hat einen Kommentar hinterlassen!",
+    "postNew": "N",
+    "postNewAria": "Neues Tagebuch"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -373,7 +387,9 @@
     "aria": "App-Einführung",
     "sample": "Beispiel {{n}}",
     "prev": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "trialTitle": "7 Tage PRO-Vorteile kostenlos testen!",
+    "trialSub": "5 KI-Zeichnungen · Suche · Export"
   },
   "diary": {
     "empty": {
@@ -452,7 +468,26 @@
       "rewardTitle": "Werbung ansehen für 1 KI-Zeichnung",
       "rewardLead": "Schau die Werbung bis zum Ende, um eine KI-Zeichnung freizuschalten.",
       "rewardCta": "Werbung ansehen",
-      "adIncompleteTitle": "Werbung zu Ende ansehen"
+      "adIncompleteTitle": "Werbung zu Ende ansehen",
+      "modeTitle": "Welcher Modus?",
+      "modeWacky": "Verrückter Modus",
+      "modeWackyDesc": "Schnell gezeichnet. Manchmal sieht es etwas seltsam aus.",
+      "modeFull": "Feiner Modus",
+      "modeFullDesc": "Interpretiert dein Tagebuch und zeichnet detaillierter.",
+      "starHint": "Tippe auf fallende Sterne",
+      "starScore": "{{count}} gefangen",
+      "starTap": "Stern fangen",
+      "puzzleHint": "Tippe auf ein Teil neben der Lücke",
+      "puzzleDone": "Fertig!",
+      "puzzleAria": "Schiebepuzzle",
+      "puzzleTile": "Puzzleteil {{n}}",
+      "pickTitle": "Welche Zeichnung behalten?",
+      "pickLead": "Wähle die Bilder, die du möchtest. Mehrere sind möglich.",
+      "pickPrevious": "Vorherige",
+      "pickNth": "Nr. {{n}}",
+      "pickNew": "Neu",
+      "pickConfirm": "Hinzufügen",
+      "pickSelectOne": "Wähle mindestens ein Bild"
     },
     "confirm": {
       "replaceTitle": "KI-Zeichnung",
@@ -474,11 +509,22 @@
       "adNotCompleted": "Du musst die Werbung zu Ende schauen, um mit KI zu zeichnen.",
       "adAppOnly": "Werbung ist nur in der App verfügbar",
       "aiFreeLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen.",
-      "aiDailyLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen."
+      "aiDailyLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen.",
+      "saveFailed": "Tagebucheintrag konnte nicht gespeichert werden",
+      "adNotCompletedWrite": "Schließe die Werbung ab, um dieses Tagebuch zu speichern"
     },
     "coach": {
       "character": "Leg dich fest, damit die KI dich zeichnen kann",
       "ai": "Schreib ein Tagebuch und lass die KI es zeichnen"
+    },
+    "saving": "Speichern…",
+    "savingPrep": "Zeichnung wird vorbereitet…",
+    "savingImage": "Bild wird gespeichert…",
+    "savingDone": "Fertig!",
+    "reward": {
+      "saveTitle": "Werbung ansehen, um 1 Tagebuch zu speichern",
+      "saveLead": "Limit erreicht. Sieh eine Werbung, um einen weiteren Eintrag zu speichern.",
+      "saveLeadPremium": "Monatslimit (50 Einträge) erreicht. Sieh eine Werbung, um einen weiteren zu speichern."
     }
   },
   "detail": {
@@ -617,7 +663,9 @@
     "openBook": "Tagebuchbuch ansehen",
     "err": {
       "pdf": "PDF-Speichern fehlgeschlagen"
-    }
+    },
+    "month": "Monat zum Exportieren",
+    "monthHint": "Es kann jeweils ein Monat exportiert werden"
   },
   "book": {
     "dialogAria": "Tagebuchbuch-Ansicht",
@@ -683,7 +731,9 @@
     },
     "stickerRotate": "Drehen",
     "removeOverlay": "Entfernen",
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "photoCancel": "Abbrechen",
+    "photoConfirm": "Fertig"
   },
   "font": {
     "dialogAria": "Schrift wählen",

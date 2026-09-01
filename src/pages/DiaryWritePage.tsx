@@ -17,7 +17,7 @@ import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { HAIR_STYLE_OPTIONS } from '../types/character';
-import { generateDiaryImage } from '../api/aiImage';
+import { generateDiaryImage, type AiDrawSceneMode } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
@@ -47,6 +47,12 @@ import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import './DiaryWritePage.css';
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
+
+type AiPickOption = {
+  src: string;
+  kind: 'canvas' | 'ai';
+  aiIndex?: number;
+};
 
 function pickRandomLottie(pool: object[]): object | null {
   if (pool.length === 0) return null;
@@ -102,12 +108,11 @@ function DiaryWritePage({
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
+  const [aiModeOpen, setAiModeOpen] = useState(false);
   const [aiPickOpen, setAiPickOpen] = useState(false);
-  const [aiPickPrevious, setAiPickPrevious] = useState<string | null>(null);
-  const [aiPickNew, setAiPickNew] = useState<string | null>(null);
-  const [aiPickSelected, setAiPickSelected] = useState<Set<'previous' | 'new'>>(
-    () => new Set(['previous', 'new']),
-  );
+  const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
+  const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
+  const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
   const [accessTick, setAccessTick] = useState(0);
   void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
@@ -134,6 +139,13 @@ function DiaryWritePage({
   useEffect(() => {
     onNativeSaveStateChange?.(!aiLoading);
   }, [aiLoading, onNativeSaveStateChange]);
+
+  useEffect(() => {
+    setAiGeneratedImages([]);
+    setAiPickOptions([]);
+    setAiPickSelected(new Set());
+    setAiPickOpen(false);
+  }, [initialEntry?.id]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -346,7 +358,7 @@ function DiaryWritePage({
     return getRemainingFreeAiDraws() <= 0 && getAiDrawCredits() <= 0;
   };
 
-  const startAiDrawFlow = () => {
+  const openAiModePicker = () => {
     if (
       AI_REWARD_AD_ENABLED &&
       !getDiaryAccessState().isPremiumActive &&
@@ -356,7 +368,11 @@ function DiaryWritePage({
       setRewardPromptOpen(true);
       return;
     }
-    void runAiDraw();
+    setAiModeOpen(true);
+  };
+
+  const startAiDrawFlow = (sceneMode: AiDrawSceneMode) => {
+    void runAiDraw(sceneMode);
   };
 
   const handleAiDraw = () => {
@@ -364,16 +380,14 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    // 무료 체험·크레딧 소진 시 확인창 없이 바로 광고 안내
     if (needsAiRewardAd()) {
       setRewardPromptOpen(true);
       return;
     }
-    // 테스트: 확인창 없이 바로 생성 (광고 스킵은 AI_REWARD_AD_ENABLED=false)
-    startAiDrawFlow();
+    openAiModePicker();
   };
 
-  const runAiDraw = async () => {
+  const runAiDraw = async (sceneMode: AiDrawSceneMode) => {
     setAiError(null);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
@@ -408,17 +422,27 @@ function DiaryWritePage({
         title,
         content,
         character,
+        sceneMode,
       });
 
-      if (previousSnapshot) {
-        setAiPickPrevious(previousSnapshot);
-        setAiPickNew(imageUrl);
-        setAiPickSelected(new Set(['previous', 'new']));
-        setAiPickOpen(true);
-      } else {
+      const nextHistory = [...aiGeneratedImages, imageUrl];
+      setAiGeneratedImages(nextHistory);
+
+      if (nextHistory.length === 1 && !previousSnapshot) {
         await canvasRef.current?.loadImage(imageUrl);
         drawingTouchedRef.current = true;
         dismissAiCoach();
+      } else {
+        const options: AiPickOption[] = [];
+        if (previousSnapshot && nextHistory.length === 1) {
+          options.push({ src: previousSnapshot, kind: 'canvas' });
+        }
+        nextHistory.forEach((src, index) => {
+          options.push({ src, kind: 'ai', aiIndex: index + 1 });
+        });
+        setAiPickOptions(options);
+        setAiPickSelected(new Set(options.map((_, index) => index)));
+        setAiPickOpen(true);
       }
     } catch (err) {
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
@@ -429,21 +453,26 @@ function DiaryWritePage({
 
   const dismissAiPick = () => {
     setAiPickOpen(false);
-    setAiPickPrevious(null);
-    setAiPickNew(null);
+    setAiPickOptions([]);
+    setAiPickSelected(new Set());
   };
 
-  const toggleAiPick = (choice: 'previous' | 'new') => {
+  const toggleAiPick = (index: number) => {
     setAiPickSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(choice)) next.delete(choice);
-      else next.add(choice);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
       return next;
     });
   };
 
+  const aiPickLabel = (option: AiPickOption) => {
+    if (option.kind === 'canvas') return t('write.ai.pickPrevious');
+    return t('write.ai.pickNth', { n: option.aiIndex });
+  };
+
   const applyAiPick = async () => {
-    if (!aiPickPrevious || !aiPickNew) {
+    if (aiPickOptions.length === 0) {
       dismissAiPick();
       return;
     }
@@ -452,15 +481,17 @@ function DiaryWritePage({
       return;
     }
 
-    const selected = [...aiPickSelected];
+    const selectedSrcs = [...aiPickSelected]
+      .sort((a, b) => a - b)
+      .map((index) => aiPickOptions[index]?.src)
+      .filter((src): src is string => Boolean(src));
     dismissAiPick();
 
     try {
-      if (selected.length === 1) {
-        const src = selected[0] === 'previous' ? aiPickPrevious : aiPickNew;
-        await canvasRef.current?.loadImage(src);
+      if (selectedSrcs.length === 1) {
+        await canvasRef.current?.loadImage(selectedSrcs[0]);
       } else {
-        await canvasRef.current?.loadImages([aiPickPrevious, aiPickNew]);
+        await canvasRef.current?.loadImages(selectedSrcs);
       }
       drawingTouchedRef.current = true;
       dismissAiCoach();
@@ -483,7 +514,7 @@ function DiaryWritePage({
       return;
     }
     grantAiDrawCredits(1);
-    startAiDrawFlow();
+    openAiModePicker();
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -781,6 +812,39 @@ function DiaryWritePage({
           onPrimary={saveAndLeave}
         />
       )}
+      {aiModeOpen && (
+        <AppModal
+          title={t('write.ai.modeTitle')}
+          onDismiss={() => setAiModeOpen(false)}
+          showClose
+          closeAriaLabel={t('common.close')}
+        >
+          <div className="diary-write__ai-mode">
+            <button
+              type="button"
+              className="diary-write__ai-mode-btn"
+              onClick={() => {
+                setAiModeOpen(false);
+                startAiDrawFlow('wacky');
+              }}
+            >
+              <span className="diary-write__ai-mode-name">{t('write.ai.modeWacky')}</span>
+              <span className="diary-write__ai-mode-desc">{t('write.ai.modeWackyDesc')}</span>
+            </button>
+            <button
+              type="button"
+              className="diary-write__ai-mode-btn diary-write__ai-mode-btn--full"
+              onClick={() => {
+                setAiModeOpen(false);
+                startAiDrawFlow('full');
+              }}
+            >
+              <span className="diary-write__ai-mode-name">{t('write.ai.modeFull')}</span>
+              <span className="diary-write__ai-mode-desc">{t('write.ai.modeFullDesc')}</span>
+            </button>
+          </div>
+        </AppModal>
+      )}
       {aiConfirmOpen && (
         <AppModal
           title={t('quota.drawConfirmTitle')}
@@ -796,7 +860,7 @@ function DiaryWritePage({
           primaryLabel={t('quota.drawConfirmOk')}
           onPrimary={() => {
             setAiConfirmOpen(false);
-            startAiDrawFlow();
+            openAiModePicker();
           }}
         />
       )}
@@ -829,7 +893,7 @@ function DiaryWritePage({
           onPrimary={() => void handleWatchAd()}
         />
       )}
-      {aiPickOpen && aiPickPrevious && aiPickNew && (
+      {aiPickOpen && aiPickOptions.length > 0 && (
         <AppModal
           title={t('write.ai.pickTitle')}
           lead={t('write.ai.pickLead')}
@@ -842,21 +906,18 @@ function DiaryWritePage({
           onPrimary={() => void applyAiPick()}
         >
           <div className="diary-write__ai-pick">
-            {(['previous', 'new'] as const).map((choice) => {
-              const src = choice === 'previous' ? aiPickPrevious : aiPickNew;
-              const label =
-                choice === 'previous' ? t('write.ai.pickPrevious') : t('write.ai.pickNew');
-              const checked = aiPickSelected.has(choice);
+            {aiPickOptions.map((option, index) => {
+              const checked = aiPickSelected.has(index);
               return (
                 <button
-                  key={choice}
+                  key={`${option.kind}-${option.aiIndex ?? 'canvas'}-${index}`}
                   type="button"
                   className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
                   aria-pressed={checked}
-                  onClick={() => toggleAiPick(choice)}
+                  onClick={() => toggleAiPick(index)}
                 >
-                  <img src={src} alt="" className="diary-write__ai-pick-thumb" />
-                  <span className="diary-write__ai-pick-label">{label}</span>
+                  <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
+                  <span className="diary-write__ai-pick-label">{aiPickLabel(option)}</span>
                   <span className="diary-write__ai-pick-check" aria-hidden="true">
                     {checked ? '✓' : ''}
                   </span>

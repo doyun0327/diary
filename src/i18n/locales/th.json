@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "แคะ!",
     "pokePushBody": "{{name}}~ มาเขียนไดอารี่กัน",
-    "pokeSent": "แคะแล้ว!"
+    "pokeSent": "แคะแล้ว!",
+    "membersAria": "สมาชิกในห้อง",
+    "membersMoreAria": "แสดงสมาชิกอีก {{n}} คน",
+    "membersPanelAria": "รายชื่อสมาชิก",
+    "pokeAction": "จิ้ม",
+    "pokeHint": "จิ้ม {{name}}",
+    "pokeAria": "จิ้ม {{name}}",
+    "pokeSelf": "จิ้มตัวเองไม่ได้",
+    "pokeWait": "รอสักครู่ก่อนจิ้มอีกครั้ง",
+    "pokeNeedLogin": "เข้าสู่ระบบเพื่อจิ้ม",
+    "pokeFail": "ส่งการจิ้มไม่สำเร็จ",
+    "sharePushBody": "แชร์ไดอารี่แล้ว!",
+    "commentPushBody": "แสดงความคิดเห็นแล้ว!",
+    "postNew": "N",
+    "postNewAria": "ไดอารี่ใหม่"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "ลองใช้สิทธิ์ PRO ฟรี 7 วัน!",
+    "trialSub": "วาด AI 5 ครั้ง · ค้นหา · ส่งออก"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "ดูโฆษณาเพื่อวาด AI 1 ครั้ง",
       "rewardLead": "ดูโฆษณาจนจบเพื่อปลดล็อกการวาด AI หนึ่งครั้ง",
       "rewardCta": "ดูโฆษณา",
-      "adIncompleteTitle": "ดูโฆษณาให้จบ"
+      "adIncompleteTitle": "ดูโฆษณาให้จบ",
+      "modeTitle": "โหมดไหนดี?",
+      "modeWacky": "โหมดฮาๆ",
+      "modeWackyDesc": "วาดเร็ว บางทีอาจดูแปลกๆ ได้",
+      "modeFull": "โหมดละเอียด",
+      "modeFullDesc": "ตีความไดอารี่แล้ววาดให้ละเอียดขึ้น",
+      "starHint": "แตะดาวที่ตกลงมา",
+      "starScore": "ได้ {{count}} ดวง",
+      "starTap": "จับดาว",
+      "puzzleHint": "แตะชิ้นข้างช่องว่าง",
+      "puzzleDone": "เสร็จแล้ว!",
+      "puzzleAria": "พัซเซิลเลื่อน",
+      "puzzleTile": "ชิ้นที่ {{n}}",
+      "pickTitle": "จะใช้ภาพไหน?",
+      "pickLead": "เลือกภาพที่ต้องการ สามารถเลือกได้หลายภาพ",
+      "pickPrevious": "ภาพก่อนหน้า",
+      "pickNth": "ภาพที่ {{n}}",
+      "pickNew": "ภาพใหม่",
+      "pickConfirm": "ใส่",
+      "pickSelectOne": "เลือกอย่างน้อย 1 ภาพ"
     },
     "confirm": {
       "replaceTitle": "ภาพวาด AI",
@@ -473,11 +508,22 @@
       "adNotCompleted": "ต้องดูโฆษณาจนจบจึงจะวาดด้วย AI ได้",
       "adAppOnly": "โฆษณาใช้ได้ในแอปเท่านั้น",
       "aiFreeLimit": "ด้วยสิทธิ์ทดลอง Pro คุณสร้างภาพ AI ฟรีได้ 2 ครั้ง",
-      "aiDailyLimit": "ด้วยสิทธิ์ทดลอง Pro คุณสร้างภาพ AI ฟรีได้ 2 ครั้ง"
+      "aiDailyLimit": "ด้วยสิทธิ์ทดลอง Pro คุณสร้างภาพ AI ฟรีได้ 2 ครั้ง",
+      "saveFailed": "บันทึกไดอารี่ไม่สำเร็จ",
+      "adNotCompletedWrite": "ดูโฆษณาจบเพื่อบันทึกไดอารี่นี้"
     },
     "coach": {
       "character": "ตั้งตัวเอง เพื่อให้ AI วาดตาม",
       "ai": "เขียนไดอารี่แล้วให้ AI วาดภาพ"
+    },
+    "saving": "กำลังบันทึก…",
+    "savingPrep": "กำลังเตรียมภาพ…",
+    "savingImage": "กำลังบันทึกภาพ…",
+    "savingDone": "เสร็จแล้ว!",
+    "reward": {
+      "saveTitle": "ดูโฆษณาเพื่อบันทึกไดอารี่ 1 เรื่อง",
+      "saveLead": "ถึงขีดจำกัดแล้ว ดูโฆษณาเพื่อบันทึกเพิ่มอีก 1 เรื่อง",
+      "saveLeadPremium": "ถึงขีดจำกัดรายเดือน (50 เรื่อง) แล้ว ดูโฆษณาเพื่อบันทึกเพิ่มอีก 1 เรื่อง"
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "ดูสมุดไดอารี่",
     "err": {
       "pdf": "บันทึก PDF ไม่สำเร็จ"
-    }
+    },
+    "month": "เดือนที่จะส่งออก",
+    "monthHint": "ส่งออกได้ทีละ 1 เดือน"
   },
   "book": {
     "dialogAria": "มุมมองสมุดไดอารี่",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "หมุน",
     "removeOverlay": "ลบ",
-    "undo": "ย้อนกลับ"
+    "undo": "ย้อนกลับ",
+    "photoCancel": "ยกเลิก",
+    "photoConfirm": "เสร็จ"
   },
   "font": {
     "dialogAria": "เลือกฟอนต์",

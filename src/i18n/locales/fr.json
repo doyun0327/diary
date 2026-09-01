@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "Toc!",
     "pokePushBody": "{{name}}~ écris ton journal",
-    "pokeSent": "Toc envoyé !"
+    "pokeSent": "Toc envoyé !",
+    "membersAria": "Membres de la salle",
+    "membersMoreAria": "Afficher {{n}} membres de plus",
+    "membersPanelAria": "Liste des membres",
+    "pokeAction": "Poke",
+    "pokeHint": "Poker {{name}}",
+    "pokeAria": "Poker {{name}}",
+    "pokeSelf": "Tu ne peux pas te poker toi-même",
+    "pokeWait": "Attends un instant avant de poker à nouveau",
+    "pokeNeedLogin": "Connecte-toi pour poker",
+    "pokeFail": "Impossible d'envoyer le poke",
+    "sharePushBody": "A partagé un journal !",
+    "commentPushBody": "A laissé un commentaire !",
+    "postNew": "N",
+    "postNewAria": "Nouveau journal"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "Profite des avantages PRO gratuitement pendant 7 jours !",
+    "trialSub": "5 dessins IA · Recherche · Export"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "Regarder une pub pour 1 dessin IA",
       "rewardLead": "Regardez la pub jusqu’à la fin pour débloquer un dessin IA.",
       "rewardCta": "Voir la pub",
-      "adIncompleteTitle": "Terminez la pub"
+      "adIncompleteTitle": "Terminez la pub",
+      "modeTitle": "Quel mode ?",
+      "modeWacky": "Mode farfelu",
+      "modeWackyDesc": "Dessin rapide. Le résultat peut parfois être un peu bizarre.",
+      "modeFull": "Mode délicat",
+      "modeFullDesc": "Interprète ton journal et dessine avec plus de détails.",
+      "starHint": "Touche les étoiles qui tombent",
+      "starScore": "{{count}} attrapées",
+      "starTap": "Attraper une étoile",
+      "puzzleHint": "Touche une pièce à côté de l'espace vide",
+      "puzzleDone": "Terminé !",
+      "puzzleAria": "Puzzle coulissant",
+      "puzzleTile": "Pièce {{n}}",
+      "pickTitle": "Quel dessin garder ?",
+      "pickLead": "Choisis les images que tu veux. Tu peux en sélectionner plusieurs.",
+      "pickPrevious": "Précédent",
+      "pickNth": "N° {{n}}",
+      "pickNew": "Nouveau",
+      "pickConfirm": "Ajouter",
+      "pickSelectOne": "Sélectionne au moins une image"
     },
     "confirm": {
       "replaceTitle": "Dessin IA",
@@ -473,11 +508,22 @@
       "adNotCompleted": "Il faut regarder la pub jusqu'a la fin pour dessiner avec l'IA.",
       "adAppOnly": "Les pubs sont disponibles uniquement dans l’app",
       "aiFreeLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement.",
-      "aiDailyLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement."
+      "aiDailyLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement.",
+      "saveFailed": "Impossible d'enregistrer le journal",
+      "adNotCompletedWrite": "Termine la pub pour enregistrer ce journal"
     },
     "coach": {
       "character": "Définis-toi pour que l’IA te dessine",
       "ai": "Écris, puis laisse l’IA dessiner"
+    },
+    "saving": "Enregistrement…",
+    "savingPrep": "Préparation du dessin…",
+    "savingImage": "Enregistrement de l'image…",
+    "savingDone": "Terminé !",
+    "reward": {
+      "saveTitle": "Regarder une pub pour enregistrer 1 journal",
+      "saveLead": "Limite atteinte. Regarde une pub pour enregistrer une entrée de plus.",
+      "saveLeadPremium": "Limite mensuelle (50 entrées) atteinte. Regarde une pub pour enregistrer une entrée de plus."
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "Voir le carnet",
     "err": {
       "pdf": "Échec de l'enregistrement PDF"
-    }
+    },
+    "month": "Mois à exporter",
+    "monthHint": "Tu peux exporter un mois à la fois"
   },
   "book": {
     "dialogAria": "Vue carnet de journal",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "Pivoter",
     "removeOverlay": "Retirer",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "photoCancel": "Annuler",
+    "photoConfirm": "Terminé"
   },
   "font": {
     "dialogAria": "Choisir une police",

@@ -22,7 +22,6 @@ export default function AiLoadingWait({ animationData, lottieKey, statusText }: 
       {animationData ? (
         <AiLoadingLottie key={lottieKey} animationData={animationData} />
       ) : null}
-      <p className="ai-loading-wait__status">{statusText}</p>
     </div>
   );
 }

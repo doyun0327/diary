@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "戳一下!",
     "pokePushBody": "{{name}}~来写日记吧",
-    "pokeSent": "戳一下完成!"
+    "pokeSent": "戳一下完成!",
+    "membersAria": "房间成员",
+    "membersMoreAria": "再显示 {{n}} 位成员",
+    "membersPanelAria": "成员列表",
+    "pokeAction": "戳一下",
+    "pokeHint": "戳 {{name}}",
+    "pokeAria": "戳 {{name}}",
+    "pokeSelf": "不能戳自己",
+    "pokeWait": "请稍后再戳",
+    "pokeNeedLogin": "登录后才能戳",
+    "pokeFail": "戳失败",
+    "sharePushBody": "分享了日记！",
+    "commentPushBody": "留言了！",
+    "postNew": "N",
+    "postNewAria": "新日记"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "免费体验 7 天 PRO 福利！",
+    "trialSub": "AI 绘图 5 次 · 搜索 · 导出"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "看广告获得 1 次 AI 绘画",
       "rewardLead": "完整观看广告可解锁一次 AI 绘画。",
       "rewardCta": "看广告",
-      "adIncompleteTitle": "请看完广告"
+      "adIncompleteTitle": "请看完广告",
+      "modeTitle": "要用哪种模式？",
+      "modeWacky": "搞怪模式",
+      "modeWackyDesc": "快速绘制，有时结果可能有点奇怪。",
+      "modeFull": "细腻模式",
+      "modeFullDesc": "解读日记内容，画得更细致。",
+      "starHint": "点击掉落的星星",
+      "starScore": "接到 {{count}} 颗",
+      "starTap": "接星星",
+      "puzzleHint": "点空白旁边的拼图块",
+      "puzzleDone": "完成！",
+      "puzzleAria": "滑动拼图",
+      "puzzleTile": "拼图 {{n}}",
+      "pickTitle": "要保留哪张图？",
+      "pickLead": "选择想要的图片，可选多张。",
+      "pickPrevious": "之前的图",
+      "pickNth": "第 {{n}} 张",
+      "pickNew": "新图",
+      "pickConfirm": "加入",
+      "pickSelectOne": "请至少选一张图"
     },
     "confirm": {
       "replaceTitle": "AI 画",
@@ -473,11 +508,22 @@
       "adNotCompleted": "需要看完广告才能用 AI 画画。",
       "adAppOnly": "广告仅在 App 内可用",
       "aiFreeLimit": "Pro 体验券可免费生成 2 次 AI 绘画。",
-      "aiDailyLimit": "Pro 体验券可免费生成 2 次 AI 绘画。"
+      "aiDailyLimit": "Pro 体验券可免费生成 2 次 AI 绘画。",
+      "saveFailed": "无法保存日记",
+      "adNotCompletedWrite": "看完广告才能保存这篇日记"
     },
     "coach": {
       "character": "设定自己后，AI会按这个样子画画",
       "ai": "写好日记后，用AI来画画吧"
+    },
+    "saving": "保存中…",
+    "savingPrep": "准备图片中…",
+    "savingImage": "保存图片中…",
+    "savingDone": "完成！",
+    "reward": {
+      "saveTitle": "看广告以保存 1 篇日记",
+      "saveLead": "已达上限。看广告可再保存 1 篇。",
+      "saveLeadPremium": "已达本月上限（50 篇）。看广告可再保存 1 篇。"
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "查看日记本",
     "err": {
       "pdf": "PDF 保存失败"
-    }
+    },
+    "month": "要导出的月份",
+    "monthHint": "一次只能导出一个月"
   },
   "book": {
     "dialogAria": "日记本视图",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "旋转",
     "removeOverlay": "移除",
-    "undo": "撤销"
+    "undo": "撤销",
+    "photoCancel": "取消",
+    "photoConfirm": "完成"
   },
   "font": {
     "dialogAria": "选择字体",

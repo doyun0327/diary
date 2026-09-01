@@ -352,7 +352,21 @@
     },
     "pokePushTitle": "ぽちっ!",
     "pokePushBody": "{{name}}〜日記書こう",
-    "pokeSent": "ぽちっ完了!"
+    "pokeSent": "ぽちっ完了!",
+    "membersAria": "ルームメンバー",
+    "membersMoreAria": "メンバーをあと{{n}}人表示",
+    "membersPanelAria": "メンバー一覧",
+    "pokeAction": "ぽちっ",
+    "pokeHint": "{{name}}をぽちっ",
+    "pokeAria": "{{name}}をぽちっ",
+    "pokeSelf": "自分にはぽちっできません",
+    "pokeWait": "少し待ってからもう一度ぽちっしてください",
+    "pokeNeedLogin": "ログインしてぽちっ",
+    "pokeFail": "ぽちっを送れませんでした",
+    "sharePushBody": "日記を共有しました！",
+    "commentPushBody": "コメントを残しました！",
+    "postNew": "N",
+    "postNewAria": "新しい日記"
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -372,7 +386,9 @@
     "aria": "App introduction",
     "sample": "Sample {{n}}",
     "prev": "Back",
-    "next": "Next"
+    "next": "Next",
+    "trialTitle": "7日間PRO特典を無料で体験！",
+    "trialSub": "AI絵5回 · 検索 · 書き出し"
   },
   "diary": {
     "empty": {
@@ -451,7 +467,26 @@
       "rewardTitle": "広告を見てAI描画1回",
       "rewardLead": "広告を最後まで見るとAI描画が1回使えます。",
       "rewardCta": "広告を見る",
-      "adIncompleteTitle": "広告を最後まで見てください"
+      "adIncompleteTitle": "広告を最後まで見てください",
+      "modeTitle": "どのモードで描きますか？",
+      "modeWacky": "ワチャワチャモード",
+      "modeWackyDesc": "素早く描きます。たまに変な仕上がりになることも。",
+      "modeFull": "繊細モード",
+      "modeFullDesc": "日記の内容を解釈して、細かく描きます。",
+      "starHint": "落ちてくる星をタップ",
+      "starScore": "{{count}}個",
+      "starTap": "星をキャッチ",
+      "puzzleHint": "空きマスの隣のピースをタップ",
+      "puzzleDone": "完成！",
+      "puzzleAria": "スライドパズル",
+      "puzzleTile": "パズルピース {{n}}",
+      "pickTitle": "どの絵を入れますか？",
+      "pickLead": "入れたい絵を選んでください。複数選べます。",
+      "pickPrevious": "以前の絵",
+      "pickNth": "{{n}}枚目",
+      "pickNew": "新しい絵",
+      "pickConfirm": "入れる",
+      "pickSelectOne": "絵を1枚以上選んでください"
     },
     "confirm": {
       "replaceTitle": "AIの絵",
@@ -473,11 +508,22 @@
       "adNotCompleted": "広告を最後まで見ないとAI絵を描けません。",
       "adAppOnly": "広告はアプリでのみ利用できます",
       "aiFreeLimit": "Pro体験券でAI描画を2回無料で生成できます。",
-      "aiDailyLimit": "Pro体験券でAI描画を2回無料で生成できます。"
+      "aiDailyLimit": "Pro体験券でAI描画を2回無料で生成できます。",
+      "saveFailed": "日記を保存できませんでした",
+      "adNotCompletedWrite": "広告を最後まで見ると保存できます"
     },
     "coach": {
       "character": "自分を決めるとAIがその姿で描きます",
       "ai": "日記を書いてAIで絵を描いてみよう"
+    },
+    "saving": "保存中…",
+    "savingPrep": "絵を準備中…",
+    "savingImage": "絵を保存中…",
+    "savingDone": "完了！",
+    "reward": {
+      "saveTitle": "広告を見て日記を1件保存",
+      "saveLead": "上限に達しました。広告を見るとあと1件保存できます。",
+      "saveLeadPremium": "今月の上限（50件）に達しました。広告を見るとあと1件保存できます。"
     }
   },
   "detail": {
@@ -616,7 +662,9 @@
     "openBook": "日記帳を見る",
     "err": {
       "pdf": "PDFの保存に失敗しました"
-    }
+    },
+    "month": "書き出す月",
+    "monthHint": "1か月分ずつ書き出せます"
   },
   "book": {
     "dialogAria": "日記帳ビュー",
@@ -682,7 +730,9 @@
     },
     "stickerRotate": "回転",
     "removeOverlay": "削除",
-    "undo": "戻る"
+    "undo": "戻る",
+    "photoCancel": "キャンセル",
+    "photoConfirm": "完了"
   },
   "font": {
     "dialogAria": "フォントを選ぶ",
