@@ -610,7 +610,8 @@
       "build": "Teilbild kann nicht erstellt werden",
       "convert": "Teilbild-Konvertierung fehlgeschlagen",
       "imageLoad": "Zeichnung konnte nicht geladen werden"
-    }
+    },
+    "goCreateRoom": "Raum erstellen"
   },
   "character": {
     "dialogAria": "Meine Charakter-Einstellungen",

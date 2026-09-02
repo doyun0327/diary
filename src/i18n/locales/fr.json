@@ -609,7 +609,8 @@
       "build": "Impossible de créer l'image de partage",
       "convert": "Échec de la conversion de l'image de partage",
       "imageLoad": "Impossible de charger le dessin"
-    }
+    },
+    "goCreateRoom": "Créer un salon"
   },
   "character": {
     "dialogAria": "Réglages de mon personnage",

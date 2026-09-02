@@ -609,7 +609,8 @@
       "build": "Tidak bisa membuat gambar bagikan",
       "convert": "Konversi gambar bagikan gagal",
       "imageLoad": "Tidak bisa memuat gambar"
-    }
+    },
+    "goCreateRoom": "Buat ruang"
   },
   "character": {
     "dialogAria": "Pengaturan karakter saya",

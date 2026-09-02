@@ -613,7 +613,8 @@
       "build": "Can't create share image",
       "convert": "Share image conversion failed",
       "imageLoad": "Couldn't load drawing"
-    }
+    },
+    "goCreateRoom": "Create a room"
   },
   "character": {
     "dialogAria": "My character settings",

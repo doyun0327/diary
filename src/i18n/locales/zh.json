@@ -609,7 +609,8 @@
       "build": "无法创建分享图",
       "convert": "分享图转换失败",
       "imageLoad": "无法加载画作"
-    }
+    },
+    "goCreateRoom": "去创建房间"
   },
   "character": {
     "dialogAria": "我的角色设置",

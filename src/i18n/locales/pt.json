@@ -609,7 +609,8 @@
       "build": "Não foi possível criar a imagem de compartilhamento",
       "convert": "Falha na conversão da imagem",
       "imageLoad": "Não foi possível carregar o desenho"
-    }
+    },
+    "goCreateRoom": "Criar uma sala"
   },
   "character": {
     "dialogAria": "Configurações do meu personagem",

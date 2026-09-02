@@ -609,7 +609,8 @@
       "build": "共有画像を作成できません",
       "convert": "共有画像の変換に失敗しました",
       "imageLoad": "絵を読み込めませんでした"
-    }
+    },
+    "goCreateRoom": "ルームを作る"
   },
   "character": {
     "dialogAria": "マイキャラクター設定",

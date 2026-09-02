@@ -609,7 +609,8 @@
       "build": "Không tạo được ảnh chia sẻ",
       "convert": "Chuyển đổi ảnh chia sẻ thất bại",
       "imageLoad": "Không tải được tranh"
-    }
+    },
+    "goCreateRoom": "Tạo phòng"
   },
   "character": {
     "dialogAria": "Cài đặt nhân vật của tôi",

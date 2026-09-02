@@ -580,12 +580,24 @@ function DiaryDetailPage({
                   <h3>{t('share.rooms')}</h3>
                   <span className="diary-detail__picker-head-spacer" />
                 </div>
-                <p className="diary-detail__room-hint">{t('share.roomsHint')}</p>
+                {!roomsLoading && rooms.length > 0 && (
+                  <p className="diary-detail__room-hint">{t('share.roomsHint')}</p>
+                )}
                 {roomsLoading && <p className="diary-detail__room-empty">{t('share.roomsLoading')}</p>}
-                {!roomsLoading && rooms.length === 0 && (
-                  <p className="diary-detail__room-empty">
-                    {roomsLoadError ?? t('share.roomsEmpty')}
-                  </p>
+                {!roomsLoading && roomsLoadError && (
+                  <p className="diary-detail__room-empty">{roomsLoadError}</p>
+                )}
+                {!roomsLoading && !roomsLoadError && rooms.length === 0 && (
+                  <button
+                    type="button"
+                    className="diary-detail__room-share-btn"
+                    onClick={() => {
+                      closeShare({ force: true });
+                      onOpenRooms();
+                    }}
+                  >
+                    {t('share.goCreateRoom')}
+                  </button>
                 )}
                 {!roomsLoading && rooms.length > 0 && (
                   <>
@@ -643,14 +655,16 @@ function DiaryDetailPage({
                     )}
                   </>
                 )}
-                <button
-                  type="button"
-                  className="diary-detail__room-share-btn"
-                  disabled={sharing || selectedRoomIds.length === 0}
-                  onClick={() => void shareToSelectedRooms()}
-                >
-                  {sharing ? t('share.sharing') : t('share.submit')}
-                </button>
+                {!roomsLoading && rooms.length > 0 && (
+                  <button
+                    type="button"
+                    className="diary-detail__room-share-btn"
+                    disabled={sharing || selectedRoomIds.length === 0}
+                    onClick={() => void shareToSelectedRooms()}
+                  >
+                    {sharing ? t('share.sharing') : t('share.submit')}
+                  </button>
+                )}
               </>
             )}
           </div>

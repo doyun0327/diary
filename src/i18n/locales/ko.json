@@ -586,6 +586,7 @@
     "sharing": "공유 중…",
     "goToRoomsAsk": "방 목록으로 이동할까요?",
     "goToRooms": "방 목록으로",
+    "goCreateRoom": "방 만들러 가기",
     "pcHint": "PC 웹에서는 앱으로 바로 공유가 안 돼요. 이미지가 다운로드됐으니, 폰에서 열거나 앱에 올려 주세요.",
     "ok": {
       "oneRoom": "「{{name}}」방에 공유했어요",
