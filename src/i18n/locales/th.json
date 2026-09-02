@@ -737,7 +737,8 @@
     "removeOverlay": "ลบ",
     "undo": "ย้อนกลับ",
     "photoCancel": "ยกเลิก",
-    "photoConfirm": "เสร็จ"
+    "photoConfirm": "เสร็จ",
+    "stickerPackPremiumLead": "สติกเกอร์ภาพประกอบใช้ได้เมื่อสมัคร Pro"
   },
   "font": {
     "dialogAria": "เลือกฟอนต์",

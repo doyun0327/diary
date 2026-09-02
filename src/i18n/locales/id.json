@@ -737,7 +737,8 @@
     "removeOverlay": "Hapus",
     "undo": "Urungkan",
     "photoCancel": "Batal",
-    "photoConfirm": "Selesai"
+    "photoConfirm": "Selesai",
+    "stickerPackPremiumLead": "Stiker ilustrasi tersedia dengan Pro."
   },
   "font": {
     "dialogAria": "Pilih font",

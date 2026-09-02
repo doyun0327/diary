@@ -41,6 +41,16 @@ export function postDiaryNative(data: Record<string, unknown>) {
 }
 
 export async function requestAiRewardedAd(): Promise<boolean> {
+  return requestRewardedAd("aiDraw");
+}
+
+export async function requestDiaryRewardedAd(): Promise<boolean> {
+  return requestRewardedAd("diarySave");
+}
+
+async function requestRewardedAd(
+  reason: "aiDraw" | "diarySave",
+): Promise<boolean> {
   if (!isFlutterApp()) return false;
 
   return new Promise<boolean>((resolve) => {
@@ -62,7 +72,7 @@ export async function requestAiRewardedAd(): Promise<boolean> {
 
     window.__onDiaryRewardedAd = (payload) => finish(Boolean(payload?.ok));
     window.addEventListener("diary-rewarded-ad-result", onCustom);
-    postDiaryNative({ type: "rewardedAdShow", reason: "aiDraw" });
+    postDiaryNative({ type: "rewardedAdShow", reason });
   });
 }
 

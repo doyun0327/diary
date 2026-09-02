@@ -310,19 +310,43 @@ function App() {
     queueCloudSync({ month: viewMonthKey });
   }, [queueCloudSync, viewMonthKey]);
 
+  const persistNewEntry = useCallback(
+    async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
+      await addEntry(entry);
+      setPage("home");
+      syncInBackground();
+    },
+    [addEntry, syncInBackground],
+  );
+
+  const persistDiarySave = useCallback(
+    async (
+      entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">,
+      editId: string | null,
+    ) => {
+      if (editId) {
+        await updateEntry(editId, entry);
+        setSelectedId(editId);
+        setEditingId(null);
+        setPage("detail");
+        void syncSharedDiaryAfterEdit(editId, entry);
+        syncInBackground();
+        return;
+      }
+      await persistNewEntry(entry);
+    },
+    [persistNewEntry, syncInBackground, updateEntry],
+  );
+
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
     entry,
   ) => {
     return (async () => {
       try {
-        if (editingId) {
-          const id = editingId;
-          await updateEntry(id, entry);
-          setSelectedId(id);
-          setEditingId(null);
-          setPage("detail");
-          void syncSharedDiaryAfterEdit(id, entry);
-          syncInBackground();
+        const editId = editingId;
+
+        if (editId) {
+          await persistDiarySave(entry, editId);
           return;
         }
 
@@ -356,9 +380,7 @@ function App() {
           consumeDiaryUsage();
         }
 
-        await addEntry(entry);
-        setPage("home");
-        syncInBackground();
+        await persistNewEntry(entry);
       } catch (err) {
         console.error("[diary] save failed", err);
         throw err instanceof Error
@@ -978,9 +1000,11 @@ function App() {
             lead={
               subscriptionModal === "search" || subscriptionModal === "export"
                 ? t("subscription.featureGateLead")
-                : accessStatus.isPremiumActive
-                  ? t("subscription.limitPremiumReachedLead")
-                  : t("subscription.limitFreeLead")
+                : subscriptionModal === "write" && !accessStatus.isPremiumActive
+                  ? t("write.err.diaryDailyLimit")
+                  : accessStatus.isPremiumActive
+                    ? t("subscription.limitPremiumReachedLead")
+                    : t("subscription.limitFreeLead")
             }
             onDismiss={closeSubscriptionModal}
             showClose={false}

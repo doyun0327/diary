@@ -737,7 +737,8 @@
     "removeOverlay": "移除",
     "undo": "撤銷",
     "photoCancel": "取消",
-    "photoConfirm": "完成"
+    "photoConfirm": "完成",
+    "stickerPackPremiumLead": "插畫貼紙需訂閱 Pro 後使用。"
   },
   "font": {
     "dialogAria": "選擇字體",

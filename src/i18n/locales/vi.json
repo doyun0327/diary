@@ -737,7 +737,8 @@
     "removeOverlay": "Gỡ",
     "undo": "Hoàn tác",
     "photoCancel": "Hủy",
-    "photoConfirm": "Xong"
+    "photoConfirm": "Xong",
+    "stickerPackPremiumLead": "Sticker minh họa chỉ dùng được khi đăng ký Pro."
   },
   "font": {
     "dialogAria": "Chọn phông chữ",

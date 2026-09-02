@@ -1,14 +1,20 @@
 export const FREE_ENTRY_GRANT = 5;
-/** 무료 회원은 일기 작성·저장 무제한. AI 그림만 횟수 제한 */
+/** @deprecated 일기 평생 무료 N장 — 현재는 일일 광고 한도 사용 */
 export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_PRICE_KRW = 1900;
-/** 미구독자 AI 그림 평생 무료 한도 (테스트: 2) */
-export const FREE_AI_DRAWS_TOTAL = 2;
+/** 무료 회원: 광고 보고 하루 최대 AI 그림 생성 횟수 */
+export const FREE_DAILY_AI_AD_LIMIT = 3;
+/** @deprecated FREE_DAILY_AI_AD_LIMIT */
+export const FREE_DAILY_DIARY_AD_LIMIT = FREE_DAILY_AI_AD_LIMIT;
+/** @deprecated 일기 저장 광고 — AI 생성 시 차감 */
+export const DIARY_REWARD_AD_ENABLED = false;
+/** @deprecated 일일 광고 한도로 대체 */
+export const FREE_AI_DRAWS_TOTAL = 0;
 /** @deprecated FREE_AI_DRAWS_TOTAL */
 export const FREE_AI_DRAWS_PER_DAY = FREE_AI_DRAWS_TOTAL;
-/** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드). 배포 앱에서 사용 — 테스트 중 false */
-export const AI_REWARD_AD_ENABLED = false;
+/** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드) */
+export const AI_REWARD_AD_ENABLED = true;
 /** 설치 후 검색·보내기 무료 체험 기간 */
 export const FEATURE_TRIAL_DAYS = 7;
 const FEATURE_TRIAL_MS = FEATURE_TRIAL_DAYS * 24 * 60 * 60 * 1000;
@@ -55,8 +61,14 @@ type AccessState = {
   aiDrawCredits: number;
   /** 미구독자 평생 무료 AI 그림 사용 횟수 */
   aiFreeDrawsUsed: number;
-  /** 광고로 받은 추가 일기 저장 슬롯 (무료 한도 소진 후) */
+  /** @deprecated diarySaveCredits 사용 */
   bonusDiarySlots: number;
+  /** YYYY-MM-DD — 일일 AI 그림 생성 카운트 기준일 */
+  diaryDayKey: string | null;
+  /** 오늘 완료한 AI 그림 생성 수 */
+  diaryCreatesToday: number;
+  /** @deprecated diarySaveCredits — 미사용 */
+  diarySaveCredits: number;
 };
 
 export type DiaryAccessStatus = {
@@ -73,6 +85,22 @@ export type DiaryAccessStatus = {
 
 function getMonthKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getDiaryDayKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function normalizeDailyAiState(state: AccessState) {
+  const dayKey = getDiaryDayKey();
+  if (state.diaryDayKey !== dayKey) {
+    state.diaryDayKey = dayKey;
+    state.diaryCreatesToday = 0;
+    state.diarySaveCredits = 0;
+    state.aiDrawCredits = 0;
+  }
+  state.diaryCreatesToday = Math.max(0, state.diaryCreatesToday);
+  state.diarySaveCredits = Math.max(0, state.diarySaveCredits);
 }
 
 function readAiFreeDrawsUsed(
@@ -95,6 +123,9 @@ function loadAccessState(): AccessState {
         aiDrawCredits: 0,
         aiFreeDrawsUsed: 0,
         bonusDiarySlots: 0,
+        diaryDayKey: getDiaryDayKey(),
+        diaryCreatesToday: 0,
+        diarySaveCredits: 0,
       };
     }
 
@@ -110,6 +141,12 @@ function loadAccessState(): AccessState {
       aiDrawCredits: Math.max(0, Number(parsed.aiDrawCredits ?? 0)),
       aiFreeDrawsUsed: readAiFreeDrawsUsed(parsed),
       bonusDiarySlots: Math.max(0, Number(parsed.bonusDiarySlots ?? 0)),
+      diaryDayKey:
+        typeof parsed.diaryDayKey === "string"
+          ? parsed.diaryDayKey
+          : getDiaryDayKey(),
+      diaryCreatesToday: Math.max(0, Number(parsed.diaryCreatesToday ?? 0)),
+      diarySaveCredits: Math.max(0, Number(parsed.diarySaveCredits ?? 0)),
     };
   } catch {
     return {
@@ -119,6 +156,9 @@ function loadAccessState(): AccessState {
       aiDrawCredits: 0,
       aiFreeDrawsUsed: 0,
       bonusDiarySlots: 0,
+      diaryDayKey: getDiaryDayKey(),
+      diaryCreatesToday: 0,
+      diarySaveCredits: 0,
     };
   }
 }
@@ -226,7 +266,7 @@ export function canUseSearchAndExport(): boolean {
 }
 
 export function getDiaryAccessState(
-  entriesCount = getStoredDiaryEntryCount(),
+  _entriesCount = getStoredDiaryEntryCount(),
 ): DiaryAccessStatus {
   const now = Date.now();
   const state = loadAccessState();
@@ -260,35 +300,29 @@ export function getDiaryAccessState(
     };
   }
 
-  if (!FREE_ENTRY_LIMIT_ENABLED) {
-    return {
-      canCreate: true,
-      remaining: Number.MAX_SAFE_INTEGER,
-      isPremiumActive: false,
-      canUseSearchAndExport: searchExportOk,
-      monthlyRemaining: 0,
-      monthlyUsed: 0,
-      monthlyLimit: 0,
-      message: "Free diary limit is temporarily disabled.",
-    };
-  }
+  normalizeDailyAiState(state);
+  saveAccessState(state);
 
-  const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
-  const bonusSlots = Math.max(0, state.bonusDiarySlots);
-  const remaining = freeRemaining + bonusSlots;
+  const aiDrawsToday = state.diaryCreatesToday;
+  const aiCredits = state.aiDrawCredits;
+  const slotsLeft = Math.max(
+    0,
+    FREE_DAILY_AI_AD_LIMIT - aiDrawsToday - aiCredits,
+  );
+  const remaining = slotsLeft + aiCredits;
 
   return {
-    canCreate: remaining > 0,
+    canCreate: true,
     remaining,
     isPremiumActive: false,
     canUseSearchAndExport: searchExportOk,
-    monthlyRemaining: 0,
-    monthlyUsed: Math.min(FREE_ENTRY_GRANT, entriesCount),
-    monthlyLimit: FREE_ENTRY_GRANT,
+    monthlyRemaining: remaining,
+    monthlyUsed: aiDrawsToday,
+    monthlyLimit: FREE_DAILY_AI_AD_LIMIT,
     message:
       remaining > 0
-        ? `Free diaries remaining: ${remaining}.`
-        : "Free 5 diaries used. Subscribe to keep writing.",
+        ? `Free AI draws remaining today: ${remaining}.`
+        : "Daily free AI draw limit reached. Subscribe for unlimited AI.",
   };
 }
 
@@ -331,9 +365,13 @@ function normalizeAiCredits(state: AccessState) {
 
 export function getRemainingFreeAiDraws() {
   const state = loadAccessState();
+  normalizeDailyAiState(state);
   normalizeAiCredits(state);
   saveAccessState(state);
-  return Math.max(0, FREE_AI_DRAWS_TOTAL - state.aiFreeDrawsUsed);
+  return Math.max(
+    0,
+    FREE_DAILY_AI_AD_LIMIT - state.diaryCreatesToday - state.aiDrawCredits,
+  );
 }
 
 /** @deprecated getRemainingFreeAiDraws */
@@ -342,63 +380,145 @@ export function getRemainingFreeAiDrawsToday() {
 }
 
 export function consumeFreeAiDrawChance() {
-  const state = loadAccessState();
-  normalizeAiCredits(state);
-  if (state.aiFreeDrawsUsed >= FREE_AI_DRAWS_TOTAL) return false;
-  state.aiFreeDrawsUsed += 1;
-  saveAccessState(state);
-  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  return true;
+  return consumeAiDrawDailyQuota();
 }
 
 export function getAiDrawCredits() {
   const state = loadAccessState();
+  normalizeDailyAiState(state);
   normalizeAiCredits(state);
   saveAccessState(state);
   return state.aiDrawCredits;
 }
 
 export function grantAiDrawCredits(count = 1) {
-  const state = loadAccessState();
-  normalizeAiCredits(state);
-  state.aiDrawCredits = Math.max(0, state.aiDrawCredits + Math.max(0, count));
-  saveAccessState(state);
-  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  return state.aiDrawCredits;
+  return grantAiDrawCreditWithDailyCap(count) ? getAiDrawCredits() : 0;
 }
 
 export function consumeAiDrawCredit() {
+  return consumeAiDrawDailyQuota();
+}
+
+export function getAiDrawsToday() {
   const state = loadAccessState();
+  normalizeDailyAiState(state);
+  saveAccessState(state);
+  return state.diaryCreatesToday;
+}
+
+export function getRemainingAiDrawsToday() {
+  return getRemainingFreeAiDraws();
+}
+
+/** 오늘 광고로 더 이상 AI 그림을 생성할 수 없음 */
+export function isAiDailyLimitReached() {
+  if (!AI_REWARD_AD_ENABLED) return false;
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
+  normalizeAiCredits(state);
+  saveAccessState(state);
+  return (
+    state.diaryCreatesToday >= FREE_DAILY_AI_AD_LIMIT &&
+    state.aiDrawCredits <= 0
+  );
+}
+
+/** AI 그림 생성 전 광고 시청이 필요함 */
+export function needsAiAdBeforeDraw() {
+  if (!AI_REWARD_AD_ENABLED) return false;
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
+  normalizeAiCredits(state);
+  saveAccessState(state);
+  if (state.diaryCreatesToday >= FREE_DAILY_AI_AD_LIMIT) return false;
+  return state.aiDrawCredits <= 0;
+}
+
+export function canGrantAiDrawCredit() {
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
+  normalizeAiCredits(state);
+  return (
+    state.diaryCreatesToday + state.aiDrawCredits < FREE_DAILY_AI_AD_LIMIT
+  );
+}
+
+/** 광고 시청 후 AI 그림 1회 생성 슬롯 지급 */
+export function grantAiDrawCreditWithDailyCap(count = 1) {
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
+  normalizeAiCredits(state);
+  const add = Math.max(0, count);
+  if (state.diaryCreatesToday + state.aiDrawCredits + add > FREE_DAILY_AI_AD_LIMIT) {
+    return false;
+  }
+  state.aiDrawCredits += add;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** AI 그림 생성 시 광고 슬롯 1개 소모 */
+export function consumeAiDrawDailyQuota() {
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
   normalizeAiCredits(state);
   if (state.aiDrawCredits <= 0) return false;
   state.aiDrawCredits -= 1;
+  state.diaryCreatesToday += 1;
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;
 }
 
-/** 광고 시청 후 무료 한도 초과해도 일기 1편 저장 가능 */
+/** @deprecated isAiDailyLimitReached */
+export function isDiaryDailyLimitReached() {
+  return false;
+}
+
+/** @deprecated needsAiAdBeforeDraw */
+export function needsDiaryAdBeforeSave() {
+  return false;
+}
+
+/** @deprecated grantAiDrawCreditWithDailyCap */
+export function grantDiarySaveCredit(count = 1) {
+  return grantAiDrawCreditWithDailyCap(count);
+}
+
+/** @deprecated consumeAiDrawDailyQuota */
+export function consumeDiarySaveCreditOnCreate() {
+  return consumeAiDrawDailyQuota();
+}
+
+/** @deprecated getAiDrawsToday */
+export function getDiaryCreatesToday() {
+  return getAiDrawsToday();
+}
+
+/** @deprecated */
+export function getDiarySaveCredits() {
+  return getAiDrawCredits();
+}
+
+/** @deprecated */
+export function getRemainingDiaryCreatesToday() {
+  return getRemainingAiDrawsToday();
+}
+
+/** @deprecated */
+export function canGrantDiarySaveCredit() {
+  return canGrantAiDrawCredit();
+}
+
+/** @deprecated grantDiarySaveCredit 사용 */
 export function grantBonusDiarySlots(count = 1) {
-  const state = loadAccessState();
-  state.bonusDiarySlots = Math.max(
-    0,
-    state.bonusDiarySlots + Math.max(0, count),
-  );
-  saveAccessState(state);
-  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  return state.bonusDiarySlots;
+  return grantDiarySaveCredit(count) ? getDiarySaveCredits() : 0;
 }
 
-/** 저장 시 무료 기본 한도를 넘는 경우 보너스 슬롯 1개 소모 */
-export function consumeBonusDiarySlotIfNeeded(entriesCount: number) {
-  const freeRemaining = Math.max(0, FREE_ENTRY_GRANT - entriesCount);
-  if (freeRemaining > 0) return true;
-  const state = loadAccessState();
-  if (state.bonusDiarySlots <= 0) return false;
-  state.bonusDiarySlots -= 1;
-  saveAccessState(state);
-  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  return true;
+/** @deprecated consumeDiarySaveCreditOnCreate 사용 */
+export function consumeBonusDiarySlotIfNeeded(_entriesCount: number) {
+  return consumeDiarySaveCreditOnCreate();
 }
 
 /** @deprecated RevenueCat ???????? ???. ????? mock?? ????? ?? ??? */

@@ -14,10 +14,21 @@ import {
 import { FontSizePicker } from './FontPicker';
 import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
-import { isAssetStickerSrc, toAssetStickerUrl } from '../utils/assetStickers';
+import {
+  isAssetStickerSrc,
+  isPremiumStickerCategory,
+  isPremiumStickerItem,
+  PREMIUM_PACK_TAB_ICON,
+  toAssetStickerUrl,
+} from '../utils/assetStickers';
 import { getEmojiStickerImageUrl } from '../utils/emojiStickerImage';
 import { STICKER_CATEGORIES, stickerItemValue, type StickerCategoryId } from '../utils/stickers';
 import type { DiaryCanvasState } from '../types/diary';
+import {
+  isPremiumActiveNow,
+  subscribeDiaryAccess,
+} from '../utils/diaryAccess';
+import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
 import './DrawingCanvas.css';
@@ -295,6 +306,8 @@ function DrawingCanvas({
   const stickerImages = useRef<Map<string, HTMLImageElement>>(new Map());
   const activePhotoIdRef = useRef<string | null>(null);
   const activeStickerIdRef = useRef<string | null>(null);
+  /** 스티커 시트에서 고른 직후에만 캔버스 탭으로 1회 배치 */
+  const stickerPlacementArmedRef = useRef(false);
   const overlayPointers = useRef<Map<number, { x: number; y: number }>>(
     new Map(),
   );
@@ -334,6 +347,8 @@ function DrawingCanvas({
   const [mode, setMode] = useState<ToolMode>('none');
   const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
+  const [stickerPremiumOpen, setStickerPremiumOpen] = useState(false);
+  const [isPremiumActive, setIsPremiumActive] = useState(() => isPremiumActiveNow());
   const [colorsOpen, setColorsOpen] = useState(false);
   const [fontOpen, setFontOpen] = useState(false);
   const [stickerCategoryId, setStickerCategoryId] =
@@ -367,6 +382,14 @@ function DrawingCanvas({
     const active = tabs.querySelector<HTMLElement>('.drawing__sticker-tab.active');
     active?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
   }, [stickerCategoryId, stickerOpen]);
+
+  useEffect(() => {
+    return subscribeDiaryAccess(() => {
+      const active = isPremiumActiveNow();
+      setIsPremiumActive(active);
+      if (active) setStickerPremiumOpen(false);
+    });
+  }, []);
 
   /** 도구줄(dock-bar) 높이만큼 그리기 영역·저장에서 제외 */
   useEffect(() => {
@@ -1269,6 +1292,7 @@ function DrawingCanvas({
 
   const confirmActiveSticker = () => {
     setActiveStickerId(null);
+    stickerPlacementArmedRef.current = false;
     // ✓ 후엔 스티커 배치 종료 — 펜은 직접 눌러야 선택
     setMode('none');
     setStickerOpen(false);
@@ -1286,6 +1310,7 @@ function DrawingCanvas({
     if (!activeStickerId) return;
     setStickerLayers((prev) => prev.filter((l) => l.id !== activeStickerId));
     setActiveStickerId(null);
+    stickerPlacementArmedRef.current = false;
     setMode('none');
     setStickerOpen(false);
     setColorsOpen(false);
@@ -1347,10 +1372,12 @@ function DrawingCanvas({
     setStickerOpen((open) => {
       const next = !open;
       if (next) {
+        stickerPlacementArmedRef.current = false;
         setMode('sticker');
         setColorsOpen(false);
         setFontOpen(false);
       } else {
+        stickerPlacementArmedRef.current = false;
         setMode('none');
         setColorsOpen(false);
       }
@@ -1358,8 +1385,13 @@ function DrawingCanvas({
     });
   };
 
-  const pickSticker = (emoji: string) => {
-    setSelectedSticker(emoji);
+  const pickSticker = (value: string) => {
+    if (isPremiumStickerItem(value) && !isPremiumActive) {
+      setStickerPremiumOpen(true);
+      return;
+    }
+    setSelectedSticker(value);
+    stickerPlacementArmedRef.current = true;
     setMode('sticker');
     setStickerOpen(false);
     setFontOpen(false);
@@ -1426,6 +1458,10 @@ function DrawingCanvas({
   };
 
   const placeStickerLayer = (value: string, x: number, y: number) => {
+    if (isPremiumStickerItem(value) && !isPremiumActive) {
+      setStickerPremiumOpen(true);
+      return;
+    }
     confirmActiveOverlay();
     const imageSrc = isAssetStickerSrc(value)
       ? value
@@ -1442,6 +1478,7 @@ function DrawingCanvas({
         size: DEFAULT_STICKER_SIZE,
         rotation: 0,
       };
+      stickerPlacementArmedRef.current = false;
       setStickerLayers((prev) => [...prev, layer]);
       setActiveStickerId(id);
     };
@@ -1579,7 +1616,7 @@ function DrawingCanvas({
       confirmActivePhoto();
       return;
     }
-    setActiveStickerId(null);
+    confirmActiveSticker();
   };
 
   const getPos = (e: PointerEvent<HTMLCanvasElement>) => {
@@ -1607,11 +1644,11 @@ function DrawingCanvas({
   const handleDown = (e: PointerEvent<HTMLCanvasElement>) => {
     if (mode === 'sticker') {
       e.preventDefault();
-      // 편집 중이면 선택만 해제 (새 스티커 붙이지 않음)
       if (activeStickerId) {
-        setActiveStickerId(null);
+        confirmActiveSticker();
         return;
       }
+      if (!stickerPlacementArmedRef.current) return;
       const pos = getPos(e);
       placeStickerLayer(selectedSticker, pos.x, pos.y);
       return;
@@ -2127,6 +2164,7 @@ function DrawingCanvas({
                 type="button"
                 className="sheet-close-btn"
                 onClick={() => {
+                  stickerPlacementArmedRef.current = false;
                   setStickerOpen(false);
                   setMode('none');
                   setColorsOpen(false);
@@ -2143,7 +2181,10 @@ function DrawingCanvas({
               role="tablist"
               aria-label={t('canvas.stickerCatsAria')}
             >
-              {STICKER_CATEGORIES.map((cat) => (
+              {STICKER_CATEGORIES.map((cat) => {
+                const isPackTab = isPremiumStickerCategory(cat.id);
+                const tabIcon = isPackTab ? PREMIUM_PACK_TAB_ICON : cat.icon;
+                return (
                 <button
                   key={cat.id}
                   type="button"
@@ -2151,12 +2192,13 @@ function DrawingCanvas({
                   aria-selected={stickerCategoryId === cat.id}
                   aria-label={t(`stickers.${cat.id}`)}
                   title={t(`stickers.${cat.id}`)}
-                  className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}`}
+                  className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}${isPackTab && !isPremiumActive ? ' drawing__sticker-tab--premium' : ''}`}
                   onClick={() => setStickerCategoryId(cat.id)}
                 >
-                  {cat.icon}
+                  {tabIcon}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -2166,11 +2208,13 @@ function DrawingCanvas({
             ).map((item, index) => {
               const value = stickerItemValue(item);
               const previewSrc = stickerDisplaySrc(value);
+              const isLockedPackItem =
+                isPremiumStickerCategory(stickerCategoryId) && !isPremiumActive;
               return (
                 <button
                   key={`${stickerCategoryId}-${value}-${index}`}
                   type="button"
-                  className={`${selectedSticker === value ? 'selected' : ''}${previewSrc ? ' drawing__stickers-btn--image' : ''}`}
+                  className={`${selectedSticker === value ? 'selected' : ''}${previewSrc ? ' drawing__stickers-btn--image' : ''}${isLockedPackItem ? ' drawing__stickers-btn--locked' : ''}`}
                   onClick={() => pickSticker(value)}
                 >
                   {previewSrc ? (
@@ -2223,6 +2267,23 @@ function DrawingCanvas({
             })}
           </div>
         </div>
+      )}
+
+      {stickerPremiumOpen && (
+        <AppModal
+          title={t('subscription.featureGateTitle')}
+          lead={t('canvas.stickerPackPremiumLead')}
+          onDismiss={() => setStickerPremiumOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setStickerPremiumOpen(false)}
+          primaryLabel={t('subscription.subscribeCta')}
+          onPrimary={() => {
+            setStickerPremiumOpen(false);
+            void requestSubscriptionPurchaseAndSync();
+          }}
+        />
       )}
 
       {clearConfirmOpen && (

@@ -514,7 +514,6 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 6px;
   padding: 8px;
   border: 2px solid color-mix(in srgb, var(--color-accent-text) 18%, transparent);
   border-radius: var(--radius-md);
@@ -534,12 +533,6 @@
   object-fit: cover;
   border-radius: calc(var(--radius-md) - 4px);
   background: color-mix(in srgb, var(--color-accent-text) 6%, transparent);
-}
-
-.diary-write__ai-pick-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--color-accent-text);
 }
 
 .diary-write__ai-pick-check {

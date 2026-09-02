@@ -98,6 +98,18 @@ export const PACK_STICKER_CATEGORY = {
   items: ASSET_STICKER_SRCS.map((src) => ({ src })),
 } as const;
 
+/** Pro 전용 스티커 탭 (마지막 일러스트 팩) */
+export const PREMIUM_STICKER_CATEGORY_ID = PACK_STICKER_CATEGORY.id;
+export const PREMIUM_PACK_TAB_ICON = '👑';
+
+export function isPremiumStickerCategory(id: string): boolean {
+  return id === PREMIUM_STICKER_CATEGORY_ID;
+}
+
+export function isPremiumStickerItem(value: string): boolean {
+  return isAssetStickerSrc(value);
+}
+
 export function isAssetStickerSrc(value: string): boolean {
   return value.startsWith('/stikers/');
 }

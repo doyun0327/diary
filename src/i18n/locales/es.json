@@ -737,7 +737,8 @@
     "removeOverlay": "Quitar",
     "undo": "Deshacer",
     "photoCancel": "Cancelar",
-    "photoConfirm": "Listo"
+    "photoConfirm": "Listo",
+    "stickerPackPremiumLead": "Los stickers de ilustración están disponibles con Pro."
   },
   "font": {
     "dialogAria": "Elegir fuente",

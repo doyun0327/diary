@@ -738,7 +738,8 @@
     "removeOverlay": "Entfernen",
     "undo": "Rückgängig",
     "photoCancel": "Abbrechen",
-    "photoConfirm": "Fertig"
+    "photoConfirm": "Fertig",
+    "stickerPackPremiumLead": "Illustrations-Sticker sind mit Pro verfügbar."
   },
   "font": {
     "dialogAria": "Schrift wählen",

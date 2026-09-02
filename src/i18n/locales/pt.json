@@ -737,7 +737,8 @@
     "removeOverlay": "Remover",
     "undo": "Desfazer",
     "photoCancel": "Cancelar",
-    "photoConfirm": "Concluir"
+    "photoConfirm": "Concluir",
+    "stickerPackPremiumLead": "Adesivos de ilustração estão disponíveis com o Pro."
   },
   "font": {
     "dialogAria": "Escolher fonte",

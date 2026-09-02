@@ -23,13 +23,13 @@ import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
-  FREE_AI_DRAWS_TOTAL,
-  consumeAiDrawCredit,
-  consumeFreeAiDrawChance,
-  getAiDrawCredits,
+  FREE_DAILY_AI_AD_LIMIT,
+  consumeAiDrawDailyQuota,
   getDiaryAccessState,
   getRemainingFreeAiDraws,
-  grantAiDrawCredits,
+  grantAiDrawCreditWithDailyCap,
+  isAiDailyLimitReached,
+  needsAiAdBeforeDraw,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
@@ -53,6 +53,27 @@ type AiPickOption = {
   kind: 'canvas' | 'ai';
   aiIndex?: number;
 };
+
+function buildAiPickOptions(
+  previousSnapshot: string | null,
+  aiHistory: string[],
+  includePreviousCanvas: boolean,
+): AiPickOption[] {
+  const seen = new Set<string>();
+  const options: AiPickOption[] = [];
+
+  const add = (src: string, kind: 'canvas' | 'ai', aiIndex?: number) => {
+    if (seen.has(src)) return;
+    seen.add(src);
+    options.push({ src, kind, aiIndex });
+  };
+
+  if (includePreviousCanvas && previousSnapshot) {
+    add(previousSnapshot, 'canvas');
+  }
+  aiHistory.forEach((src, index) => add(src, 'ai', index + 1));
+  return options;
+}
 
 function pickRandomLottie(pool: object[]): object | null {
   if (pool.length === 0) return null;
@@ -131,6 +152,7 @@ function DiaryWritePage({
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
+  const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiPickOpen, setAiPickOpen] = useState(false);
@@ -138,7 +160,6 @@ function DiaryWritePage({
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
   const [accessTick, setAccessTick] = useState(0);
-  void accessTick;
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -400,23 +421,40 @@ function DiaryWritePage({
   };
 
   const aiRemaining = (() => {
+    void accessTick;
     if (writeQuota) {
       return {
-        n: Math.max(0, writeQuota.limit - writeQuota.used),
+        used: writeQuota.used,
         limit: writeQuota.limit,
       };
     }
+    const limit = FREE_DAILY_AI_AD_LIMIT;
+    const remaining = getRemainingFreeAiDraws();
     return {
-      n: getRemainingFreeAiDraws(),
-      limit: FREE_AI_DRAWS_TOTAL,
+      used: Math.max(0, limit - remaining),
+      limit,
     };
   })();
 
-  const needsAiRewardAd = () => {
-    if (!AI_REWARD_AD_ENABLED) return false;
-    const access = getDiaryAccessState();
-    if (access.isPremiumActive) return false;
-    return getRemainingFreeAiDraws() <= 0 && getAiDrawCredits() <= 0;
+  const promptAiDrawBlocked = () => {
+    if (isAiDailyLimitReached()) {
+      setAiDailyLimitOpen(true);
+      return;
+    }
+    if (AI_REWARD_AD_ENABLED) {
+      setRewardPromptOpen(true);
+      return;
+    }
+    setAiError(t('write.err.aiDailyLimit'));
+  };
+
+  const consumeAiDrawQuota = () => {
+    if (getDiaryAccessState().isPremiumActive) return true;
+    if (!consumeAiDrawDailyQuota()) {
+      promptAiDrawBlocked();
+      return false;
+    }
+    return true;
   };
 
   const handleAiDraw = () => {
@@ -424,7 +462,19 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    if (needsAiRewardAd()) {
+    if (getDiaryAccessState().isPremiumActive) {
+      void runAiDraw();
+      return;
+    }
+    if (isAiDailyLimitReached()) {
+      promptAiDrawBlocked();
+      return;
+    }
+    if (needsAiAdBeforeDraw()) {
+      if (!isFlutterApp()) {
+        setAiError(t('write.err.adAppOnly'));
+        return;
+      }
       setRewardPromptOpen(true);
       return;
     }
@@ -447,23 +497,7 @@ function DiaryWritePage({
     setAiLoading(true);
 
     try {
-      if (AI_REWARD_AD_ENABLED && !getDiaryAccessState().isPremiumActive) {
-        const freeLeft = getRemainingFreeAiDraws();
-        if (freeLeft > 0) {
-          if (!consumeFreeAiDrawChance()) {
-            setAiError(t('write.err.aiFreeLimit'));
-            return;
-          }
-        } else if (getAiDrawCredits() > 0) {
-          if (!consumeAiDrawCredit()) {
-            setRewardPromptOpen(true);
-            return;
-          }
-        } else {
-          setRewardPromptOpen(true);
-          return;
-        }
-      }
+      if (!consumeAiDrawQuota()) return;
 
       let previousSnapshot: string | null = null;
       previousSnapshot = await capturePreviousSnapshot();
@@ -475,6 +509,7 @@ function DiaryWritePage({
         onProgress: setAiProgress,
       });
 
+      const priorAiCount = aiGeneratedImages.length;
       const nextHistory = [...aiGeneratedImages, imageUrl];
       setAiGeneratedImages(nextHistory);
 
@@ -483,13 +518,11 @@ function DiaryWritePage({
         drawingTouchedRef.current = true;
         dismissAiCoach();
       } else {
-        const options: AiPickOption[] = [];
-        if (previousSnapshot) {
-          options.push({ src: previousSnapshot, kind: 'canvas' });
-        }
-        nextHistory.forEach((src, index) => {
-          options.push({ src, kind: 'ai', aiIndex: index + 1 });
-        });
+        const options = buildAiPickOptions(
+          previousSnapshot,
+          nextHistory,
+          priorAiCount === 0,
+        );
         setAiPickOptions(options);
         setAiPickSelected(new Set(options.map((_, index) => index)));
         setAiPickOpen(true);
@@ -514,11 +547,6 @@ function DiaryWritePage({
       else next.add(index);
       return next;
     });
-  };
-
-  const aiPickLabel = (option: AiPickOption) => {
-    if (option.kind === 'canvas') return t('write.ai.pickPrevious');
-    return t('write.ai.pickNth', { n: option.aiIndex });
   };
 
   const applyAiPick = async () => {
@@ -555,6 +583,11 @@ function DiaryWritePage({
       setAiError(t('write.err.adAppOnly'));
       return;
     }
+    if (isAiDailyLimitReached()) {
+      setRewardPromptOpen(false);
+      setAiDailyLimitOpen(true);
+      return;
+    }
     setRewardPromptOpen(false);
     setAdIncompleteOpen(false);
     setAiError(null);
@@ -563,7 +596,10 @@ function DiaryWritePage({
       setAdIncompleteOpen(true);
       return;
     }
-    grantAiDrawCredits(1);
+    if (!grantAiDrawCreditWithDailyCap(1)) {
+      setAiDailyLimitOpen(true);
+      return;
+    }
     void runAiDraw();
   };
 
@@ -813,14 +849,12 @@ function DiaryWritePage({
                     >
                       {aiLabel}
                     </button>
-                    {!isEdit && (
-                      <span className="diary-write__ai-remaining" aria-label={t('quota.fraction', { used: aiRemaining.n, limit: aiRemaining.limit })}>
-                        {t('quota.fraction', {
-                          used: aiRemaining.n,
-                          limit: aiRemaining.limit,
-                        })}
-                      </span>
-                    )}
+                    <span className="diary-write__ai-remaining" aria-label={t('quota.fraction', { used: aiRemaining.used, limit: aiRemaining.limit })}>
+                      {t('quota.fraction', {
+                        used: aiRemaining.used,
+                        limit: aiRemaining.limit,
+                      })}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -896,7 +930,7 @@ function DiaryWritePage({
         <AppModal
           title={t('quota.drawConfirmTitle')}
           lead={t('quota.drawConfirmLead', {
-            n: aiRemaining.n,
+            n: aiRemaining.used,
             limit: aiRemaining.limit,
           })}
           onDismiss={() => setAiConfirmOpen(false)}
@@ -914,7 +948,7 @@ function DiaryWritePage({
       {rewardPromptOpen && (
         <AppModal
           title={t('write.ai.rewardTitle')}
-          lead={t('write.ai.rewardLead')}
+          lead={t('write.ai.rewardLeadDaily')}
           onDismiss={() => setRewardPromptOpen(false)}
           showClose={false}
           closeAriaLabel={t('common.close')}
@@ -925,6 +959,22 @@ function DiaryWritePage({
           }}
           primaryLabel={t('write.ai.rewardCta')}
           onPrimary={() => void handleWatchAd()}
+        />
+      )}
+      {aiDailyLimitOpen && (
+        <AppModal
+          title={t('write.ai.rewardTitle')}
+          lead={t('write.err.aiDailyLimit')}
+          onDismiss={() => setAiDailyLimitOpen(false)}
+          showClose={false}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => setAiDailyLimitOpen(false)}
+          primaryLabel={t('subscription.subscribeCta')}
+          onPrimary={() => {
+            setAiDailyLimitOpen(false);
+            void requestSubscriptionPurchaseAndSync();
+          }}
         />
       )}
       {adIncompleteOpen && (
@@ -957,14 +1007,13 @@ function DiaryWritePage({
               const checked = aiPickSelected.has(index);
               return (
                 <button
-                  key={`${option.kind}-${option.aiIndex ?? 'canvas'}-${index}`}
+                  key={`${option.kind}-${index}-${option.src.slice(0, 32)}`}
                   type="button"
                   className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
                   aria-pressed={checked}
                   onClick={() => toggleAiPick(index)}
                 >
                   <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
-                  <span className="diary-write__ai-pick-label">{aiPickLabel(option)}</span>
                   <span className="diary-write__ai-pick-check" aria-hidden="true">
                     {checked ? '✓' : ''}
                   </span>

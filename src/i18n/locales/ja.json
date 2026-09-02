@@ -737,7 +737,8 @@
     "removeOverlay": "削除",
     "undo": "戻る",
     "photoCancel": "キャンセル",
-    "photoConfirm": "完了"
+    "photoConfirm": "完了",
+    "stickerPackPremiumLead": "イラストステッカーはPro加入後に使えます。"
   },
   "font": {
     "dialogAria": "フォントを選ぶ",
