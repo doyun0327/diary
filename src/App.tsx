@@ -1021,6 +1021,7 @@ function App() {
               if (!isFlutterApp()) return;
               if (subscribing) return;
               setSubscribing(true);
+              closeSubscriptionModal();
               void requestSubscriptionPurchaseAndSync().finally(() =>
                 setSubscribing(false),
               );

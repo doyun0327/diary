@@ -1,4 +1,5 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { ChangeEvent, PointerEvent, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveAppLanguage } from '../i18n';
@@ -2269,36 +2270,43 @@ function DrawingCanvas({
         </div>
       )}
 
-      {stickerPremiumOpen && (
-        <AppModal
-          title={t('subscription.featureGateTitle')}
-          lead={t('canvas.stickerPackPremiumLead')}
-          onDismiss={() => setStickerPremiumOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setStickerPremiumOpen(false)}
-          primaryLabel={t('subscription.subscribeCta')}
-          onPrimary={() => {
-            setStickerPremiumOpen(false);
-            void requestSubscriptionPurchaseAndSync();
-          }}
-        />
-      )}
+      {createPortal(
+        <>
+          {stickerPremiumOpen && (
+            <AppModal
+              title={t('subscription.featureGateTitle')}
+              lead={t('canvas.stickerPackPremiumLead')}
+              onDismiss={() => setStickerPremiumOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('common.cancel')}
+              onSecondary={() => setStickerPremiumOpen(false)}
+              primaryLabel={t('subscription.subscribeCta')}
+              onPrimary={() => {
+                setStickerPremiumOpen(false);
+                setStickerOpen(false);
+                setFontOpen(false);
+                void requestSubscriptionPurchaseAndSync();
+              }}
+            />
+          )}
 
-      {clearConfirmOpen && (
-        <AppModal
-          title={t('canvas.clearAll')}
-          lead={t('canvas.confirm.clear')}
-          onDismiss={() => setClearConfirmOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setClearConfirmOpen(false)}
-          primaryDanger
-          primaryLabel={t('canvas.clearAll')}
-          onPrimary={applyClearAll}
-        />
+          {clearConfirmOpen && (
+            <AppModal
+              title={t('canvas.clearAll')}
+              lead={t('canvas.confirm.clear')}
+              onDismiss={() => setClearConfirmOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('common.cancel')}
+              onSecondary={() => setClearConfirmOpen(false)}
+              primaryDanger
+              primaryLabel={t('canvas.clearAll')}
+              onPrimary={applyClearAll}
+            />
+          )}
+        </>,
+        document.getElementById('root') ?? document.body,
       )}
     </div>
   );

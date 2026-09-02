@@ -598,3 +598,12 @@
   font-size: 0.85rem;
   color: var(--color-danger);
 }
+
+/* 결제창 닫힌 직후 유령 터치가 AI 버튼 등으로 전달되지 않게 */
+.diary-write__purchase-shield {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: transparent;
+  touch-action: none;
+}

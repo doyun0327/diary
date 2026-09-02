@@ -122,9 +122,9 @@ export function requestSubscriptionPurchase() {
   return true;
 }
 
-/** 구독 결제 시작 + 완료 콜백/sync 대기 */
+/** 구독 결제 시작 + Pro 활성화 대기 (이미 가입됨 → 복원 포함) */
 export async function requestSubscriptionPurchaseAndSync(
-  timeoutMs = 120_000,
+  timeoutMs = 20_000,
 ): Promise<boolean> {
   if (!requestSubscriptionPurchase()) return false;
   scheduleSubscriptionSyncAfterPurchase();

@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, DiarySticker } from '../types/diary';
@@ -160,6 +161,45 @@ function DiaryWritePage({
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
   const [accessTick, setAccessTick] = useState(0);
+  const [purchaseClickShield, setPurchaseClickShield] = useState(false);
+  const proPurchaseGuardUntilRef = useRef(0);
+  const purchaseShieldTimerRef = useRef<number | null>(null);
+
+  const armPurchaseShield = useCallback((ms = 8_000) => {
+    proPurchaseGuardUntilRef.current = Date.now() + ms;
+    setPurchaseClickShield(true);
+    contentRef.current?.blur();
+    titleRef.current?.blur();
+    if (purchaseShieldTimerRef.current != null) {
+      window.clearTimeout(purchaseShieldTimerRef.current);
+    }
+    purchaseShieldTimerRef.current = window.setTimeout(() => {
+      purchaseShieldTimerRef.current = null;
+      if (Date.now() >= proPurchaseGuardUntilRef.current) {
+        setPurchaseClickShield(false);
+      }
+    }, ms);
+  }, []);
+
+  const isPurchaseShielded = useCallback(
+    () => purchaseClickShield || Date.now() < proPurchaseGuardUntilRef.current,
+    [purchaseClickShield],
+  );
+
+  const startProPurchase = useCallback(() => {
+    armPurchaseShield();
+    setRewardPromptOpen(false);
+    setAiDailyLimitOpen(false);
+    setAdIncompleteOpen(false);
+    setAiConfirmOpen(false);
+    setAiError(null);
+    setAiLoading(false);
+    contentRef.current?.blur();
+    titleRef.current?.blur();
+    void requestSubscriptionPurchaseAndSync().finally(() => {
+      armPurchaseShield(6_000);
+    });
+  }, [armPurchaseShield]);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -406,15 +446,48 @@ function DiaryWritePage({
     return () => window.removeEventListener('diary-write-cancel', onNativeCancel);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (purchaseShieldTimerRef.current != null) {
+        window.clearTimeout(purchaseShieldTimerRef.current);
+      }
+    };
+  }, []);
+
   // Pro 결제 반영되면 AI 광고 팝업 즉시 닫기 + 남은 횟수 갱신
   useEffect(() => {
     return subscribeDiaryAccess(() => {
       setAccessTick((n) => n + 1);
       if (getDiaryAccessState().isPremiumActive) {
         setRewardPromptOpen(false);
+        setAiDailyLimitOpen(false);
+        proPurchaseGuardUntilRef.current = 0;
+        setPurchaseClickShield(false);
       }
     });
   }, []);
+
+  // 네이티브 결제창 닫힘 직후 잠깐 뜨는 팝업/로딩·유령 터치 방지
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        armPurchaseShield();
+        return;
+      }
+      if (Date.now() > proPurchaseGuardUntilRef.current) return;
+      armPurchaseShield(6_000);
+      setRewardPromptOpen(false);
+      setAiDailyLimitOpen(false);
+      setAdIncompleteOpen(false);
+      setAiConfirmOpen(false);
+      setAiLoading(false);
+      setAiError(null);
+      contentRef.current?.blur();
+      titleRef.current?.blur();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [armPurchaseShield]);
 
   const saveAndLeave = () => {
     formRef.current?.requestSubmit();
@@ -437,6 +510,7 @@ function DiaryWritePage({
   })();
 
   const promptAiDrawBlocked = () => {
+    if (isPurchaseShielded()) return;
     if (isAiDailyLimitReached()) {
       setAiDailyLimitOpen(true);
       return;
@@ -458,6 +532,7 @@ function DiaryWritePage({
   };
 
   const handleAiDraw = () => {
+    if (isPurchaseShielded()) return;
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
@@ -490,15 +565,16 @@ function DiaryWritePage({
   };
 
   const runAiDraw = async () => {
+    if (isPurchaseShielded()) return;
     setAiError(null);
+    if (!consumeAiDrawQuota()) return;
+
     setAiProgress('waiting');
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
 
     try {
-      if (!consumeAiDrawQuota()) return;
-
       let previousSnapshot: string | null = null;
       previousSnapshot = await capturePreviousSnapshot();
 
@@ -650,10 +726,18 @@ function DiaryWritePage({
   };
 
   const handleTitleFocus = () => {
+    if (isPurchaseShielded()) {
+      titleRef.current?.blur();
+      return;
+    }
     scrollWritingFieldIntoView(titleRef.current);
   };
 
   const handleContentFocus = () => {
+    if (isPurchaseShielded()) {
+      contentRef.current?.blur();
+      return;
+    }
     scrollWritingFieldIntoView(contentRef.current);
   };
 
@@ -799,7 +883,7 @@ function DiaryWritePage({
               fontSizeId={fontSizeId}
               onFontSizeChange={setFontSizeId}
             />
-            {aiLoading && (
+            {aiLoading && !purchaseClickShield && (
               <AiLoadingWait
                 animationData={activeAiLottie}
                 lottieKey={aiLottieKey}
@@ -914,124 +998,124 @@ function DiaryWritePage({
           {aiError && <p className="diary-write__ai-error">{aiError}</p>}
         </section>
       </div>
-      {leaveConfirmOpen && (
-        <AppModal
-          title={t('write.confirm.saveOnLeave')}
-          onDismiss={() => setLeaveConfirmOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('write.confirm.saveOnLeaveDiscard')}
-          onSecondary={leaveWithoutSaving}
-          primaryLabel={isEdit ? t('write.saveEdit') : t('write.save')}
-          onPrimary={saveAndLeave}
-        />
-      )}
-      {aiConfirmOpen && (
-        <AppModal
-          title={t('quota.drawConfirmTitle')}
-          lead={t('quota.drawConfirmLead', {
-            n: aiRemaining.used,
-            limit: aiRemaining.limit,
-          })}
-          onDismiss={() => setAiConfirmOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setAiConfirmOpen(false)}
-          primaryLabel={t('quota.drawConfirmOk')}
-          onPrimary={() => {
-            setAiConfirmOpen(false);
-            void runAiDraw();
-          }}
-        />
-      )}
-      {rewardPromptOpen && (
-        <AppModal
-          title={t('write.ai.rewardTitle')}
-          lead={t('write.ai.rewardLeadDaily')}
-          onDismiss={() => setRewardPromptOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('subscription.subscribeCta')}
-          onSecondary={() => {
-            setRewardPromptOpen(false);
-            void requestSubscriptionPurchaseAndSync();
-          }}
-          primaryLabel={t('write.ai.rewardCta')}
-          onPrimary={() => void handleWatchAd()}
-        />
-      )}
-      {aiDailyLimitOpen && (
-        <AppModal
-          title={t('write.ai.rewardTitle')}
-          lead={t('write.err.aiDailyLimit')}
-          onDismiss={() => setAiDailyLimitOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setAiDailyLimitOpen(false)}
-          primaryLabel={t('subscription.subscribeCta')}
-          onPrimary={() => {
-            setAiDailyLimitOpen(false);
-            void requestSubscriptionPurchaseAndSync();
-          }}
-        />
-      )}
-      {adIncompleteOpen && (
-        <AppModal
-          title={t('write.ai.adIncompleteTitle')}
-          lead={t('write.err.adNotCompleted')}
-          onDismiss={() => setAdIncompleteOpen(false)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.close')}
-          onSecondary={() => setAdIncompleteOpen(false)}
-          primaryLabel={t('write.ai.rewardCta')}
-          onPrimary={() => void handleWatchAd()}
-        />
-      )}
-      {aiPickOpen && aiPickOptions.length > 0 && (
-        <AppModal
-          title={t('write.ai.pickTitle')}
-          lead={t('write.ai.pickLead')}
-          onDismiss={dismissAiPick}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={dismissAiPick}
-          primaryLabel={t('write.ai.pickConfirm')}
-          onPrimary={() => void applyAiPick()}
-        >
-          <div className="diary-write__ai-pick">
-            {aiPickOptions.map((option, index) => {
-              const checked = aiPickSelected.has(index);
-              return (
-                <button
-                  key={`${option.kind}-${index}-${option.src.slice(0, 32)}`}
-                  type="button"
-                  className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
-                  aria-pressed={checked}
-                  onClick={() => toggleAiPick(index)}
-                >
-                  <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
-                  <span className="diary-write__ai-pick-check" aria-hidden="true">
-                    {checked ? '✓' : ''}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </AppModal>
-      )}
-      {saveError && (
-        <AppModal
-          title={saveError}
-          onDismiss={() => setSaveError(null)}
-          showClose={false}
-          closeAriaLabel={t('common.close')}
-          primaryLabel={t('common.close')}
-          onPrimary={() => setSaveError(null)}
-        />
+      {createPortal(
+        <>
+          {purchaseClickShield && (
+            <div className="diary-write__purchase-shield" aria-hidden="true" />
+          )}
+          {leaveConfirmOpen && (
+            <AppModal
+              title={t('write.confirm.saveOnLeave')}
+              onDismiss={() => setLeaveConfirmOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('write.confirm.saveOnLeaveDiscard')}
+              onSecondary={leaveWithoutSaving}
+              primaryLabel={isEdit ? t('write.saveEdit') : t('write.save')}
+              onPrimary={saveAndLeave}
+            />
+          )}
+          {aiConfirmOpen && (
+            <AppModal
+              title={t('quota.drawConfirmTitle')}
+              lead={t('quota.drawConfirmLead', {
+                n: aiRemaining.used,
+                limit: aiRemaining.limit,
+              })}
+              onDismiss={() => setAiConfirmOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('common.cancel')}
+              onSecondary={() => setAiConfirmOpen(false)}
+              primaryLabel={t('quota.drawConfirmOk')}
+              onPrimary={() => {
+                setAiConfirmOpen(false);
+                void runAiDraw();
+              }}
+            />
+          )}
+          {rewardPromptOpen && (
+            <AppModal
+              title={t('write.ai.rewardTitle')}
+              lead={t('write.ai.rewardLeadDaily')}
+              onDismiss={() => setRewardPromptOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('subscription.subscribeCta')}
+              onSecondary={startProPurchase}
+              primaryLabel={t('write.ai.rewardCta')}
+              onPrimary={() => void handleWatchAd()}
+            />
+          )}
+          {aiDailyLimitOpen && (
+            <AppModal
+              title={t('write.ai.rewardTitle')}
+              lead={t('write.err.aiDailyLimit')}
+              onDismiss={() => setAiDailyLimitOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={t('subscription.subscribeCta')}
+              onPrimary={startProPurchase}
+            />
+          )}
+          {adIncompleteOpen && (
+            <AppModal
+              title={t('write.ai.adIncompleteTitle')}
+              lead={t('write.err.adNotCompleted')}
+              onDismiss={() => setAdIncompleteOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('common.close')}
+              onSecondary={() => setAdIncompleteOpen(false)}
+              primaryLabel={t('write.ai.rewardCta')}
+              onPrimary={() => void handleWatchAd()}
+            />
+          )}
+          {aiPickOpen && aiPickOptions.length > 0 && (
+            <AppModal
+              title={t('write.ai.pickTitle')}
+              lead={t('write.ai.pickLead')}
+              onDismiss={dismissAiPick}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              secondaryLabel={t('common.cancel')}
+              onSecondary={dismissAiPick}
+              primaryLabel={t('write.ai.pickConfirm')}
+              onPrimary={() => void applyAiPick()}
+            >
+              <div className="diary-write__ai-pick">
+                {aiPickOptions.map((option, index) => {
+                  const checked = aiPickSelected.has(index);
+                  return (
+                    <button
+                      key={`${option.kind}-${index}-${option.src.slice(0, 32)}`}
+                      type="button"
+                      className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
+                      aria-pressed={checked}
+                      onClick={() => toggleAiPick(index)}
+                    >
+                      <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
+                      <span className="diary-write__ai-pick-check" aria-hidden="true">
+                        {checked ? '✓' : ''}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </AppModal>
+          )}
+          {saveError && (
+            <AppModal
+              title={saveError}
+              onDismiss={() => setSaveError(null)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={t('common.close')}
+              onPrimary={() => setSaveError(null)}
+            />
+          )}
+        </>,
+        document.getElementById('root') ?? document.body,
       )}
     </form>
   );

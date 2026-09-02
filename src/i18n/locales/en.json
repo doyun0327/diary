@@ -527,8 +527,7 @@
       "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
       "aiDailyLimit": "You can generate up to 3 AI drawings per day with ads. Upgrade to Pro for more.",
-      "aiFreeLimit": "With your Pro trial, you can create 2 AI drawings for free.",
-      "aiDailyLimit": "With your Pro trial, you can create 2 AI drawings for free."
+      "aiFreeLimit": "You've used today's free AI drawing allowance."
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
