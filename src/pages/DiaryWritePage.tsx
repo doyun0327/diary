@@ -801,7 +801,6 @@ function DiaryWritePage({
         ? 'write.ai.statusDrawing'
         : 'write.ai.statusFinishing';
   const aiLabel = aiLoading ? t(aiStatusKey) : t('write.ai.button');
-  const aiStatusText = t(aiStatusKey);
 
   return (
     <form ref={formRef} className="diary-write" onSubmit={handleSubmit}>
@@ -935,8 +934,8 @@ function DiaryWritePage({
               <AiLoadingWait
                 animationData={activeAiLottie}
                 lottieKey={aiLottieKey}
-                statusText={aiStatusText}
                 step={aiProgress}
+                sourceText={content}
               />
             )}
             </div>
