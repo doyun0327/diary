@@ -2,6 +2,8 @@ export const FREE_ENTRY_GRANT = 5;
 /** @deprecated 일기 평생 무료 N장 — 현재는 일일 광고 한도 사용 */
 export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
+/** Pro: 이번 달 AI 그림 생성 한도 (작성·수정 동일) */
+export const MONTHLY_AI_DRAW_LIMIT = MONTHLY_DIARY_LIMIT;
 export const MONTHLY_PRICE_KRW = 1900;
 /** 무료 회원: 광고 보고 하루 최대 AI 그림 생성 횟수 */
 export const FREE_DAILY_AI_AD_LIMIT = 3;
@@ -284,19 +286,19 @@ export function getDiaryAccessState(
   const searchExportOk = isPremiumActive || isSearchExportTrialActive();
 
   if (isPremiumActive) {
-    const remaining = Math.max(0, MONTHLY_DIARY_LIMIT - state.monthlyLimitUsed);
+    const remaining = Math.max(0, MONTHLY_AI_DRAW_LIMIT - state.monthlyLimitUsed);
     return {
-      canCreate: remaining > 0,
+      canCreate: true,
       remaining,
       isPremiumActive: true,
       canUseSearchAndExport: true,
       monthlyRemaining: remaining,
       monthlyUsed: state.monthlyLimitUsed,
-      monthlyLimit: MONTHLY_DIARY_LIMIT,
+      monthlyLimit: MONTHLY_AI_DRAW_LIMIT,
       message:
         remaining > 0
           ? `Premium: ${remaining} entries left this month.`
-          : "Monthly limit of 50 entries reached.",
+          : "Monthly AI drawing limit of 50 reached.",
     };
   }
 
@@ -327,6 +329,17 @@ export function getDiaryAccessState(
 }
 
 export function consumeDiaryUsage() {
+  return consumeProAiDrawQuota();
+}
+
+/** Pro: 이번 달 AI 그림 한도 소진 여부 */
+export function isProAiMonthlyLimitReached() {
+  const status = getDiaryAccessState();
+  return status.isPremiumActive && status.monthlyRemaining <= 0;
+}
+
+/** Pro: AI 그림 1회 차감 (작성·수정 동일). 한도면 false */
+export function consumeProAiDrawQuota() {
   const state = loadAccessState();
   const now = Date.now();
   const monthKey = getMonthKey(new Date(now));
@@ -336,12 +349,12 @@ export function consumeDiaryUsage() {
     state.monthlyLimitUsed = 0;
   }
 
-  if (state.premiumUntil && state.premiumUntil > now) {
-    state.monthlyLimitUsed = Math.max(0, state.monthlyLimitUsed + 1);
-    saveAccessState(state);
-    window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  }
+  if (!state.premiumUntil || state.premiumUntil <= now) return false;
+  if (state.monthlyLimitUsed >= MONTHLY_AI_DRAW_LIMIT) return false;
 
+  state.monthlyLimitUsed += 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;
 }
 
@@ -353,7 +366,7 @@ export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
     state.monthlyLimitUsed = 0;
   }
   state.monthKey = monthKey;
-  state.monthlyLimitUsed = Math.max(0, Math.min(MONTHLY_DIARY_LIMIT, Math.floor(used)));
+  state.monthlyLimitUsed = Math.max(0, Math.min(MONTHLY_AI_DRAW_LIMIT, Math.floor(used)));
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }

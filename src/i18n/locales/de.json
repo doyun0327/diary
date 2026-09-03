@@ -469,6 +469,7 @@
       "characterAria": "Charakter für KI-Zeichnung",
       "characterTitle": "Dieser Charakter wird zur Hauptfigur",
       "rewardTitle": "Werbung ansehen für 1 KI-Zeichnung",
+      "monthlyLimitTitle": "KI-Zeichnungen diesen Monat",
       "rewardLead": "Schau die Werbung bis zum Ende, um eine KI-Zeichnung freizuschalten.",
       "rewardCta": "Werbung ansehen",
       "adIncompleteTitle": "Werbung zu Ende ansehen",
@@ -513,6 +514,7 @@
       "adAppOnly": "Werbung ist nur in der App verfügbar",
       "aiFreeLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen.",
       "aiDailyLimit": "Mit der Pro-Testversion kannst du 2 KI-Zeichnungen kostenlos erstellen.",
+      "aiMonthlyLimit": "Du hast alle 50 KI-Zeichnungen diesen Monat verbraucht. Nächsten Monat kannst du wieder zeichnen.",
       "saveFailed": "Tagebucheintrag konnte nicht gespeichert werden",
       "adNotCompletedWrite": "Schließe die Werbung ab, um dieses Tagebuch zu speichern"
     },

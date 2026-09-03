@@ -468,6 +468,7 @@
       "characterAria": "Nhân vật cho tranh AI",
       "characterTitle": "Nhân vật này sẽ thành nhân vật chính",
       "rewardTitle": "Xem quảng cáo để vẽ AI 1 lần",
+      "monthlyLimitTitle": "Hình AI tháng này",
       "rewardLead": "Xem hết quảng cáo để mở khóa một lần vẽ AI.",
       "rewardCta": "Xem quảng cáo",
       "adIncompleteTitle": "Hãy xem hết quảng cáo",
@@ -512,6 +513,7 @@
       "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
       "aiFreeLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
       "aiDailyLimit": "Với bản dùng thử Pro, bạn có thể tạo 2 hình AI miễn phí.",
+      "aiMonthlyLimit": "Bạn đã dùng hết 50 lần vẽ AI tháng này. Tháng sau vẽ tiếp được.",
       "saveFailed": "Không lưu được nhật ký",
       "adNotCompletedWrite": "Xem hết quảng cáo để lưu nhật ký này"
     },

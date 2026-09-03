@@ -24,12 +24,15 @@ import { formatDate, today } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
-  FREE_DAILY_AI_AD_LIMIT,
+  applyMonthlyUsageFromServer,
   consumeAiDrawDailyQuota,
+  consumeProAiDrawQuota,
+  FREE_DAILY_AI_AD_LIMIT,
   getDiaryAccessState,
   getRemainingFreeAiDraws,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
+  isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
@@ -45,6 +48,8 @@ import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resol
 import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
+import { getAccessToken } from '../hooks/useAuthSession';
+import { consumeMonthlyUsage, fetchMonthlyUsage } from '../api/usageApi';
 import './DiaryWritePage.css';
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
@@ -154,6 +159,7 @@ function DiaryWritePage({
   const [aiLottieKey, setAiLottieKey] = useState(0);
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
+  const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiPickOpen, setAiPickOpen] = useState(false);
@@ -522,8 +528,47 @@ function DiaryWritePage({
     setAiError(t('write.err.aiDailyLimit'));
   };
 
-  const consumeAiDrawQuota = () => {
-    if (getDiaryAccessState().isPremiumActive) return true;
+  const promptProAiLimit = () => {
+    setProAiLimitOpen(true);
+  };
+
+  const consumeAiDrawQuota = async () => {
+    if (getDiaryAccessState().isPremiumActive) {
+      if (isProAiMonthlyLimitReached()) {
+        promptProAiLimit();
+        return false;
+      }
+      const token = getAccessToken();
+      if (token) {
+        try {
+          const usage = await consumeMonthlyUsage(token);
+          applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+          return true;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          if (message.includes('409')) {
+            try {
+              const usage = await fetchMonthlyUsage(token);
+              applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+            } catch {
+              // ignore
+            }
+            promptProAiLimit();
+            return false;
+          }
+          if (!consumeProAiDrawQuota()) {
+            promptProAiLimit();
+            return false;
+          }
+          return true;
+        }
+      }
+      if (!consumeProAiDrawQuota()) {
+        promptProAiLimit();
+        return false;
+      }
+      return true;
+    }
     if (!consumeAiDrawDailyQuota()) {
       promptAiDrawBlocked();
       return false;
@@ -538,6 +583,10 @@ function DiaryWritePage({
       return;
     }
     if (getDiaryAccessState().isPremiumActive) {
+      if (isProAiMonthlyLimitReached()) {
+        promptProAiLimit();
+        return;
+      }
       void runAiDraw();
       return;
     }
@@ -567,7 +616,7 @@ function DiaryWritePage({
   const runAiDraw = async () => {
     if (isPurchaseShielded()) return;
     setAiError(null);
-    if (!consumeAiDrawQuota()) return;
+    if (!(await consumeAiDrawQuota())) return;
 
     setAiProgress('waiting');
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
@@ -1056,6 +1105,17 @@ function DiaryWritePage({
               closeAriaLabel={t('common.close')}
               primaryLabel={t('subscription.subscribeCta')}
               onPrimary={startProPurchase}
+            />
+          )}
+          {proAiLimitOpen && (
+            <AppModal
+              title={t('write.ai.monthlyLimitTitle')}
+              lead={t('write.err.aiMonthlyLimit')}
+              onDismiss={() => setProAiLimitOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={t('common.close')}
+              onPrimary={() => setProAiLimitOpen(false)}
             />
           )}
           {adIncompleteOpen && (

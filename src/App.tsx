@@ -50,14 +50,12 @@ import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/sy
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import {
   applyMonthlyUsageFromServer,
-  consumeDiaryUsage,
   getDiaryAccessState,
   setDiaryAccessAccountId,
   subscribeDiaryAccess,
   SUBSCRIPTION_CHANGE_EVENT,
 } from "./utils/diaryAccess";
 import {
-  consumeMonthlyUsage,
   fetchMonthlyUsage,
 } from "./api/usageApi";
 import {
@@ -158,7 +156,7 @@ function App() {
       .catch(() => {
         // 백엔드 미적용 시 로컬 카운트 유지
       });
-  }, [session?.userId, entries.length, accessTick]);
+  }, [session?.userId, entries.length]);
 
   const closeSubscriptionModal = useCallback(() => {
     setSubscriptionModal(null);
@@ -348,36 +346,6 @@ function App() {
         if (editId) {
           await persistDiarySave(entry, editId);
           return;
-        }
-
-        const status = getDiaryAccessState(entries.length);
-
-        if (status.isPremiumActive) {
-          const token = getAccessToken();
-          if (token) {
-            try {
-              const usage = await consumeMonthlyUsage(token);
-              applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-            } catch (err) {
-              const message =
-                err instanceof Error ? err.message : String(err);
-              if (message.includes("409")) {
-                try {
-                  const usage = await fetchMonthlyUsage(token);
-                  applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-                } catch {
-                  // ignore
-                }
-              } else {
-                consumeDiaryUsage();
-              }
-            }
-            await addEntry(entry);
-            setPage("home");
-            syncInBackground();
-            return;
-          }
-          consumeDiaryUsage();
         }
 
         await persistNewEntry(entry);

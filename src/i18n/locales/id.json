@@ -468,6 +468,7 @@
       "characterAria": "Karakter untuk gambar AI",
       "characterTitle": "Karakter ini menjadi tokoh utama",
       "rewardTitle": "Tonton iklan untuk 1 gambar AI",
+      "monthlyLimitTitle": "Gambar AI bulan ini",
       "rewardLead": "Tonton iklan sampai selesai untuk membuka satu gambar AI.",
       "rewardCta": "Tonton iklan",
       "adIncompleteTitle": "Selesaikan iklan",
@@ -512,6 +513,7 @@
       "adAppOnly": "Iklan hanya tersedia di aplikasi",
       "aiFreeLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
       "aiDailyLimit": "Dengan uji coba Pro, Anda bisa membuat 2 gambar AI gratis.",
+      "aiMonthlyLimit": "Kuota 50 gambar AI bulan ini habis. Bisa menggambar lagi bulan depan.",
       "saveFailed": "Gagal menyimpan diary",
       "adNotCompletedWrite": "Selesaikan iklan untuk menyimpan diary ini"
     },

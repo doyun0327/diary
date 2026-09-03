@@ -468,6 +468,7 @@
       "characterAria": "AI 畫畫用的角色",
       "characterTitle": "這個角色會成為畫中的主角",
       "rewardTitle": "看廣告獲得 1 次 AI 繪畫",
+      "monthlyLimitTitle": "本月 AI 繪畫",
       "rewardLead": "完整觀看廣告可解鎖一次 AI 繪畫。",
       "rewardCta": "看廣告",
       "adIncompleteTitle": "請看完廣告",
@@ -512,6 +513,7 @@
       "adAppOnly": "廣告僅在 App 內可用",
       "aiFreeLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。",
       "aiDailyLimit": "Pro 體驗券可免費生成 2 次 AI 繪畫。",
+      "aiMonthlyLimit": "本月 50 次 AI 繪畫已用完。下個月可以再畫。",
       "saveFailed": "無法儲存日記",
       "adNotCompletedWrite": "看完廣告才能儲存這篇日記"
     },

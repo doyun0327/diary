@@ -468,6 +468,7 @@
       "characterAria": "AI 画画用的角色",
       "characterTitle": "这个角色会成为画中的主角",
       "rewardTitle": "看广告获得 1 次 AI 绘画",
+      "monthlyLimitTitle": "本月 AI 绘画",
       "rewardLead": "完整观看广告可解锁一次 AI 绘画。",
       "rewardCta": "看广告",
       "adIncompleteTitle": "请看完广告",
@@ -512,6 +513,7 @@
       "adAppOnly": "广告仅在 App 内可用",
       "aiFreeLimit": "Pro 体验券可免费生成 2 次 AI 绘画。",
       "aiDailyLimit": "Pro 体验券可免费生成 2 次 AI 绘画。",
+      "aiMonthlyLimit": "本月 50 次 AI 绘画已用完。下个月可以再画。",
       "saveFailed": "无法保存日记",
       "adNotCompletedWrite": "看完广告才能保存这篇日记"
     },

@@ -468,6 +468,7 @@
       "characterAria": "AI絵用のキャラクター",
       "characterTitle": "このキャラクターが主人公になります",
       "rewardTitle": "広告を見てAI描画1回",
+      "monthlyLimitTitle": "今月のAI描画",
       "rewardLead": "広告を最後まで見るとAI描画が1回使えます。",
       "rewardCta": "広告を見る",
       "adIncompleteTitle": "広告を最後まで見てください",
@@ -512,6 +513,7 @@
       "adAppOnly": "広告はアプリでのみ利用できます",
       "aiFreeLimit": "Pro体験券でAI描画を2回無料で生成できます。",
       "aiDailyLimit": "Pro体験券でAI描画を2回無料で生成できます。",
+      "aiMonthlyLimit": "今月のAI描画50回を使い切りました。来月また描けます。",
       "saveFailed": "日記を保存できませんでした",
       "adNotCompletedWrite": "広告を最後まで見ると保存できます"
     },

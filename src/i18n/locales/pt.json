@@ -468,6 +468,7 @@
       "characterAria": "Personagem para desenho IA",
       "characterTitle": "Este personagem será o protagonista",
       "rewardTitle": "Assista a um anúncio por 1 desenho IA",
+      "monthlyLimitTitle": "Desenhos IA deste mês",
       "rewardLead": "Assista ao anúncio até o fim para liberar um desenho IA.",
       "rewardCta": "Ver anúncio",
       "adIncompleteTitle": "Termine o anúncio",
@@ -512,6 +513,7 @@
       "adAppOnly": "Anúncios só estão disponíveis no app",
       "aiFreeLimit": "Com o teste Pro, você pode criar 2 desenhos IA grátis.",
       "aiDailyLimit": "Com o teste Pro, você pode criar 2 desenhos IA grátis.",
+      "aiMonthlyLimit": "Você usou os 50 desenhos IA deste mês. Poderá desenhar de novo no mês que vem.",
       "saveFailed": "Não foi possível salvar o diário",
       "adNotCompletedWrite": "Termine o anúncio para salvar este diário"
     },

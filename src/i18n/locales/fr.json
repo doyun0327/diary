@@ -468,6 +468,7 @@
       "characterAria": "Personnage pour le dessin IA",
       "characterTitle": "Ce personnage devient le protagoniste",
       "rewardTitle": "Regarder une pub pour 1 dessin IA",
+      "monthlyLimitTitle": "Dessins IA ce mois-ci",
       "rewardLead": "Regardez la pub jusqu’à la fin pour débloquer un dessin IA.",
       "rewardCta": "Voir la pub",
       "adIncompleteTitle": "Terminez la pub",
@@ -512,6 +513,7 @@
       "adAppOnly": "Les pubs sont disponibles uniquement dans l’app",
       "aiFreeLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement.",
       "aiDailyLimit": "Avec l’essai Pro, vous pouvez créer 2 dessins IA gratuitement.",
+      "aiMonthlyLimit": "Vous avez utilisé les 50 dessins IA de ce mois. Vous pourrez dessiner le mois prochain.",
       "saveFailed": "Impossible d'enregistrer le journal",
       "adNotCompletedWrite": "Termine la pub pour enregistrer ce journal"
     },

@@ -423,10 +423,10 @@
     "limitTitle": "일기 작성 한도",
     "featureGateTitle": "프리미엄 기능",
     "limitFreeLead": "오늘 광고로 AI 그림 3번까지 생성할 수 있어요.",
-    "limitPremiumLead": "이번 달 {{n}}장을 더 쓸 수 있어요.",
-    "limitPremiumReachedLead": "이번 달 작성 한도(50장)에 도달했어요. 다음 달에 다시 작성할 수 있어요.",
+    "limitPremiumLead": "이번 달 AI 그림을 {{n}}번 더 그릴 수 있어요.",
+    "limitPremiumReachedLead": "이번 달 AI 그림 한도(50회)에 도달했어요. 다음 달에 다시 그릴 수 있어요.",
     "featureGateLead": "Pro로 아래 기능을 이용할 수 있어요",
-    "premiumBenefits": "구독 혜택: 검색, 보내기, 월 {{n}}장 작성",
+    "premiumBenefits": "구독 혜택: 검색, 보내기, 월 AI 그림 {{n}}회",
     "subscribeCta": "PRO로 업그레이드",
     "appOnly": "앱에서 구독할 수 있어요",
     "restore": "구매 복원",
@@ -488,6 +488,7 @@
       "characterAria": "AI 그림에 쓸 캐릭터 설정",
       "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요",
       "rewardTitle": "광고 보고 AI 그림 1회",
+      "monthlyLimitTitle": "이번 달 AI 그림",
       "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
       "rewardLeadDaily": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요. (하루 최대 3번)",
       "rewardCta": "광고 보기",
@@ -528,7 +529,8 @@
       "adAppOnly": "앱에서만 광고를 볼 수 있어요",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",
       "aiFreeLimit": "오늘은 광고로 AI 그림 3번까지 생성할 수 있어요.",
-      "aiDailyLimit": "오늘은 광고로 AI 그림 3번까지 생성할 수 있어요. PRO로 더 많이 그릴 수 있어요."
+      "aiDailyLimit": "오늘은 광고로 AI 그림 3번까지 생성할 수 있어요. PRO로 더 많이 그릴 수 있어요.",
+      "aiMonthlyLimit": "이번 달 AI 그림 50회를 모두 썼어요. 다음 달에 다시 그릴 수 있어요."
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",

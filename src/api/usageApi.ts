@@ -25,7 +25,7 @@ async function readError(res: Response, fallback: string): Promise<string> {
   return `${fallback} (HTTP ${res.status})`;
 }
 
-/** 계정의 이번 달 일기 작성 횟수 */
+/** 계정의 이번 달 AI 그림 생성 횟수 */
 export async function fetchMonthlyUsage(
   accessToken: string,
 ): Promise<MonthlyUsageDto> {
@@ -38,7 +38,7 @@ export async function fetchMonthlyUsage(
   return (await res.json()) as MonthlyUsageDto;
 }
 
-/** 신규 일기 1장 사용 (한도 초과면 409) */
+/** AI 그림 1회 사용 (작성·수정 동일, 한도 초과면 409) */
 export async function consumeMonthlyUsage(
   accessToken: string,
 ): Promise<MonthlyUsageDto> {
