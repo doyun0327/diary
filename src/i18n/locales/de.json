@@ -450,6 +450,7 @@
     },
     "save": "Speichern",
     "saveEdit": "Bearbeitung abschließen",
+    "savingEdit": "Wird gespeichert…",
     "savedToast": "Gespeichert.",
     "updatedToast": "Aktualisiert.",
     "cancel": "Abbrechen",

@@ -449,6 +449,7 @@
     },
     "save": "บันทึก",
     "saveEdit": "แก้ไขเสร็จ",
+    "savingEdit": "กำลังแก้ไข…",
     "savedToast": "บันทึกแล้ว",
     "updatedToast": "แก้ไขแล้ว",
     "cancel": "ยกเลิก",

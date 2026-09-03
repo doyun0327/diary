@@ -449,6 +449,7 @@
     },
     "save": "Guardar",
     "saveEdit": "Terminar edición",
+    "savingEdit": "Guardando…",
     "savedToast": "Guardado.",
     "updatedToast": "Actualizado.",
     "cancel": "Cancelar",

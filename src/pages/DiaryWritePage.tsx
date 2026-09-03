@@ -119,7 +119,7 @@ interface DiaryWritePageProps {
   onCancel: () => void;
   onOpenCharacter: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
-  onNativeSaveStateChange?: (enabled: boolean) => void;
+  onNativeSaveStateChange?: (enabled: boolean, saving?: boolean) => void;
   writeQuota?: { used: number; limit: number };
 }
 
@@ -236,7 +236,7 @@ function DiaryWritePage({
 
   useEffect(() => {
     savingRef.current = saving;
-    onNativeSaveStateChange?.(!aiLoading && !saving);
+    onNativeSaveStateChange?.(!aiLoading && !saving, saving);
   }, [aiLoading, saving, onNativeSaveStateChange]);
 
   useEffect(() => {
@@ -730,6 +730,7 @@ function DiaryWritePage({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (saving || aiLoading) return;
+    setSaving(true);
     let imageUrl: string | undefined;
     let canvasState: DiaryCanvasState | undefined;
     try {
@@ -741,17 +742,18 @@ function DiaryWritePage({
       imageUrl = raw || undefined;
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : t('write.err.saveImage'));
+      setSaving(false);
       return;
     }
     if (!title.trim() && !content.trim() && !imageUrl) {
       setAiError(t('write.err.empty'));
+      setSaving(false);
       return;
     }
 
     setAiError(null);
     setSaveError(null);
     clearWriteDraft();
-    setSaving(true);
     try {
       await onSave({
         date,
@@ -817,7 +819,13 @@ function DiaryWritePage({
             className="diary-write__nav-btn diary-write__nav-btn--save"
             disabled={aiLoading || saving}
           >
-            {isEdit ? t('write.saveEdit') : t('write.save')}
+            {saving
+              ? isEdit
+                ? t('write.savingEdit')
+                : t('write.saving')
+              : isEdit
+                ? t('write.saveEdit')
+                : t('write.save')}
           </button>
         </nav>
       )}

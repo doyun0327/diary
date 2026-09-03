@@ -103,6 +103,7 @@ function App() {
   const [subscriptionModal, setSubscriptionModal] =
     useState<SubscriptionModalReason | null>(null);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
+  const [writeSaving, setWriteSaving] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [googleLoginForProOpen, setGoogleLoginForProOpen] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
@@ -675,7 +676,13 @@ function App() {
                 ? t("write.title.edit")
                 : t("write.title.new")
               : "",
-        saveLabel: editingId ? t("write.saveEdit") : t("write.save"),
+        saveLabel: writeSaving
+          ? editingId
+            ? t("write.savingEdit")
+            : t("write.saving")
+          : editingId
+            ? t("write.saveEdit")
+            : t("write.save"),
         saveEnabled: writeSaveEnabled,
       });
     };
@@ -693,6 +700,7 @@ function App() {
     needsAppIntro,
     editingId,
     writeSaveEnabled,
+    writeSaving,
     lockSetupOpen,
     lockDisableOpen,
     screenLock.locked,
@@ -807,7 +815,10 @@ function App() {
             onSave={handleSave}
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
-            onNativeSaveStateChange={setWriteSaveEnabled}
+            onNativeSaveStateChange={(enabled, saving) => {
+              setWriteSaveEnabled(enabled);
+              setWriteSaving(Boolean(saving));
+            }}
             writeQuota={{
               used: accessStatus.monthlyUsed,
               limit: accessStatus.monthlyLimit,

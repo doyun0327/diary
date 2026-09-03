@@ -449,6 +449,7 @@
     },
     "save": "保存",
     "saveEdit": "編集完了",
+    "savingEdit": "編集中…",
     "savedToast": "保存しました。",
     "updatedToast": "編集しました。",
     "cancel": "キャンセル",

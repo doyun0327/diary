@@ -449,6 +449,7 @@
     },
     "save": "Save",
     "saveEdit": "Done editing",
+    "savingEdit": "Updating…",
     "savedToast": "Saved.",
     "updatedToast": "Updated.",
     "saving": "Saving…",
