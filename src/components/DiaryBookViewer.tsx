@@ -40,39 +40,6 @@ interface DiaryBookViewerProps {
   onClose: () => void;
 }
 
-function coverDateLabel(entries: DiaryEntry[], rangeStart?: string, rangeEnd?: string): string {
-  const from = rangeStart || entries[0]?.date || '';
-  const to = rangeEnd || entries[entries.length - 1]?.date || from;
-  if (!from) return '';
-  return `${from} ~ ${to}`;
-}
-
-function BookCover({
-  entries,
-  avatarUrl,
-  rangeStart,
-  rangeEnd,
-}: {
-  entries: DiaryEntry[];
-  avatarUrl?: string | null;
-  rangeStart?: string;
-  rangeEnd?: string;
-}) {
-  const range = coverDateLabel(entries, rangeStart, rangeEnd);
-
-  return (
-    <div className="diary-book__cover">
-      <p className="diary-book__cover-brand">PageBy</p>
-      {avatarUrl ? (
-        <img className="diary-book__cover-avatar" src={avatarUrl} alt="" />
-      ) : (
-        <span className="diary-book__cover-avatar diary-book__cover-avatar--empty" />
-      )}
-      {range ? <p className="diary-book__cover-range">{range}</p> : null}
-    </div>
-  );
-}
-
 function DiaryBookViewer({
   entries,
   rangeStart,
@@ -139,6 +106,44 @@ function DiaryBookViewer({
     [sorted, t, total],
   );
 
+  const ensureCover = useCallback(() => {
+    if (pagesRef.current[0]) return Promise.resolve();
+    const existing = jobsRef.current.get(0);
+    if (existing) return existing;
+    const gen = genRef.current;
+
+    const job = (async () => {
+      try {
+        if (sorted.length > 0) {
+          await ensurePage(1);
+        }
+        const page = await renderCoverBookPage(sorted, {
+          avatarUrl,
+          rangeStart,
+          rangeEnd,
+          slot: pagesRef.current[1]?.slot,
+        });
+        if (gen !== genRef.current) {
+          revokeBookPage(page);
+          return;
+        }
+        pagesRef.current[0] = page;
+        setPages((prev) => {
+          const next = [...prev];
+          next[0] = page;
+          return next;
+        });
+      } catch (err) {
+        if (gen === genRef.current) {
+          setError(err instanceof Error ? err.message : t('book.err.build'));
+        }
+      }
+    })();
+
+    jobsRef.current.set(0, job);
+    return job;
+  }, [avatarUrl, ensurePage, rangeEnd, rangeStart, sorted, t]);
+
   useEffect(() => {
     genRef.current += 1;
     setPages(Array.from({ length: total }, () => null));
@@ -170,13 +175,15 @@ function DiaryBookViewer({
   }, []);
 
   useEffect(() => {
+    void ensureCover();
     void ensurePage(1);
     if (index > 0) void ensurePage(index);
-  }, [ensurePage, index]);
+  }, [ensureCover, ensurePage, index]);
 
   const isCover = index === 0;
-  const current = isCover ? null : pages[index];
-  const busy = !isCover && !current;
+  const cover = pages[0];
+  const current = isCover ? cover : pages[index];
+  const busy = !current;
   const canPrev = index > 0;
   const canNext = index < total - 1;
 
@@ -218,23 +225,16 @@ function DiaryBookViewer({
     setPdfLottieKey((key) => key + 1);
     setError(null);
     try {
-      await Promise.all(Array.from({ length: total }, (_, i) => ensurePage(i)));
-      const cover = await renderCoverBookPage(sorted, {
-        avatarUrl,
-        rangeStart,
-        rangeEnd,
-        slot: pagesRef.current[1]?.slot,
-      });
-      const rest = pagesRef.current
-        .map((p, i) => (i === 0 ? cover : p))
-        .filter((p): p is BookPage => p != null);
+      await Promise.all([
+        ensureCover(),
+        ...Array.from({ length: total - 1 }, (_, i) => ensurePage(i + 1)),
+      ]);
+      const rest = pagesRef.current.filter((p): p is BookPage => p != null);
       if (rest.length !== total) {
-        revokeBookPage(cover);
         throw new Error(t('book.err.build'));
       }
       const blob = await buildPdfFromBookPages(rest);
       await downloadToDevice(blob, pdfName);
-      revokeBookPage(cover);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('book.err.build'));
     } finally {
@@ -317,17 +317,11 @@ function DiaryBookViewer({
           </button>
 
           <div className="diary-book__viewport">
-            {isCover ? (
-              <div className={`${pageClass} diary-book__page--cover`} onAnimationEnd={onFlipEnd}>
-                <BookCover
-                  entries={sorted}
-                  avatarUrl={avatarUrl}
-                  rangeStart={rangeStart}
-                  rangeEnd={rangeEnd}
-                />
-              </div>
-            ) : current ? (
-              <div className={pageClass} onAnimationEnd={onFlipEnd}>
+            {current ? (
+              <div
+                className={`${pageClass}${isCover ? ' diary-book__page--cover' : ''}`}
+                onAnimationEnd={onFlipEnd}
+              >
                 <img src={current.blobUrl} alt={current.label} draggable={false} />
               </div>
             ) : (

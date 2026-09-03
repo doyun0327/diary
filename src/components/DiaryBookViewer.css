@@ -187,65 +187,7 @@
 }
 
 .diary-book__page--cover {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 0;
-}
-
-.diary-book__cover {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 88%;
-  height: 84%;
-  min-height: 0;
-  padding: 8% 10px;
-  text-align: center;
-  border-radius: 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-soft);
-  overflow: hidden;
-}
-
-.diary-book__cover-brand {
-  margin: 0;
-  flex-shrink: 0;
-  font-family: var(--brand-font);
-  font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--color-text);
-}
-
-.diary-book__cover-avatar {
-  width: auto;
-  height: auto;
-  max-width: 56%;
-  max-height: 46%;
-  aspect-ratio: 1;
-  margin: 0;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--color-bg);
-  border: 2px solid var(--color-border-soft);
-  flex-shrink: 1;
-}
-
-.diary-book__cover-avatar--empty {
-  display: block;
-}
-
-.diary-book__cover-range {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1.2;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-muted);
 }
 
 .diary-book__page > img {
