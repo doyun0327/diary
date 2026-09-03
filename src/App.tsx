@@ -30,7 +30,7 @@ import { useDiary } from "./hooks/useDiary";
 import { useCharacter } from "./hooks/useCharacter";
 import { useClientProfile } from "./hooks/useClientProfile";
 import { useScreenLock } from "./hooks/useScreenLock";
-import { getAccessToken, getAuthSession, useAuthSession } from "./hooks/useAuthSession";
+import { getAccessToken, getAuthSession, isGoogleSignedIn, useAuthSession } from "./hooks/useAuthSession";
 import {
   usePushOpenHandler,
   usePushRegistration,
@@ -50,6 +50,7 @@ import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/sy
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import {
   applyMonthlyUsageFromServer,
+  canUseProAiQuota,
   getDiaryAccessState,
   setDiaryAccessAccountId,
   subscribeDiaryAccess,
@@ -61,6 +62,7 @@ import {
 import {
   identifySubscriptionUser,
   installSubscriptionBridge,
+  REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
@@ -102,9 +104,12 @@ function App() {
     useState<SubscriptionModalReason | null>(null);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
+  const [googleLoginForProOpen, setGoogleLoginForProOpen] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
   const [cloudSyncLoading, setCloudSyncLoading] = useState(false);
-  void accessTick;
+  const fetchedProUsageUserRef = useRef<string | null>(null);
+  const [appToast, setAppToast] = useState<string | null>(null);
+  const appToastTimer = useRef<number | null>(null);
 
   const accessStatus = getDiaryAccessState(entries.length);
 
@@ -148,31 +153,39 @@ function App() {
 
   useEffect(() => {
     const token = getAccessToken();
-    if (!token || !getDiaryAccessState(entries.length).isPremiumActive) return;
+    const userId = session?.userId;
+    if (!token || !userId || !canUseProAiQuota()) {
+      fetchedProUsageUserRef.current = null;
+      return;
+    }
+    if (fetchedProUsageUserRef.current === userId) return;
+    fetchedProUsageUserRef.current = userId;
     void fetchMonthlyUsage(token)
       .then((usage) =>
         applyMonthlyUsageFromServer(usage.used, usage.yearMonth),
       )
       .catch(() => {
-        // 백엔드 미적용 시 로컬 카운트 유지
+        fetchedProUsageUserRef.current = null;
       });
-  }, [session?.userId, entries.length]);
+  }, [session?.userId, accessTick]);
+
+  useEffect(() => {
+    const onNeedGoogle = () => {
+      setSubscriptionModal(null);
+      setSubscribing(false);
+      setGoogleLoginForProOpen(true);
+    };
+    window.addEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
+    return () =>
+      window.removeEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
+  }, []);
 
   const closeSubscriptionModal = useCallback(() => {
     setSubscriptionModal(null);
     setSubscribing(false);
   }, []);
 
-  const openPremiumFeature = useCallback(
-    (reason: "search" | "export", open: () => void) => {
-      if (accessStatus.canUseSearchAndExport) {
-        open();
-        return;
-      }
-      setSubscriptionModal(reason);
-    },
-    [accessStatus.canUseSearchAndExport],
-  );
+  const pendingSearchSelectRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!subscriptionModal) return;
@@ -190,14 +203,24 @@ function App() {
       ) {
         const reason = subscriptionModal;
         closeSubscriptionModal();
-        if (reason === "search") setSearchOpen(true);
-        if (reason === "export") setExportOpen(true);
+        if (reason === "search") {
+          const id = pendingSearchSelectRef.current;
+          pendingSearchSelectRef.current = null;
+          if (id) {
+            setSearchOpen(false);
+            setSelectedId(id);
+            setEditingId(null);
+            setPage("detail");
+          }
+          return;
+        }
+        if (reason === "export" && !bookEntries) setExportOpen(true);
       }
     };
     window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
     return () =>
       window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
-  }, [subscriptionModal, entries.length, closeSubscriptionModal]);
+  }, [subscriptionModal, entries.length, bookEntries, closeSubscriptionModal]);
 
   useEffect(() => {
     if (needsProfileSetup) return;
@@ -237,6 +260,15 @@ function App() {
     setSelectedId(id);
     setEditingId(null);
     setPage("detail");
+  };
+
+  const handleSearchSelect = (id: string) => {
+    if (!getDiaryAccessState(entries.length).canUseSearchAndExport) {
+      pendingSearchSelectRef.current = id;
+      setSubscriptionModal("search");
+      return;
+    }
+    handleSelect(id);
   };
 
   const syncChainRef = useRef<Promise<void>>(Promise.resolve());
@@ -308,13 +340,26 @@ function App() {
     queueCloudSync({ month: viewMonthKey });
   }, [queueCloudSync, viewMonthKey]);
 
+  useEffect(() => {
+    return () => {
+      if (appToastTimer.current != null) window.clearTimeout(appToastTimer.current);
+    };
+  }, []);
+
+  const showAppToast = useCallback((msg: string) => {
+    setAppToast(msg);
+    if (appToastTimer.current != null) window.clearTimeout(appToastTimer.current);
+    appToastTimer.current = window.setTimeout(() => setAppToast(null), 1800);
+  }, []);
+
   const persistNewEntry = useCallback(
     async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
       await addEntry(entry);
       setPage("home");
       syncInBackground();
+      showAppToast(t("write.savedToast"));
     },
-    [addEntry, syncInBackground],
+    [addEntry, showAppToast, syncInBackground, t],
   );
 
   const persistDiarySave = useCallback(
@@ -329,11 +374,12 @@ function App() {
         setPage("detail");
         void syncSharedDiaryAfterEdit(editId, entry);
         syncInBackground();
+        showAppToast(t("write.updatedToast"));
         return;
       }
       await persistNewEntry(entry);
     },
-    [persistNewEntry, syncInBackground, updateEntry],
+    [persistNewEntry, showAppToast, syncInBackground, t, updateEntry],
   );
 
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
@@ -421,6 +467,10 @@ function App() {
       setLanguageOpen(false);
       return true;
     }
+    if (googleLoginForProOpen) {
+      setGoogleLoginForProOpen(false);
+      return true;
+    }
     if (accountOpen) {
       setAccountOpen(false);
       return true;
@@ -450,6 +500,7 @@ function App() {
     return false;
   }, [
     accountOpen,
+    googleLoginForProOpen,
     appInfoOpen,
     bookEntries,
     characterOpen,
@@ -702,12 +753,8 @@ function App() {
         screenLockEnabled={screenLock.enabled}
         onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
-        onOpenExport={() =>
-          openPremiumFeature("export", () => setExportOpen(true))
-        }
-        onOpenSearch={() =>
-          openPremiumFeature("search", () => setSearchOpen(true))
-        }
+        onOpenExport={() => setExportOpen(true)}
+        onOpenSearch={() => setSearchOpen(true)}
         onOpenRooms={openRooms}
         onOpenAppInfo={() => setAppInfoOpen(true)}
         onNativeBack={() => {
@@ -761,14 +808,10 @@ function App() {
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
             onNativeSaveStateChange={setWriteSaveEnabled}
-            writeQuota={
-              accessStatus.isPremiumActive
-                ? {
-                    used: accessStatus.monthlyUsed,
-                    limit: accessStatus.monthlyLimit,
-                  }
-                : undefined
-            }
+            writeQuota={{
+              used: accessStatus.monthlyUsed,
+              limit: accessStatus.monthlyLimit,
+            }}
           />
         )}
         {page === "detail" && selectedEntry && (
@@ -910,7 +953,7 @@ function App() {
           <SearchSheet
             entries={entries}
             onClose={() => setSearchOpen(false)}
-            onSelect={handleSelect}
+            onSelect={handleSearchSelect}
           />,
           document.getElementById("root") ?? document.body,
         )}
@@ -986,8 +1029,13 @@ function App() {
                   : t("subscription.appOnly")
             }
             onPrimary={() => {
-              if (!isFlutterApp()) return;
               if (subscribing) return;
+              if (!isGoogleSignedIn()) {
+                closeSubscriptionModal();
+                setGoogleLoginForProOpen(true);
+                return;
+              }
+              if (!isFlutterApp()) return;
               setSubscribing(true);
               closeSubscriptionModal();
               void requestSubscriptionPurchaseAndSync().finally(() =>
@@ -1000,6 +1048,30 @@ function App() {
               <SubscriptionBenefitsSwipe />
             </div>
           </AppModal>,
+          document.getElementById("root") ?? document.body,
+        )}
+      {googleLoginForProOpen &&
+        createPortal(
+          <AppModal
+            title={t("subscription.googleLoginRequiredTitle")}
+            onDismiss={() => setGoogleLoginForProOpen(false)}
+            showClose={false}
+            secondaryLabel={t("common.cancel")}
+            onSecondary={() => setGoogleLoginForProOpen(false)}
+            primaryLabel={t("subscription.googleLoginRequiredCta")}
+            onPrimary={() => {
+              setGoogleLoginForProOpen(false);
+              setAccountOpen(true);
+            }}
+            closeAriaLabel={t("common.close")}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {appToast &&
+        createPortal(
+          <div className="app-toast" role="status">
+            {appToast}
+          </div>,
           document.getElementById("root") ?? document.body,
         )}
     </div>

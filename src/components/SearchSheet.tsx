@@ -100,6 +100,7 @@ function SearchSheet({ entries, onClose, onSelect }: SearchSheetProps) {
               <DiaryListRow
                 key={entry.id}
                 entry={entry}
+                highlightQuery={query}
                 onClick={() => onSelect(entry.id)}
               />
             ))}

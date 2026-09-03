@@ -81,6 +81,12 @@ export function getAuthSession(): AuthSession | null {
   return loadSession();
 }
 
+/** Google 계정으로 로그인된 상태 (게스트 JWT만 있으면 false) */
+export function isGoogleSignedIn(): boolean {
+  const session = loadSession();
+  return session?.provider === 'google' && Boolean(loadToken());
+}
+
 function sessionFromAuth(
   provider: AuthProvider,
   auth: Awaited<ReturnType<typeof loginAsGuest>>,

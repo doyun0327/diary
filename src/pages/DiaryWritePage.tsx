@@ -25,11 +25,11 @@ import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferred
 import {
   AI_REWARD_AD_ENABLED,
   applyMonthlyUsageFromServer,
+  canUseProAiQuota,
   consumeAiDrawDailyQuota,
   consumeProAiDrawQuota,
   FREE_DAILY_AI_AD_LIMIT,
-  getDiaryAccessState,
-  getRemainingFreeAiDraws,
+  getAiDrawsToday,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
@@ -464,7 +464,7 @@ function DiaryWritePage({
   useEffect(() => {
     return subscribeDiaryAccess(() => {
       setAccessTick((n) => n + 1);
-      if (getDiaryAccessState().isPremiumActive) {
+      if (canUseProAiQuota()) {
         setRewardPromptOpen(false);
         setAiDailyLimitOpen(false);
         proPurchaseGuardUntilRef.current = 0;
@@ -499,7 +499,7 @@ function DiaryWritePage({
     formRef.current?.requestSubmit();
   };
 
-  const aiRemaining = (() => {
+  const aiQuota = (() => {
     void accessTick;
     if (writeQuota) {
       return {
@@ -507,13 +507,12 @@ function DiaryWritePage({
         limit: writeQuota.limit,
       };
     }
-    const limit = FREE_DAILY_AI_AD_LIMIT;
-    const remaining = getRemainingFreeAiDraws();
     return {
-      used: Math.max(0, limit - remaining),
-      limit,
+      used: getAiDrawsToday(),
+      limit: FREE_DAILY_AI_AD_LIMIT,
     };
   })();
+  const aiLeft = Math.max(0, aiQuota.limit - aiQuota.used);
 
   const promptAiDrawBlocked = () => {
     if (isPurchaseShielded()) return;
@@ -533,7 +532,7 @@ function DiaryWritePage({
   };
 
   const consumeAiDrawQuota = async () => {
-    if (getDiaryAccessState().isPremiumActive) {
+    if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
         promptProAiLimit();
         return false;
@@ -582,7 +581,7 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    if (getDiaryAccessState().isPremiumActive) {
+    if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
         promptProAiLimit();
         return;
@@ -982,11 +981,8 @@ function DiaryWritePage({
                     >
                       {aiLabel}
                     </button>
-                    <span className="diary-write__ai-remaining" aria-label={t('quota.fraction', { used: aiRemaining.used, limit: aiRemaining.limit })}>
-                      {t('quota.fraction', {
-                        used: aiRemaining.used,
-                        limit: aiRemaining.limit,
-                      })}
+                    <span className="diary-write__ai-remaining">
+                      {aiLeft}
                     </span>
                   </div>
                 </div>
@@ -1067,10 +1063,7 @@ function DiaryWritePage({
           {aiConfirmOpen && (
             <AppModal
               title={t('quota.drawConfirmTitle')}
-              lead={t('quota.drawConfirmLead', {
-                n: aiRemaining.used,
-                limit: aiRemaining.limit,
-              })}
+              lead={String(aiLeft)}
               onDismiss={() => setAiConfirmOpen(false)}
               showClose={false}
               closeAriaLabel={t('common.close')}

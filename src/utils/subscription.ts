@@ -3,6 +3,7 @@ import {
   getDiaryAccessState,
   SUBSCRIPTION_CHANGE_EVENT,
 } from './diaryAccess';
+import { isGoogleSignedIn } from '../hooks/useAuthSession';
 import { isFlutterApp, postDiaryNative } from './nativeShare';
 
 export type SubscriptionStatusPayload = {
@@ -13,6 +14,9 @@ export type SubscriptionStatusPayload = {
 
 export const SUBSCRIPTION_PURCHASE_COMPLETE_EVENT =
   'diary-subscription-purchase-complete';
+
+/** 게스트는 Pro 결제 전 구글 로그인 필요 */
+export const REQUIRE_GOOGLE_FOR_PRO_EVENT = 'diary-require-google-for-pro';
 
 const PURCHASE_SYNC_DELAYS_MS = [0, 400, 1200, 3000] as const;
 
@@ -117,6 +121,10 @@ export function refreshSubscriptionStatus(timeoutMs = 1800): Promise<boolean> {
 }
 
 export function requestSubscriptionPurchase() {
+  if (!isGoogleSignedIn()) {
+    window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
+    return false;
+  }
   if (!isFlutterApp()) return false;
   postDiaryNative({ type: 'subscriptionPurchase' });
   return true;

@@ -125,6 +125,8 @@ function AccountSheet({
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<number | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
   /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
   const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(() => {
@@ -175,6 +177,18 @@ function AccountSheet({
     const timer = window.setTimeout(() => setAuthSuccess(null), 4000);
     return () => window.clearTimeout(timer);
   }, [authSuccess]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current != null) window.clearTimeout(toastTimer.current);
+    };
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    if (toastTimer.current != null) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 1800);
+  };
 
   const finishGoogleSignIn = async (idToken: string) => {
     setAuthBusy('google');
@@ -446,6 +460,7 @@ function AccountSheet({
     if (!name) return;
     onNicknameChange(name);
     syncProfileToRooms({ nickname: name, avatarUrl });
+    showToast(t('account.ok.nameSaved'));
   };
 
   const onPickPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -764,6 +779,12 @@ function AccountSheet({
             />
           </div>
         </AppModal>
+      ) : null}
+
+      {toast ? (
+        <div className="account-sheet__toast" role="status">
+          {toast}
+        </div>
       ) : null}
 
       {withdrawOpen ? (

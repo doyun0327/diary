@@ -1,3 +1,5 @@
+import { isGoogleSignedIn } from "../hooks/useAuthSession";
+
 export const FREE_ENTRY_GRANT = 5;
 /** @deprecated 일기 평생 무료 N장 — 현재는 일일 광고 한도 사용 */
 export const FREE_ENTRY_LIMIT_ENABLED = false;
@@ -6,7 +8,7 @@ export const MONTHLY_DIARY_LIMIT = 50;
 export const MONTHLY_AI_DRAW_LIMIT = MONTHLY_DIARY_LIMIT;
 export const MONTHLY_PRICE_KRW = 1900;
 /** 무료 회원: 광고 보고 하루 최대 AI 그림 생성 횟수 */
-export const FREE_DAILY_AI_AD_LIMIT = 3;
+export const FREE_DAILY_AI_AD_LIMIT = 1;
 /** @deprecated FREE_DAILY_AI_AD_LIMIT */
 export const FREE_DAILY_DIARY_AD_LIMIT = FREE_DAILY_AI_AD_LIMIT;
 /** @deprecated 일기 저장 광고 — AI 생성 시 차감 */
@@ -47,9 +49,19 @@ export function setDiaryAccessAccountId(accountId: string) {
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
+function isDevicePremiumNow(): boolean {
+  const state = loadAccessState();
+  return Boolean(state.premiumUntil && state.premiumUntil > Date.now());
+}
+
 /** 현재 저장소 기준 Pro 여부 (항상 최신 localStorage) */
 export function isPremiumActiveNow(): boolean {
   return getDiaryAccessState().isPremiumActive;
+}
+
+/** Google 로그인 + 기기 Pro — AI 월 50회. 게스트는 하루 광고 1회 */
+export function canUseProAiQuota(): boolean {
+  return isGoogleSignedIn() && isDevicePremiumNow();
 }
 
 function storageKey() {
@@ -284,8 +296,9 @@ export function getDiaryAccessState(
     state.premiumUntil && state.premiumUntil > now,
   );
   const searchExportOk = isPremiumActive || isSearchExportTrialActive();
+  const proAi = isPremiumActive && isGoogleSignedIn();
 
-  if (isPremiumActive) {
+  if (proAi) {
     const remaining = Math.max(0, MONTHLY_AI_DRAW_LIMIT - state.monthlyLimitUsed);
     return {
       canCreate: true,
@@ -334,8 +347,9 @@ export function consumeDiaryUsage() {
 
 /** Pro: 이번 달 AI 그림 한도 소진 여부 */
 export function isProAiMonthlyLimitReached() {
+  if (!canUseProAiQuota()) return false;
   const status = getDiaryAccessState();
-  return status.isPremiumActive && status.monthlyRemaining <= 0;
+  return status.monthlyRemaining <= 0;
 }
 
 /** Pro: AI 그림 1회 차감 (작성·수정 동일). 한도면 false */
@@ -349,7 +363,7 @@ export function consumeProAiDrawQuota() {
     state.monthlyLimitUsed = 0;
   }
 
-  if (!state.premiumUntil || state.premiumUntil <= now) return false;
+  if (!canUseProAiQuota()) return false;
   if (state.monthlyLimitUsed >= MONTHLY_AI_DRAW_LIMIT) return false;
 
   state.monthlyLimitUsed += 1;
