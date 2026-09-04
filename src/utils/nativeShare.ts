@@ -20,6 +20,19 @@ declare global {
       productId?: string | null;
     }) => void;
     __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
+    __onDiaryTipPurchaseComplete?: (payload: {
+      ok: boolean;
+      cancelled?: boolean;
+      productId?: string | null;
+      error?: string | null;
+    }) => void;
+    __onDiaryTipProducts?: (payload: {
+      products?: Array<{
+        productId?: string;
+        priceString?: string;
+        currencyCode?: string;
+      }>;
+    }) => void;
   }
 }
 

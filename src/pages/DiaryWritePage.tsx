@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { createPortal } from 'react-dom';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { DiaryEntry, DiarySticker } from '../types/diary';
+import type { DiaryEntry, DiarySticker, DiaryCanvasState } from '../types/diary';
 import { isMood, isNumberSticker, MOODS, NUMBER_STICKERS } from '../types/diary';
 import {
   defaultStickerForPack,
@@ -45,7 +45,6 @@ import {
 } from '../utils/onboarding';
 import { clearWriteDraft } from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
-import type { DiaryCanvasState } from '../types/diary';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import { getAccessToken } from '../hooks/useAuthSession';
@@ -58,24 +57,41 @@ type AiPickOption = {
   src: string;
   kind: 'canvas' | 'ai';
   aiIndex?: number;
+  /** 예전 그림 — 스티커/펜 레이어 원본. 있으면 loadCanvasState로 복원 */
+  canvasState?: DiaryCanvasState | null;
 };
+
+function cloneCanvasState(state: DiaryCanvasState | null | undefined): DiaryCanvasState | null {
+  if (!state) return null;
+  try {
+    return JSON.parse(JSON.stringify(state)) as DiaryCanvasState;
+  } catch {
+    return null;
+  }
+}
 
 function buildAiPickOptions(
   previousSnapshot: string | null,
   aiHistory: string[],
   includePreviousCanvas: boolean,
+  previousCanvasState?: DiaryCanvasState | null,
 ): AiPickOption[] {
   const seen = new Set<string>();
   const options: AiPickOption[] = [];
 
-  const add = (src: string, kind: 'canvas' | 'ai', aiIndex?: number) => {
+  const add = (
+    src: string,
+    kind: 'canvas' | 'ai',
+    aiIndex?: number,
+    canvasState?: DiaryCanvasState | null,
+  ) => {
     if (seen.has(src)) return;
     seen.add(src);
-    options.push({ src, kind, aiIndex });
+    options.push({ src, kind, aiIndex, canvasState });
   };
 
   if (includePreviousCanvas && previousSnapshot) {
-    add(previousSnapshot, 'canvas');
+    add(previousSnapshot, 'canvas', undefined, previousCanvasState ?? null);
   }
   aiHistory.forEach((src, index) => add(src, 'ai', index + 1));
   return options;
@@ -233,6 +249,10 @@ function DiaryWritePage({
   const contentRef = useRef<HTMLTextAreaElement>(null);
   /** 수정 모드 — AI 선택지에 넣을 원본 그림 (캔버스 로드 전에도 사용) */
   const editOriginalImageRef = useRef<string | null>(initialEntry?.imageUrl ?? null);
+  /** AI 직전 캔버스 레이어 스냅샷 — 예전 그림 선택 시 PNG 합성이 아닌 원본 복원 */
+  const previousCanvasStateRef = useRef<DiaryCanvasState | null>(
+    cloneCanvasState(initialEntry?.canvasState),
+  );
 
   useEffect(() => {
     savingRef.current = saving;
@@ -241,11 +261,12 @@ function DiaryWritePage({
 
   useEffect(() => {
     editOriginalImageRef.current = initialEntry?.imageUrl ?? null;
+    previousCanvasStateRef.current = cloneCanvasState(initialEntry?.canvasState);
     setAiGeneratedImages([]);
     setAiPickOptions([]);
     setAiPickSelected(new Set());
     setAiPickOpen(false);
-  }, [initialEntry?.id, initialEntry?.imageUrl]);
+  }, [initialEntry?.id, initialEntry?.imageUrl, initialEntry?.canvasState]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -604,12 +625,22 @@ function DiaryWritePage({
     void runAiDraw();
   };
 
-  const capturePreviousSnapshot = async (): Promise<string | null> => {
+  const capturePreviousSnapshot = async (): Promise<{
+    preview: string | null;
+    canvasState: DiaryCanvasState | null;
+  }> => {
     if (canvasRef.current?.hasContent()) {
       await canvasRef.current.prepareExport();
-      return canvasRef.current.toDataURL() ?? null;
+      const canvasState = cloneCanvasState(canvasRef.current.getCanvasState());
+      const preview = canvasRef.current.toDataURL() ?? null;
+      return { preview, canvasState };
     }
-    return editOriginalImageRef.current ?? initialEntry?.imageUrl ?? null;
+    return {
+      preview: editOriginalImageRef.current ?? initialEntry?.imageUrl ?? null,
+      canvasState: cloneCanvasState(
+        previousCanvasStateRef.current ?? initialEntry?.canvasState,
+      ),
+    };
   };
 
   const runAiDraw = async () => {
@@ -623,8 +654,9 @@ function DiaryWritePage({
     setAiLoading(true);
 
     try {
-      let previousSnapshot: string | null = null;
-      previousSnapshot = await capturePreviousSnapshot();
+      const { preview: previousSnapshot, canvasState: previousState } =
+        await capturePreviousSnapshot();
+      previousCanvasStateRef.current = previousState;
 
       const { imageUrl } = await generateDiaryImage({
         title,
@@ -646,6 +678,7 @@ function DiaryWritePage({
           previousSnapshot,
           nextHistory,
           priorAiCount === 0,
+          previousState,
         );
         setAiPickOptions(options);
         setAiPickSelected(new Set(options.map((_, index) => index)));
@@ -683,18 +716,46 @@ function DiaryWritePage({
       return;
     }
 
-    const selectedSrcs = [...aiPickSelected]
+    const selected = [...aiPickSelected]
       .sort((a, b) => a - b)
-      .map((index) => aiPickOptions[index]?.src)
-      .filter((src): src is string => Boolean(src));
+      .map((index) => aiPickOptions[index])
+      .filter((option): option is AiPickOption => Boolean(option));
     dismissAiPick();
 
+    const canvasOption = selected.find((option) => option.kind === 'canvas');
+    const aiSrcs = selected
+      .filter((option) => option.kind === 'ai')
+      .map((option) => option.src)
+      .filter(Boolean);
+
     try {
-      if (selectedSrcs.length === 1) {
-        await canvasRef.current?.loadImage(selectedSrcs[0]);
-      } else {
-        await canvasRef.current?.loadImages(selectedSrcs);
+      // 이전 그림만 선택 → 캔버스는 AI 생성 전 상태 그대로 (재로드/합성 PNG 금지)
+      if (canvasOption && aiSrcs.length === 0) {
+        dismissAiCoach();
+        return;
       }
+
+      if (canvasOption && aiSrcs.length > 0) {
+        // 이전 그림은 이미 캔버스에 있음 → AI만 추가
+        if (!canvasRef.current?.hasContent() && canvasOption.src) {
+          const restoreState =
+            canvasOption.canvasState ?? previousCanvasStateRef.current;
+          if (restoreState) {
+            await canvasRef.current?.loadCanvasState(
+              restoreState,
+              canvasOption.src,
+            );
+          } else {
+            await canvasRef.current?.loadEditableImage(canvasOption.src);
+          }
+        }
+        await canvasRef.current?.appendImages(aiSrcs);
+      } else if (aiSrcs.length === 1) {
+        await canvasRef.current?.loadImage(aiSrcs[0]);
+      } else if (aiSrcs.length > 1) {
+        await canvasRef.current?.loadImages(aiSrcs);
+      }
+
       drawingTouchedRef.current = true;
       dismissAiCoach();
     } catch (err) {

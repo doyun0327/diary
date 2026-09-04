@@ -199,3 +199,114 @@ button.app-info__row:active {
   margin-top: 8px !important;
   font-size: 0.78rem !important;
 }
+
+.app-info__churu {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding-bottom: 8px;
+}
+
+.app-info__churu-hero {
+  align-self: center;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.app-info__churu-lead {
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.app-info__churu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-info__churu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-border-soft);
+  border-radius: 16px;
+  background: var(--color-bg);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.app-info__churu-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.app-info__churu-btn:not(:disabled):active {
+  transform: scale(0.99);
+}
+
+.app-info__churu-btn-emoji {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+  line-height: 1;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.app-info__churu-btn-text {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.app-info__churu-btn-name {
+  font-size: 0.94rem;
+  font-weight: 650;
+  color: var(--color-text);
+}
+
+.app-info__churu-btn-price {
+  flex: 0 0 auto;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-accent-text);
+}
+
+.app-info__churu-thanks,
+.app-info__churu-error {
+  margin: 0;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.app-info__churu-thanks {
+  color: var(--color-accent-text);
+}
+
+.app-info__churu-error {
+  color: #c45c5c;
+}

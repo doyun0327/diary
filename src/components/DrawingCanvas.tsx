@@ -41,6 +41,8 @@ export interface DrawingCanvasHandle {
   loadImage: (src: string) => Promise<void>;
   /** 여러 사진 레이어를 나란히 올림 (AI 이전+새 선택 등) */
   loadImages: (srcs: string[]) => Promise<void>;
+  /** 기존 레이어를 유지한 채 사진만 추가 */
+  appendImages: (srcs: string[]) => Promise<void>;
   /** 수정 가능 사진 레이어로 올림 — 클릭 시 확대·취소·삭제 */
   loadEditableImage: (src: string) => Promise<void>;
   getCanvasState: () => DiaryCanvasState | null;
@@ -309,6 +311,8 @@ function DrawingCanvas({
   const activeStickerIdRef = useRef<string | null>(null);
   /** 스티커 시트에서 고른 직후에만 캔버스 탭으로 1회 배치 */
   const stickerPlacementArmedRef = useRef(false);
+  const stickerPanelLockUntilRef = useRef(0);
+  const lastStickerPlaceAtRef = useRef(0);
   const overlayPointers = useRef<Map<number, { x: number; y: number }>>(
     new Map(),
   );
@@ -348,6 +352,7 @@ function DrawingCanvas({
   const [mode, setMode] = useState<ToolMode>('none');
   const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
+  const [stickerPanelLocked, setStickerPanelLocked] = useState(false);
   const [stickerPremiumOpen, setStickerPremiumOpen] = useState(false);
   const [isPremiumActive, setIsPremiumActive] = useState(() => isPremiumActiveNow());
   const [colorsOpen, setColorsOpen] = useState(false);
@@ -371,7 +376,7 @@ function DrawingCanvas({
     const panel = stickerPanelRef.current;
     if (!panel) return;
     const frame = window.requestAnimationFrame(() => {
-      panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      panel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
     });
     return () => window.cancelAnimationFrame(frame);
   }, [stickerOpen]);
@@ -1218,6 +1223,14 @@ function DrawingCanvas({
       const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, true);
     },
+    appendImages: async (srcs: string[]) => {
+      if (srcs.length === 0) return;
+      await ensureCanvasLayout();
+      for (const src of srcs) {
+        const safeSrc = await resolveLayerSrc(src);
+        await addPhotoLayerAsync(safeSrc, 0.45, false);
+      }
+    },
     loadImages: async (srcs: string[]) => {
       if (srcs.length === 0) return;
       clearUndoStack();
@@ -1374,6 +1387,9 @@ function DrawingCanvas({
       const next = !open;
       if (next) {
         stickerPlacementArmedRef.current = false;
+        stickerPanelLockUntilRef.current = performance.now() + 450;
+        setStickerPanelLocked(true);
+        window.setTimeout(() => setStickerPanelLocked(false), 450);
         setMode('sticker');
         setColorsOpen(false);
         setFontOpen(false);
@@ -1387,6 +1403,7 @@ function DrawingCanvas({
   };
 
   const pickSticker = (value: string) => {
+    if (performance.now() < stickerPanelLockUntilRef.current) return;
     if (isPremiumStickerItem(value) && !isPremiumActive) {
       setStickerPremiumOpen(true);
       return;
@@ -1480,8 +1497,10 @@ function DrawingCanvas({
         rotation: 0,
       };
       stickerPlacementArmedRef.current = false;
+      lastStickerPlaceAtRef.current = performance.now();
       setStickerLayers((prev) => [...prev, layer]);
       setActiveStickerId(id);
+      activeStickerIdRef.current = id;
     };
 
     if (imageSrc) {
@@ -1645,6 +1664,8 @@ function DrawingCanvas({
   const handleDown = (e: PointerEvent<HTMLCanvasElement>) => {
     if (mode === 'sticker') {
       e.preventDefault();
+      e.stopPropagation();
+      if (performance.now() - lastStickerPlaceAtRef.current < 450) return;
       if (activeStickerId) {
         confirmActiveSticker();
         return;
@@ -2157,7 +2178,10 @@ function DrawingCanvas({
       </div>
 
       {stickerOpen && (
-        <div className="drawing__sticker-panel" ref={stickerPanelRef}>
+        <div
+          className={`drawing__sticker-panel${stickerPanelLocked ? ' is-opening' : ''}`}
+          ref={stickerPanelRef}
+        >
           <div className="drawing__sticker-panel-header">
             <div className="drawing__sticker-panel-head">
               <span>{t('canvas.stickerSheetTitle')}</span>
@@ -2165,6 +2189,7 @@ function DrawingCanvas({
                 type="button"
                 className="sheet-close-btn"
                 onClick={() => {
+                  if (performance.now() < stickerPanelLockUntilRef.current) return;
                   stickerPlacementArmedRef.current = false;
                   setStickerOpen(false);
                   setMode('none');

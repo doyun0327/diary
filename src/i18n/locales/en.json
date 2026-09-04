@@ -105,6 +105,21 @@
     "aria": "App info",
     "back": "Back",
     "version": "Current version",
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
+    },
     "legal": {
       "menu": "Terms & Privacy Policy",
       "title": "Terms · Privacy",

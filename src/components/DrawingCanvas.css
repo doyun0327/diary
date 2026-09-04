@@ -624,6 +624,10 @@
   overflow: hidden;
 }
 
+.drawing__sticker-panel.is-opening {
+  pointer-events: none;
+}
+
 .drawing__sticker-panel-header {
   flex-shrink: 0;
   min-width: 0;

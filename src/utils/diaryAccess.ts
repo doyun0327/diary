@@ -208,10 +208,12 @@ export function applySubscriptionStatus(
   const now = Date.now();
   const until = normalizeExpiresAtMs(expiresAt);
   // Flutter가 active=true 로 보내거나, 활성 구독 productId를 실어 보낼 때만 Pro
+  // (츄르 후원 소모성 상품 pageby_churu_* 는 제외)
   const treatActive =
     active ||
     (typeof productId === "string" &&
       productId.length > 0 &&
+      !productId.includes("churu") &&
       (productId.includes("pageby") ||
         productId.includes("premium") ||
         productId === "pageby_monthly"));
