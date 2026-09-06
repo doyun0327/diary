@@ -341,8 +341,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
   border-radius: 50%;
@@ -357,11 +357,7 @@
   justify-content: center;
   line-height: 1;
   color: var(--color-text);
-}
-
-.diary-write__ai-char-emoji svg {
-  width: 1.15rem;
-  height: 1.15rem;
+  font-size: 0.95rem;
 }
 
 .diary-write__tip-btn {

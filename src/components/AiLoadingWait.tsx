@@ -77,11 +77,37 @@ function makeFloater(word: string, id: number, delay: number, used: Floater[]): 
 }
 
 function AiLoadingLottie({ animationData }: { animationData: object }) {
-  const { View } = useLottie({
+  const { View, play, animationItem } = useLottie({
     animationData,
     loop: true,
     autoplay: true,
   });
+
+  useEffect(() => {
+    let wasHidden = document.visibilityState === 'hidden';
+    const resume = () => {
+      const hidden = document.visibilityState === 'hidden';
+      if (hidden) {
+        wasHidden = true;
+        return;
+      }
+      if (!wasHidden) return;
+      wasHidden = false;
+      try {
+        animationItem?.goToAndPlay?.(0, true);
+      } catch {
+        // ignore
+      }
+      play?.();
+    };
+    document.addEventListener('visibilitychange', resume);
+    window.addEventListener('pageshow', resume);
+    return () => {
+      document.removeEventListener('visibilitychange', resume);
+      window.removeEventListener('pageshow', resume);
+    };
+  }, [play, animationItem]);
+
   return <div className="ai-loading-wait__lottie">{View}</div>;
 }
 
@@ -96,6 +122,8 @@ interface AiLoadingWaitProps {
   lottieKey: number;
   step: AiProgress;
   sourceText?: string;
+  /** 오일파스텔 등 오래 걸릴 때 안내 토스트 */
+  durationHint?: boolean;
 }
 
 export default function AiLoadingWait({
@@ -103,13 +131,52 @@ export default function AiLoadingWait({
   lottieKey,
   step,
   sourceText = '',
+  durationHint = false,
 }: AiLoadingWaitProps) {
   const { t } = useTranslation();
   const activeIndex = AI_PROGRESS_STEPS.indexOf(step);
   const keywords = useMemo(() => keywordsFromDiary(sourceText), [sourceText]);
   const [floaters, setFloaters] = useState<Floater[]>([]);
+  const [hintVisible, setHintVisible] = useState(durationHint);
+  const [resumeKey, setResumeKey] = useState(0);
   const cursorRef = useRef(0);
   const idRef = useRef(MAX_FLOATING);
+
+  useEffect(() => {
+    let wasHidden = document.visibilityState === 'hidden';
+    let timer: number | null = null;
+    const remountOnShow = () => {
+      const hidden = document.visibilityState === 'hidden';
+      if (hidden) {
+        wasHidden = true;
+        return;
+      }
+      if (!wasHidden) return;
+      wasHidden = false;
+      if (timer != null) window.clearTimeout(timer);
+      // WebView는 resume 직후 rAF가 한 박자 늦을 수 있음
+      timer = window.setTimeout(() => {
+        setResumeKey((key) => key + 1);
+      }, 80);
+    };
+    document.addEventListener('visibilitychange', remountOnShow);
+    window.addEventListener('pageshow', remountOnShow);
+    return () => {
+      if (timer != null) window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', remountOnShow);
+      window.removeEventListener('pageshow', remountOnShow);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!durationHint) {
+      setHintVisible(false);
+      return;
+    }
+    setHintVisible(true);
+    const timer = window.setTimeout(() => setHintVisible(false), 3000);
+    return () => window.clearTimeout(timer);
+  }, [durationHint]);
 
   useEffect(() => {
     const next: Floater[] = [];
@@ -182,11 +249,19 @@ export default function AiLoadingWait({
       <div className="ai-loading-wait__panel">
         <div className="ai-loading-wait__stage">
           {animationData ? (
-            <AiLoadingLottie key={lottieKey} animationData={animationData} />
+            <AiLoadingLottie
+              key={`${lottieKey}-${resumeKey}`}
+              animationData={animationData}
+            />
           ) : (
             <div className="ai-loading-wait__lottie" />
           )}
         </div>
+        {hintVisible ? (
+          <div className="ai-loading-wait__toast" role="status">
+            {t('write.ai.durationHint')}
+          </div>
+        ) : null}
         <div className="ai-loading-wait__track" aria-hidden>
           {AI_PROGRESS_STEPS.map((id, index) => (
             <Fragment key={id}>

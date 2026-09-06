@@ -11,7 +11,7 @@ import {
   isNumberPack,
   useMoodPackId,
 } from '../utils/moodPack';
-import { HAIR_STYLE_OPTIONS, type CharacterProfile } from '../types/character';
+import { GENDER_EMOJI, type CharacterProfile } from '../types/character';
 import AiLoadingWait from '../components/AiLoadingWait';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
@@ -619,20 +619,17 @@ function DiaryWritePage({
     });
   }, []);
 
-  // 네이티브 결제창 닫힘 직후 잠깐 뜨는 팝업/로딩·유령 터치 방지
+  // 네이티브 결제창에서 막 돌아온 뒤에만 팝업·유령 터치 정리
+  // (일반 백그라운드 복귀에서 AI 로딩을 끄거나 로띠를 숨기지 않음)
   useEffect(() => {
     const onVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        armPurchaseShield();
-        return;
-      }
+      if (document.visibilityState !== 'visible') return;
       if (Date.now() > proPurchaseGuardUntilRef.current) return;
       armPurchaseShield(6_000);
       setRewardPromptOpen(false);
       setAiDailyLimitOpen(false);
       setAdIncompleteOpen(false);
       setAiConfirmOpen(false);
-      setAiLoading(false);
       setAiError(null);
       contentRef.current?.blur();
       titleRef.current?.blur();
@@ -640,6 +637,31 @@ function DiaryWritePage({
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [armPurchaseShield]);
+
+  // AI 그리는 중 앱 복귀 시 로띠 다시 재생
+  useEffect(() => {
+    if (!aiLoading) return;
+    let wasHidden = document.visibilityState === 'hidden';
+    const onVisibility = () => {
+      const hidden = document.visibilityState === 'hidden';
+      if (hidden) {
+        wasHidden = true;
+        return;
+      }
+      if (!wasHidden) return;
+      wasHidden = false;
+      window.setTimeout(() => {
+        setAiLottieKey((key) => key + 1);
+        setActiveAiLottie((prev) => prev ?? pickRandomLottie(aiLottiePool));
+      }, 80);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pageshow', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pageshow', onVisibility);
+    };
+  }, [aiLoading, aiLottiePool]);
 
   const saveAndLeave = () => {
     formRef.current?.requestSubmit();
@@ -1142,6 +1164,7 @@ function DiaryWritePage({
                 lottieKey={aiLottieKey}
                 step={aiProgress}
                 sourceText={content}
+                durationHint={aiStyleRef.current === 'oilPastel'}
               />
             )}
             </div>
@@ -1173,8 +1196,7 @@ function DiaryWritePage({
                       title={t('write.ai.characterTitle')}
                     >
                       <span className="diary-write__ai-char-emoji" aria-hidden>
-                        {HAIR_STYLE_OPTIONS.find((o) => o.value === character.hairStyle)?.emoji ??
-                          '👩🏻'}
+                        {GENDER_EMOJI[character.gender]}
                       </span>
                     </button>
                   </div>

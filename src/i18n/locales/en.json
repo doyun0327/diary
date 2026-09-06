@@ -512,9 +512,10 @@
         },
         "oilPastel": {
           "name": "Oil pastel",
-          "desc": "Soft oil-pastel illustration"
+          "desc": "Soft oil-pastel look · about 30 sec when not queued"
         }
       },
+      "durationHint": "This usually takes about 30 seconds",
       "exGood1": "Good: We had a pizza party today",
       "exGood2": "Good: I played with a dog in the park",
       "exBad": "Weak: I felt good today",
@@ -576,6 +577,8 @@
     "bookTitle": "Diary book · PDF",
     "pngAria": "Download PNG",
     "pngTitle": "Save as PNG",
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
     "shareAria": "Share",
     "moreAria": "More",
     "menuCloseAria": "Close menu",
@@ -588,11 +591,14 @@
       "delete": "Delete this diary?"
     },
     "ok": {
-      "png": "Saved as PNG"
+      "png": "Saved as PNG",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "PNG save failed",
       "pngBlob": "Couldn't create PNG",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save",
       "share": "Share failed",
       "roomsList": "Couldn't load rooms"
     }
@@ -678,7 +684,6 @@
     },
     "outfit": {
       "short-sleeve": "Short sleeves",
-      "long-sleeve": "Long sleeves",
       "dress": "Dress",
       "hoodie": "Hoodie",
       "school-uniform": "School uniform",
@@ -693,7 +698,7 @@
       "ribbon": "Ribbon"
     },
     "petLabel": "Pet",
-    "petHint": "Up to {{max}} pets. Turn off to keep settings but skip them in drawings.",
+    "petHint": "You can add up to {{max}} pets.\nTurn off to keep settings but skip them in drawings.",
     "petEmpty": "None yet. Add one below.",
     "petAdd": "Add {{kind}}",
     "petOn": "On",

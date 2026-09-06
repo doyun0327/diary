@@ -13,7 +13,7 @@
     "pageNextAria": "다음 페이지",
     "pageGoAria": "{{page}}페이지",
     "processing": "처리 중…",
-    "deployUpdating": "업데이트 중입니다. 2분 안에 끝나요!",
+    "deployUpdating": "업데이트 중입니다.\n2분안에 끝나요",
     "requestFailed": "요청 실패 ({{status}})",
     "serverUnreachable": "서버에 연결하지 못했어요. Spring(8080)이 켜져 있는지 확인해 주세요.",
     "weekday": {
@@ -515,6 +515,7 @@
           "desc": "포근하고 은은하게 스며드는 오일파스텔 화풍"
         }
       },
+      "durationHint": "약 30초 정도 걸려요",
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
       "exGood2": "좋은 예: 공원에서 강아지랑 뛰어놀았어요",
       "exBad": "아쉬운 예: 오늘 기분이 좋았어요",
@@ -577,6 +578,8 @@
     "bookTitle": "일기장 · PDF",
     "pngAria": "PNG 다운로드",
     "pngTitle": "PNG로 저장",
+    "downloadAria": "그림 다운로드",
+    "downloadTitle": "캔버스 그림만 저장",
     "shareAria": "공유하기",
     "moreAria": "더보기",
     "menuCloseAria": "메뉴 닫기",
@@ -589,11 +592,14 @@
       "delete": "이 일기를 삭제할까요?"
     },
     "ok": {
-      "png": "PNG로 저장했어요"
+      "png": "PNG로 저장했어요",
+      "download": "그림을 저장했어요"
     },
     "err": {
       "png": "PNG 저장에 실패했어요",
       "pngBlob": "PNG를 만들지 못했어요",
+      "download": "그림 저장에 실패했어요",
+      "noImage": "저장할 그림이 없어요",
       "share": "공유에 실패했어요",
       "roomsList": "방 목록을 불러오지 못했어요"
     }
@@ -679,7 +685,6 @@
     },
     "outfit": {
       "short-sleeve": "반팔",
-      "long-sleeve": "긴팔",
       "dress": "원피스",
       "hoodie": "후드티",
       "school-uniform": "교복",
@@ -694,7 +699,7 @@
       "ribbon": "리본"
     },
     "petLabel": "반려동물",
-    "petHint": "최대 {{max}}마리까지 추가할 수 있어요. 꺼두면 설정은 남고 그림에만 안 나와요.",
+    "petHint": "최대 {{max}}마리까지 추가할 수 있어요.\n꺼두면 설정은 남고 그림에는 안 나와요.",
     "petEmpty": "아직 없어요. 아래에서 추가해 보세요.",
     "petAdd": "{{kind}} 추가",
     "petOn": "사용 중",

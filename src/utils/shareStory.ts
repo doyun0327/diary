@@ -58,24 +58,38 @@ async function tryNativeShare(file: File, title: string, text: string): Promise<
   }
 }
 
+/** SNS용 일기 이미지 미리 생성 (공유 시트 열릴 때) */
+export function prefetchDiaryShareBlob(entry: DiaryEntry): Promise<Blob> {
+  return renderEntryBookPage(entry).then((page) => {
+    const blob = page.blob;
+    revokeBookPage(page);
+    return blob;
+  });
+}
+
 /**
  * SNS 공유 (인스타·카카오톡 등 시스템 공유 시트)
- * - 상세의 diary-detail__paper 를 그대로 캡처해 공유
+ * - blob이 있으면 캡처 생략하고 바로 공유
  * - 폰: 시스템 공유 시트 → 원하는 앱 선택
  * - PC 웹: 이미지 다운로드 (앱 공유 API 미지원)
  */
 export async function shareDiaryTo(
   entry: DiaryEntry,
   _target: ShareTarget = 'sns',
-  _options?: { paperElement?: HTMLElement | null },
+  options?: { paperElement?: HTMLElement | null; blob?: Blob },
 ): Promise<{ result: 'shared' | 'downloaded'; previewUrl?: string; isMobileShare: boolean }> {
-  const bookPage = await renderEntryBookPage(entry);
+  let ownedPage: Awaited<ReturnType<typeof renderEntryBookPage>> | null = null;
+  let blob = options?.blob;
+  if (!blob) {
+    ownedPage = await renderEntryBookPage(entry);
+    blob = ownedPage.blob;
+  }
+
   try {
-    const blob = bookPage.blob;
     const filename = `diary-${entry.date}.jpg`;
     const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
     const title = entry.title || 'diary';
-    const text = '내 diary를 SNS로 공유해요';
+    const text = '내 일기를 SNS로 공유해요';
 
     const isMobileShare = canShareImageFile();
 
@@ -89,6 +103,6 @@ export async function shareDiaryTo(
     const previewUrl = downloadBlob(blob, filename);
     return { result: 'downloaded', previewUrl, isMobileShare };
   } finally {
-    revokeBookPage(bookPage);
+    if (ownedPage) revokeBookPage(ownedPage);
   }
 }

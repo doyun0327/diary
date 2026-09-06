@@ -30,7 +30,6 @@ export interface CharacterProfile {
     | 'ponytail';
   outfit:
     | 'short-sleeve'
-    | 'long-sleeve'
     | 'dress'
     | 'hoodie'
     | 'school-uniform'
@@ -58,19 +57,75 @@ export const GENDER_OPTIONS: { value: CharacterProfile['gender']; label: string 
   { value: 'man', label: '남자어른' },
 ];
 
+export const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
+  girl: '👧🏻',
+  boy: '👦🏻',
+  woman: '👩🏻',
+  man: '👨🏻',
+};
+
 export const HAIR_STYLE_OPTIONS: {
   value: CharacterProfile['hairStyle'];
   label: string;
-  emoji: string;
+  /** public/hairStyle 상대 경로 */
+  image: string;
+  gender: 'male' | 'female';
 }[] = [
-  { value: 'man-short', label: '짧은 스타일', emoji: '👨🏻' },
-  { value: 'man-perm', label: '파마', emoji: '👨🏻‍🦱' },
-  { value: 'woman-bob', label: '단발 생머리', emoji: '👩🏻' },
-  { value: 'woman-long', label: '장발 생머리', emoji: '👩🏻‍🦰' },
-  { value: 'woman-perm', label: '단발 파마', emoji: '👩🏻‍🦱' },
-  { value: 'woman-long-perm', label: '장발 파마', emoji: '👱🏻‍♀️' },
-  { value: 'ponytail', label: '포니테일', emoji: '👧🏻' },
+  { value: 'man-short', label: '짧은 스타일', image: '/hairStyle/man-hair.png', gender: 'male' },
+  { value: 'man-perm', label: '파마', image: '/hairStyle/man-perm.png', gender: 'male' },
+  {
+    value: 'woman-bob',
+    label: '단발 생머리',
+    image: '/hairStyle/woman-shorthair.png',
+    gender: 'female',
+  },
+  {
+    value: 'woman-long',
+    label: '장발 생머리',
+    image: '/hairStyle/woman-longhair.png',
+    gender: 'female',
+  },
+  {
+    value: 'woman-perm',
+    label: '단발 파마',
+    image: '/hairStyle/woman-shortwave.png',
+    gender: 'female',
+  },
+  {
+    value: 'woman-long-perm',
+    label: '장발 파마',
+    image: '/hairStyle/long-wavy-hair-variant.png',
+    gender: 'female',
+  },
+  {
+    value: 'ponytail',
+    label: '포니테일',
+    image: '/hairStyle/woman-ponytail.png',
+    gender: 'female',
+  },
 ];
+
+export function isMaleGender(gender: CharacterProfile['gender']): boolean {
+  return gender === 'boy' || gender === 'man';
+}
+
+export function hairOptionsForGender(gender: CharacterProfile['gender']) {
+  const group = isMaleGender(gender) ? 'male' : 'female';
+  return HAIR_STYLE_OPTIONS.filter((opt) => opt.gender === group);
+}
+
+export function defaultHairForGender(
+  gender: CharacterProfile['gender'],
+): CharacterProfile['hairStyle'] {
+  return isMaleGender(gender) ? 'man-short' : 'woman-bob';
+}
+
+export function hairImageForStyle(style: CharacterProfile['hairStyle']): string {
+  return (
+    HAIR_STYLE_OPTIONS.find((opt) => opt.value === style)?.image ??
+    '/hairStyle/woman-shorthair.png'
+  );
+}
 
 export const OUTFIT_OPTIONS: {
   value: CharacterProfile['outfit'];
@@ -78,7 +133,6 @@ export const OUTFIT_OPTIONS: {
   emoji: string;
 }[] = [
   { value: 'short-sleeve', label: '반팔', emoji: '👕' },
-  { value: 'long-sleeve', label: '긴팔', emoji: '🥼' },
   { value: 'dress', label: '원피스', emoji: '👗' },
   { value: 'hoodie', label: '후드티', emoji: '🧥' },
   { value: 'school-uniform', label: '교복', emoji: '👔' },
@@ -138,12 +192,11 @@ const HAIR_STYLE_EN: Record<CharacterProfile['hairStyle'], string> = {
   'woman-long': "women's long straight hair",
   'woman-perm': "women's short permed curly hair",
   'woman-long-perm': "women's long permed curly hair",
-  ponytail: "women's ponytail hairstyle",
+  ponytail: "women's black ponytail hairstyle",
 };
 
 const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
   'short-sleeve': 'a simple short-sleeve shirt',
-  'long-sleeve': 'a simple long-sleeve shirt',
   dress: 'a simple dress',
   hoodie: 'a hoodie',
   'school-uniform': 'a school uniform',
@@ -155,8 +208,6 @@ const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
 const OUTFIT_EN_OIL_PASTEL: Record<CharacterProfile['outfit'], string> = {
   'short-sleeve':
     'a trendy oversized Korean short-sleeve tee tucked casually into high-rise pants, modern Seoul streetwear',
-  'long-sleeve':
-    'a soft Korean knit long-sleeve or layered crewneck with clean casual trousers, contemporary K-fashion',
   dress:
     'a chic Korean midi or shirt dress with a soft silhouette and everyday Seoul style',
   hoodie:
@@ -224,7 +275,7 @@ const HAIR_STYLE_FALLBACK: Record<string, CharacterProfile['hairStyle']> = {
 
 const OUTFIT_FALLBACK: Record<string, CharacterProfile['outfit']> = {
   'short-sleeve': 'short-sleeve',
-  'long-sleeve': 'long-sleeve',
+  'long-sleeve': 'short-sleeve',
   dress: 'dress',
   hoodie: 'hoodie',
   'school-uniform': 'school-uniform',
@@ -341,8 +392,12 @@ export function normalizeCharacter(
       : DEFAULT_CHARACTER.gender;
 
   const rawStyle = typeof raw.hairStyle === 'string' ? raw.hairStyle : undefined;
-  const hairStyle =
+  let hairStyle =
     (rawStyle && HAIR_STYLE_FALLBACK[rawStyle]) || DEFAULT_CHARACTER.hairStyle;
+  const allowedHair = hairOptionsForGender(gender);
+  if (!allowedHair.some((opt) => opt.value === hairStyle)) {
+    hairStyle = defaultHairForGender(gender);
+  }
 
   const rawOutfit = typeof raw.outfit === 'string' ? raw.outfit : undefined;
   const outfit =

@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import {
   ACCESSORY_OPTIONS,
   createPet,
+  defaultHairForGender,
+  GENDER_EMOJI,
   GENDER_OPTIONS,
-  HAIR_STYLE_OPTIONS,
+  hairOptionsForGender,
   MAX_PETS,
   OUTFIT_OPTIONS,
   PET_COLOR_OPTIONS,
@@ -24,13 +26,6 @@ interface CharacterSetupProps {
   /** 완료(완료 버튼) 시 — 첫 온보딩에서 쓰기 화면으로 보낼 때 사용 */
   onComplete?: () => void;
 }
-
-const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
-  girl: '👧🏻',
-  boy: '👦🏻',
-  woman: '👩🏻',
-  man: '👨🏻',
-};
 
 function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterSetupProps) {
   const { t } = useTranslation();
@@ -76,6 +71,18 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
     });
   };
 
+  const hairOptions = hairOptionsForGender(character.gender);
+
+  const setGender = (gender: CharacterProfile['gender']) => {
+    const allowed = hairOptionsForGender(gender);
+    const hairOk = allowed.some((opt) => opt.value === character.hairStyle);
+    onChange({
+      ...character,
+      gender,
+      hairStyle: hairOk ? character.hairStyle : defaultHairForGender(gender),
+    });
+  };
+
   return (
     <>
       <div className="character-setup__backdrop" onClick={onClose} />
@@ -98,7 +105,10 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                   key={opt.value}
                   type="button"
                   className={`character-setup__emoji-btn ${character.gender === opt.value ? 'selected' : ''}`}
-                  onClick={() => onChange({ ...character, gender: opt.value })}
+                  onClick={() => {
+                    setGender(opt.value);
+                    showToast(label);
+                  }}
                   aria-label={label}
                   title={label}
                 >
@@ -112,13 +122,13 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
         <section>
           <h3>{t('character.hairLabel')}</h3>
           <div className="character-setup__emoji-row character-setup__emoji-row--wrap">
-            {HAIR_STYLE_OPTIONS.map((opt) => {
+            {hairOptions.map((opt) => {
               const label = t(`character.hair.${opt.value}`);
               return (
                 <button
                   key={opt.value}
                   type="button"
-                  className={`character-setup__emoji-btn ${character.hairStyle === opt.value ? 'selected' : ''}`}
+                  className={`character-setup__emoji-btn character-setup__emoji-btn--hair ${character.hairStyle === opt.value ? 'selected' : ''}`}
                   onClick={() => {
                     onChange({ ...character, hairStyle: opt.value });
                     showToast(label);
@@ -126,7 +136,12 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                   aria-label={label}
                   title={label}
                 >
-                  <span className="character-setup__emoji">{opt.emoji}</span>
+                  <img
+                    className="character-setup__hair-img"
+                    src={opt.image}
+                    alt=""
+                    draggable={false}
+                  />
                 </button>
               );
             })}
@@ -143,7 +158,10 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                   key={opt.value}
                   type="button"
                   className={`character-setup__emoji-btn ${character.outfit === opt.value ? 'selected' : ''}`}
-                  onClick={() => onChange({ ...character, outfit: opt.value })}
+                  onClick={() => {
+                    onChange({ ...character, outfit: opt.value });
+                    showToast(label);
+                  }}
                   aria-label={label}
                   title={label}
                 >
@@ -164,7 +182,10 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                   key={opt.value}
                   type="button"
                   className={`character-setup__emoji-btn ${character.accessory === opt.value ? 'selected' : ''}`}
-                  onClick={() => onChange({ ...character, accessory: opt.value })}
+                  onClick={() => {
+                    onChange({ ...character, accessory: opt.value });
+                    showToast(label);
+                  }}
                   aria-label={label}
                   title={label}
                 >
@@ -181,9 +202,7 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
             {t('character.petHint', { max: MAX_PETS })}
           </p>
 
-          {pets.length === 0 ? (
-            <p className="character-setup__empty">{t('character.petEmpty')}</p>
-          ) : (
+          {pets.length > 0 ? (
             <ul className="character-setup__pet-list">
               {pets.map((pet, index) => {
                 const kindMeta = PET_KIND_OPTIONS.find((o) => o.value === pet.kind);
@@ -252,7 +271,7 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                 );
               })}
             </ul>
-          )}
+          ) : null}
 
           <div className="character-setup__pet-add-row">
             {PET_KIND_OPTIONS.map((opt) => (

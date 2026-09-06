@@ -5,13 +5,15 @@ import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
 import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
-import { shareDiaryTo } from '../utils/shareStory';
+import { prefetchDiaryShareBlob, shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
 import { resolveEntryImageForRoomShare } from '../utils/resolveRoomShareImage';
 import { getCachedRoomsList, invalidateRoomFeed } from '../utils/roomCache';
 import { prefetchRoomsList } from '../utils/roomPrefetch';
 import { isNetworkError, resolveNetworkErrorTitle } from '../utils/networkError';
+import { downloadToDevice } from '../utils/saveBlob';
+import { getDiaryImage } from '../utils/diaryImageStore';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
@@ -60,15 +62,18 @@ function DiaryDetailPage({
   const [sharedRoomIds, setSharedRoomIds] = useState<string[]>([]);
   const [roomsLoadError, setRoomsLoadError] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackModal>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const knownRoomsRef = useRef(new Map<string, RoomSummary>());
   const shareImagePromiseRef = useRef<Promise<string | undefined> | null>(null);
+  const snsBlobPromiseRef = useRef<Promise<Blob> | null>(null);
 
   const resetShareImagePrep = () => {
     shareImagePromiseRef.current = null;
+    snsBlobPromiseRef.current = null;
   };
 
   const prepareShareImage = () => {
@@ -76,6 +81,13 @@ function DiaryDetailPage({
       shareImagePromiseRef.current = resolveEntryImageForRoomShare(entry);
     }
     return shareImagePromiseRef.current;
+  };
+
+  const prepareSnsShareBlob = () => {
+    if (!snsBlobPromiseRef.current) {
+      snsBlobPromiseRef.current = prefetchDiaryShareBlob(entry);
+    }
+    return snsBlobPromiseRef.current;
   };
 
   useEffect(() => {
@@ -106,6 +118,7 @@ function DiaryDetailPage({
     setSharedRoomIds([]);
     void prefetchRoomsList(0, SHARE_ROOMS_PAGE_SIZE);
     void prepareShareImage();
+    void prepareSnsShareBlob();
     setShareOpen(true);
   };
 
@@ -311,6 +324,55 @@ function DiaryDetailPage({
     }
   };
 
+  const handleDownloadCanvas = async () => {
+    if (downloading || sharing) return;
+    setFeedback(null);
+    setDownloading(true);
+    try {
+      let raw = entry.imageUrl?.trim();
+      if (!raw) {
+        try {
+          raw = (await getDiaryImage(entry.id))?.trim();
+        } catch {
+          // ignore
+        }
+      }
+      if (!raw) {
+        setFeedback({ kind: 'info', title: t('detail.err.noImage') });
+        return;
+      }
+
+      let blob: Blob;
+      if (raw.startsWith('data:') || raw.startsWith('blob:')) {
+        const res = await fetch(raw);
+        blob = await res.blob();
+      } else {
+        const res = await fetch(raw, { mode: 'cors', credentials: 'omit' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        blob = await res.blob();
+      }
+
+      const ext = blob.type.includes('png')
+        ? 'png'
+        : blob.type.includes('webp')
+          ? 'webp'
+          : 'jpg';
+      const filename = `diary-${entry.date}-canvas.${ext}`;
+      await downloadToDevice(blob, filename);
+    } catch (err) {
+      setFeedback({
+        kind: 'info',
+        title: resolveNetworkErrorTitle(
+          err,
+          t('share.err.network'),
+          err instanceof Error ? err.message : t('detail.err.download'),
+        ),
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handlePickSns = async () => {
     if (sharing) return;
     setFeedback(null);
@@ -320,8 +382,10 @@ function DiaryDetailPage({
     }
     setSharing(true);
     try {
+      const blob = await prepareSnsShareBlob();
       const { result, previewUrl: url, isMobileShare } = await shareDiaryTo(entry, 'sns', {
         paperElement: paperRef.current,
+        blob,
       });
       closeShare({ force: true });
 
@@ -361,11 +425,42 @@ function DiaryDetailPage({
         </button>
 
         <div className="diary-detail__actions">
+          {entry.imageUrl ? (
+            <button
+              type="button"
+              className="diary-detail__icon-btn"
+              onClick={() => void handleDownloadCanvas()}
+              disabled={downloading || sharing}
+              aria-label={t('detail.downloadAria')}
+              title={t('detail.downloadTitle')}
+            >
+              {downloading ? (
+                '…'
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" x2="12" y1="15" y2="3" />
+                </svg>
+              )}
+            </button>
+          ) : null}
           <button
             type="button"
             className="diary-detail__icon-btn"
             onClick={openShare}
-            disabled={sharing}
+            disabled={sharing || downloading}
             aria-label={t('detail.shareAria')}
             title={t('detail.shareAria')}
           >
