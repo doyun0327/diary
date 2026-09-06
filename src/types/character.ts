@@ -185,40 +185,73 @@ const GENDER_EN: Record<CharacterProfile['gender'], string> = {
   man: 'a man in his twenties',
 };
 
-const HAIR_STYLE_EN: Record<CharacterProfile['hairStyle'], string> = {
-  'man-short': "short men's haircut",
-  'man-perm': "men's permed curly hair",
-  'woman-bob': "women's short straight bob hair",
-  'woman-long': "women's long straight hair",
-  'woman-perm': "women's short permed curly hair",
-  'woman-long-perm': "women's long permed curly hair",
-  ponytail: "women's black ponytail hairstyle",
-};
+function genderPossessive(gender: CharacterProfile['gender']): string {
+  switch (gender) {
+    case 'girl':
+      return "young girl's";
+    case 'boy':
+      return "young boy's";
+    case 'woman':
+      return "women's";
+    case 'man':
+      return "men's";
+  }
+}
+
+function describeHairStyle(
+  style: CharacterProfile['hairStyle'],
+  gender: CharacterProfile['gender'],
+): string {
+  const who = genderPossessive(gender);
+  switch (style) {
+    case 'man-short':
+      return `${who} short haircut`;
+    case 'man-perm':
+      return `${who} permed curly hair`;
+    case 'woman-bob':
+      return `${who} short straight bob hair`;
+    case 'woman-long':
+      return `${who} long straight hair`;
+    case 'woman-perm':
+      return `${who} short permed curly hair`;
+    case 'woman-long-perm':
+      return `${who} long permed curly hair`;
+    case 'ponytail':
+      return `${who} black ponytail hairstyle`;
+  }
+}
 
 const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
-  'short-sleeve': 'a simple short-sleeve shirt',
-  dress: 'a simple dress',
-  hoodie: 'a hoodie',
-  'school-uniform': 'a school uniform',
-  swimsuit: 'a swimsuit',
-  'ski-suit': 'a ski suit',
+  'short-sleeve': 'simple short-sleeve shirt',
+  dress: 'simple dress',
+  hoodie: 'hoodie',
+  'school-uniform': 'school uniform',
+  swimsuit: 'swimsuit',
+  'ski-suit': 'ski suit',
 };
 
 /** 오일파스텔: 한국에서 흔히 보이는 요즘 일상 패션 */
 const OUTFIT_EN_OIL_PASTEL: Record<CharacterProfile['outfit'], string> = {
   'short-sleeve':
-    'a trendy oversized Korean short-sleeve tee tucked casually into high-rise pants, modern Seoul streetwear',
-  dress:
-    'a chic Korean midi or shirt dress with a soft silhouette and everyday Seoul style',
+    'trendy oversized Korean short-sleeve tee tucked casually into high-rise pants, modern Seoul streetwear',
+  dress: 'chic Korean midi or shirt dress with a soft silhouette and everyday Seoul style',
   hoodie:
-    'an oversized Korean streetwear hoodie with relaxed pants and sneakers, trendy K-casual look',
+    'oversized Korean streetwear hoodie with relaxed pants and sneakers, trendy K-casual look',
   'school-uniform':
-    'a realistic modern Korean school uniform (blouse or shirt with skirt or slacks), neat and contemporary',
-  swimsuit:
-    'a modern Korean-style swimsuit or resort wear, neat and fashionable',
-  'ski-suit':
-    'a stylish modern Korean ski jacket and pants set, sporty and fashionable',
+    'realistic modern Korean school uniform (blouse or shirt with skirt or slacks), neat and contemporary',
+  swimsuit: 'modern Korean-style swimsuit or resort wear, neat and fashionable',
+  'ski-suit': 'stylish modern Korean ski jacket and pants set, sporty and fashionable',
 };
+
+function describeOutfit(
+  outfit: CharacterProfile['outfit'],
+  gender: CharacterProfile['gender'],
+  style?: 'storybook' | 'oilPastel',
+): string {
+  const who = genderPossessive(gender);
+  const base = (style === 'oilPastel' ? OUTFIT_EN_OIL_PASTEL : OUTFIT_EN)[outfit];
+  return `wearing a ${who} ${base}`;
+}
 
 const ACCESSORY_EN: Record<CharacterProfile['accessory'], string | null> = {
   none: null,
@@ -433,17 +466,21 @@ export function describeCharacter(
   profile: CharacterProfile,
   style?: 'storybook' | 'oilPastel',
 ): string {
-  const outfits = style === 'oilPastel' ? OUTFIT_EN_OIL_PASTEL : OUTFIT_EN;
   const accessories =
     style === 'oilPastel' ? ACCESSORY_EN_OIL_PASTEL : ACCESSORY_EN;
+  const child = profile.gender === 'girl' || profile.gender === 'boy';
 
   const parts = [
     GENDER_EN[profile.gender],
-    HAIR_STYLE_EN[profile.hairStyle],
-    `wearing ${outfits[profile.outfit]}`,
+    describeHairStyle(profile.hairStyle, profile.gender),
+    describeOutfit(profile.outfit, profile.gender, style),
   ];
   if (style === 'oilPastel') {
-    parts.push('dressed in contemporary Korean everyday fashion');
+    parts.push(
+      child
+        ? 'dressed in contemporary Korean kids everyday fashion'
+        : 'dressed in contemporary Korean everyday fashion',
+    );
   }
   const accessory = accessories[profile.accessory];
   if (accessory) parts.push(accessory);

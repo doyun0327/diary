@@ -639,9 +639,9 @@
 }
 
 .diary-write__ai-style-desc {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--color-text-muted);
 }
 
