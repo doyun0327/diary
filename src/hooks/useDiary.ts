@@ -35,24 +35,49 @@ function canvasLayerCount(state: DiaryCanvasState | undefined): number {
   );
 }
 
-/** localStorage에는 canvasState data URL만 제외 (imageUrl은 친구방 공유를 위해 유지) */
+/**
+ * localStorage에는 메타만 둔다.
+ * data URL 그림/레이어는 IndexedDB에 있으므로 넣으면 QuotaExceeded로
+ * 저장 실패 → 새로고침 후 그림 소실이 난다 (동화책 등 큰 AI 그림에서 특히).
+ * https URL은 짧아서 localStorage에 유지해도 된다.
+ */
 function toStorageEntry(entry: DiaryEntry): DiaryEntry {
   let next: DiaryEntry = entry;
   if (next.canvasState && canvasStateHasDataUrl(next.canvasState)) {
     const { canvasState: _omit, ...rest } = next;
+    next = rest;
+  } else if (next.canvasState) {
+    // ink/photos가 https만 있어도 용량·파손 위험 — 캔버스는 IDB 전용
+    const { canvasState: _omit, ...rest } = next;
+    next = rest;
+  }
+  if (isEmbeddedDataUrl(next.imageUrl)) {
+    const { imageUrl: _omitImg, ...rest } = next;
     next = rest;
   }
   return next;
 }
 
 function persistEntries(entries: DiaryEntry[]): boolean {
+  const payload = entries.map(toStorageEntry);
   try {
-    const payload = entries.map(toStorageEntry);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     return true;
   } catch (err) {
     console.error('[diary] localStorage persist failed', err);
-    return false;
+    // 예전 data URL이 남아 quota가 가득 찬 경우 — 이미지 필드를 전부 빼고 재시도
+    try {
+      const slim = payload.map((e) => {
+        if (!e.imageUrl && !e.canvasState) return e;
+        const { imageUrl: _i, canvasState: _c, ...rest } = e;
+        return rest;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+      return true;
+    } catch (retryErr) {
+      console.error('[diary] localStorage slim persist failed', retryErr);
+      return false;
+    }
   }
 }
 
@@ -136,7 +161,10 @@ async function hydrateEntries(entries: DiaryEntry[]): Promise<DiaryEntry[]> {
     next.push(current);
   }
 
-  if (migrated) {
+  const needsScrub = entries.some(
+    (e) => isEmbeddedDataUrl(e.imageUrl) || Boolean(e.canvasState),
+  );
+  if (migrated || needsScrub) {
     persistEntries(next);
   }
   return next;
