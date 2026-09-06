@@ -537,7 +537,9 @@
       "pickConfirm": "Add",
       "pickSelectOne": "Select at least one image",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "Drawing ready",
+      "cdnFallbackNotice": "Your drawing is ready. It took a bit longer to load because the network was unstable."
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",

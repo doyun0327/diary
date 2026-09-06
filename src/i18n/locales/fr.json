@@ -500,7 +500,9 @@
       "pickConfirm": "Ajouter",
       "pickSelectOne": "Sélectionne au moins une image",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "Image chargée",
+      "cdnFallbackNotice": "Ton dessin est prêt. Le chargement a pris un peu plus de temps à cause d'une connexion instable."
     },
     "confirm": {
       "replaceTitle": "Dessin IA",

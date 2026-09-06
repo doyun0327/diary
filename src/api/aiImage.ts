@@ -28,6 +28,10 @@ export interface AiDrawResult {
   scene?: string;
   /** 최종 이미지 프롬프트 (선택) */
   prompt?: string;
+  /** CDN fallback 등 사용자 안내 */
+  notice?: string;
+  /** runware-cdn 등 */
+  imageSource?: string;
 }
 
 type DrawPayload = {
@@ -41,6 +45,7 @@ type DrawPayload = {
   notice?: string;
   refundUsage?: string;
   usageRefunded?: string;
+  imageSource?: string;
 };
 
 /** 그림 job 실패 — 사용권 환불 안내 포함 가능 */
@@ -75,19 +80,25 @@ function parseImageResult(data: DrawPayload): AiDrawResult {
     console.info('[AI] scene/prompt:', scene);
   }
 
+  const notice = data.notice?.trim() || undefined;
+  const imageSource = data.imageSource?.trim() || undefined;
+  if (notice) {
+    console.info('[AI] notice:', notice);
+  }
+
   if (data.imageBase64) {
     const imageUrl = data.imageBase64.startsWith('data:')
       ? data.imageBase64
       : `data:image/png;base64,${data.imageBase64}`;
-    return { imageUrl, scene, prompt: data.prompt?.trim() };
+    return { imageUrl, scene, prompt: data.prompt?.trim(), notice, imageSource };
   }
 
   if (data.imageUrl?.startsWith('data:')) {
-    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
+    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim(), notice, imageSource };
   }
 
   if (data.imageUrl?.startsWith('http://') || data.imageUrl?.startsWith('https://')) {
-    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim() };
+    return { imageUrl: data.imageUrl, scene, prompt: data.prompt?.trim(), notice, imageSource };
   }
 
   throw aiError('백엔드 응답에 이미지가 없습니다');

@@ -500,7 +500,9 @@
       "pickConfirm": "Thêm",
       "pickSelectOne": "Chọn ít nhất một hình",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "Đã tải ảnh",
+      "cdnFallbackNotice": "Bức vẽ đã xong. Mạng không ổn định nên tải hơi lâu."
     },
     "confirm": {
       "replaceTitle": "Tranh AI",

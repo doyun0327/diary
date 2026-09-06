@@ -218,6 +218,7 @@ function DiaryWritePage({
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
   const [usageNotice, setUsageNotice] = useState('');
+  const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
   const aiStyleRef = useRef<AiDrawStyleId>('storybook');
   const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free'>('none');
   const [aiPickOpen, setAiPickOpen] = useState(false);
@@ -881,7 +882,7 @@ function DiaryWritePage({
         await capturePreviousSnapshot();
       previousCanvasStateRef.current = previousState;
 
-      const { imageUrl } = await generateDiaryImage({
+      const { imageUrl, notice, imageSource } = await generateDiaryImage({
         title,
         content,
         character,
@@ -910,10 +911,16 @@ function DiaryWritePage({
         setAiPickSelected(new Set(options.map((_, index) => index)));
         setAiPickOpen(true);
       }
+      if (notice) {
+        setUsageNoticeKind(imageSource === 'runware-cdn' ? 'cdn' : 'refund');
+        setUsageNotice(notice);
+        setUsageNoticeOpen(true);
+      }
     } catch (err) {
       const notice = await refundAiDrawQuotaIfNeeded(err);
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
       if (notice) {
+        setUsageNoticeKind('refund');
         setUsageNotice(notice);
         setUsageNoticeOpen(true);
       }
@@ -1408,8 +1415,17 @@ function DiaryWritePage({
           )}
           {usageNoticeOpen && (
             <AppModal
-              title={t('write.ai.usageNotDeductedTitle')}
-              lead={usageNotice || t('write.ai.usageNotDeducted')}
+              title={
+                usageNoticeKind === 'cdn'
+                  ? t('write.ai.cdnFallbackTitle')
+                  : t('write.ai.usageNotDeductedTitle')
+              }
+              lead={
+                usageNotice ||
+                (usageNoticeKind === 'cdn'
+                  ? t('write.ai.cdnFallbackNotice')
+                  : t('write.ai.usageNotDeducted'))
+              }
               onDismiss={() => setUsageNoticeOpen(false)}
               showClose={false}
               closeAriaLabel={t('common.close')}

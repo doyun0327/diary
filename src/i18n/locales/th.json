@@ -500,7 +500,9 @@
       "pickConfirm": "ใส่",
       "pickSelectOne": "เลือกอย่างน้อย 1 ภาพ",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "โหลดรูปแล้ว",
+      "cdnFallbackNotice": "รูปวาดพร้อมแล้ว การโหลดใช้เวลานานขึ้นเพราะเน็ตไม่เสถียร"
     },
     "confirm": {
       "replaceTitle": "ภาพวาด AI",

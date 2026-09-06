@@ -500,7 +500,9 @@
       "pickConfirm": "加入",
       "pickSelectOne": "请至少选一张图",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "图片已加载",
+      "cdnFallbackNotice": "画作已完成。网络不稳定，加载多花了一些时间。"
     },
     "confirm": {
       "replaceTitle": "AI 画",

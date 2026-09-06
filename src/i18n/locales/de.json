@@ -501,7 +501,9 @@
       "pickConfirm": "Hinzufügen",
       "pickSelectOne": "Wähle mindestens ein Bild",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "Bild geladen",
+      "cdnFallbackNotice": "Deine Zeichnung ist fertig. Wegen einer instabilen Verbindung hat das Laden etwas länger gedauert."
     },
     "confirm": {
       "replaceTitle": "KI-Zeichnung",

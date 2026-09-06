@@ -500,7 +500,9 @@
       "pickConfirm": "入れる",
       "pickSelectOne": "絵を1枚以上選んでください",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "読み込み完了",
+      "cdnFallbackNotice": "絵ができました。ネットワークが不安定で、読み込みに少し時間がかかりました。"
     },
     "confirm": {
       "replaceTitle": "AIの絵",

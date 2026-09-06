@@ -500,7 +500,9 @@
       "pickConfirm": "Tambahkan",
       "pickSelectOne": "Pilih minimal satu gambar",
       "usageNotDeductedTitle": "Usage credit",
-      "usageNotDeducted": "Your usage credit was not deducted."
+      "usageNotDeducted": "Your usage credit was not deducted.",
+      "cdnFallbackTitle": "Gambar dimuat",
+      "cdnFallbackNotice": "Gambarmu sudah siap. Memuat agak lama karena jaringan tidak stabil."
     },
     "confirm": {
       "replaceTitle": "Gambar AI",
