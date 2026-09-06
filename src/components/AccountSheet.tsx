@@ -381,7 +381,10 @@ function AccountSheet({
     setAuthError(null);
     setAuthSuccess(null);
     try {
-      const result = await onSyncDiaries(null, { month: syncMonth });
+      // 마지막 업로드 이후 변경분만 push (첫 동기화·since 없으면 전체)
+      const result = await onSyncDiaries(session?.lastSyncedAt ?? null, {
+        month: syncMonth,
+      });
       markSynced(result.serverTime);
       onMonthSynced?.(syncMonth);
       setAuthSuccess(

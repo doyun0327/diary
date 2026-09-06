@@ -222,19 +222,45 @@ function syncFingerprint(entries: DiaryEntry[]): string {
     .join('\n');
 }
 
-async function hasPendingImageUploads(entries: DiaryEntry[]): Promise<boolean> {
-  for (const entry of entries) {
-    if (entry.imageUrl && isEmbeddedDataUrl(entry.imageUrl)) return true;
-    try {
-      const fromIdb = await getDiaryImage(entry.id);
-      if (!fromIdb) continue;
-      if (isEmbeddedDataUrl(fromIdb)) return true;
-      if (!fromIdb.startsWith('http://') && !fromIdb.startsWith('https://')) return true;
-    } catch {
-      // ignore
-    }
+async function entryHasPendingImageUpload(entry: DiaryEntry): Promise<boolean> {
+  if (entry.imageUrl && isEmbeddedDataUrl(entry.imageUrl)) return true;
+  try {
+    const fromIdb = await getDiaryImage(entry.id);
+    if (!fromIdb) return false;
+    if (isEmbeddedDataUrl(fromIdb)) return true;
+    if (!fromIdb.startsWith('http://') && !fromIdb.startsWith('https://')) return true;
+  } catch {
+    // ignore
   }
   return false;
+}
+
+async function hasPendingImageUploads(entries: DiaryEntry[]): Promise<boolean> {
+  for (const entry of entries) {
+    if (await entryHasPendingImageUpload(entry)) return true;
+  }
+  return false;
+}
+
+/** since 이후 변경분 + 그림 미업로드만. since 없으면 전체 */
+async function selectEntriesForUpload(
+  entries: DiaryEntry[],
+  since: string | null,
+): Promise<DiaryEntry[]> {
+  if (!since) return entries;
+  const sinceMs = Date.parse(since);
+  if (Number.isNaN(sinceMs)) return entries;
+
+  const out: DiaryEntry[] = [];
+  for (const entry of entries) {
+    const updatedMs = Date.parse(entry.updatedAt);
+    if (Number.isNaN(updatedMs) || updatedMs > sinceMs) {
+      out.push(entry);
+      continue;
+    }
+    if (await entryHasPendingImageUpload(entry)) out.push(entry);
+  }
+  return out;
 }
 
 /** sync 전송용: https 그림만 담고 canvasState는 제외 */
@@ -418,7 +444,7 @@ export function useDiary() {
 
   /**
    * 서버와 LWW 동기화.
-   * @param since 마지막 성공 동기화 시각 (없으면 해당 월 전체 pull)
+   * @param since 마지막 성공 동기화 시각 — 있으면 그 이후 변경·미업로드 그림만 push, pull도 since 기준
    * @param options.month YYYY-MM — 해당 월만 pull
    * @param options.pullOnly true면 로컬 업로드 없이 pull만
    */
@@ -431,9 +457,12 @@ export function useDiary() {
     const pullOnly = options?.pullOnly === true;
     const pendingDeletes = pullOnly ? [] : loadDeletedIds();
     const localEntries = await hydrateEntries(loadEntries());
+    const uploadCandidates = pullOnly
+      ? []
+      : await selectEntriesForUpload(localEntries, since);
     const hadDeletes = !pullOnly && pendingDeletes.length > 0;
-    const hadUploads = !pullOnly && (await hasPendingImageUploads(localEntries));
-    const entriesForSync = pullOnly ? [] : await prepareEntriesForSync(localEntries);
+    const hadUploads = !pullOnly && (await hasPendingImageUploads(uploadCandidates));
+    const entriesForSync = pullOnly ? [] : await prepareEntriesForSync(uploadCandidates);
 
     if (!pullOnly) {
       // 업로드로 https가 생긴 항목은 로컬에도 반영
