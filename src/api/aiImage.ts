@@ -1,5 +1,6 @@
 import type { CharacterProfile } from '../types/character';
 import { describeCharacter } from '../types/character';
+import type { AiDrawStyleId } from '../utils/aiDrawStyles';
 import { apiUrl, isRemoteApi } from './config';
 
 /**
@@ -174,6 +175,8 @@ export async function generateDiaryImage(input: {
   title?: string;
   content: string;
   character?: CharacterProfile;
+  /** 영어동화책(기본) | 오일파스텔 */
+  style?: AiDrawStyleId;
   onProgress?: (step: AiProgress) => void;
 }): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
@@ -187,11 +190,14 @@ export async function generateDiaryImage(input: {
     ? describeCharacter(input.character)
     : undefined;
 
-  const payload = {
+  const styleId = input.style ?? 'storybook';
+
+  const payload: Record<string, unknown> = {
     diaryLine,
     title: title || undefined,
     character,
     sceneMode: 'full' as const,
+    style: styleId,
   };
 
   console.info('[AI] ===== POST /api/ai/draw =====');

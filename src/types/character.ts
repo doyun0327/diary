@@ -1,5 +1,5 @@
 export interface CharacterProfile {
-  gender: 'boy' | 'girl';
+  gender: 'girl' | 'boy' | 'woman' | 'man';
   hairStyle: 'short' | 'medium' | 'curly';
   outfit: 'short-sleeve' | 'dress' | 'hoodie' | 'school-uniform' | 'swimsuit' | 'ski-suit';
   accessory: 'none' | 'glasses' | 'hat' | 'ribbon';
@@ -13,8 +13,10 @@ export const DEFAULT_CHARACTER: CharacterProfile = {
 };
 
 export const GENDER_OPTIONS: { value: CharacterProfile['gender']; label: string }[] = [
-  { value: 'boy', label: '남자아이' },
   { value: 'girl', label: '여자아이' },
+  { value: 'boy', label: '남자아이' },
+  { value: 'woman', label: '여자어른' },
+  { value: 'man', label: '남자어른' },
 ];
 
 export const HAIR_STYLE_OPTIONS: { value: CharacterProfile['hairStyle']; label: string; emoji: string }[] = [
@@ -44,8 +46,10 @@ export const ACCESSORY_OPTIONS: {
 ];
 
 const GENDER_EN: Record<CharacterProfile['gender'], string> = {
-  boy: 'a young boy',
   girl: 'a young girl',
+  boy: 'a young boy',
+  woman: 'a woman in her twenties',
+  man: 'a man in his twenties',
 };
 
 const HAIR_STYLE_EN: Record<CharacterProfile['hairStyle'], string> = {
@@ -118,12 +122,16 @@ const ACCESSORY_FALLBACK: Record<string, CharacterProfile['accessory']> = {
   ribbon: 'ribbon',
 };
 
+const GENDER_VALUES = new Set<CharacterProfile['gender']>(['girl', 'boy', 'woman', 'man']);
+
 /** 이전 저장 형식도 새 필드로 보정 */
 export function normalizeCharacter(
   raw: Partial<CharacterProfile> | (Partial<CharacterProfile> & Record<string, unknown>),
 ): CharacterProfile {
   const gender =
-    raw.gender === 'boy' || raw.gender === 'girl' ? raw.gender : DEFAULT_CHARACTER.gender;
+    typeof raw.gender === 'string' && GENDER_VALUES.has(raw.gender as CharacterProfile['gender'])
+      ? (raw.gender as CharacterProfile['gender'])
+      : DEFAULT_CHARACTER.gender;
 
   const rawStyle = typeof raw.hairStyle === 'string' ? raw.hairStyle : undefined;
   const hairStyle =

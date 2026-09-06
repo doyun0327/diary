@@ -502,6 +502,18 @@
       "tipBody": "Your character is the lead; AI draws from the full diary text.",
       "tipVisible": "Visible actions & places",
       "tipAsk": " — please write them.",
+      "styleTitle": "Which style?",
+      "styleLead": "Pick a look for your diary drawing.",
+      "style": {
+        "storybook": {
+          "name": "Storybook",
+          "desc": "Same fairy-tale look as now"
+        },
+        "oilPastel": {
+          "name": "Oil pastel",
+          "desc": "Soft oil-pastel illustration"
+        }
+      },
       "exGood1": "Good: We had a pizza party today",
       "exGood2": "Good: I played with a dog in the park",
       "exBad": "Weak: I felt good today",
@@ -649,8 +661,10 @@
     "hairLabel": "Hair",
     "outfitLabel": "Outfit",
     "gender": {
+      "girl": "Girl",
       "boy": "Boy",
-      "girl": "Girl"
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "Men's hair",

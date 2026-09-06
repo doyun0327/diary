@@ -83,8 +83,6 @@ const PARTICLES = [
   '도',
   '만',
   '로',
-  '요',
-  '다',
 ];
 
 function stemKorean(token: string): string {

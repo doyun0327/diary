@@ -18,8 +18,10 @@ interface CharacterSetupProps {
 }
 
 const GENDER_EMOJI: Record<CharacterProfile['gender'], string> = {
-  boy: '👦🏻',
   girl: '👧🏻',
+  boy: '👦🏻',
+  woman: '👩🏻',
+  man: '👨🏻',
 };
 
 function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterSetupProps) {
@@ -45,7 +47,7 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
 
         <section>
           <h3>{t('character.who')}</h3>
-          <div className="character-setup__emoji-row">
+          <div className="character-setup__emoji-row character-setup__emoji-row--wrap">
             {GENDER_OPTIONS.map((opt) => {
               const label = t(`character.gender.${opt.value}`);
               return (

@@ -21,6 +21,7 @@ import { HAIR_STYLE_OPTIONS } from '../types/character';
 import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
+import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
@@ -178,6 +179,8 @@ function DiaryWritePage({
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
+  const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  const aiStyleRef = useRef<AiDrawStyleId>('storybook');
   const [aiPickOpen, setAiPickOpen] = useState(false);
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
@@ -605,6 +608,13 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
+    setAiStyleOpen(true);
+  };
+
+  const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
+    aiStyleRef.current = styleId;
+    setAiStyleOpen(false);
+
     // 웹: 광고·일일/월간 한도 없이 바로 생성
     if (!isFlutterApp()) {
       void runAiDraw();
@@ -666,6 +676,7 @@ function DiaryWritePage({
         title,
         content,
         character,
+        style: aiStyleRef.current,
         onProgress: setAiProgress,
       });
 
@@ -1133,6 +1144,34 @@ function DiaryWritePage({
               primaryLabel={isEdit ? t('write.saveEdit') : t('write.save')}
               onPrimary={saveAndLeave}
             />
+          )}
+          {aiStyleOpen && (
+            <AppModal
+              title={t('write.ai.styleTitle')}
+              lead={t('write.ai.styleLead')}
+              onDismiss={() => setAiStyleOpen(false)}
+              showClose
+              closeAriaLabel={t('common.close')}
+            >
+              <div className="diary-write__ai-styles" role="list">
+                {AI_DRAW_STYLES.map((style) => (
+                  <button
+                    key={style.id}
+                    type="button"
+                    className="diary-write__ai-style-btn"
+                    role="listitem"
+                    onClick={() => proceedAfterStylePick(style.id)}
+                  >
+                    <span className="diary-write__ai-style-name">
+                      {t(`write.ai.style.${style.id}.name`)}
+                    </span>
+                    <span className="diary-write__ai-style-desc">
+                      {t(`write.ai.style.${style.id}.desc`)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </AppModal>
           )}
           {aiConfirmOpen && (
             <AppModal

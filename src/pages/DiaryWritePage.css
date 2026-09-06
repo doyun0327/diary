@@ -599,6 +599,48 @@
   color: var(--color-danger);
 }
 
+.diary-write__ai-styles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 4px;
+  text-align: left;
+}
+
+.diary-write__ai-style-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-border-soft);
+  border-radius: 16px;
+  background: var(--color-bg);
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.diary-write__ai-style-btn:active {
+  transform: scale(0.99);
+}
+
+.diary-write__ai-style-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.diary-write__ai-style-desc {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
 /* 결제창 닫힌 직후 유령 터치가 AI 버튼 등으로 전달되지 않게 */
 .diary-write__purchase-shield {
   position: fixed;
