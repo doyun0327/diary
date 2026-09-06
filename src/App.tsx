@@ -55,6 +55,7 @@ import {
 } from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
+import { preloadMoodPackIcons } from "./utils/moodPack";
 import {
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
@@ -133,6 +134,17 @@ function App() {
   useEffect(() => {
     if (deployUpdating) requestDraftFlush();
   }, [deployUpdating]);
+
+  useEffect(() => {
+    const run = () => preloadMoodPackIcons();
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(run, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(run, 300);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const fetchedProUsageUserRef = useRef<string | null>(null);
   const [appToast, setAppToast] = useState<string | null>(null);
   const appToastTimer = useRef<number | null>(null);

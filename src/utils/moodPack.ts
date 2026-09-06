@@ -282,12 +282,28 @@ export function entryMoodPack(entry: { moodPack?: string } | null | undefined): 
   return parseMoodPackId(entry?.moodPack) ?? getStoredMoodPackId();
 }
 
+const preloadedMoodIconSrcs = new Set<string>();
+
+/** 팩 아이콘을 브라우저 이미지 캐시에 미리 올려 두기 */
+export function preloadMoodPackIcons(packId: MoodPackId = getStoredMoodPackId()) {
+  const pack = getMoodPack(packId);
+  const srcs = Object.values(pack.icons ?? {});
+  for (const src of srcs) {
+    if (!src || preloadedMoodIconSrcs.has(src)) continue;
+    preloadedMoodIconSrcs.add(src);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  }
+}
+
 export function applyMoodPack(id: MoodPackId) {
   try {
     localStorage.setItem(MOOD_PACK_STORAGE_KEY, id);
   } catch {
     // ignore
   }
+  preloadMoodPackIcons(id);
   window.dispatchEvent(new Event(MOOD_PACK_CHANGE_EVENT));
 }
 

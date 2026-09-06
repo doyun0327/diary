@@ -9,6 +9,7 @@ import {
   entryMoodPack,
   getStoredMoodPackId,
   isNumberPack,
+  preloadMoodPackIcons,
   useMoodPackId,
 } from '../utils/moodPack';
 import { GENDER_EMOJI, type CharacterProfile } from '../types/character';
@@ -324,6 +325,10 @@ function DiaryWritePage({
       return isMood(prev) ? prev : 'happy';
     });
   }, [writePackId, isEdit]);
+
+  useEffect(() => {
+    preloadMoodPackIcons(writePackId);
+  }, [writePackId]);
 
   useEffect(() => {
     const onNativeSave = () => {
