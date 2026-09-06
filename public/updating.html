@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <title>PageBy · 업데이트 중</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nunito:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f4f4f4;
+        --panel: #ffffff;
+        --text: #1a1a1a;
+        --muted: #6b6b6b;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(120% 80% at 50% -10%, #ffffff 0%, transparent 55%),
+          linear-gradient(180deg, #fafafa 0%, var(--bg) 100%);
+        color: var(--text);
+        font-family: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      }
+      body {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: max(24px, env(safe-area-inset-top)) 24px
+          max(24px, env(safe-area-inset-bottom));
+      }
+      .panel {
+        width: min(100%, 320px);
+        padding: 32px 28px 28px;
+        border-radius: 22px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        text-align: center;
+        animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .brand {
+        margin: 0 0 8px;
+        font-family: 'Gaegu', 'Nunito', sans-serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .lottie {
+        width: min(160px, 46vw);
+        height: min(160px, 46vw);
+        margin: 8px auto 12px;
+      }
+      .lottie > svg {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .fallback {
+        width: 72px;
+        height: 72px;
+        margin: 28px auto;
+        border-radius: 50%;
+        border: 3px solid #e8e8e8;
+        border-top-color: #2a2a2a;
+        animation: spin 0.9s linear infinite;
+      }
+      h1 {
+        margin: 0;
+        font-family: 'Gaegu', 'Nunito', sans-serif;
+        font-size: 1.45rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.35;
+      }
+      p {
+        margin: 10px 0 0;
+        font-size: 0.98rem;
+        font-weight: 600;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+      .hint {
+        margin-top: 18px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #9a9a9a;
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel" role="status" aria-live="polite" aria-busy="true">
+      <p class="brand">PageBy</p>
+      <div id="lottie" class="lottie" aria-hidden="true">
+        <div class="fallback" id="fallback"></div>
+      </div>
+      <h1>업데이트 중입니다</h1>
+      <p>2분 안에 끝나요!</p>
+      <p class="hint">끝나면 자동으로 새로고침돼요</p>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
+    <script>
+      (function () {
+        var host = document.getElementById('lottie');
+        var fallback = document.getElementById('fallback');
+        function clearFallback() {
+          if (fallback && fallback.parentNode) fallback.parentNode.removeChild(fallback);
+        }
+        try {
+          if (window.lottie) {
+            window.lottie.loadAnimation({
+              container: host,
+              renderer: 'svg',
+              loop: true,
+              autoplay: true,
+              path: '/lottie/ai-loading-cat.json',
+            });
+            clearFallback();
+          }
+        } catch (_) {
+          /* keep spinner */
+        }
+
+        // 배포가 끝나면 / 가 앱(index)으로 돌아옴 — 안내 문구가 사라지면 이동
+        var tries = 0;
+        setInterval(function () {
+          tries += 1;
+          fetch('/?check=' + Date.now(), {
+            method: 'GET',
+            cache: 'no-store',
+            headers: { Accept: 'text/html' },
+          })
+            .then(function (res) {
+              return res.text().then(function (body) {
+                var stillUpdating = body.indexOf('업데이트 중입니다') !== -1;
+                if (!stillUpdating) {
+                  location.replace('/?from=update&t=' + Date.now());
+                } else if (tries > 45) {
+                  location.reload();
+                }
+              });
+            })
+            .catch(function () {
+              if (tries > 8) location.reload();
+            });
+        }, 8000);
+      })();
+    </script>
+  </body>
+</html>

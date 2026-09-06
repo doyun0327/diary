@@ -8,8 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
-    "deploy:preview": "npm run build && wrangler versions upload"
+    "deploy": "npm run build && wrangler deploy --var MAINTENANCE:0",
+    "deploy:hold": "node scripts/deploy-hold.mjs",
+    "deploy:preview": "npm run build && wrangler versions upload",
+    "maintenance:on": "wrangler deploy --var MAINTENANCE:1",
+    "maintenance:off": "wrangler deploy --var MAINTENANCE:0"
   },
   "dependencies": {
     "@rolldown/binding-win32-x64-msvc": "^1.2.4",
