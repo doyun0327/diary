@@ -44,7 +44,15 @@ import {
   markAiCoachSeen,
   markCharacterCoachSeen,
 } from '../utils/onboarding';
-import { clearWriteDraft } from '../utils/writeDraft';
+import {
+  clearWriteDraft,
+  DRAFT_FLUSH_EVENT,
+  loadWriteDraft,
+  loadWriteDraftMedia,
+  saveWriteDraft,
+  saveWriteDraftMedia,
+  writeDraftHasContent,
+} from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
@@ -151,19 +159,45 @@ function DiaryWritePage({
 }: DiaryWritePageProps) {
   const { t, i18n } = useTranslation();
   const isEdit = Boolean(initialEntry);
+  const resumeDraft = (() => {
+    const draft = loadWriteDraft();
+    if (!draft || !writeDraftHasContent(draft)) return null;
+    if (isEdit) {
+      return draft.editingId === initialEntry?.id ? draft : null;
+    }
+    // 새 글: 수정용 초안이어도 대상 일기가 없으면 내용 복원
+    if (draft.editingId && draft.editingId !== '') {
+      return draft;
+    }
+    return draft;
+  })();
   const globalPack = useMoodPackId();
   const writePackId = isEdit ? entryMoodPack(initialEntry) : globalPack;
-  const [date, setDate] = useState(initialEntry?.date ?? today());
-  const [title, setTitle] = useState(initialEntry?.title ?? '');
-  const [content, setContent] = useState(initialEntry?.content ?? '');
+  const [date, setDate] = useState(
+    () => resumeDraft?.date ?? initialEntry?.date ?? today(),
+  );
+  const [title, setTitle] = useState(
+    () => resumeDraft?.title ?? initialEntry?.title ?? '',
+  );
+  const [content, setContent] = useState(
+    () => resumeDraft?.content ?? initialEntry?.content ?? '',
+  );
   const [mood, setMood] = useState<DiarySticker>(
-    () => initialEntry?.mood ?? defaultStickerForPack(getStoredMoodPackId()),
+    () =>
+      resumeDraft?.mood ??
+      initialEntry?.mood ??
+      defaultStickerForPack(getStoredMoodPackId()),
   );
   const [fontId, setFontId] = useState(
-    () => initialEntry?.fontId ?? getPreferredFontId(),
+    () => resumeDraft?.fontId ?? initialEntry?.fontId ?? getPreferredFontId(),
   );
   const [fontSizeId, setFontSizeId] = useState(
-    () => parseFontSizeId(initialEntry?.fontSize ?? getPreferredFontSizeId()),
+    () =>
+      parseFontSizeId(
+        resumeDraft?.fontSize ??
+          initialEntry?.fontSize ??
+          getPreferredFontSizeId(),
+      ),
   );
   const [canvasCollapsed, setCanvasCollapsed] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -231,13 +265,20 @@ function DiaryWritePage({
   const savingRef = useRef(false);
   const drawingTouchedRef = useRef(false);
   const baselineRef = useRef({
-    date: initialEntry?.date ?? today(),
-    title: initialEntry?.title ?? '',
-    content: initialEntry?.content ?? '',
-    mood: (initialEntry?.mood ?? defaultStickerForPack(getStoredMoodPackId())) as DiarySticker,
-    fontId: initialEntry?.fontId ?? getPreferredFontId(),
-    fontSizeId: parseFontSizeId(initialEntry?.fontSize ?? getPreferredFontSizeId()),
-    hadImage: Boolean(initialEntry?.imageUrl),
+    date: resumeDraft?.date ?? initialEntry?.date ?? today(),
+    title: resumeDraft?.title ?? initialEntry?.title ?? '',
+    content: resumeDraft?.content ?? initialEntry?.content ?? '',
+    mood: (resumeDraft?.mood ??
+      initialEntry?.mood ??
+      defaultStickerForPack(getStoredMoodPackId())) as DiarySticker,
+    fontId: resumeDraft?.fontId ?? initialEntry?.fontId ?? getPreferredFontId(),
+    fontSizeId: parseFontSizeId(
+      resumeDraft?.fontSize ??
+        initialEntry?.fontSize ??
+        getPreferredFontSizeId(),
+    ),
+    hadImage:
+      Boolean(initialEntry?.imageUrl) || Boolean(resumeDraft?.hasDrawing),
   });
   const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
     if (isEdit) return null;
@@ -273,8 +314,9 @@ function DiaryWritePage({
 
   useEffect(() => {
     if (isEdit) return;
+    if (resumeDraft?.fontId) return;
     setFontId(getPreferredFontId());
-  }, [i18n.language, isEdit]);
+  }, [i18n.language, isEdit, resumeDraft?.fontId]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -366,18 +408,18 @@ function DiaryWritePage({
   }, []);
 
   useEffect(() => {
-    const state = initialEntry?.canvasState;
-    const src = initialEntry?.imageUrl;
-    if (!state && !src) return;
     let cancelled = false;
     let attempts = 0;
 
-    const tryLoad = () => {
+    const applyCanvas = (
+      state: DiaryCanvasState | null | undefined,
+      src: string | null | undefined,
+    ) => {
       if (cancelled) return;
       const canvas = canvasRef.current;
       if (!canvas) {
         if (attempts++ < 90) {
-          window.requestAnimationFrame(tryLoad);
+          window.requestAnimationFrame(() => applyCanvas(state, src));
         }
         return;
       }
@@ -388,23 +430,104 @@ function DiaryWritePage({
             state.inkUrl),
       );
       if (hasLayers && state) {
-        void canvas.loadCanvasState(state, src).catch(() => {
+        void canvas.loadCanvasState(state, src ?? undefined).catch(() => {
           if (!cancelled && src) void canvas.loadEditableImage(src);
         });
+        drawingTouchedRef.current = true;
         return;
       }
       if (src) {
         void canvas.loadEditableImage(src).catch(() => {
           if (!cancelled) void canvas.loadImage(src);
         });
+        drawingTouchedRef.current = true;
       }
     };
 
-    tryLoad();
+    void (async () => {
+      if (resumeDraft?.hasDrawing) {
+        const media = await loadWriteDraftMedia();
+        if (cancelled) return;
+        if (media.canvasState || media.imageUrl) {
+          applyCanvas(media.canvasState, media.imageUrl);
+          return;
+        }
+      }
+      applyCanvas(initialEntry?.canvasState, initialEntry?.imageUrl);
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [initialEntry?.imageUrl, initialEntry?.canvasState]);
+  }, [initialEntry?.imageUrl, initialEntry?.canvasState, resumeDraft?.hasDrawing]);
+
+  const flushWriteDraft = useCallback(async () => {
+    const hasDrawing = Boolean(canvasRef.current?.hasContent());
+    const meta = {
+      date,
+      title,
+      content,
+      mood,
+      fontId,
+      fontSize: fontSizeId,
+      editingId: initialEntry?.id ?? null,
+      hasDrawing,
+    };
+    if (!writeDraftHasContent(meta) && !hasDrawing) {
+      // 아직 빈 새 글이면 굳이 저장하지 않음 (수정 모드는 원본이 있으므로 필드 바뀌면 저장)
+      if (!isEdit) return;
+    }
+    saveWriteDraft(meta);
+    try {
+      await canvasRef.current?.prepareExport();
+      const rawState = canvasRef.current?.getCanvasState() ?? null;
+      const imageUrl = canvasRef.current?.toDataURL() ?? null;
+      await saveWriteDraftMedia({
+        canvasState: rawState,
+        imageUrl: imageUrl || null,
+      });
+      if (hasDrawing) {
+        saveWriteDraft({ ...meta, hasDrawing: true });
+      }
+    } catch (err) {
+      console.warn('[draft] canvas flush failed', err);
+    }
+  }, [
+    date,
+    title,
+    content,
+    mood,
+    fontId,
+    fontSizeId,
+    initialEntry?.id,
+    isEdit,
+  ]);
+
+  // 텍스트·설정 자동 임시저장
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void flushWriteDraft();
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [flushWriteDraft]);
+
+  // 배포 새로고침·백그라운드 전환 직전 flush
+  useEffect(() => {
+    const onFlush = () => {
+      void flushWriteDraft();
+    };
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') onFlush();
+    };
+    window.addEventListener(DRAFT_FLUSH_EVENT, onFlush);
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onFlush);
+    return () => {
+      window.removeEventListener(DRAFT_FLUSH_EVENT, onFlush);
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onFlush);
+    };
+  }, [flushWriteDraft]);
 
   const resolveCanvasStateForSave = async (
     state: DiaryCanvasState | null,
@@ -434,7 +557,7 @@ function DiaryWritePage({
   };
 
   const leaveWithoutSaving = () => {
-    if (!isEdit) clearWriteDraft();
+    clearWriteDraft();
     setLeaveConfirmOpen(false);
     onCancel();
   };

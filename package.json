@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy --var MAINTENANCE:0",
     "deploy:hold": "node scripts/deploy-hold.mjs",
+    "deploy:backend": "npm --prefix ../diary_back run deploy",
+    "deploy:backend:hold": "npm --prefix ../diary_back run deploy:hold",
     "deploy:preview": "npm run build && wrangler versions upload",
     "maintenance:on": "wrangler deploy --var MAINTENANCE:1",
     "maintenance:off": "wrangler deploy --var MAINTENANCE:0"

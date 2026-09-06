@@ -25,10 +25,13 @@ export function useDeployMaintenance(): boolean {
           return;
         }
         if (wasOnRef.current) {
-          // 배포 끝 → 새 번들 받기
+          // 배포 끝 → 작성 초안 flush 후 새 번들
           wasOnRef.current = false;
           setMaintenance(false);
-          window.location.reload();
+          window.dispatchEvent(new Event('diary-flush-draft'));
+          window.setTimeout(() => {
+            window.location.reload();
+          }, 200);
           return;
         }
         setMaintenance(false);

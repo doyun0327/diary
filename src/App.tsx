@@ -46,7 +46,13 @@ import type { DiaryEntry } from "./types/diary";
 import { formatYearMonth, monthKey } from "./utils/date";
 import type { SyncCloudOptions } from "./api/diariesApi";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
-import { clearWriteDraft } from "./utils/writeDraft";
+import {
+  clearWriteDraft,
+  loadWriteDraft,
+  requestDraftFlush,
+  saveWriteDraft,
+  writeDraftHasContent,
+} from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import {
@@ -73,6 +79,17 @@ export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
 
 type SubscriptionModalReason = "write" | "search" | "export";
 
+function readResumeWrite(): { page: Page; editingId: string | null } {
+  const draft = loadWriteDraft();
+  if (draft && writeDraftHasContent(draft)) {
+    return {
+      page: "write",
+      editingId: draft.editingId?.trim() ? draft.editingId : null,
+    };
+  }
+  return { page: "home", editingId: null };
+}
+
 function App() {
   const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries, syncWithCloud, ready } =
@@ -82,9 +99,11 @@ function App() {
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } =
     useClientProfile();
   const screenLock = useScreenLock();
-  const [page, setPage] = useState<Page>("home");
+  const [page, setPage] = useState<Page>(() => readResumeWrite().page);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(
+    () => readResumeWrite().editingId,
+  );
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -110,11 +129,35 @@ function App() {
   const [accessTick, setAccessTick] = useState(0);
   const [cloudSyncLoading, setCloudSyncLoading] = useState(false);
   const deployUpdating = useDeployMaintenance();
+
+  useEffect(() => {
+    if (deployUpdating) requestDraftFlush();
+  }, [deployUpdating]);
   const fetchedProUsageUserRef = useRef<string | null>(null);
   const [appToast, setAppToast] = useState<string | null>(null);
   const appToastTimer = useRef<number | null>(null);
 
   const accessStatus = getDiaryAccessState(entries.length);
+
+  // 복원된 수정 id 가 목록에 없으면 새 글로 이어서 작성
+  useEffect(() => {
+    if (!ready || !editingId) return;
+    if (entries.some((entry) => entry.id === editingId)) return;
+    const draft = loadWriteDraft();
+    if (draft?.editingId === editingId) {
+      saveWriteDraft({
+        date: draft.date,
+        title: draft.title,
+        content: draft.content,
+        mood: draft.mood,
+        fontId: draft.fontId,
+        fontSize: draft.fontSize,
+        hasDrawing: draft.hasDrawing,
+        editingId: null,
+      });
+    }
+    setEditingId(null);
+  }, [ready, editingId, entries]);
 
   const now = new Date();
   const [calYear, setCalYear] = useState(now.getFullYear());
