@@ -352,8 +352,16 @@
 }
 
 .diary-write__ai-char-emoji {
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+  color: var(--color-text);
+}
+
+.diary-write__ai-char-emoji svg {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .diary-write__tip-btn {

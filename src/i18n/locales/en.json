@@ -668,13 +668,17 @@
       "man": "Man"
     },
     "hair": {
-      "short": "Men's hair",
-      "medium": "Women's bob",
-      "curly": "Women's perm",
-      "bald": "Bald"
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "Short sleeves",
+      "long-sleeve": "Long sleeves",
       "dress": "Dress",
       "hoodie": "Hoodie",
       "school-uniform": "School uniform",
@@ -687,7 +691,28 @@
       "glasses": "Glasses",
       "hat": "Hat",
       "ribbon": "Ribbon"
-    }
+    },
+    "petLabel": "Pet",
+    "petHint": "You can add up to {{max}} pets",
+    "petEmpty": "None yet. Add one below.",
+    "petAdd": "Add {{kind}}",
+    "petRemove": "Remove",
+    "pet": {
+      "dog": "Dog",
+      "cat": "Cat"
+    },
+    "petColorLabel": "Color",
+    "petColor": {
+      "white": "White",
+      "black": "Black",
+      "brown": "Brown",
+      "cream": "Cream",
+      "gray": "Gray",
+      "orange": "Orange",
+      "spotted": "Spotted"
+    },
+    "petNoteLabel": "Breed / notes (optional)",
+    "petNotePlaceholder": "e.g. Golden Retriever, Korean shorthair"
   },
   "export": {
     "title": "Export",

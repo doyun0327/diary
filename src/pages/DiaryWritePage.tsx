@@ -11,13 +11,12 @@ import {
   isNumberPack,
   useMoodPackId,
 } from '../utils/moodPack';
-import type { CharacterProfile } from '../types/character';
+import { HAIR_STYLE_OPTIONS, type CharacterProfile } from '../types/character';
 import AiLoadingWait from '../components/AiLoadingWait';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
-import { HAIR_STYLE_OPTIONS } from '../types/character';
 import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
@@ -1174,7 +1173,8 @@ function DiaryWritePage({
                       title={t('write.ai.characterTitle')}
                     >
                       <span className="diary-write__ai-char-emoji" aria-hidden>
-                        {HAIR_STYLE_OPTIONS.find((o) => o.value === character.hairStyle)?.emoji ?? '👤'}
+                        {HAIR_STYLE_OPTIONS.find((o) => o.value === character.hairStyle)?.emoji ??
+                          '👩🏻'}
                       </span>
                     </button>
                   </div>
