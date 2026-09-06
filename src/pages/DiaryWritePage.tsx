@@ -553,6 +553,9 @@ function DiaryWritePage({
   };
 
   const consumeAiDrawQuota = async () => {
+    // 브라우저(웹)에서는 개발·미리보기용으로 AI 제한 없음
+    if (!isFlutterApp()) return true;
+
     if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
         promptProAiLimit();
@@ -602,6 +605,11 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
+    // 웹: 광고·일일/월간 한도 없이 바로 생성
+    if (!isFlutterApp()) {
+      void runAiDraw();
+      return;
+    }
     if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
         promptProAiLimit();
@@ -615,10 +623,6 @@ function DiaryWritePage({
       return;
     }
     if (needsAiAdBeforeDraw()) {
-      if (!isFlutterApp()) {
-        setAiError(t('write.err.adAppOnly'));
-        return;
-      }
       setRewardPromptOpen(true);
       return;
     }
@@ -1049,9 +1053,11 @@ function DiaryWritePage({
                     >
                       {aiLabel}
                     </button>
-                    <span className="diary-write__ai-remaining">
-                      {aiLeft}
-                    </span>
+                    {isFlutterApp() && (
+                      <span className="diary-write__ai-remaining">
+                        {aiLeft}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
