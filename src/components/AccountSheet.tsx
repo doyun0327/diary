@@ -128,14 +128,6 @@ function AccountSheet({
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<number | null>(null);
   const [flutterNative, setFlutterNative] = useState(() => isFlutterApp());
-  /** 게스트 사진이 있을 때 Google 사진으로 바꿀지 묻는 대기 URL */
-  const [pendingGooglePhoto, setPendingGooglePhoto] = useState<string | null>(() => {
-    try {
-      return sessionStorage.getItem('picture-diary-pending-google-photo');
-    } catch {
-      return null;
-    }
-  });
   const [photoMenuOpen, setPhotoMenuOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const avatarWrapRef = useRef<HTMLDivElement>(null);
@@ -146,6 +138,14 @@ function AccountSheet({
   useEffect(() => {
     setNameDraft(nickname);
   }, [nickname]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('picture-diary-pending-google-photo');
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -316,15 +316,6 @@ function AccountSheet({
               nickname: name || nameNow,
               avatarUrl: next.photoUrl,
             });
-          } else if (next.photoUrl !== avatarNow) {
-            try {
-              sessionStorage.setItem(
-                'picture-diary-pending-google-photo',
-                next.photoUrl,
-              );
-            } catch {
-              // ignore
-            }
           }
         }
         try {
@@ -357,7 +348,7 @@ function AccountSheet({
     });
   };
 
-  /** 로그인 성공후: 빈 이름만 채우고, 사진은 없을 때 시드 / 있으면 교체 확인 */
+  /** 로그인 성공후: 빈 이름만 채우고, 사진은 없을 때만 Google 사진 시드 */
   const seedProfileFromAuth = (next: AuthSession) => {
     const name = next.displayName.trim();
     if (name && !nickname.trim()) {
@@ -368,10 +359,6 @@ function AccountSheet({
     if (!next.photoUrl) return;
     if (!avatarUrl) {
       applyAuthPhoto(next.photoUrl, name || nickname || nameDraft.trim());
-      return;
-    }
-    if (next.photoUrl !== avatarUrl) {
-      setPendingGooglePhoto(next.photoUrl);
     }
   };
 
@@ -436,26 +423,6 @@ function AccountSheet({
   const useAccountPhoto = () => {
     if (!session?.photoUrl) return;
     applyAuthPhoto(session.photoUrl);
-  };
-
-  const confirmReplaceWithGooglePhoto = () => {
-    if (!pendingGooglePhoto) return;
-    applyAuthPhoto(pendingGooglePhoto);
-    setPendingGooglePhoto(null);
-    try {
-      sessionStorage.removeItem('picture-diary-pending-google-photo');
-    } catch {
-      // ignore
-    }
-  };
-
-  const cancelReplaceWithGooglePhoto = () => {
-    setPendingGooglePhoto(null);
-    try {
-      sessionStorage.removeItem('picture-diary-pending-google-photo');
-    } catch {
-      // ignore
-    }
   };
 
   const saveName = () => {
@@ -759,30 +726,6 @@ function AccountSheet({
         )}
 
       </div>
-
-      {pendingGooglePhoto ? (
-        <AppModal
-          title={t('account.replacePhoto.title')}
-          lead={t('account.replacePhoto.lead')}
-          onDismiss={cancelReplaceWithGooglePhoto}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={cancelReplaceWithGooglePhoto}
-          primaryLabel={t('account.replacePhoto.confirm')}
-          onPrimary={confirmReplaceWithGooglePhoto}
-        >
-          <div className="account-sheet__replace-preview" aria-hidden>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="account-sheet__replace-preview-img" />
-            ) : null}
-            <span className="account-sheet__replace-preview-arrow">→</span>
-            <img
-              src={pendingGooglePhoto}
-              alt=""
-              className="account-sheet__replace-preview-img"
-            />
-          </div>
-        </AppModal>
-      ) : null}
 
       {toast ? (
         <div className="account-sheet__toast" role="status">
