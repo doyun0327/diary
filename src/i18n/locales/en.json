@@ -2,6 +2,7 @@
   "common": {
     "close": "Close",
     "cancel": "Cancel",
+    "ok": "OK",
     "save": "Save",
     "delete": "Delete",
     "loading": "Loading…",
@@ -534,7 +535,9 @@
       "pickNth": "#{{n}}",
       "pickNew": "New",
       "pickConfirm": "Add",
-      "pickSelectOne": "Select at least one image"
+      "pickSelectOne": "Select at least one image",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",

@@ -5,6 +5,8 @@ export type MonthlyUsageDto = {
   used: number;
   limit: number;
   allowed?: boolean;
+  /** 환불 시 사용자 안내 */
+  notice?: string | null;
 };
 
 function authHeaders(accessToken: string): HeadersInit {
@@ -48,6 +50,20 @@ export async function consumeMonthlyUsage(
   });
   if (!res.ok) {
     throw new Error(await readError(res, '월간 한도 차감 실패'));
+  }
+  return (await res.json()) as MonthlyUsageDto;
+}
+
+/** Runware 400 등 생성 실패 시 월간 카운트 1회 환불 */
+export async function refundMonthlyUsage(
+  accessToken: string,
+): Promise<MonthlyUsageDto> {
+  const res = await fetch(apiUrl('/api/usage/monthly/refund'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '월간 한도 환불 실패'));
   }
   return (await res.json()) as MonthlyUsageDto;
 }

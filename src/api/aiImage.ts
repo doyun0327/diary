@@ -38,7 +38,28 @@ type DrawPayload = {
   jobId?: string;
   status?: string;
   message?: string;
+  notice?: string;
+  refundUsage?: string;
+  usageRefunded?: string;
 };
+
+/** 그림 job 실패 — 사용권 환불 안내 포함 가능 */
+export class AiDrawJobError extends Error {
+  notice?: string;
+  refundUsage: boolean;
+  usageRefunded: boolean;
+
+  constructor(
+    message: string,
+    opts?: { notice?: string; refundUsage?: boolean; usageRefunded?: boolean },
+  ) {
+    super(message);
+    this.name = 'AiDrawJobError';
+    this.notice = opts?.notice?.trim() || undefined;
+    this.refundUsage = Boolean(opts?.refundUsage);
+    this.usageRefunded = Boolean(opts?.usageRefunded);
+  }
+}
 
 const POLL_INTERVAL_MS = 1500;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
@@ -115,7 +136,10 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
   return humanizeAiError(fallback);
 }
 
-async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => void): Promise<AiDrawResult> {
+async function pollDrawJob(
+  jobId: string,
+  onProgress?: (step: AiProgress) => void,
+): Promise<AiDrawResult> {
   const started = Date.now();
   onProgress?.('waiting');
 
@@ -148,7 +172,14 @@ async function pollDrawJob(jobId: string, onProgress?: (step: AiProgress) => voi
       return parseImageResult(data);
     }
     if (status === 'failed') {
-      throw aiError(data.message?.trim() || '그림 생성에 실패했습니다');
+      const refundUsage = data.refundUsage === 'true';
+      const usageRefunded =
+        data.usageRefunded === 'true' || data.refundUsage === 'done';
+      throw new AiDrawJobError(data.message?.trim() || '그림 생성에 실패했습니다', {
+        notice: data.notice,
+        refundUsage,
+        usageRefunded,
+      });
     }
 
     if (status === 'running') {
@@ -177,6 +208,8 @@ export async function generateDiaryImage(input: {
   character?: CharacterProfile;
   /** 영어동화책(기본) | 오일파스텔 */
   style?: AiDrawStyleId;
+  /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
+  accessToken?: string | null;
   onProgress?: (step: AiProgress) => void;
 }): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
@@ -205,14 +238,19 @@ export async function generateDiaryImage(input: {
 
   input.onProgress?.('waiting');
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (input.accessToken?.trim()) {
+    headers.Authorization = `Bearer ${input.accessToken.trim()}`;
+  }
+
   let response: Response;
   try {
     response = await fetch(apiUrl('/api/ai/draw'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers,
       body: JSON.stringify(payload),
     });
   } catch {

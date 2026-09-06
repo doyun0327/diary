@@ -2,6 +2,7 @@
   "common": {
     "close": "關閉",
     "cancel": "取消",
+    "ok": "OK",
     "save": "保存",
     "delete": "刪除",
     "loading": "加載中…",
@@ -497,7 +498,9 @@
       "pickNth": "第 {{n}} 張",
       "pickNew": "新圖",
       "pickConfirm": "加入",
-      "pickSelectOne": "請至少選一張圖"
+      "pickSelectOne": "請至少選一張圖",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "confirm": {
       "replaceTitle": "AI 畫",

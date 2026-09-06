@@ -2,6 +2,7 @@
   "common": {
     "close": "ปิด",
     "cancel": "ยกเลิก",
+    "ok": "OK",
     "save": "บันทึก",
     "delete": "ลบ",
     "loading": "กำลังโหลด…",
@@ -497,7 +498,9 @@
       "pickNth": "ภาพที่ {{n}}",
       "pickNew": "ภาพใหม่",
       "pickConfirm": "ใส่",
-      "pickSelectOne": "เลือกอย่างน้อย 1 ภาพ"
+      "pickSelectOne": "เลือกอย่างน้อย 1 ภาพ",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "confirm": {
       "replaceTitle": "ภาพวาด AI",

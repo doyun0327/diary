@@ -374,6 +374,25 @@ export function consumeProAiDrawQuota() {
   return true;
 }
 
+/** Pro: AI 그림 1회 차감 취소 (생성 실패 환불) */
+export function refundProAiDrawQuota() {
+  const state = loadAccessState();
+  const now = Date.now();
+  const monthKey = getMonthKey(new Date(now));
+
+  if (state.monthKey !== monthKey) {
+    state.monthKey = monthKey;
+    state.monthlyLimitUsed = 0;
+    saveAccessState(state);
+    return false;
+  }
+  if (state.monthlyLimitUsed <= 0) return false;
+  state.monthlyLimitUsed -= 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
 export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
   const state = loadAccessState();
   const monthKey = yearMonth || getMonthKey();
@@ -495,6 +514,19 @@ export function consumeAiDrawDailyQuota() {
   if (state.aiDrawCredits <= 0) return false;
   state.aiDrawCredits -= 1;
   state.diaryCreatesToday += 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** 무료 AI 일일 슬롯 1회 환불 (생성 실패 시) */
+export function refundAiDrawDailyQuota() {
+  const state = loadAccessState();
+  normalizeDailyAiState(state);
+  normalizeAiCredits(state);
+  if (state.diaryCreatesToday <= 0) return false;
+  state.diaryCreatesToday -= 1;
+  state.aiDrawCredits += 1;
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;

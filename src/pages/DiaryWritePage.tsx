@@ -18,7 +18,7 @@ import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
-import { generateDiaryImage, type AiProgress } from '../api/aiImage';
+import { generateDiaryImage, AiDrawJobError, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
@@ -35,6 +35,8 @@ import {
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
+  refundAiDrawDailyQuota,
+  refundProAiDrawQuota,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
@@ -57,7 +59,7 @@ import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resol
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import { getAccessToken } from '../hooks/useAuthSession';
-import { consumeMonthlyUsage, fetchMonthlyUsage } from '../api/usageApi';
+import { consumeMonthlyUsage, fetchMonthlyUsage, refundMonthlyUsage } from '../api/usageApi';
 import './DiaryWritePage.css';
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
@@ -214,7 +216,10 @@ function DiaryWritePage({
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
+  const [usageNotice, setUsageNotice] = useState('');
   const aiStyleRef = useRef<AiDrawStyleId>('storybook');
+  const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free'>('none');
   const [aiPickOpen, setAiPickOpen] = useState(false);
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
@@ -704,9 +709,12 @@ function DiaryWritePage({
     setProAiLimitOpen(true);
   };
 
-  const consumeAiDrawQuota = async () => {
+  const consumeAiDrawQuota = async (): Promise<boolean> => {
     // 브라우저(웹)에서는 개발·미리보기용으로 AI 제한 없음
-    if (!isFlutterApp()) return true;
+    if (!isFlutterApp()) {
+      aiQuotaKindRef.current = 'none';
+      return true;
+    }
 
     if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
@@ -718,6 +726,7 @@ function DiaryWritePage({
         try {
           const usage = await consumeMonthlyUsage(token);
           applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+          aiQuotaKindRef.current = 'pro-server';
           return true;
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
@@ -735,6 +744,7 @@ function DiaryWritePage({
             promptProAiLimit();
             return false;
           }
+          aiQuotaKindRef.current = 'pro-local';
           return true;
         }
       }
@@ -742,13 +752,59 @@ function DiaryWritePage({
         promptProAiLimit();
         return false;
       }
+      aiQuotaKindRef.current = 'pro-local';
       return true;
     }
     if (!consumeAiDrawDailyQuota()) {
       promptAiDrawBlocked();
       return false;
     }
+    aiQuotaKindRef.current = 'free';
     return true;
+  };
+
+  const refundAiDrawQuotaIfNeeded = async (err: unknown): Promise<string | null> => {
+    const jobErr = err instanceof AiDrawJobError ? err : null;
+    const shouldRefund =
+      Boolean(jobErr?.refundUsage) ||
+      Boolean(jobErr?.usageRefunded) ||
+      (err instanceof Error &&
+        /runware/i.test(err.message) &&
+        /\(400\)/.test(err.message));
+    if (!shouldRefund) return null;
+
+    const fallbackNotice = t('write.ai.usageNotDeducted');
+    let notice =
+      jobErr?.notice?.trim() ||
+      (jobErr?.usageRefunded ? fallbackNotice : null);
+
+    const kind = aiQuotaKindRef.current;
+    if (kind === 'pro-server' && !jobErr?.usageRefunded) {
+      const token = getAccessToken();
+      if (token) {
+        try {
+          const usage = await refundMonthlyUsage(token);
+          applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+          notice = usage.notice?.trim() || fallbackNotice;
+        } catch {
+          notice = notice || fallbackNotice;
+        }
+      } else {
+        refundProAiDrawQuota();
+        notice = notice || fallbackNotice;
+      }
+    } else if (kind === 'pro-local') {
+      refundProAiDrawQuota();
+      notice = notice || fallbackNotice;
+    } else if (kind === 'free') {
+      refundAiDrawDailyQuota();
+      notice = notice || fallbackNotice;
+    } else if (jobErr?.usageRefunded) {
+      notice = notice || fallbackNotice;
+    }
+
+    aiQuotaKindRef.current = 'none';
+    return notice;
   };
 
   const handleAiDraw = () => {
@@ -826,9 +882,11 @@ function DiaryWritePage({
         content,
         character,
         style: aiStyleRef.current,
+        accessToken: getAccessToken(),
         onProgress: setAiProgress,
       });
 
+      aiQuotaKindRef.current = 'none';
       const priorAiCount = aiGeneratedImages.length;
       const nextHistory = [...aiGeneratedImages, imageUrl];
       setAiGeneratedImages(nextHistory);
@@ -849,7 +907,12 @@ function DiaryWritePage({
         setAiPickOpen(true);
       }
     } catch (err) {
+      const notice = await refundAiDrawQuotaIfNeeded(err);
       setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
+      if (notice) {
+        setUsageNotice(notice);
+        setUsageNoticeOpen(true);
+      }
     } finally {
       setAiLoading(false);
     }
@@ -1337,6 +1400,17 @@ function DiaryWritePage({
                 setAiConfirmOpen(false);
                 void runAiDraw();
               }}
+            />
+          )}
+          {usageNoticeOpen && (
+            <AppModal
+              title={t('write.ai.usageNotDeductedTitle')}
+              lead={usageNotice || t('write.ai.usageNotDeducted')}
+              onDismiss={() => setUsageNoticeOpen(false)}
+              showClose={false}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={t('common.ok')}
+              onPrimary={() => setUsageNoticeOpen(false)}
             />
           )}
           {rewardPromptOpen && (

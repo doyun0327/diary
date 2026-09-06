@@ -2,6 +2,7 @@
   "common": {
     "close": "Đóng",
     "cancel": "Hủy",
+    "ok": "OK",
     "save": "Lưu",
     "delete": "Xóa",
     "loading": "Đang tải…",
@@ -497,7 +498,9 @@
       "pickNth": "Hình {{n}}",
       "pickNew": "Hình mới",
       "pickConfirm": "Thêm",
-      "pickSelectOne": "Chọn ít nhất một hình"
+      "pickSelectOne": "Chọn ít nhất một hình",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "confirm": {
       "replaceTitle": "Tranh AI",

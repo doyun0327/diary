@@ -2,6 +2,7 @@
   "common": {
     "close": "닫기",
     "cancel": "취소",
+    "ok": "확인",
     "save": "저장",
     "delete": "삭제",
     "loading": "불러오는 중…",
@@ -534,7 +535,9 @@
       "pickNth": "{{n}}번째",
       "pickNew": "새 그림",
       "pickConfirm": "넣기",
-      "pickSelectOne": "그림을 하나 이상 선택해 주세요"
+      "pickSelectOne": "그림을 하나 이상 선택해 주세요",
+      "usageNotDeductedTitle": "사용권 안내",
+      "usageNotDeducted": "사용권이 차감되지 않았습니다."
     },
     "reward": {
       "saveTitle": "광고 보고 일기 1편 저장",

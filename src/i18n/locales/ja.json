@@ -2,6 +2,7 @@
   "common": {
     "close": "閉じる",
     "cancel": "キャンセル",
+    "ok": "OK",
     "save": "保存",
     "delete": "削除",
     "loading": "読み込み中…",
@@ -497,7 +498,9 @@
       "pickNth": "{{n}}枚目",
       "pickNew": "新しい絵",
       "pickConfirm": "入れる",
-      "pickSelectOne": "絵を1枚以上選んでください"
+      "pickSelectOne": "絵を1枚以上選んでください",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "confirm": {
       "replaceTitle": "AIの絵",

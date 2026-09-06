@@ -2,6 +2,7 @@
   "common": {
     "close": "Cerrar",
     "cancel": "Cancelar",
+    "ok": "OK",
     "save": "Guardar",
     "delete": "Eliminar",
     "loading": "Cargando…",
@@ -497,7 +498,9 @@
       "pickNth": "N.º {{n}}",
       "pickNew": "Nuevo",
       "pickConfirm": "Añadir",
-      "pickSelectOne": "Selecciona al menos una imagen"
+      "pickSelectOne": "Selecciona al menos una imagen",
+      "usageNotDeductedTitle": "Usage credit",
+      "usageNotDeducted": "Your usage credit was not deducted."
     },
     "confirm": {
       "replaceTitle": "Dibujo IA",
