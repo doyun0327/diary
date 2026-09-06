@@ -13,6 +13,7 @@
     "pageNextAria": "Nächste Seite",
     "pageGoAria": "Seite {{page}}",
     "processing": "Wird verarbeitet…",
+    "deployUpdating": "Update läuft… Fertig in etwa 2 Minuten!",
     "requestFailed": "Anfrage fehlgeschlagen ({{status}})",
     "serverUnreachable": "Verbindung zum Server fehlgeschlagen. Prüfe, ob Spring (8080) läuft.",
     "weekday": {

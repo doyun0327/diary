@@ -13,6 +13,7 @@
     "pageNextAria": "Next page",
     "pageGoAria": "Page {{page}}",
     "processing": "Processing…",
+    "deployUpdating": "Updating… Done in about 2 minutes!",
     "requestFailed": "Request failed ({{status}})",
     "serverUnreachable": "Couldn't connect to the server. Check that Spring (8080) is running.",
     "weekday": {

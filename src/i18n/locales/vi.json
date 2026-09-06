@@ -13,6 +13,7 @@
     "pageNextAria": "Trang sau",
     "pageGoAria": "Trang {{page}}",
     "processing": "Đang xử lý…",
+    "deployUpdating": "Đang cập nhật… Xong trong khoảng 2 phút!",
     "requestFailed": "Yêu cầu thất bại ({{status}})",
     "serverUnreachable": "Không kết nối được máy chủ. Kiểm tra xem Spring (8080) có đang chạy không.",
     "weekday": {

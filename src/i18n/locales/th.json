@@ -13,6 +13,7 @@
     "pageNextAria": "หน้าถัดไป",
     "pageGoAria": "หน้า {{page}}",
     "processing": "กำลังดำเนินการ…",
+    "deployUpdating": "กำลังอัปเดต… เสร็จในประมาณ 2 นาที!",
     "requestFailed": "คำขอล้มเหลว ({{status}})",
     "serverUnreachable": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบว่า Spring (8080) ทำงานอยู่",
     "weekday": {

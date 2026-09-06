@@ -13,6 +13,7 @@
     "pageNextAria": "Halaman berikutnya",
     "pageGoAria": "Halaman {{page}}",
     "processing": "Memproses…",
+    "deployUpdating": "Sedang update… Selesai dalam ±2 menit!",
     "requestFailed": "Permintaan gagal ({{status}})",
     "serverUnreachable": "Tidak bisa terhubung ke server. Pastikan Spring (8080) berjalan.",
     "weekday": {

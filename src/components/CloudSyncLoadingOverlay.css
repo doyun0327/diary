@@ -6,8 +6,9 @@
   align-items: center;
   justify-content: center;
   padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
-  background: var(--color-overlay);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .cloud-sync-loading__panel {
@@ -16,16 +17,16 @@
   align-items: center;
   gap: 14px;
   max-width: 280px;
-  padding: 28px 24px 24px;
-  border-radius: var(--radius-xl);
-  background: var(--sheet-bg);
-  box-shadow: var(--shadow-float);
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .cloud-sync-loading__lottie {
   flex-shrink: 0;
-  width: min(140px, 36vw);
-  height: min(140px, 36vw);
+  width: min(160px, 42vw);
+  height: min(160px, 42vw);
 }
 
 .cloud-sync-loading__lottie > div {
@@ -36,10 +37,11 @@
 .cloud-sync-loading__text {
   margin: 0;
   font-family: var(--brand-font);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.45;
   text-align: center;
-  color: var(--color-text);
+  color: #ffffff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
 }

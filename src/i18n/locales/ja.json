@@ -13,6 +13,7 @@
     "pageNextAria": "次のページ",
     "pageGoAria": "{{page}}ページ",
     "processing": "処理中…",
+    "deployUpdating": "アップデート中です。まもなく終わります！",
     "requestFailed": "リクエストに失敗しました（{{status}}）",
     "serverUnreachable": "サーバーに接続できません。Spring（8080）が起動しているか確認してください。",
     "weekday": {

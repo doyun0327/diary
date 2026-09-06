@@ -27,6 +27,7 @@ import RoomsHubPage from "./pages/RoomsHubPage";
 import RoomPage from "./pages/RoomPage";
 import RoomPostPage from "./pages/RoomPostPage";
 import { useDiary } from "./hooks/useDiary";
+import { useDeployMaintenance } from "./hooks/useDeployMaintenance";
 import { useCharacter } from "./hooks/useCharacter";
 import { useClientProfile } from "./hooks/useClientProfile";
 import { useScreenLock } from "./hooks/useScreenLock";
@@ -108,6 +109,7 @@ function App() {
   const [googleLoginForProOpen, setGoogleLoginForProOpen] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
   const [cloudSyncLoading, setCloudSyncLoading] = useState(false);
+  const deployUpdating = useDeployMaintenance();
   const fetchedProUsageUserRef = useRef<string | null>(null);
   const [appToast, setAppToast] = useState<string | null>(null);
   const appToastTimer = useRef<number | null>(null);
@@ -909,6 +911,11 @@ function App() {
       {cloudSyncLoading &&
         createPortal(
           <CloudSyncLoadingOverlay message={t("account.sync.loadingDiaries")} />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {deployUpdating &&
+        createPortal(
+          <CloudSyncLoadingOverlay message={t("common.deployUpdating")} />,
           document.getElementById("root") ?? document.body,
         )}
       {languageOpen &&

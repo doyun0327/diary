@@ -13,6 +13,7 @@
     "pageNextAria": "Página siguiente",
     "pageGoAria": "Página {{page}}",
     "processing": "Procesando…",
+    "deployUpdating": "Actualizando… ¡Listo en unos 2 minutos!",
     "requestFailed": "Error en la solicitud ({{status}})",
     "serverUnreachable": "No se pudo conectar al servidor. Comprueba que Spring (8080) esté en marcha.",
     "weekday": {
