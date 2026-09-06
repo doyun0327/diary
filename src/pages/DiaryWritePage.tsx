@@ -12,7 +12,7 @@ import {
   preloadMoodPackIcons,
   useMoodPackId,
 } from '../utils/moodPack';
-import { GENDER_EMOJI, type CharacterProfile } from '../types/character';
+import { GENDER_EMOJI, preloadCharacterHairIcons, type CharacterProfile } from '../types/character';
 import AiLoadingWait from '../components/AiLoadingWait';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
@@ -334,6 +334,10 @@ function DiaryWritePage({
   useEffect(() => {
     preloadMoodPackIcons(writePackId);
   }, [writePackId]);
+
+  useEffect(() => {
+    preloadCharacterHairIcons();
+  }, []);
 
   useEffect(() => {
     const onNativeSave = () => {

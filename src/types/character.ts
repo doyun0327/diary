@@ -127,6 +127,20 @@ export function hairImageForStyle(style: CharacterProfile['hairStyle']): string 
   );
 }
 
+const preloadedHairSrcs = new Set<string>();
+
+/** 캐릭터 시트 헤어 PNG를 미리 올려 첫 오픈 지연을 줄임 */
+export function preloadCharacterHairIcons() {
+  for (const opt of HAIR_STYLE_OPTIONS) {
+    const src = opt.image;
+    if (!src || preloadedHairSrcs.has(src)) continue;
+    preloadedHairSrcs.add(src);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  }
+}
+
 export const OUTFIT_OPTIONS: {
   value: CharacterProfile['outfit'];
   label: string;
@@ -458,7 +472,11 @@ function describePet(pet: CharacterPet): string {
   const color = PET_COLOR_EN[pet.color];
   const kind = PET_KIND_EN[pet.kind];
   const detail = note ? `${note}, ${color}` : color;
-  return `a ${detail} ${kind}`;
+  // 종류를 강하게 — 모델이 cat/dog을 서로 바꿔 그리는 경우 방지
+  if (pet.kind === 'cat') {
+    return `a ${detail} cat (feline house cat only — not a dog, not a puppy)`;
+  }
+  return `a ${detail} dog (canine puppy/dog only — not a cat)`;
 }
 
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */
@@ -489,11 +507,18 @@ export function describeCharacter(
     const active = enabledPets(profile.pets);
     if (active.length > 0) {
       const petList = active.map(describePet).join(', and ');
+      const hasCat = active.some((p) => p.kind === 'cat');
+      const hasDog = active.some((p) => p.kind === 'dog');
       parts.push(
         active.length === 1
-          ? `with ${petList} as a companion pet nearby`
-          : `with companion pets nearby: ${petList}`,
+          ? `accompanied by ${petList} as their pet — must show this exact animal species`
+          : `accompanied by these pets: ${petList} — must show these exact animal species`,
       );
+      if (hasCat && !hasDog) {
+        parts.push('no dogs in the picture');
+      } else if (hasDog && !hasCat) {
+        parts.push('no cats in the picture');
+      }
     }
   }
 

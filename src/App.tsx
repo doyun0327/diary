@@ -56,6 +56,7 @@ import {
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import { preloadMoodPackIcons } from "./utils/moodPack";
+import { preloadCharacterHairIcons } from "./types/character";
 import {
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
@@ -136,7 +137,10 @@ function App() {
   }, [deployUpdating]);
 
   useEffect(() => {
-    const run = () => preloadMoodPackIcons();
+    const run = () => {
+      preloadMoodPackIcons();
+      preloadCharacterHairIcons();
+    };
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(run, { timeout: 2000 });
       return () => window.cancelIdleCallback(id);
