@@ -12,8 +12,10 @@ export interface CharacterPet {
   id: string;
   kind: PetKind;
   color: PetColor;
-  /** 종류·특징 자유 입력 (선택) */
+  /** 이름·품종 등 자유 입력 (선택) */
   note: string;
+  /** false면 설정은 유지하고 AI 그림에만 제외 */
+  enabled: boolean;
 }
 
 export interface CharacterProfile {
@@ -149,11 +151,36 @@ const OUTFIT_EN: Record<CharacterProfile['outfit'], string> = {
   'ski-suit': 'a ski suit',
 };
 
+/** 오일파스텔: 한국에서 흔히 보이는 요즘 일상 패션 */
+const OUTFIT_EN_OIL_PASTEL: Record<CharacterProfile['outfit'], string> = {
+  'short-sleeve':
+    'a trendy oversized Korean short-sleeve tee tucked casually into high-rise pants, modern Seoul streetwear',
+  'long-sleeve':
+    'a soft Korean knit long-sleeve or layered crewneck with clean casual trousers, contemporary K-fashion',
+  dress:
+    'a chic Korean midi or shirt dress with a soft silhouette and everyday Seoul style',
+  hoodie:
+    'an oversized Korean streetwear hoodie with relaxed pants and sneakers, trendy K-casual look',
+  'school-uniform':
+    'a realistic modern Korean school uniform (blouse or shirt with skirt or slacks), neat and contemporary',
+  swimsuit:
+    'a modern Korean-style swimsuit or resort wear, neat and fashionable',
+  'ski-suit':
+    'a stylish modern Korean ski jacket and pants set, sporty and fashionable',
+};
+
 const ACCESSORY_EN: Record<CharacterProfile['accessory'], string | null> = {
   none: null,
   glasses: 'wearing glasses',
   hat: 'wearing a hat',
   ribbon: 'with a hair ribbon',
+};
+
+const ACCESSORY_EN_OIL_PASTEL: Record<CharacterProfile['accessory'], string | null> = {
+  none: null,
+  glasses: 'wearing stylish thin-frame glasses',
+  hat: 'wearing a trendy Korean baseball cap or soft bucket hat',
+  ribbon: 'with a cute modern hair ribbon or clip',
 };
 
 const PET_KIND_EN: Record<PetKind, string> = {
@@ -256,7 +283,7 @@ export function createPetId(): string {
 }
 
 export function createPet(kind: PetKind, color: PetColor = 'brown'): CharacterPet {
-  return { id: createPetId(), kind, color, note: '' };
+  return { id: createPetId(), kind, color, note: '', enabled: true };
 }
 
 function normalizePet(raw: unknown): CharacterPet | null {
@@ -271,11 +298,13 @@ function normalizePet(raw: unknown): CharacterPet | null {
     typeof obj.id === 'string' && obj.id.trim()
       ? obj.id.trim()
       : createPetId();
+  const enabled = obj.enabled === false ? false : true;
   return {
     id,
     kind,
     color,
     note: sanitizePetNote(obj.note ?? obj.petNote),
+    enabled,
   };
 }
 
@@ -292,8 +321,13 @@ function migrateLegacyPets(raw: Record<string, unknown>): CharacterPet[] {
       kind,
       color,
       note: sanitizePetNote(raw.petNote),
+      enabled: true,
     },
   ];
+}
+
+export function enabledPets(pets: CharacterPet[]): CharacterPet[] {
+  return pets.filter((pet) => pet.enabled !== false);
 }
 
 /** 이전 저장 형식도 새 필드로 보정 */
@@ -340,22 +374,35 @@ function describePet(pet: CharacterPet): string {
 }
 
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */
-export function describeCharacter(profile: CharacterProfile): string {
+export function describeCharacter(
+  profile: CharacterProfile,
+  style?: 'storybook' | 'oilPastel',
+): string {
+  const outfits = style === 'oilPastel' ? OUTFIT_EN_OIL_PASTEL : OUTFIT_EN;
+  const accessories =
+    style === 'oilPastel' ? ACCESSORY_EN_OIL_PASTEL : ACCESSORY_EN;
+
   const parts = [
     GENDER_EN[profile.gender],
     HAIR_STYLE_EN[profile.hairStyle],
-    `wearing ${OUTFIT_EN[profile.outfit]}`,
+    `wearing ${outfits[profile.outfit]}`,
   ];
-  const accessory = ACCESSORY_EN[profile.accessory];
+  if (style === 'oilPastel') {
+    parts.push('dressed in contemporary Korean everyday fashion');
+  }
+  const accessory = accessories[profile.accessory];
   if (accessory) parts.push(accessory);
 
   if (profile.pets.length > 0) {
-    const petList = profile.pets.map(describePet).join(', and ');
-    parts.push(
-      profile.pets.length === 1
-        ? `with ${petList} as a companion pet nearby`
-        : `with companion pets nearby: ${petList}`,
-    );
+    const active = enabledPets(profile.pets);
+    if (active.length > 0) {
+      const petList = active.map(describePet).join(', and ');
+      parts.push(
+        active.length === 1
+          ? `with ${petList} as a companion pet nearby`
+          : `with companion pets nearby: ${petList}`,
+      );
+    }
   }
 
   return parts.join(', ');
@@ -369,8 +416,9 @@ export function summarizeCharacterKo(profile: CharacterProfile): string {
   const accessory = ACCESSORY_OPTIONS.find((o) => o.value === profile.accessory)?.label ?? '';
   const bits = [gender, hair, outfit, accessory === '없음' ? '' : accessory];
 
-  if (profile.pets.length > 0) {
-    const petBits = profile.pets.map((pet) => {
+  const active = enabledPets(profile.pets);
+  if (active.length > 0) {
+    const petBits = active.map((pet) => {
       const kind = PET_KIND_OPTIONS.find((o) => o.value === pet.kind)?.label ?? '';
       const color = PET_COLOR_OPTIONS.find((o) => o.value === pet.color)?.label ?? '';
       const note = sanitizePetNote(pet.note);

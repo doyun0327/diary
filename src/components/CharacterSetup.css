@@ -110,6 +110,11 @@
   border: 1px solid var(--color-border-soft);
   border-radius: 14px;
   background: var(--color-bg-soft);
+  transition: opacity 0.15s ease;
+}
+
+.character-setup__pet-card.is-off {
+  opacity: 0.55;
 }
 
 .character-setup__pet-card-head {
@@ -127,6 +132,32 @@
   font-size: 0.92rem;
   font-weight: 700;
   color: var(--color-text);
+}
+
+.character-setup__pet-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.character-setup__pet-toggle {
+  border: 1.5px solid var(--color-border-soft);
+  border-radius: 999px;
+  background: var(--color-bg-input);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 5px 10px;
+  line-height: 1.2;
+}
+
+.character-setup__pet-toggle.is-on {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .character-setup__pet-remove {

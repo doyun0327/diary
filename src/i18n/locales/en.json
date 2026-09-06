@@ -693,9 +693,11 @@
       "ribbon": "Ribbon"
     },
     "petLabel": "Pet",
-    "petHint": "You can add up to {{max}} pets",
+    "petHint": "Up to {{max}} pets. Turn off to keep settings but skip them in drawings.",
     "petEmpty": "None yet. Add one below.",
     "petAdd": "Add {{kind}}",
+    "petOn": "On",
+    "petOff": "Off",
     "petRemove": "Remove",
     "pet": {
       "dog": "Dog",
@@ -711,8 +713,8 @@
       "orange": "Orange",
       "spotted": "Spotted"
     },
-    "petNoteLabel": "Breed / notes (optional)",
-    "petNotePlaceholder": "e.g. Golden Retriever, Korean shorthair"
+    "petNoteLabel": "Name / breed (optional)",
+    "petNotePlaceholder": "e.g. Momo, Golden Retriever"
   },
   "export": {
     "title": "Export",

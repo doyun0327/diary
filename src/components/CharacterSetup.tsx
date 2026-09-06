@@ -187,20 +187,34 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
             <ul className="character-setup__pet-list">
               {pets.map((pet, index) => {
                 const kindMeta = PET_KIND_OPTIONS.find((o) => o.value === pet.kind);
+                const isOn = pet.enabled !== false;
                 return (
-                  <li key={pet.id} className="character-setup__pet-card">
+                  <li
+                    key={pet.id}
+                    className={`character-setup__pet-card${isOn ? '' : ' is-off'}`}
+                  >
                     <div className="character-setup__pet-card-head">
                       <span className="character-setup__pet-card-title">
                         <span aria-hidden>{kindMeta?.emoji ?? '🐾'}</span>
                         {t(`character.pet.${pet.kind}`)} {index + 1}
                       </span>
-                      <button
-                        type="button"
-                        className="character-setup__pet-remove"
-                        onClick={() => removePet(pet.id)}
-                      >
-                        {t('character.petRemove')}
-                      </button>
+                      <div className="character-setup__pet-card-actions">
+                        <button
+                          type="button"
+                          className={`character-setup__pet-toggle${isOn ? ' is-on' : ''}`}
+                          aria-pressed={isOn}
+                          onClick={() => updatePet(pet.id, { enabled: !isOn })}
+                        >
+                          {isOn ? t('character.petOn') : t('character.petOff')}
+                        </button>
+                        <button
+                          type="button"
+                          className="character-setup__pet-remove"
+                          onClick={() => removePet(pet.id)}
+                        >
+                          {t('character.petRemove')}
+                        </button>
+                      </div>
                     </div>
                     <h4 className="character-setup__subhead">{t('character.petColorLabel')}</h4>
                     <div className="character-setup__swatch-row" role="list">
@@ -216,6 +230,7 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                             onClick={() => updatePet(pet.id, { color: opt.value })}
                             aria-label={label}
                             title={label}
+                            disabled={!isOn}
                           />
                         );
                       })}
@@ -227,6 +242,7 @@ function CharacterSetup({ character, onChange, onClose, onComplete }: CharacterS
                         maxLength={40}
                         value={pet.note}
                         placeholder={t('character.petNotePlaceholder')}
+                        disabled={!isOn}
                         onChange={(e) =>
                           updatePet(pet.id, { note: sanitizePetNote(e.target.value) })
                         }

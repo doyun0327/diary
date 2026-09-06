@@ -186,11 +186,11 @@ export async function generateDiaryImage(input: {
     throw new Error('그림을 만들려면 일기 내용을 먼저 적어 주세요');
   }
 
-  const character = input.character
-    ? describeCharacter(input.character)
-    : undefined;
-
   const styleId = input.style ?? 'storybook';
+
+  const character = input.character
+    ? describeCharacter(input.character, styleId)
+    : undefined;
 
   const payload: Record<string, unknown> = {
     diaryLine,

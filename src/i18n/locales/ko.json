@@ -508,11 +508,11 @@
       "style": {
         "storybook": {
           "name": "영어동화책 st",
-          "desc": "지금과 같은 동화책 느낌"
+          "desc": "익살스럽고 자유로운 표현이 돋보이는 동화책 화풍 "
         },
         "oilPastel": {
           "name": "오일파스텔 st",
-          "desc": "오일파스텔로 그린 듯한 그림"
+          "desc": "포근하고 은은하게 스며드는 오일파스텔 화풍"
         }
       },
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
@@ -694,9 +694,11 @@
       "ribbon": "리본"
     },
     "petLabel": "반려동물",
-    "petHint": "최대 {{max}}마리까지 추가할 수 있어요",
+    "petHint": "최대 {{max}}마리까지 추가할 수 있어요. 꺼두면 설정은 남고 그림에만 안 나와요.",
     "petEmpty": "아직 없어요. 아래에서 추가해 보세요.",
     "petAdd": "{{kind}} 추가",
+    "petOn": "사용 중",
+    "petOff": "꺼짐",
     "petRemove": "삭제",
     "pet": {
       "dog": "강아지",
@@ -712,8 +714,8 @@
       "orange": "주황",
       "spotted": "얼룩"
     },
-    "petNoteLabel": "종류·특징 (선택)",
-    "petNotePlaceholder": "예: 골든리트리버, 코리안숏헤어"
+    "petNoteLabel": "이름·종류 (선택)",
+    "petNotePlaceholder": "예: 모모, 골든리트리버"
   },
   "export": {
     "title": "내보내기",
