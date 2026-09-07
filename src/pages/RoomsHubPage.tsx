@@ -19,7 +19,7 @@ import {
   getCachedRoomsList,
   invalidateRoomsList,
 } from "../utils/roomCache";
-import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
+import { prefetchRoomFeed, prefetchRoomsList, prefetchVisibleRoomFeeds } from "../utils/roomPrefetch";
 import { isNetworkError, resolveNetworkErrorTitle } from "../utils/networkError";
 import "./RoomsPages.css";
 
@@ -164,6 +164,14 @@ function RoomsHubPage({
     void refresh(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 프로필 준비될 때 다시 로드
   }, [shareReady, nickname, clientId]);
+
+  useEffect(() => {
+    if (!shareReady || rooms.length === 0) return;
+    prefetchVisibleRoomFeeds(
+      rooms.map((r) => r.id),
+      5,
+    );
+  }, [shareReady, rooms]);
 
   const onRoomsPageChange = (nextPage: number) => {
     if (nextPage === page || loading) return;

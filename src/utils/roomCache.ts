@@ -1,9 +1,12 @@
 import type { RoomDetail, RoomPost, RoomPostPage, RoomSummaryPage } from '../types/room';
 
-const FEED_TTL_MS = 60_000;
+/** 신선 — 재요청 없이 바로 사용 */
+const FEED_FRESH_MS = 90_000;
+/** 만료 후에도 화면용으로 잠깐 쓸 수 있는 기간 (백그라운드 갱신) */
+const FEED_STALE_MS = 10 * 60_000;
 const LIST_TTL_MS = 30_000;
 
-type RoomFeedEntry = {
+export type RoomFeedEntry = {
   room: RoomDetail;
   page: number;
   size: number;
@@ -11,6 +14,8 @@ type RoomFeedEntry = {
   totalElements: number;
   totalPages: number;
   at: number;
+  /** true면 캐시는 있으나 TTL 지나서 백그라운드 갱신 권장 */
+  stale?: boolean;
 };
 
 type RoomsListCache = {
@@ -32,14 +37,22 @@ export function getCachedRoomFeed(
   roomId: string,
   page = 0,
   size = 10,
+  opts?: { allowStale?: boolean },
 ): RoomFeedEntry | null {
-  const hit = feedByKey.get(feedKey(roomId, page, size));
+  const key = feedKey(roomId, page, size);
+  const hit = feedByKey.get(key);
   if (!hit) return null;
-  if (Date.now() - hit.at > FEED_TTL_MS) {
-    feedByKey.delete(feedKey(roomId, page, size));
-    return null;
+  const age = Date.now() - hit.at;
+  if (age <= FEED_FRESH_MS) {
+    return { ...hit, stale: false };
   }
-  return hit;
+  if (opts?.allowStale && age <= FEED_STALE_MS) {
+    return { ...hit, stale: true };
+  }
+  if (age > FEED_STALE_MS) {
+    feedByKey.delete(key);
+  }
+  return null;
 }
 
 export function setCachedRoomFeed(
@@ -67,15 +80,17 @@ export function setCachedRoomFeed(
   });
 }
 
-export function getCachedRoomDetail(roomId: string): RoomDetail | null {
+export function getCachedRoomDetail(
+  roomId: string,
+  opts?: { allowStale?: boolean },
+): RoomDetail | null {
   const prefix = `${roomId}:`;
   for (const [key, entry] of feedByKey) {
     if (!key.startsWith(prefix)) continue;
-    if (Date.now() - entry.at > FEED_TTL_MS) {
-      feedByKey.delete(key);
-      continue;
-    }
-    return entry.room;
+    const age = Date.now() - entry.at;
+    if (age <= FEED_FRESH_MS) return entry.room;
+    if (opts?.allowStale && age <= FEED_STALE_MS) return entry.room;
+    if (age > FEED_STALE_MS) feedByKey.delete(key);
   }
   return null;
 }
@@ -84,7 +99,8 @@ export function getCachedRoomPost(roomId: string, postId: string): RoomPost | nu
   const prefix = `${roomId}:`;
   for (const [key, entry] of feedByKey) {
     if (!key.startsWith(prefix)) continue;
-    if (Date.now() - entry.at > FEED_TTL_MS) {
+    const age = Date.now() - entry.at;
+    if (age > FEED_STALE_MS) {
       feedByKey.delete(key);
       continue;
     }

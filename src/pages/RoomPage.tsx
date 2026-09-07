@@ -69,10 +69,23 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
 
   useEffect(() => {
     setPostsPage(0);
-    setRoom(null);
-    setPosts([]);
-    setTotalElements(0);
-    setTotalPages(1);
+    const warm = getCachedRoomFeed(roomId, 0, ROOM_POSTS_PAGE_SIZE, {
+      allowStale: true,
+    });
+    if (warm) {
+      const nextPosts = Array.isArray(warm.posts) ? warm.posts : [];
+      setRoom(warm.room);
+      setPosts(nextPosts);
+      setTotalElements(warm.totalElements);
+      setTotalPages(Math.max(1, warm.totalPages));
+      setLoading(false);
+    } else {
+      setRoom(null);
+      setPosts([]);
+      setTotalElements(0);
+      setTotalPages(1);
+      setLoading(true);
+    }
   }, [roomId]);
 
   useEffect(() => {
@@ -83,14 +96,14 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
 
   const applyFeed = useCallback(
     (cached: NonNullable<ReturnType<typeof getCachedRoomFeed>>) => {
-      const posts = Array.isArray(cached.posts) ? cached.posts : [];
+      const nextPosts = Array.isArray(cached.posts) ? cached.posts : [];
       setRoom(cached.room);
-      setPosts(posts);
+      setPosts(nextPosts);
       setTotalElements(cached.totalElements);
       setTotalPages(Math.max(1, cached.totalPages));
       syncRoomPostsSeenBaseline(
         roomId,
-        posts.map((p) => p.id),
+        nextPosts.map((p) => p.id),
       );
       setSeenTick((n) => n + 1);
     },
@@ -101,24 +114,33 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   roomRef.current = room;
 
   const refresh = useCallback(async () => {
-    const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE);
+    const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
+      allowStale: true,
+    });
     if (cached) {
       applyFeed(cached);
       setLoading(false);
-      return;
+      // 신선하면 끝, stale이면 백그라운드 갱신
+      if (!cached.stale) return;
+    } else if (!roomRef.current) {
+      setLoading(true);
     }
 
-    if (!roomRef.current) setLoading(true);
     setError(null);
     try {
       await prefetchRoomFeed(roomId, {
         page: postsPage,
         size: ROOM_POSTS_PAGE_SIZE,
+        force: Boolean(cached?.stale),
       });
-      const fresh = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE);
+      const fresh = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
+        allowStale: true,
+      });
       if (fresh) applyFeed(fresh);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('rooms.err.load'));
+      if (!cached) {
+        setError(err instanceof Error ? err.message : t('rooms.err.load'));
+      }
     } finally {
       setLoading(false);
     }

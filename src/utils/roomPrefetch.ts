@@ -55,10 +55,24 @@ export function prefetchRoomFeed(
   }
 
   return once(`room-feed:${roomId}:${page}:${size}`, async () => {
-    const cachedRoom = getCachedRoomDetail(roomId);
+    const cachedRoom = getCachedRoomDetail(roomId, { allowStale: true });
     if (cachedRoom) {
       const feed = await roomsApi.listRoomPosts(roomId, { page, size });
       setCachedRoomFeed(roomId, cachedRoom, feed);
+      // 멤버/방 정보는 백그라운드로 최신화
+      void roomsApi
+        .getRoom(roomId)
+        .then((detail) => {
+          const latest = getCachedRoomFeed(roomId, page, size, { allowStale: true });
+          if (latest) setCachedRoomFeed(roomId, detail, {
+            content: latest.posts,
+            page: latest.page,
+            size: latest.size,
+            totalElements: latest.totalElements,
+            totalPages: latest.totalPages,
+          });
+        })
+        .catch(() => {});
       return;
     }
     const [detail, feed] = await Promise.all([
@@ -67,4 +81,24 @@ export function prefetchRoomFeed(
     ]);
     setCachedRoomFeed(roomId, detail, feed);
   });
+}
+
+/** 허브에서 보이는 방 피드 미리 받아 두기 */
+export function prefetchVisibleRoomFeeds(roomIds: string[], limit = 5): void {
+  if (!getAccessToken()) return;
+  const ids = roomIds.filter(Boolean).slice(0, limit);
+  const run = () => {
+    for (const id of ids) {
+      void prefetchRoomFeed(id, { page: 0, size: DEFAULT_POSTS_PAGE_SIZE });
+    }
+  };
+  const w = window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+  if (typeof w.requestIdleCallback === 'function') {
+    w.requestIdleCallback(run, { timeout: 1500 });
+  } else {
+    window.setTimeout(run, 250);
+  }
 }
