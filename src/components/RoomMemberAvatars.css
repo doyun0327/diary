@@ -155,6 +155,41 @@
   gap: 6px;
 }
 
+.room-members__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.room-members__row .room-members__row-btn {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-members__safety {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.room-members__safety:active {
+  background: var(--color-bg-muted);
+}
+
+.room-members__more--list {
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+}
+
 .room-members__row-btn {
   width: 100%;
   border: none;

@@ -1,0 +1,50 @@
+.room-safety__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.room-safety__action {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sheet-bg, #fff) 92%, var(--color-accent-soft, #eee));
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.room-safety__action:active {
+  transform: scale(0.98);
+}
+
+.room-safety__action--danger {
+  color: #b42318;
+  border-color: color-mix(in srgb, #b42318 28%, transparent);
+}
+
+.room-safety__reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.room-safety__reason {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.room-safety__reason input {
+  margin: 0;
+}

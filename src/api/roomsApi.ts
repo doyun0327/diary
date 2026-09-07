@@ -260,3 +260,22 @@ export function createComment(
     }),
   });
 }
+
+export type UgcReportBody = {
+  roomId: string;
+  targetUserId: string;
+  targetNickname?: string;
+  kind: 'user' | 'post' | 'comment';
+  reason: string;
+  postId?: string;
+  commentId?: string;
+  createdAt?: string;
+};
+
+/** UGC 신고 — 서버 room_ugc_reports 에 저장 */
+export async function reportUgc(body: UgcReportBody): Promise<void> {
+  await request<void>('/api/rooms/reports', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}

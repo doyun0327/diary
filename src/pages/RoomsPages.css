@@ -126,7 +126,8 @@
 .rooms__toolbar > button:not(.rooms__back),
 .rooms__toolbar-actions,
 .rooms__link,
-.rooms__danger {
+.rooms__danger,
+.rooms__more {
   border: none;
   background: none;
   font-family: inherit;
@@ -193,6 +194,55 @@
 
 .rooms__danger {
   color: var(--color-danger);
+}
+
+.rooms__more {
+  min-width: 42px;
+  letter-spacing: 0.08em;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.rooms__comment-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+}
+
+.rooms__comment-head .rooms__comment-name {
+  margin: 0;
+}
+
+.rooms__comment-more {
+  border: none;
+  background: none;
+  padding: 0 4px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rooms__toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 60;
+  transform: translateX(-50%);
+  max-width: min(320px, 86vw);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
 }
 
 .rooms__hint {

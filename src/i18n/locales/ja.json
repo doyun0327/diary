@@ -336,6 +336,32 @@
     "confirm": {
       "deletePost": "この共有日記をルームから削除しますか？"
     },
+    "safety": {
+      "moreAria": "Block or report",
+      "menuTitle": "Safety",
+      "menuLead": "Choose an action for {{name}}.",
+      "report": "Report",
+      "block": "Block",
+      "reportTitle": "Report",
+      "reportLead": "Report content from {{name}}. We'll review it.",
+      "reportSubmit": "Submit report",
+      "reporting": "Sending…",
+      "reasonAria": "Report reason",
+      "reasons": {
+        "spam": "Spam or ads",
+        "harassment": "Harassment or abuse",
+        "sexual": "Sexual or offensive",
+        "hate": "Hate or discrimination",
+        "other": "Other"
+      },
+      "blockTitle": "Block this person?",
+      "blockLead": "Posts and comments from {{name}} won't appear for you.",
+      "blockConfirm": "Block",
+      "blockedToast": "Blocked {{name}}",
+      "reportedToast": "Report received. We'll review it.",
+      "feedEmptyBlocked": "Nothing to show — only posts from blocked people.",
+      "you": "You"
+    },
     "err": {
       "needNickname": "先にメニュー → アカウントでニックネームを設定してください",
       "needProfile": "友達と共有するには名前と写真が必要です",

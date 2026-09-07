@@ -5,9 +5,15 @@ import * as roomsApi from '../api/roomsApi';
 import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
+import RoomSafetyModal, { type SafetyTarget } from '../components/RoomSafetyModal';
 import { getCachedRoomPost } from '../utils/roomCache';
 import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
+import {
+  filterBlockedAuthorId,
+  isUserBlocked,
+  subscribeBlockedUsers,
+} from '../utils/blockedUsers';
 import { useClientProfile } from '../hooks/useClientProfile';
 import './RoomsPages.css';
 
@@ -43,8 +49,21 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [blockTick, setBlockTick] = useState(0);
 
-  const colorMap = useMemo(() => buildCommentColorMap(comments), [comments]);
+  useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+
+  const visibleComments = useMemo(() => {
+    void blockTick;
+    return filterBlockedAuthorId(comments);
+  }, [comments, blockTick]);
+
+  const colorMap = useMemo(
+    () => buildCommentColorMap(visibleComments),
+    [visibleComments],
+  );
 
   const refresh = useCallback(async () => {
     const fromCache = getCachedRoomPost(roomId, postId);
@@ -80,6 +99,18 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     void refresh();
   }, [refresh, roomId, postId]);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 1800);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  useEffect(() => {
+    if (post && isUserBlocked(post.authorUserId) && post.authorUserId !== userId) {
+      onBack();
+    }
+  }, [post, userId, onBack, blockTick]);
+
   const handleComment = async () => {
     const body = text.trim();
     if (!body || busy) return;
@@ -114,6 +145,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     }
   };
 
+  const openSafety = (target: SafetyTarget) => {
+    if (!target.userId || target.userId === userId) return;
+    setSafetyTarget(target);
+  };
+
   return (
     <div className="rooms rooms--post">
       <div className="rooms__toolbar">
@@ -135,6 +171,24 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           >
             {t('common.delete')}
           </button>
+        ) : post ? (
+          <button
+            type="button"
+            className="rooms__more"
+            disabled={busy}
+            aria-label={t('rooms.safety.moreAria')}
+            onClick={() =>
+              openSafety({
+                roomId,
+                userId: post.authorUserId,
+                nickname: post.authorNickname,
+                kind: 'post',
+                postId: post.id,
+              })
+            }
+          >
+            ···
+          </button>
         ) : (
           <span className="rooms__toolbar-balance" aria-hidden />
         )}
@@ -153,10 +207,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       )}
 
       <section className="rooms__comments">
-        <h3>{t('rooms.comments', { n: comments.length })}</h3>
+        <h3>{t('rooms.comments', { n: visibleComments.length })}</h3>
         <ul className="rooms__comment-list">
-          {comments.map((c, i) => {
-            const prev = comments[i - 1];
+          {visibleComments.map((c, i) => {
+            const prev = visibleComments[i - 1];
             const showName = !prev || prev.authorUserId !== c.authorUserId;
             const isMine = c.authorUserId === userId;
             const colorIdx = colorMap.get(c.authorUserId) ?? 0;
@@ -171,9 +225,28 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                 ].join(' ')}
               >
                 {showName && !isMine && (
-                  <strong className="rooms__comment-name">
-                    {roomAuthorLabel(c.authorNickname, c.authorWithdrawn, t)}
-                  </strong>
+                  <div className="rooms__comment-head">
+                    <strong className="rooms__comment-name">
+                      {roomAuthorLabel(c.authorNickname, c.authorWithdrawn, t)}
+                    </strong>
+                    <button
+                      type="button"
+                      className="rooms__comment-more"
+                      aria-label={t('rooms.safety.moreAria')}
+                      onClick={() =>
+                        openSafety({
+                          roomId,
+                          userId: c.authorUserId,
+                          nickname: c.authorNickname,
+                          kind: 'comment',
+                          postId,
+                          commentId: c.id,
+                        })
+                      }
+                    >
+                      ···
+                    </button>
+                  </div>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>
               </li>
@@ -221,6 +294,24 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           }}
         />
       )}
+
+      {safetyTarget && (
+        <RoomSafetyModal
+          target={safetyTarget}
+          onClose={() => setSafetyTarget(null)}
+          onBlocked={() => {
+            setBlockTick((n) => n + 1);
+            if (post && safetyTarget.userId === post.authorUserId) onBack();
+          }}
+          onDone={setToast}
+        />
+      )}
+
+      {toast ? (
+        <div className="rooms__toast" role="status">
+          {toast}
+        </div>
+      ) : null}
     </div>
   );
 }

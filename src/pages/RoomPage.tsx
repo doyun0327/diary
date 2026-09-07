@@ -21,6 +21,10 @@ import {
   syncRoomPostsSeenBaseline,
 } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
+import {
+  filterBlockedAuthorId,
+  subscribeBlockedUsers,
+} from '../utils/blockedUsers';
 import './RoomsPages.css';
 
 const ROOM_POSTS_PAGE_SIZE = 10;
@@ -43,19 +47,27 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
   const [postsPage, setPostsPage] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
+  const [blockTick, setBlockTick] = useState(0);
+
+  useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+
+  const visibleFeedPosts = useMemo(() => {
+    void blockTick;
+    return filterBlockedAuthorId(posts);
+  }, [posts, blockTick]);
 
   const unreadPostIds = useMemo(() => {
     void seenTick;
     return new Set(
-      posts.filter((p) => isRoomPostUnread(roomId, p.id)).map((p) => p.id),
+      visibleFeedPosts.filter((p) => isRoomPostUnread(roomId, p.id)).map((p) => p.id),
     );
-  }, [posts, roomId, seenTick]);
+  }, [visibleFeedPosts, roomId, seenTick]);
 
-  const postsPageCount = Math.max(1, Math.ceil(posts.length / ROOM_POSTS_PAGE_SIZE));
+  const postsPageCount = Math.max(1, Math.ceil(visibleFeedPosts.length / ROOM_POSTS_PAGE_SIZE));
   const visiblePosts = useMemo(() => {
     const start = postsPage * ROOM_POSTS_PAGE_SIZE;
-    return posts.slice(start, start + ROOM_POSTS_PAGE_SIZE);
-  }, [posts, postsPage]);
+    return visibleFeedPosts.slice(start, start + ROOM_POSTS_PAGE_SIZE);
+  }, [visibleFeedPosts, postsPage]);
 
   useEffect(() => {
     setPostsPage(0);
@@ -150,7 +162,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
           <div className="rooms__section-head">
             <div className="rooms__section-head-main">
               <h3>{t('rooms.sharedDiaries')}</h3>
-              <span className="rooms__section-count">{posts.length}</span>
+              <span className="rooms__section-count">{visibleFeedPosts.length}</span>
             </div>
             <RoomMemberAvatars
               roomId={roomId}
@@ -160,17 +172,19 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
               onDismissPokeCoach={dismissPokeCoach}
             />
           </div>
-          {posts.length === 0 && (
+          {visibleFeedPosts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
               <p className="rooms__empty-title rooms__empty-title--multiline">
-                {t('rooms.sharedEmpty')}
+                {posts.length === 0 ? t('rooms.sharedEmpty') : t('rooms.safety.feedEmptyBlocked')}
               </p>
-              <button type="button" className="rooms__btn primary" onClick={onGoHome}>
-                {t('rooms.goHome')}
-              </button>
+              {posts.length === 0 ? (
+                <button type="button" className="rooms__btn primary" onClick={onGoHome}>
+                  {t('rooms.goHome')}
+                </button>
+              ) : null}
             </div>
           )}
-          {posts.length > 0 && (
+          {visibleFeedPosts.length > 0 && (
             <div className="rooms__coach-anchor">
               {showCoach && (
                 <div className="rooms__coach" role="status">
@@ -235,7 +249,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                   );
                 })}
               </ul>
-              {posts.length > ROOM_POSTS_PAGE_SIZE && (
+              {visibleFeedPosts.length > ROOM_POSTS_PAGE_SIZE && (
                 <PagePager
                   page={postsPage}
                   pageCount={postsPageCount}
