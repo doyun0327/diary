@@ -281,11 +281,6 @@ const ACCESSORY_EN_OIL_PASTEL: Record<CharacterProfile['accessory'], string | nu
   ribbon: 'with a cute modern hair ribbon or clip',
 };
 
-const PET_KIND_EN: Record<PetKind, string> = {
-  dog: 'dog',
-  cat: 'cat',
-};
-
 const PET_COLOR_EN: Record<PetColor, string> = {
   white: 'white',
   black: 'black',
@@ -470,7 +465,6 @@ export function normalizeCharacter(
 function describePet(pet: CharacterPet): string {
   const note = sanitizePetNote(pet.note);
   const color = PET_COLOR_EN[pet.color];
-  const kind = PET_KIND_EN[pet.kind];
   const detail = note ? `${note}, ${color}` : color;
   // 종류를 강하게 — 모델이 cat/dog을 서로 바꿔 그리는 경우 방지
   if (pet.kind === 'cat') {
