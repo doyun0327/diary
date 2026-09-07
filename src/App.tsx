@@ -884,6 +884,7 @@ function App() {
               used: accessStatus.monthlyUsed,
               limit: accessStatus.monthlyLimit,
             }}
+            onAppToast={showAppToast}
           />
         )}
         {page === "detail" && selectedEntry && (

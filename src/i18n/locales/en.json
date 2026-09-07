@@ -582,6 +582,7 @@
     "err": {
       "needContent": "Write the diary first",
       "aiFailed": "Failed to generate drawing",
+      "aiRetry": "Please try again",
       "aiNeedContent": "Write diary content before generating",
       "aiHttp": "Drawing failed: HTTP {{status}}",
       "aiNoImage": "No image in backend response",

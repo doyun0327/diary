@@ -148,6 +148,8 @@ interface DiaryWritePageProps {
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean, saving?: boolean) => void;
   writeQuota?: { used: number; limit: number };
+  /** 저장 토스트와 동일한 app-toast */
+  onAppToast?: (message: string) => void;
 }
 
 function DiaryWritePage({
@@ -158,6 +160,7 @@ function DiaryWritePage({
   onOpenCharacter,
   onNativeSaveStateChange,
   writeQuota,
+  onAppToast,
 }: DiaryWritePageProps) {
   const { t, i18n } = useTranslation();
   const isEdit = Boolean(initialEntry);
@@ -250,6 +253,11 @@ function DiaryWritePage({
     () => purchaseClickShield || Date.now() < proPurchaseGuardUntilRef.current,
     [purchaseClickShield],
   );
+
+  const showAiRetryToast = useCallback(() => {
+    setAiError(null);
+    onAppToast?.(t('write.err.aiRetry'));
+  }, [onAppToast, t]);
 
   const startProPurchase = useCallback(() => {
     armPurchaseShield();
@@ -918,7 +926,7 @@ function DiaryWritePage({
       }
     } catch (err) {
       const notice = await refundAiDrawQuotaIfNeeded(err);
-      setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
+      showAiRetryToast();
       if (notice) {
         setUsageNoticeKind('refund');
         setUsageNotice(notice);
@@ -996,8 +1004,8 @@ function DiaryWritePage({
 
       drawingTouchedRef.current = true;
       dismissAiCoach();
-    } catch (err) {
-      setAiError(err instanceof Error ? err.message : t('write.err.aiFailed'));
+    } catch {
+      showAiRetryToast();
     }
   };
 

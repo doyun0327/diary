@@ -582,6 +582,7 @@
     "err": {
       "needContent": "일기 내용을 먼저 적어 주세요",
       "aiFailed": "그림 생성에 실패했습니다",
+      "aiRetry": "다시 시도해 주세요",
       "aiNeedContent": "그림을 만들려면 일기 내용을 먼저 적어 주세요",
       "aiHttp": "그림 생성 실패: HTTP {{status}}",
       "aiNoImage": "백엔드 응답에 이미지가 없습니다",
