@@ -2,6 +2,7 @@ import * as roomsApi from '../api/roomsApi';
 import { getAccessToken } from '../hooks/useAuthSession';
 import type { RoomSummaryPage } from '../types/room';
 import {
+  getCachedRoomDetail,
   getCachedRoomFeed,
   getCachedRoomsList,
   setCachedRoomFeed,
@@ -37,21 +38,32 @@ export function prefetchRoomsList(
   });
 }
 
-/** 방 상세 + 공유 일기 — 캐시·진행 중 요청이 있으면 재사용 */
+const DEFAULT_POSTS_PAGE_SIZE = 10;
+
+/** 방 상세 + 공유 일기(해당 페이지만) — 캐시·진행 중 요청이 있으면 재사용 */
 export function prefetchRoomFeed(
   roomId: string,
-  opts?: { force?: boolean },
+  opts?: { force?: boolean; page?: number; size?: number },
 ): Promise<void> {
   if (!getAccessToken() || !roomId.trim()) return Promise.resolve();
 
-  if (!opts?.force && getCachedRoomFeed(roomId)) {
+  const page = opts?.page ?? 0;
+  const size = opts?.size ?? DEFAULT_POSTS_PAGE_SIZE;
+
+  if (!opts?.force && getCachedRoomFeed(roomId, page, size)) {
     return Promise.resolve();
   }
 
-  return once(`room-feed:${roomId}`, async () => {
+  return once(`room-feed:${roomId}:${page}:${size}`, async () => {
+    const cachedRoom = getCachedRoomDetail(roomId);
+    if (cachedRoom) {
+      const feed = await roomsApi.listRoomPosts(roomId, { page, size });
+      setCachedRoomFeed(roomId, cachedRoom, feed);
+      return;
+    }
     const [detail, feed] = await Promise.all([
       roomsApi.getRoom(roomId),
-      roomsApi.listRoomPosts(roomId),
+      roomsApi.listRoomPosts(roomId, { page, size }),
     ]);
     setCachedRoomFeed(roomId, detail, feed);
   });

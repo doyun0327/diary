@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
 import BackIcon from '../components/BackIcon';
@@ -27,7 +27,7 @@ import {
 } from '../utils/blockedUsers';
 import './RoomsPages.css';
 
-const ROOM_POSTS_PAGE_SIZE = 10;
+export const ROOM_POSTS_PAGE_SIZE = 10;
 
 interface RoomPageProps {
   roomId: string;
@@ -41,6 +41,8 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
@@ -56,6 +58,8 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     return filterBlockedAuthorId(posts);
   }, [posts, blockTick]);
 
+  const postsPageCount = Math.max(1, totalPages);
+
   const unreadPostIds = useMemo(() => {
     void seenTick;
     return new Set(
@@ -63,14 +67,12 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     );
   }, [visibleFeedPosts, roomId, seenTick]);
 
-  const postsPageCount = Math.max(1, Math.ceil(visibleFeedPosts.length / ROOM_POSTS_PAGE_SIZE));
-  const visiblePosts = useMemo(() => {
-    const start = postsPage * ROOM_POSTS_PAGE_SIZE;
-    return visibleFeedPosts.slice(start, start + ROOM_POSTS_PAGE_SIZE);
-  }, [visibleFeedPosts, postsPage]);
-
   useEffect(() => {
     setPostsPage(0);
+    setRoom(null);
+    setPosts([]);
+    setTotalElements(0);
+    setTotalPages(1);
   }, [roomId]);
 
   useEffect(() => {
@@ -79,40 +81,48 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     }
   }, [postsPage, postsPageCount]);
 
-  const refresh = useCallback(async () => {
-    const cached = getCachedRoomFeed(roomId);
-    if (cached) {
+  const applyFeed = useCallback(
+    (cached: NonNullable<ReturnType<typeof getCachedRoomFeed>>) => {
+      const posts = Array.isArray(cached.posts) ? cached.posts : [];
       setRoom(cached.room);
-      setPosts(cached.posts);
+      setPosts(posts);
+      setTotalElements(cached.totalElements);
+      setTotalPages(Math.max(1, cached.totalPages));
       syncRoomPostsSeenBaseline(
         roomId,
-        cached.posts.map((p) => p.id),
+        posts.map((p) => p.id),
       );
       setSeenTick((n) => n + 1);
+    },
+    [roomId],
+  );
+
+  const roomRef = useRef(room);
+  roomRef.current = room;
+
+  const refresh = useCallback(async () => {
+    const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE);
+    if (cached) {
+      applyFeed(cached);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (!roomRef.current) setLoading(true);
     setError(null);
     try {
-      await prefetchRoomFeed(roomId);
-      const fresh = getCachedRoomFeed(roomId);
-      if (fresh) {
-        setRoom(fresh.room);
-        setPosts(fresh.posts);
-        syncRoomPostsSeenBaseline(
-          roomId,
-          fresh.posts.map((p) => p.id),
-        );
-        setSeenTick((n) => n + 1);
-      }
+      await prefetchRoomFeed(roomId, {
+        page: postsPage,
+        size: ROOM_POSTS_PAGE_SIZE,
+      });
+      const fresh = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE);
+      if (fresh) applyFeed(fresh);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('rooms.err.load'));
     } finally {
       setLoading(false);
     }
-  }, [roomId, t]);
+  }, [roomId, postsPage, applyFeed, t]);
 
   useEffect(() => {
     void refresh();
@@ -162,7 +172,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
           <div className="rooms__section-head">
             <div className="rooms__section-head-main">
               <h3>{t('rooms.sharedDiaries')}</h3>
-              <span className="rooms__section-count">{visibleFeedPosts.length}</span>
+              <span className="rooms__section-count">{totalElements}</span>
             </div>
             <RoomMemberAvatars
               roomId={roomId}
@@ -172,19 +182,24 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
               onDismissPokeCoach={dismissPokeCoach}
             />
           </div>
-          {visibleFeedPosts.length === 0 && (
+          {loading && (
+            <p className="rooms__muted">{t('common.loading')}</p>
+          )}
+          {!loading && visibleFeedPosts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
               <p className="rooms__empty-title rooms__empty-title--multiline">
-                {posts.length === 0 ? t('rooms.sharedEmpty') : t('rooms.safety.feedEmptyBlocked')}
+                {totalElements === 0
+                  ? t('rooms.sharedEmpty')
+                  : t('rooms.safety.feedEmptyBlocked')}
               </p>
-              {posts.length === 0 ? (
+              {totalElements === 0 ? (
                 <button type="button" className="rooms__btn primary" onClick={onGoHome}>
                   {t('rooms.goHome')}
                 </button>
               ) : null}
             </div>
           )}
-          {visibleFeedPosts.length > 0 && (
+          {!loading && visibleFeedPosts.length > 0 && (
             <div className="rooms__coach-anchor">
               {showCoach && (
                 <div className="rooms__coach" role="status">
@@ -200,7 +215,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                 </div>
               )}
               <ul className="rooms__gallery">
-                {visiblePosts.map((post) => {
+                {visibleFeedPosts.map((post) => {
                   const author = room.members.find((m) => m.userId === post.authorUserId);
                   const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
                   const authorName = roomAuthorLabel(
@@ -249,7 +264,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                   );
                 })}
               </ul>
-              {visibleFeedPosts.length > ROOM_POSTS_PAGE_SIZE && (
+              {postsPageCount > 1 && (
                 <PagePager
                   page={postsPage}
                   pageCount={postsPageCount}

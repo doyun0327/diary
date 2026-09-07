@@ -3,12 +3,12 @@ import type {
   RoomComment,
   RoomDetail,
   RoomPost,
+  RoomPostPage,
   RoomSummary,
   RoomSummaryPage,
 } from '../types/room';
 import { apiUrl, isRemoteApi } from './config';
 import {
-  devMockRoomPosts,
   getDevMockRoomPost,
   isMockPagingPost,
 } from './mockRoomPosts';
@@ -208,9 +208,44 @@ export function getRoom(roomId: string): Promise<RoomDetail> {
   return request<RoomDetail>(`/api/rooms/${roomId}`);
 }
 
-export async function listRoomPosts(roomId: string): Promise<RoomPost[]> {
-  const list = await request<RoomPost[]>(`/api/rooms/${roomId}/posts`);
-  return [...list, ...devMockRoomPosts(roomId)];
+export async function listRoomPosts(
+  roomId: string,
+  opts?: { page?: number; size?: number },
+): Promise<RoomPostPage> {
+  const page = opts?.page ?? 0;
+  const size = opts?.size ?? 10;
+  const qs = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+  const raw = await request<RoomPostPage | RoomPost[]>(
+    `/api/rooms/${roomId}/posts?${qs.toString()}`,
+  );
+  // 구 API(배열) / 신 API(페이지 객체) 모두 허용
+  if (Array.isArray(raw)) {
+    const totalElements = raw.length;
+    const totalPages = Math.max(1, Math.ceil(totalElements / size) || 1);
+    const start = page * size;
+    return {
+      content: raw.slice(start, start + size),
+      page,
+      size,
+      totalElements,
+      totalPages,
+    };
+  }
+  const content = Array.isArray(raw?.content) ? raw.content : [];
+  return {
+    content,
+    page: typeof raw?.page === 'number' ? raw.page : page,
+    size: typeof raw?.size === 'number' ? raw.size : size,
+    totalElements:
+      typeof raw?.totalElements === 'number' ? raw.totalElements : content.length,
+    totalPages: Math.max(
+      1,
+      typeof raw?.totalPages === 'number' ? raw.totalPages : 1,
+    ),
+  };
 }
 
 export async function getRoomPost(roomId: string, postId: string): Promise<RoomPost> {

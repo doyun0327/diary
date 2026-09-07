@@ -1530,10 +1530,26 @@
 }
 
 .rooms__post-by {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0 14px 10px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.rooms__post-by .rooms__gallery-avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.rooms__post-by-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rooms__paper--expand {

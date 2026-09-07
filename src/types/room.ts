@@ -54,6 +54,15 @@ export interface RoomPost {
   authorWithdrawn?: boolean;
 }
 
+/** GET /api/rooms/{id}/posts 페이지 응답 */
+export interface RoomPostPage {
+  content: RoomPost[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export interface RoomComment {
   id: string;
   postId: string;

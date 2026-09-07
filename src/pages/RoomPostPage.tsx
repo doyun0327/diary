@@ -6,7 +6,7 @@ import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomSafetyModal, { type SafetyTarget } from '../components/RoomSafetyModal';
-import { getCachedRoomPost } from '../utils/roomCache';
+import { getCachedRoomDetail, getCachedRoomPost } from '../utils/roomCache';
 import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
 import {
@@ -52,8 +52,40 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [blockTick, setBlockTick] = useState(0);
+  const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+
+  useEffect(() => {
+    if (!post || post.authorWithdrawn) {
+      setAuthorAvatarUrl('');
+      return;
+    }
+    const fromCache = getCachedRoomDetail(roomId)
+      ?.members.find((m) => m.userId === post.authorUserId)
+      ?.avatarUrl?.trim();
+    if (fromCache) {
+      setAuthorAvatarUrl(fromCache);
+      return;
+    }
+    let cancelled = false;
+    void roomsApi
+      .getRoom(roomId)
+      .then((detail) => {
+        if (cancelled) return;
+        const url =
+          detail.members
+            .find((m) => m.userId === post.authorUserId)
+            ?.avatarUrl?.trim() || '';
+        setAuthorAvatarUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setAuthorAvatarUrl('');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [post, roomId]);
 
   const visibleComments = useMemo(() => {
     void blockTick;
@@ -150,6 +182,12 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setSafetyTarget(target);
   };
 
+  const authorName = post
+    ? roomAuthorLabel(post.authorNickname, post.authorWithdrawn, t)
+    : '';
+  const postAvatarUrl = post?.authorWithdrawn ? '' : authorAvatarUrl;
+  const authorInitial = (authorName || '?').slice(0, 1).toUpperCase();
+
   return (
     <div className="rooms rooms--post">
       <div className="rooms__toolbar">
@@ -199,9 +237,16 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
       {post && (
         <div className="rooms__post-expand">
-          <p className="rooms__post-by">
-            {roomAuthorLabel(post.authorNickname, post.authorWithdrawn, t)}
-          </p>
+          <div className="rooms__post-by">
+            <span className="rooms__gallery-avatar" aria-hidden>
+              {postAvatarUrl ? (
+                <img src={postAvatarUrl} alt="" />
+              ) : (
+                <span className="rooms__gallery-initial">{authorInitial}</span>
+              )}
+            </span>
+            <span className="rooms__post-by-name">{authorName}</span>
+          </div>
           <RoomDiaryPaper post={post} className="rooms__paper--expand" />
         </div>
       )}
