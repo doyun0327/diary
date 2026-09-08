@@ -17,8 +17,8 @@ export type TipStorePrice = {
 export const TIP_PURCHASE_COMPLETE_EVENT = 'diary-tip-purchase-complete';
 export const TIP_PRODUCTS_EVENT = 'diary-tip-products';
 
-/** 앱에서만 츄르 결제 가능 */
-export function requestTipPurchase(productId: TipProductId): boolean {
+/** 앱에서만 츄르·AI 팩 등 소모성 결제 가능 */
+export function requestTipPurchase(productId: TipProductId | string): boolean {
   if (!isFlutterApp()) return false;
   postDiaryNative({ type: 'tipPurchase', productId });
   return true;
@@ -88,7 +88,7 @@ export function fetchTipStorePrices(timeoutMs = 8_000): Promise<
 
 /** 네이티브 결제 완료/취소까지 대기 */
 export function waitForTipPurchase(
-  productId: TipProductId,
+  productId: TipProductId | string,
   timeoutMs = 60_000,
 ): Promise<TipPurchaseResult> {
   if (!isFlutterApp()) {

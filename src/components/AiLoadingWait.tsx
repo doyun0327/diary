@@ -174,7 +174,7 @@ export default function AiLoadingWait({
       return;
     }
     setHintVisible(true);
-    const timer = window.setTimeout(() => setHintVisible(false), 3000);
+    const timer = window.setTimeout(() => setHintVisible(false), 5000);
     return () => window.clearTimeout(timer);
   }, [durationHint]);
 

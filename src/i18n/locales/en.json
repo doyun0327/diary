@@ -551,8 +551,13 @@
       "characterTitle": "This character becomes the protagonist",
       "rewardTitle": "Watch an ad for 1 AI draw",
       "monthlyLimitTitle": "This month's AI drawings",
+      "monthlyLimitLead": "You've used all 50 AI drawings this month.",
+      "buyPack10": "Buy 10 more",
+      "buyPack20": "Buy 20 more",
+      "adOneFree": "Watch ad · 1 free",
       "rewardLead": "Watch the ad to the end to unlock one AI drawing.",
       "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "rewardLeadProOverflow": "You've used all 50 AI drawings this month. Watch an ad to draw 1 more today.",
       "rewardCta": "Watch ad",
       "adIncompleteTitle": "Please finish the ad",
       "pickTitle": "Which drawing to keep?",
@@ -596,6 +601,7 @@
       "adAppOnly": "Ads are available in the app only",
       "aiDailyLimit": "You can generate 1 AI drawing per day with ads. Upgrade to Pro for more.",
       "aiMonthlyLimit": "You've used all 50 AI drawings this month. You can draw again next month.",
+      "aiMonthlyLimitAdsDone": "You've used this month's limit and today's ad draw. Try again tomorrow.",
       "aiFreeLimit": "You've used today's free AI drawing allowance."
     },
     "coach": {

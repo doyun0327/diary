@@ -73,6 +73,8 @@ type AccessState = {
   monthlyLimitUsed: number;
   monthKey: string | null;
   aiDrawCredits: number;
+  /** 추가 구매한 AI 그림 잔여 횟수 (월한도와 별도) */
+  aiPackCredits: number;
   /** 미구독자 평생 무료 AI 그림 사용 횟수 */
   aiFreeDrawsUsed: number;
   /** @deprecated diarySaveCredits 사용 */
@@ -135,6 +137,7 @@ function loadAccessState(): AccessState {
         monthlyLimitUsed: 0,
         monthKey: getMonthKey(),
         aiDrawCredits: 0,
+        aiPackCredits: 0,
         aiFreeDrawsUsed: 0,
         bonusDiarySlots: 0,
         diaryDayKey: getDiaryDayKey(),
@@ -153,6 +156,7 @@ function loadAccessState(): AccessState {
       monthKey:
         typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
       aiDrawCredits: Math.max(0, Number(parsed.aiDrawCredits ?? 0)),
+      aiPackCredits: Math.max(0, Number(parsed.aiPackCredits ?? 0)),
       aiFreeDrawsUsed: readAiFreeDrawsUsed(parsed),
       bonusDiarySlots: Math.max(0, Number(parsed.bonusDiarySlots ?? 0)),
       diaryDayKey:
@@ -168,6 +172,7 @@ function loadAccessState(): AccessState {
       monthlyLimitUsed: 0,
       monthKey: getMonthKey(),
       aiDrawCredits: 0,
+      aiPackCredits: 0,
       aiFreeDrawsUsed: 0,
       bonusDiarySlots: 0,
       diaryDayKey: getDiaryDayKey(),
@@ -208,12 +213,13 @@ export function applySubscriptionStatus(
   const now = Date.now();
   const until = normalizeExpiresAtMs(expiresAt);
   // Flutter가 active=true 로 보내거나, 활성 구독 productId를 실어 보낼 때만 Pro
-  // (츄르 후원 소모성 상품 pageby_churu_* 는 제외)
+  // (츄르·AI 팩 소모성 상품은 제외)
   const treatActive =
     active ||
     (typeof productId === "string" &&
       productId.length > 0 &&
       !productId.includes("churu") &&
+      !productId.includes("ai_draw") &&
       (productId.includes("pageby") ||
         productId.includes("premium") ||
         productId === "pageby_monthly"));
@@ -504,6 +510,38 @@ export function grantAiDrawCreditWithDailyCap(count = 1) {
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;
+}
+
+export function getAiPackCredits() {
+  const state = loadAccessState();
+  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
+  saveAccessState(state);
+  return state.aiPackCredits;
+}
+
+/** 추가 구매 팩 지급 (일일 광고 한도와 무관) */
+export function grantAiPackCredits(count: number) {
+  const add = Math.max(0, Math.floor(count));
+  if (add <= 0) return getAiPackCredits();
+  const state = loadAccessState();
+  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0) + add;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return state.aiPackCredits;
+}
+
+export function consumeAiPackCredit() {
+  const state = loadAccessState();
+  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
+  if (state.aiPackCredits <= 0) return false;
+  state.aiPackCredits -= 1;
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+export function refundAiPackCredit() {
+  return grantAiPackCredits(1);
 }
 
 /** AI 그림 생성 시 광고 슬롯 1개 소모 */

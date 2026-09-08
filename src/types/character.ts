@@ -291,6 +291,36 @@ const PET_COLOR_EN: Record<PetColor, string> = {
   spotted: 'spotted / bicolor',
 };
 
+/** 메모에 자주 쓰는 품종 → 영어 (종류 혼동 완화) */
+const PET_BREED_HINTS: { re: RegExp; en: string }[] = [
+  { re: /브리티시\s*숏\s*헤어|british\s*shorthair/i, en: 'British Shorthair' },
+  { re: /코리안\s*숏\s*헤어|korean\s*shorthair/i, en: 'Korean Shorthair' },
+  { re: /스코티시\s*폴드|scottish\s*fold/i, en: 'Scottish Fold' },
+  { re: /러시안\s*블루|russian\s*blue/i, en: 'Russian Blue' },
+  { re: /페르시안|persian/i, en: 'Persian' },
+  { re: /샴|siamese/i, en: 'Siamese' },
+  { re: /랙돌|ragdoll/i, en: 'Ragdoll' },
+  { re: /먼치킨|munchkin/i, en: 'Munchkin' },
+  { re: /노르웨이\s*숲|norwegian\s*forest/i, en: 'Norwegian Forest' },
+  { re: /메인\s*쿤|maine\s*coon/i, en: 'Maine Coon' },
+  { re: /포메라니안|pomeranian/i, en: 'Pomeranian' },
+  { re: /말티즈|maltese/i, en: 'Maltese' },
+  { re: /푸들|poodle/i, en: 'Poodle' },
+  { re: /비숑|bichon/i, en: 'Bichon Frise' },
+  { re: /시바|shiba/i, en: 'Shiba Inu' },
+  { re: /코기|corgi/i, en: 'Corgi' },
+  { re: /리트리버|retriever/i, en: 'Retriever' },
+  { re: /치와와|chihuahua/i, en: 'Chihuahua' },
+];
+
+function petBreedHint(note: string): string | null {
+  if (!note) return null;
+  for (const { re, en } of PET_BREED_HINTS) {
+    if (re.test(note)) return en;
+  }
+  return null;
+}
+
 const HAIR_STYLE_FALLBACK: Record<string, CharacterProfile['hairStyle']> = {
   'man-short': 'man-short',
   'man-perm': 'man-perm',
@@ -465,12 +495,26 @@ export function normalizeCharacter(
 function describePet(pet: CharacterPet): string {
   const note = sanitizePetNote(pet.note);
   const color = PET_COLOR_EN[pet.color];
-  const detail = note ? `${note}, ${color}` : color;
-  // 종류를 강하게 — 모델이 cat/dog을 서로 바꿔 그리는 경우 방지
+  const breed = petBreedHint(note);
+
+  // 종류·색을 앞에 — 메모(이름/한글)를 앞에 두면 모델이 개/고양이로 헷갈림
   if (pet.kind === 'cat') {
-    return `a ${detail} cat (feline house cat only — not a dog, not a puppy)`;
+    const breedBit = breed ? `${breed} ` : '';
+    const noteBit = note ? ` (owner notes: "${note}" — nickname/breed hint only)` : '';
+    return (
+      `a ${color} ${breedBit}house cat` +
+      noteBit +
+      ' — must draw a real feline cat only; never a dog, puppy, wolf, or fox'
+    );
   }
-  return `a ${detail} dog (canine puppy/dog only — not a cat)`;
+
+  const breedBit = breed ? `${breed} ` : '';
+  const noteBit = note ? ` (owner notes: "${note}" — nickname/breed hint only)` : '';
+  return (
+    `a ${color} ${breedBit}dog` +
+    noteBit +
+    ' — must draw a real canine dog only; never a cat, kitten, or feline'
+  );
 }
 
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */

@@ -551,8 +551,13 @@
       "characterTitle": "이 캐릭터가 그림 속 주인공이 돼요",
       "rewardTitle": "광고 보고 AI 그림 1회",
       "monthlyLimitTitle": "이번 달 AI 그림",
+      "monthlyLimitLead": "50회를 모두 썼어요.",
+      "buyPack10": "10개 추가구매",
+      "buyPack20": "20개 추가구매",
+      "adOneFree": "광고보고 1회무료",
       "rewardLead": "광고를 끝까지 보면 AI 그림을 1번 그릴 수 있어요.",
       "rewardLeadDaily": "광고를 끝까지 보면 오늘 AI 그림을 1번 그릴 수 있어요.",
+      "rewardLeadProOverflow": "이번 달 AI 그림 50회를 모두 썼어요. 광고를 보면 오늘 1번 더 그릴 수 있어요.",
       "rewardCta": "광고 보기",
       "adIncompleteTitle": "광고를 끝까지 봐 주세요",
       "pickTitle": "어떤 그림을 넣을까요?",
@@ -597,7 +602,8 @@
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",
       "aiFreeLimit": "오늘은 광고로 AI 그림 1번까지 생성할 수 있어요.",
       "aiDailyLimit": "오늘은 광고로 AI 그림 1번까지 생성할 수 있어요. PRO로 더 많이 그릴 수 있어요.",
-      "aiMonthlyLimit": "이번 달 AI 그림 50회를 모두 썼어요. 다음 달에 다시 그릴 수 있어요."
+      "aiMonthlyLimit": "이번 달 AI 그림 50회를 모두 썼어요. 다음 달에 다시 그릴 수 있어요.",
+      "aiMonthlyLimitAdsDone": "이번 달 한도와 오늘 광고분까지 모두 썼어요. 내일 다시 시도해 주세요."
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",

@@ -28,17 +28,22 @@ import {
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
   consumeAiDrawDailyQuota,
+  consumeAiPackCredit,
   consumeProAiDrawQuota,
   FREE_DAILY_AI_AD_LIMIT,
   getAiDrawsToday,
+  getAiPackCredits,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
   refundAiDrawDailyQuota,
+  refundAiPackCredit,
   refundProAiDrawQuota,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
+import { purchaseAiPack } from '../utils/aiPackPurchase';
+import type { AiPackProductId } from '../utils/aiPackProducts';
 import {
   isAiCoachSeen,
   isCharacterCoachSeen,
@@ -216,6 +221,7 @@ function DiaryWritePage({
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
+  const [aiPackBuying, setAiPackBuying] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
@@ -223,7 +229,9 @@ function DiaryWritePage({
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
   const aiStyleRef = useRef<AiDrawStyleId>('storybook');
-  const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free'>('none');
+  const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free' | 'ai-pack'>(
+    'none',
+  );
   const [aiPickOpen, setAiPickOpen] = useState(false);
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
@@ -718,8 +726,35 @@ function DiaryWritePage({
     setAiError(t('write.err.aiDailyLimit'));
   };
 
-  const promptProAiLimit = () => {
+  /** Pro 월 50회 소진 후: 팩 잔량 있으면 바로 진행, 없으면 구매/광고 모달 */
+  const promptProMonthlyExhausted = () => {
+    if (isPurchaseShielded()) return;
+    if (getAiPackCredits() > 0) {
+      void runAiDraw();
+      return;
+    }
+    if (
+      AI_REWARD_AD_ENABLED &&
+      !isAiDailyLimitReached() &&
+      !needsAiAdBeforeDraw()
+    ) {
+      void runAiDraw();
+      return;
+    }
     setProAiLimitOpen(true);
+  };
+
+  /** 월한도 소진 후 소모: 추가구매 팩 → 광고 일일 슬롯 */
+  const consumeProOverflowQuota = (): boolean => {
+    if (consumeAiPackCredit()) {
+      aiQuotaKindRef.current = 'ai-pack';
+      return true;
+    }
+    if (consumeAiDrawDailyQuota()) {
+      aiQuotaKindRef.current = 'free';
+      return true;
+    }
+    return false;
   };
 
   const consumeAiDrawQuota = async (): Promise<boolean> => {
@@ -729,11 +764,7 @@ function DiaryWritePage({
       return true;
     }
 
-    if (canUseProAiQuota()) {
-      if (isProAiMonthlyLimitReached()) {
-        promptProAiLimit();
-        return false;
-      }
+    if (canUseProAiQuota() && !isProAiMonthlyLimitReached()) {
       const token = getAccessToken();
       if (token) {
         try {
@@ -750,24 +781,45 @@ function DiaryWritePage({
             } catch {
               // ignore
             }
-            promptProAiLimit();
-            return false;
+            // 서버 월한도 소진 → 팩/광고 폴백
+            if (!consumeProOverflowQuota()) {
+              promptProMonthlyExhausted();
+              return false;
+            }
+            return true;
           }
           if (!consumeProAiDrawQuota()) {
-            promptProAiLimit();
-            return false;
+            if (!consumeProOverflowQuota()) {
+              promptProMonthlyExhausted();
+              return false;
+            }
+            return true;
           }
           aiQuotaKindRef.current = 'pro-local';
           return true;
         }
       }
       if (!consumeProAiDrawQuota()) {
-        promptProAiLimit();
-        return false;
+        if (!consumeProOverflowQuota()) {
+          promptProMonthlyExhausted();
+          return false;
+        }
+        return true;
       }
       aiQuotaKindRef.current = 'pro-local';
       return true;
     }
+
+    // Pro 월한도 소진 → 팩/광고
+    if (canUseProAiQuota() && isProAiMonthlyLimitReached()) {
+      if (!consumeProOverflowQuota()) {
+        promptProMonthlyExhausted();
+        return false;
+      }
+      return true;
+    }
+
+    // 무료 → 광고 일일 슬롯
     if (!consumeAiDrawDailyQuota()) {
       promptAiDrawBlocked();
       return false;
@@ -809,6 +861,9 @@ function DiaryWritePage({
     } else if (kind === 'pro-local') {
       refundProAiDrawQuota();
       notice = notice || fallbackNotice;
+    } else if (kind === 'ai-pack') {
+      refundAiPackCredit();
+      notice = notice || fallbackNotice;
     } else if (kind === 'free') {
       refundAiDrawDailyQuota();
       notice = notice || fallbackNotice;
@@ -840,7 +895,7 @@ function DiaryWritePage({
     }
     if (canUseProAiQuota()) {
       if (isProAiMonthlyLimitReached()) {
-        promptProAiLimit();
+        promptProMonthlyExhausted();
         return;
       }
       void runAiDraw();
@@ -1016,10 +1071,12 @@ function DiaryWritePage({
     }
     if (isAiDailyLimitReached()) {
       setRewardPromptOpen(false);
+      setProAiLimitOpen(false);
       setAiDailyLimitOpen(true);
       return;
     }
     setRewardPromptOpen(false);
+    setProAiLimitOpen(false);
     setAdIncompleteOpen(false);
     setAiError(null);
     const ok = await requestAiRewardedAd();
@@ -1032,6 +1089,30 @@ function DiaryWritePage({
       return;
     }
     void runAiDraw();
+  };
+
+  const handleBuyAiPack = async (productId: AiPackProductId) => {
+    if (aiPackBuying || isPurchaseShielded()) return;
+    if (!isFlutterApp()) {
+      setAiError(t('write.err.adAppOnly'));
+      return;
+    }
+    setAiPackBuying(true);
+    setAiError(null);
+    armPurchaseShield(12_000);
+    try {
+      const result = await purchaseAiPack(productId);
+      if (!result.ok) {
+        if (!result.cancelled) {
+          setAiError(t('write.err.aiRetry'));
+        }
+        return;
+      }
+      setProAiLimitOpen(false);
+      void runAiDraw();
+    } finally {
+      setAiPackBuying(false);
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -1468,13 +1549,40 @@ function DiaryWritePage({
           {proAiLimitOpen && (
             <AppModal
               title={t('write.ai.monthlyLimitTitle')}
-              lead={t('write.err.aiMonthlyLimit')}
-              onDismiss={() => setProAiLimitOpen(false)}
-              showClose={false}
+              lead={t('write.ai.monthlyLimitLead')}
+              onDismiss={() => !aiPackBuying && setProAiLimitOpen(false)}
+              showClose={!aiPackBuying}
               closeAriaLabel={t('common.close')}
-              primaryLabel={t('common.close')}
-              onPrimary={() => setProAiLimitOpen(false)}
-            />
+            >
+              <div className="app-modal__actions diary-write__ai-pack-actions">
+                <button
+                  type="button"
+                  className="app-modal__btn app-modal__btn--primary"
+                  disabled={aiPackBuying}
+                  onClick={() => void handleBuyAiPack('pageby_ai_draw_10')}
+                >
+                  {t('write.ai.buyPack10')}
+                </button>
+                <button
+                  type="button"
+                  className="app-modal__btn app-modal__btn--primary"
+                  disabled={aiPackBuying}
+                  onClick={() => void handleBuyAiPack('pageby_ai_draw_20')}
+                >
+                  {t('write.ai.buyPack20')}
+                </button>
+                {AI_REWARD_AD_ENABLED ? (
+                  <button
+                    type="button"
+                    className="app-modal__btn"
+                    disabled={aiPackBuying}
+                    onClick={() => void handleWatchAd()}
+                  >
+                    {t('write.ai.adOneFree')}
+                  </button>
+                ) : null}
+              </div>
+            </AppModal>
           )}
           {adIncompleteOpen && (
             <AppModal
