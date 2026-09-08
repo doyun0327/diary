@@ -62,7 +62,6 @@ import {
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
-import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import { getAccessToken } from '../hooks/useAuthSession';
 import { consumeMonthlyUsage, fetchMonthlyUsage, refundMonthlyUsage } from '../api/usageApi';
 import './DiaryWritePage.css';
@@ -275,20 +274,6 @@ function DiaryWritePage({
     onAppToast?.(t('write.err.aiRetry'));
   }, [onAppToast, t]);
 
-  const startProPurchase = useCallback(() => {
-    armPurchaseShield();
-    setRewardPromptOpen(false);
-    setAiDailyLimitOpen(false);
-    setAdIncompleteOpen(false);
-    setAiConfirmOpen(false);
-    setAiError(null);
-    setAiLoading(false);
-    contentRef.current?.blur();
-    titleRef.current?.blur();
-    void requestSubscriptionPurchaseAndSync().finally(() => {
-      armPurchaseShield(6_000);
-    });
-  }, [armPurchaseShield]);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -1534,22 +1519,9 @@ function DiaryWritePage({
               }}
               showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.cancel')}
-              onSecondary={() => {
-                clearPurchaseShield();
-                setRewardPromptOpen(false);
-              }}
               primaryLabel={t('write.ai.rewardCta')}
               onPrimary={() => void handleWatchAd()}
-            >
-              <button
-                type="button"
-                className="diary-write__reward-subscribe-link"
-                onClick={startProPurchase}
-              >
-                {t('subscription.subscribeCta')}
-              </button>
-            </AppModal>
+            />
           )}
           {aiDailyLimitOpen && (
             <AppModal
