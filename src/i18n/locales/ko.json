@@ -133,11 +133,23 @@
       "privacyBody": "일기·그림·프로필 정보는 기기에 저장되거나, Google 계정 로그인·친구 방 기능을 쓸 때 앱 서버에 저장될 수 있습니다. 수집 목적은 일기 저장·공유·앱 기능 제공에 한정됩니다. 친구 방에서는 다른 사용자의 글·댓글을 신고하거나 사용자를 차단할 수 있습니다. 제3자에게 판매하지 않으며, 법령에 따른 요청이 있는 경우를 제외하고 외부에 제공하지 않습니다. 문의는 앱 내 안내 채널을 이용해 주세요."
     },
     "licenses": {
-      "menu": "오픈소스 라이선스 및 출처",
-      "title": "라이선스 · 출처",
-      "iconsHeading": "아이콘 출처",
-      "libsHeading": "오픈소스 라이브러리",
-      "note": "무료 Flaticon 아이콘은 출처 표기가 필요합니다. 위 링크가 그 표기입니다."
+      "menu": "Flaticon 출처",
+      "title": "Flaticon 출처",
+      "iconsHeading": "사용한 아이콘",
+      "note": "무료 Flaticon 리소스는 출처 표기가 필요합니다. 위 링크가 그 표기입니다.",
+      "usage": {
+        "mood.classic": "기분 · Classic",
+        "mood.smileys": "기분 · Smileys",
+        "mood.cat": "기분 · Cat",
+        "mood.dog": "기분 · Dog",
+        "mood.love": "기분 · Love",
+        "mood.ghost": "기분 · Ghost",
+        "mood.weather": "기분 · Weather",
+        "mood.numbers": "기분 · Number1",
+        "mood.numbers2": "기분 · Number2",
+        "hair": "캐릭터 헤어",
+        "stickers": "캔버스 스티커(일러스트)"
+      }
     }
   },
   "theme": {
@@ -290,10 +302,14 @@
     "noProduct": "상품을 찾지 못했어요. 스토어 설정을 확인해 주세요.",
     "notConfigured": "결제 준비가 안 됐어요. 앱을 다시 실행해 주세요.",
     "buyTimeout": "결제 응답이 늦어요. 잠시 후 다시 시도해 주세요.",
-    "buyFailed": "구매에 실패했어요. 잠시 후 다시 시도해 주세요."
+    "buyFailed": "구매에 실패했어요. 잠시 후 다시 시도해 주세요.",
+    "googleRequired": "결제하려면 Google 로그인이 필요해요",
+    "googleLoginFailed": "Google 로그인에 실패했어요. 다시 시도해 주세요.",
+    "signingIn": "로그인 중…"
   },
   "credits": {
-    "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon"
+    "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "친구 방",
@@ -498,8 +514,8 @@
     "featureGateLead": "Pro로 아래 기능을 이용할 수 있어요",
     "premiumBenefits": "구독 혜택: 검색, 보내기, 월 AI 그림 {{n}}회",
     "subscribeCta": "PRO로 업그레이드",
-    "googleLoginRequiredTitle": "이력 관리를 위해 Google 로그인이 필요해요.",
-    "googleLoginRequiredLead": "이력 관리를 위해 Google 로그인이 필요해요.",
+    "googleLoginRequiredTitle": "결제하려면 Google 로그인이 필요해요",
+    "googleLoginRequiredLead": "구매 내역을 계정에 저장하려면 Google로 로그인해 주세요.",
     "googleLoginRequiredCta": "계정으로 이동",
     "appOnly": "앱에서 구독할 수 있어요",
     "restore": "구매 복원",

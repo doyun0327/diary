@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AI_PACK_PRODUCTS, type AiPackProductId } from '../utils/aiPackProducts';
 import { purchaseAiPack } from '../utils/aiPackPurchase';
@@ -9,26 +9,44 @@ import {
 } from '../utils/diaryAccess';
 import { isFlutterApp } from '../utils/nativeShare';
 import {
+  REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
   requestSubscriptionRestore,
 } from '../utils/subscription';
+import {
+  clearPendingNyangPurchase,
+  setPendingNyangPurchase,
+  type PendingNyangPurchase,
+} from '../utils/pendingNyangPurchase';
+import { isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
+import { requestNativeGoogleSignIn } from '../lib/googleAuth';
 import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 import './NyangTicketSheet.css';
 
 type TabId = 'subscribe' | 'packs';
+type BusyState = 'sub' | 'google' | AiPackProductId | null;
 
 interface NyangTicketSheetProps {
   onClose: () => void;
   /** 열릴 때 기본 탭 */
   initialTab?: TabId;
+  /** 로그인 후 자동 결제할 항목 (앱에서 넘김) */
+  autoPurchase?: PendingNyangPurchase | null;
+  onAutoPurchaseConsumed?: () => void;
 }
 
-function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketSheetProps) {
+function NyangTicketSheet({
+  onClose,
+  initialTab = 'subscribe',
+  autoPurchase = null,
+  onAutoPurchaseConsumed,
+}: NyangTicketSheetProps) {
   const { t } = useTranslation();
+  const { signInWithGoogleIdToken } = useAuthSession();
   const [tab, setTab] = useState<TabId>(initialTab);
   const [accessTick, setAccessTick] = useState(0);
-  const [busy, setBusy] = useState<'sub' | AiPackProductId | null>(null);
+  const [busy, setBusy] = useState<BusyState>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,10 +77,44 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
 
-  const handleSubscribe = async () => {
-    if (busy) return;
+  /** 비회원 → Google 회원 만든 뒤 true. 웹은 계정 시트로 보냄 */
+  const ensureGoogleMember = async (
+    pending: PendingNyangPurchase,
+  ): Promise<boolean> => {
+    if (isGoogleSignedIn()) return true;
+
+    if (!isFlutterApp()) {
+      setPendingNyangPurchase(pending);
+      setError(t('nyangTicket.googleRequired'));
+      window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
+      onClose();
+      return false;
+    }
+
+    setBusy('google');
     setMessage(null);
     setError(null);
+    clearPendingNyangPurchase();
+    try {
+      const idToken = await requestNativeGoogleSignIn();
+      await signInWithGoogleIdToken(idToken);
+      if (!isGoogleSignedIn()) {
+        setError(t('nyangTicket.googleLoginFailed'));
+        return false;
+      }
+      return true;
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : '';
+      if (reason !== 'cancelled') {
+        setError(t('nyangTicket.googleLoginFailed'));
+      }
+      return false;
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const runSubscribe = async () => {
     if (!isFlutterApp()) {
       setError(t('subscription.appOnly'));
       return;
@@ -78,17 +130,7 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
     }
   };
 
-  /** 숨김: 제목 길게 누르기 → 수동 복원 */
-  const handleHiddenRestore = () => {
-    if (!isFlutterApp() || busy) return;
-    requestSubscriptionRestore();
-    setMessage(t('nyangTicket.restoreStarted'));
-  };
-
-  const handleBuyPack = async (productId: AiPackProductId) => {
-    if (busy) return;
-    setMessage(null);
-    setError(null);
+  const runBuyPack = async (productId: AiPackProductId) => {
     if (!isFlutterApp()) {
       setError(t('nyangTicket.appOnly'));
       return;
@@ -103,6 +145,10 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
             n: result.creditsGranted ?? aiPackCreditsLabel(productId),
           }),
         );
+        return;
+      }
+      if (result.error === 'need_google') {
+        setError(t('nyangTicket.googleRequired'));
         return;
       }
       if (result.error === 'app_only') {
@@ -127,6 +173,57 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
       setBusy(null);
     }
   };
+
+  const handleSubscribe = async () => {
+    if (busy) return;
+    setMessage(null);
+    setError(null);
+    const pending: PendingNyangPurchase = { kind: 'subscribe' };
+    if (!(await ensureGoogleMember(pending))) return;
+    await runSubscribe();
+  };
+
+  /** 숨김: 제목 길게 누르기 → 수동 복원 */
+  const handleHiddenRestore = () => {
+    if (!isFlutterApp() || busy) return;
+    requestSubscriptionRestore();
+    setMessage(t('nyangTicket.restoreStarted'));
+  };
+
+  const handleBuyPack = async (productId: AiPackProductId) => {
+    if (busy) return;
+    setMessage(null);
+    setError(null);
+    const pending: PendingNyangPurchase = { kind: 'pack', productId };
+    if (!(await ensureGoogleMember(pending))) return;
+    await runBuyPack(productId);
+  };
+
+  // 계정 시트에서 Google 로그인 후 재오픈 시 이어서 결제
+  const autoPurchaseRan = useRef(false);
+  useEffect(() => {
+    if (!autoPurchase || autoPurchaseRan.current) return;
+    if (!isGoogleSignedIn()) return;
+    autoPurchaseRan.current = true;
+    onAutoPurchaseConsumed?.();
+    let cancelled = false;
+    void (async () => {
+      if (autoPurchase.kind === 'subscribe') {
+        setTab('subscribe');
+        if (cancelled) return;
+        await runSubscribe();
+        return;
+      }
+      setTab('packs');
+      if (cancelled) return;
+      await runBuyPack(autoPurchase.productId);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // 마운트 시 1회만
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="account-sheet" role="dialog" aria-label={t('nyangTicket.aria')}>
@@ -200,11 +297,13 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
               disabled={busy != null || isPro}
               onClick={() => void handleSubscribe()}
             >
-              {busy === 'sub'
-                ? t('common.processing')
-                : isPro
-                  ? t('nyangTicket.subscribed')
-                  : t('nyangTicket.subscribeCta')}
+              {busy === 'google'
+                ? t('nyangTicket.signingIn')
+                : busy === 'sub'
+                  ? t('common.processing')
+                  : isPro
+                    ? t('nyangTicket.subscribed')
+                    : t('nyangTicket.subscribeCta')}
             </button>
           </section>
         )}
@@ -224,9 +323,11 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
                       {t('nyangTicket.packLabel', { n: pack.credits })}
                     </span>
                     <span className="nyang-ticket__pack-cta">
-                      {busy === pack.id
-                        ? t('common.processing')
-                        : t('nyangTicket.buy')}
+                      {busy === 'google'
+                        ? t('nyangTicket.signingIn')
+                        : busy === pack.id
+                          ? t('common.processing')
+                          : t('nyangTicket.buy')}
                     </span>
                   </button>
                 </li>

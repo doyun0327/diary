@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../constants/app';
-import { MOOD_ICON_CREDITS } from '../utils/moodPack';
+import { ALL_FLATICON_CREDITS } from '../utils/flaticonCredits';
 import { isFlutterApp } from '../utils/nativeShare';
 import { TIP_PRODUCTS, type TipProductId } from '../utils/tipProducts';
 import { fetchTipStorePrices, waitForTipPurchase } from '../utils/tipPurchase';
@@ -220,23 +220,16 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
           <div className="app-info__doc">
             <h3>{t('appInfo.licenses.iconsHeading')}</h3>
             <ul className="app-info__libs">
-              {MOOD_ICON_CREDITS.map((credit) => (
-                <li key={credit.packId}>
+              {ALL_FLATICON_CREDITS.map((credit) => (
+                <li key={credit.id}>
                   <a href={credit.href} target="_blank" rel="noreferrer">
-                    {t('credits.moodIcons', { author: credit.author })}
+                    {t('credits.flaticonLine', {
+                      usage: t(`appInfo.licenses.usage.${credit.usageKey}`),
+                      author: credit.author,
+                    })}
                   </a>
-                  {` (${t(`emojiPack.${credit.packId}.name`)})`}
                 </li>
               ))}
-            </ul>
-            <h3>{t('appInfo.licenses.libsHeading')}</h3>
-            <ul className="app-info__libs">
-              <li>React — MIT</li>
-              <li>Vite — MIT</li>
-              <li>i18next / react-i18next — MIT</li>
-              <li>jsPDF — MIT</li>
-              <li>modern-screenshot — MIT</li>
-              <li>react-router-dom — MIT</li>
             </ul>
             <p className="app-info__note">{t('appInfo.licenses.note')}</p>
           </div>

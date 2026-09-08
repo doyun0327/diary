@@ -133,11 +133,23 @@
       "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use friend rooms. We use this data only to provide diary storage, sharing, and app features. In friend rooms you can report posts/comments or block users. We do not sell personal data, and we do not share it except when required by law. Contact us through in-app channels for privacy requests."
     },
     "licenses": {
-      "menu": "Open-source licenses & credits",
-      "title": "Licenses · Credits",
-      "iconsHeading": "Icon credits",
-      "libsHeading": "Open-source libraries",
-      "note": "Free Flaticon icons require attribution. The link above is that credit."
+      "menu": "Flaticon credits",
+      "title": "Flaticon credits",
+      "iconsHeading": "Icons used",
+      "note": "Free Flaticon resources require attribution. The links above are that credit.",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.smileys": "Mood · Smileys",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
     }
   },
   "theme": {
@@ -290,10 +302,14 @@
     "noProduct": "Product not found. Check store setup.",
     "notConfigured": "Billing isn’t ready. Please restart the app.",
     "buyTimeout": "No response from the store. Please try again.",
-    "buyFailed": "Purchase failed. Please try again later."
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…"
   },
   "credits": {
-    "moodIcons": "Mood icons: designed by {{author}} from Flaticon"
+    "moodIcons": "Mood icons: designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "Friend rooms",
@@ -498,8 +514,8 @@
     "featureGateLead": "With Pro, you can use the features below.",
     "premiumBenefits": "Premium: search, export, {{n}} AI drawings per month",
     "subscribeCta": "Upgrade to PRO",
-    "googleLoginRequiredTitle": "Google sign-in is required to keep your history",
-    "googleLoginRequiredLead": "Google sign-in is required to keep your history.",
+    "googleLoginRequiredTitle": "Google sign-in is required to purchase",
+    "googleLoginRequiredLead": "Sign in with Google so your purchase is saved to your account.",
     "googleLoginRequiredCta": "Go to account",
     "appOnly": "Subscribe in the app",
     "restore": "Restore purchases",

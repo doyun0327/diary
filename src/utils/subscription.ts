@@ -5,6 +5,7 @@ import {
 } from './diaryAccess';
 import { isGoogleSignedIn } from '../hooks/useAuthSession';
 import { isFlutterApp, postDiaryNative } from './nativeShare';
+import { setPendingNyangPurchase } from './pendingNyangPurchase';
 
 export type SubscriptionStatusPayload = {
   active: boolean;
@@ -122,6 +123,7 @@ export function refreshSubscriptionStatus(timeoutMs = 1800): Promise<boolean> {
 
 export function requestSubscriptionPurchase() {
   if (!isGoogleSignedIn()) {
+    setPendingNyangPurchase({ kind: 'subscribe' });
     window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
     return false;
   }

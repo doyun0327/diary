@@ -32,7 +32,7 @@ import { useDeployMaintenance } from "./hooks/useDeployMaintenance";
 import { useCharacter } from "./hooks/useCharacter";
 import { useClientProfile } from "./hooks/useClientProfile";
 import { useScreenLock } from "./hooks/useScreenLock";
-import { getAccessToken, getAuthSession, isGoogleSignedIn, useAuthSession } from "./hooks/useAuthSession";
+import { getAccessToken, getAuthSession, isGoogleSignedIn, useAuthSession, AUTH_CHANGE_EVENT } from "./hooks/useAuthSession";
 import {
   usePushOpenHandler,
   usePushRegistration,
@@ -82,6 +82,12 @@ import {
   OPEN_NYANG_TICKET_EVENT,
   type OpenNyangTicketDetail,
 } from "./utils/openNyangTicket";
+import {
+  clearPendingNyangPurchase,
+  setPendingNyangPurchase,
+  takePendingNyangPurchase,
+  type PendingNyangPurchase,
+} from "./utils/pendingNyangPurchase";
 import "./App.css";
 
 export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
@@ -120,6 +126,8 @@ function App() {
   const [nyangTicketTab, setNyangTicketTab] = useState<'subscribe' | 'packs'>(
     'subscribe',
   );
+  const [nyangAutoPurchase, setNyangAutoPurchase] =
+    useState<PendingNyangPurchase | null>(null);
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
   const [lockDisableOpen, setLockDisableOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -271,11 +279,28 @@ function App() {
     const onNeedGoogle = () => {
       setSubscriptionModal(null);
       setSubscribing(false);
+      setNyangTicketOpen(false);
       setGoogleLoginForProOpen(true);
     };
     window.addEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
     return () =>
       window.removeEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
+  }, []);
+
+  // Google 로그인 완료 후 보류된 구독/팩 결제 이어서
+  useEffect(() => {
+    const onAuth = () => {
+      if (!isGoogleSignedIn()) return;
+      const pending = takePendingNyangPurchase();
+      if (!pending) return;
+      setGoogleLoginForProOpen(false);
+      setAccountOpen(false);
+      setNyangAutoPurchase(pending);
+      setNyangTicketTab(pending.kind === "pack" ? "packs" : "subscribe");
+      setNyangTicketOpen(true);
+    };
+    window.addEventListener(AUTH_CHANGE_EVENT, onAuth);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, onAuth);
   }, []);
 
   const closeSubscriptionModal = useCallback(() => {
@@ -1033,7 +1058,12 @@ function App() {
           <NyangTicketSheet
             key={nyangTicketTab}
             initialTab={nyangTicketTab}
-            onClose={() => setNyangTicketOpen(false)}
+            autoPurchase={nyangAutoPurchase}
+            onAutoPurchaseConsumed={() => setNyangAutoPurchase(null)}
+            onClose={() => {
+              setNyangTicketOpen(false);
+              setNyangAutoPurchase(null);
+            }}
           />,
           document.getElementById("root") ?? document.body,
         )}
@@ -1161,6 +1191,7 @@ function App() {
             onPrimary={() => {
               if (subscribing) return;
               if (!isGoogleSignedIn()) {
+                setPendingNyangPurchase({ kind: "subscribe" });
                 closeSubscriptionModal();
                 setGoogleLoginForProOpen(true);
                 return;
@@ -1184,7 +1215,10 @@ function App() {
         createPortal(
           <AppModal
             title={t("subscription.googleLoginRequiredTitle")}
-            onDismiss={() => setGoogleLoginForProOpen(false)}
+            onDismiss={() => {
+              clearPendingNyangPurchase();
+              setGoogleLoginForProOpen(false);
+            }}
             showClose
             primaryLabel={t("subscription.googleLoginRequiredCta")}
             onPrimary={() => {
