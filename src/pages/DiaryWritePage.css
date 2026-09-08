@@ -653,3 +653,19 @@
   background: transparent;
   touch-action: none;
 }
+
+.diary-write__reward-subscribe-link {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--color-accent-text, var(--color-accent));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

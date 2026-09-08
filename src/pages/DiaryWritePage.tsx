@@ -153,8 +153,8 @@ interface DiaryWritePageProps {
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean, saving?: boolean) => void;
   writeQuota?: { used: number; limit: number };
-  /** 저장 토스트와 동일한 app-toast */
-  onAppToast?: (message: string) => void;
+  /** 저장 토스트와 동일한 app-toast (durationMs 기본 1.8초) */
+  onAppToast?: (message: string, durationMs?: number) => void;
 }
 
 function DiaryWritePage({
@@ -239,6 +239,15 @@ function DiaryWritePage({
   const [purchaseClickShield, setPurchaseClickShield] = useState(false);
   const proPurchaseGuardUntilRef = useRef(0);
   const purchaseShieldTimerRef = useRef<number | null>(null);
+
+  const clearPurchaseShield = useCallback(() => {
+    proPurchaseGuardUntilRef.current = 0;
+    setPurchaseClickShield(false);
+    if (purchaseShieldTimerRef.current != null) {
+      window.clearTimeout(purchaseShieldTimerRef.current);
+      purchaseShieldTimerRef.current = null;
+    }
+  }, []);
 
   const armPurchaseShield = useCallback((ms = 8_000) => {
     proPurchaseGuardUntilRef.current = Date.now() + ms;
@@ -643,11 +652,10 @@ function DiaryWritePage({
       if (canUseProAiQuota()) {
         setRewardPromptOpen(false);
         setAiDailyLimitOpen(false);
-        proPurchaseGuardUntilRef.current = 0;
-        setPurchaseClickShield(false);
+        clearPurchaseShield();
       }
     });
-  }, []);
+  }, [clearPurchaseShield]);
 
   // 네이티브 결제창에서 막 돌아온 뒤에만 팝업·유령 터치 정리
   // (일반 백그라운드 복귀에서 AI 로딩을 끄거나 로띠를 숨기지 않음)
@@ -725,6 +733,7 @@ function DiaryWritePage({
 
   const promptAiDrawBlocked = () => {
     if (isAiDailyLimitReached()) {
+      onAppToast?.(t('write.err.aiAdDailyOnce'), 3000);
       setAiDailyLimitOpen(true);
       return;
     }
@@ -879,9 +888,7 @@ function DiaryWritePage({
   };
 
   const handleAiDraw = () => {
-    // 결제/광고 복귀 실드가 AI 버튼을 가로채지 않게
-    proPurchaseGuardUntilRef.current = 0;
-    setPurchaseClickShield(false);
+    clearPurchaseShield();
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
@@ -1076,10 +1083,8 @@ function DiaryWritePage({
     if (isAiDailyLimitReached()) {
       setRewardPromptOpen(false);
       setProAiLimitOpen(false);
-      if (canUseProAiQuota()) {
-        onAppToast?.(t('write.err.aiAdDailyOnce'));
-        return;
-      }
+      onAppToast?.(t('write.err.aiAdDailyOnce'), 3000);
+      if (canUseProAiQuota()) return;
       setAiDailyLimitOpen(true);
       return;
     }
@@ -1087,20 +1092,25 @@ function DiaryWritePage({
     setProAiLimitOpen(false);
     setAdIncompleteOpen(false);
     setAiError(null);
+    clearPurchaseShield();
     const ok = await requestAiRewardedAd();
     if (!ok) {
+      clearPurchaseShield();
       setAdIncompleteOpen(true);
       return;
     }
+    // 광고 닫힌 직후 WebView가 바로 요청하면 실패하는 경우 대비
+    clearPurchaseShield();
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 350);
+    });
     if (!grantAiDrawCreditWithDailyCap(1)) {
-      if (canUseProAiQuota()) {
-        onAppToast?.(t('write.err.aiAdDailyOnce'));
-        return;
-      }
+      onAppToast?.(t('write.err.aiAdDailyOnce'), 3000);
+      if (canUseProAiQuota()) return;
       setAiDailyLimitOpen(true);
       return;
     }
-    void runAiDraw();
+    await runAiDraw();
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -1432,7 +1442,12 @@ function DiaryWritePage({
       {createPortal(
         <>
           {purchaseClickShield && (
-            <div className="diary-write__purchase-shield" aria-hidden="true" />
+            <div
+              className="diary-write__purchase-shield"
+              aria-hidden="true"
+              onPointerUp={clearPurchaseShield}
+              onClick={clearPurchaseShield}
+            />
           )}
           {leaveConfirmOpen && (
             <AppModal
@@ -1514,24 +1529,44 @@ function DiaryWritePage({
             <AppModal
               title={t('write.ai.rewardTitle')}
               lead={t('write.ai.rewardLeadDaily')}
-              onDismiss={() => setRewardPromptOpen(false)}
-              showClose={false}
+              onDismiss={() => {
+                clearPurchaseShield();
+                setRewardPromptOpen(false);
+              }}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('subscription.subscribeCta')}
-              onSecondary={startProPurchase}
+              secondaryLabel={t('common.cancel')}
+              onSecondary={() => {
+                clearPurchaseShield();
+                setRewardPromptOpen(false);
+              }}
               primaryLabel={t('write.ai.rewardCta')}
               onPrimary={() => void handleWatchAd()}
-            />
+            >
+              <button
+                type="button"
+                className="diary-write__reward-subscribe-link"
+                onClick={startProPurchase}
+              >
+                {t('subscription.subscribeCta')}
+              </button>
+            </AppModal>
           )}
           {aiDailyLimitOpen && (
             <AppModal
-              title={t('write.ai.rewardTitle')}
-              lead={t('write.err.aiDailyLimit')}
-              onDismiss={() => setAiDailyLimitOpen(false)}
-              showClose={false}
+              title={t('write.ai.chargeTitle')}
+              onDismiss={() => {
+                clearPurchaseShield();
+                setAiDailyLimitOpen(false);
+              }}
+              showClose
               closeAriaLabel={t('common.close')}
-              primaryLabel={t('subscription.subscribeCta')}
-              onPrimary={startProPurchase}
+              primaryLabel={t('write.ai.goPurchase')}
+              onPrimary={() => {
+                clearPurchaseShield();
+                setAiDailyLimitOpen(false);
+                openNyangTicket();
+              }}
             />
           )}
           {proAiLimitOpen && (

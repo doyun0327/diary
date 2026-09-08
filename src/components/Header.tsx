@@ -85,22 +85,44 @@ function IconGlobe() {
 function IconTicket() {
   return (
     <CrayonSvg>
-      <path
-        d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9.2 10.4c.35-.55 1-.9 1.75-.9.95 0 1.7.7 1.75 1.6.05 1.1-.75 1.55-1.35 1.95-.55.35-.85.6-.85 1.15"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <circle cx="11" cy="16.2" r="0.85" fill="currentColor" />
+      {/* 다른 메뉴 아이콘과 비슷한 시각 크기 */}
+      <g transform="translate(0.5 1.2) scale(0.95)">
+        <path
+          d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* 티켓 안 원화(₩) */}
+        <path
+          d="M9.2 9.4 12 16.2 14.8 9.4"
+          stroke="currentColor"
+          strokeWidth="1.55"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <line
+          x1="8.4"
+          y1="11.5"
+          x2="15.6"
+          y2="11.5"
+          stroke="currentColor"
+          strokeWidth="1.45"
+          strokeLinecap="round"
+        />
+        <line
+          x1="8.6"
+          y1="13.5"
+          x2="15.4"
+          y2="13.5"
+          stroke="currentColor"
+          strokeWidth="1.45"
+          strokeLinecap="round"
+        />
+      </g>
     </CrayonSvg>
   );
 }

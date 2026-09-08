@@ -48,17 +48,21 @@ export default function AppModal({
         disabled={!canClose}
       />
       <div className="app-modal__panel">
-        {showX && onDismiss ? (
-          <button
-            type="button"
-            className="app-modal__close"
-            onClick={onDismiss}
-            aria-label={closeAriaLabel}
-          >
-            <CloseIcon />
-          </button>
-        ) : null}
-        <h3 id={ariaLabelledBy}>{title}</h3>
+        <div className="app-modal__header">
+          <h3 id={ariaLabelledBy}>{title}</h3>
+          {showX && onDismiss ? (
+            <button
+              type="button"
+              className="app-modal__close"
+              onClick={onDismiss}
+              aria-label={closeAriaLabel}
+            >
+              <CloseIcon />
+            </button>
+          ) : (
+            <span className="app-modal__close-spacer" aria-hidden />
+          )}
+        </div>
         {lead ? <p className="app-modal__lead">{lead}</p> : null}
         {children}
         {(primaryLabel || secondaryLabel) && (

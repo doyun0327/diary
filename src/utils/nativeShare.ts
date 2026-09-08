@@ -78,6 +78,7 @@ async function requestRewardedAd(
     function finish(ok: boolean) {
       if (done) return;
       done = true;
+      window.clearTimeout(timer);
       window.removeEventListener("diary-rewarded-ad-result", onCustom);
       window.__onDiaryRewardedAd = prev;
       resolve(ok);
@@ -86,6 +87,9 @@ async function requestRewardedAd(
     window.__onDiaryRewardedAd = (payload) => finish(Boolean(payload?.ok));
     window.addEventListener("diary-rewarded-ad-result", onCustom);
     postDiaryNative({ type: "rewardedAdShow", reason });
+
+    // 네이티브 응답이 유실되면 웹이 영원히 멈추지 않게
+    const timer = window.setTimeout(() => finish(false), 180_000);
   });
 }
 

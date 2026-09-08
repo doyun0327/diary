@@ -427,10 +427,10 @@ function App() {
     };
   }, []);
 
-  const showAppToast = useCallback((msg: string) => {
+  const showAppToast = useCallback((msg: string, durationMs = 1800) => {
     setAppToast(msg);
     if (appToastTimer.current != null) window.clearTimeout(appToastTimer.current);
-    appToastTimer.current = window.setTimeout(() => setAppToast(null), 1800);
+    appToastTimer.current = window.setTimeout(() => setAppToast(null), durationMs);
   }, []);
 
   const persistNewEntry = useCallback(
