@@ -283,11 +283,13 @@
     "packsTitle": "AI drawing packs",
     "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
     "packsLead": "Buy once and use right away.",
-    "packLabel": "AI ×{{n}}",
+    "packLabel": "{{n}}",
     "buy": "Buy",
     "packDone": "{{n}} AI drawings added!",
     "appOnly": "Purchases are available in the app only",
     "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
     "buyFailed": "Purchase failed. Please try again later."
   },
   "credits": {

@@ -1133,9 +1133,7 @@ function App() {
                     : t("subscription.limitFreeLead")
             }
             onDismiss={closeSubscriptionModal}
-            showClose={false}
-            secondaryLabel={t("common.cancel")}
-            onSecondary={closeSubscriptionModal}
+            showClose
             primaryLabel={
               subscribing
                 ? t("common.processing")
@@ -1170,9 +1168,7 @@ function App() {
           <AppModal
             title={t("subscription.googleLoginRequiredTitle")}
             onDismiss={() => setGoogleLoginForProOpen(false)}
-            showClose={false}
-            secondaryLabel={t("common.cancel")}
-            onSecondary={() => setGoogleLoginForProOpen(false)}
+            showClose
             primaryLabel={t("subscription.googleLoginRequiredCta")}
             onPrimary={() => {
               setGoogleLoginForProOpen(false);

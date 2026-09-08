@@ -250,6 +250,9 @@
     "aria": "言語",
     "zh-TW": "繁體中文"
   },
+  "nyangTicket": {
+    "packLabel": "{{n}}枚"
+  },
   "credits": {
     "moodIcons": "気分アイコン：designed by {{author}} from Flaticon"
   },

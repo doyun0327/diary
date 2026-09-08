@@ -850,12 +850,8 @@ function RoomsHubPage({
           onDismiss={() => {
             if (!actionBusy) setRoomAction(null);
           }}
-          showClose={roomAction.kind !== "delete"}
+          showClose={!actionBusy}
           closeAriaLabel={t("common.close")}
-          secondaryLabel={t("common.cancel")}
-          onSecondary={() => {
-            if (!actionBusy) setRoomAction(null);
-          }}
           primaryDanger={roomAction.kind === "delete"}
           primaryLabel={
             actionBusy

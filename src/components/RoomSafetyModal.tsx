@@ -76,10 +76,6 @@ function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModal
         onDismiss={busy ? undefined : onClose}
         showClose={!busy}
         closeAriaLabel={t('common.close')}
-        secondaryLabel={t('common.cancel')}
-        onSecondary={() => {
-          if (!busy) onClose();
-        }}
         primaryLabel={busy ? t('rooms.safety.reporting') : t('rooms.safety.reportSubmit')}
         onPrimary={() => {
           if (!busy) void handleReport();
@@ -110,9 +106,8 @@ function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModal
         title={t('rooms.safety.blockTitle')}
         lead={t('rooms.safety.blockLead', { name })}
         onDismiss={onClose}
+        showClose
         closeAriaLabel={t('common.close')}
-        secondaryLabel={t('common.cancel')}
-        onSecondary={onClose}
         primaryDanger
         primaryLabel={t('rooms.safety.blockConfirm')}
         onPrimary={handleBlock}
@@ -125,9 +120,8 @@ function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModal
       title={t('rooms.safety.menuTitle')}
       lead={t('rooms.safety.menuLead', { name })}
       onDismiss={onClose}
+      showClose
       closeAriaLabel={t('common.close')}
-      secondaryLabel={t('common.cancel')}
-      onSecondary={onClose}
     >
       <div className="room-safety__actions">
         <button

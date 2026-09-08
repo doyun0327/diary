@@ -717,6 +717,10 @@ function DiaryWritePage({
   const aiLeft = Math.max(0, aiQuota.limit - aiQuota.used);
 
   const promptAiDrawBlocked = () => {
+    if (getAiPackCredits() > 0) {
+      void runAiDraw();
+      return;
+    }
     if (isAiDailyLimitReached()) {
       onAppToast?.(t('write.err.aiAdDailyOnce'), 3000);
       setAiDailyLimitOpen(true);
@@ -816,7 +820,11 @@ function DiaryWritePage({
       return true;
     }
 
-    // 무료 → 광고 일일 슬롯
+    // 무료 → 팩 잔여 → 광고 일일 슬롯
+    if (consumeAiPackCredit()) {
+      aiQuotaKindRef.current = 'ai-pack';
+      return true;
+    }
     if (!consumeAiDrawDailyQuota()) {
       promptAiDrawBlocked();
       return false;
@@ -1438,7 +1446,7 @@ function DiaryWritePage({
             <AppModal
               title={t('write.confirm.saveOnLeave')}
               onDismiss={() => setLeaveConfirmOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
               secondaryLabel={t('write.confirm.saveOnLeaveDiscard')}
               onSecondary={leaveWithoutSaving}
@@ -1478,10 +1486,8 @@ function DiaryWritePage({
               title={t('quota.drawConfirmTitle')}
               lead={String(aiLeft)}
               onDismiss={() => setAiConfirmOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.cancel')}
-              onSecondary={() => setAiConfirmOpen(false)}
               primaryLabel={t('quota.drawConfirmOk')}
               onPrimary={() => {
                 setAiConfirmOpen(false);
@@ -1503,7 +1509,7 @@ function DiaryWritePage({
                   : t('write.ai.usageNotDeducted'))
               }
               onDismiss={() => setUsageNoticeOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
               primaryLabel={t('common.ok')}
               onPrimary={() => setUsageNoticeOpen(false)}
@@ -1576,10 +1582,8 @@ function DiaryWritePage({
               title={t('write.ai.adIncompleteTitle')}
               lead={t('write.err.adNotCompleted')}
               onDismiss={() => setAdIncompleteOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.close')}
-              onSecondary={() => setAdIncompleteOpen(false)}
               primaryLabel={t('write.ai.rewardCta')}
               onPrimary={() => void handleWatchAd()}
             />
@@ -1589,10 +1593,8 @@ function DiaryWritePage({
               title={t('write.ai.pickTitle')}
               lead={t('write.ai.pickLead')}
               onDismiss={dismissAiPick}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.cancel')}
-              onSecondary={dismissAiPick}
               primaryLabel={t('write.ai.pickConfirm')}
               onPrimary={() => void applyAiPick()}
             >
@@ -1621,10 +1623,8 @@ function DiaryWritePage({
             <AppModal
               title={saveError}
               onDismiss={() => setSaveError(null)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              primaryLabel={t('common.close')}
-              onPrimary={() => setSaveError(null)}
             />
           )}
         </>,

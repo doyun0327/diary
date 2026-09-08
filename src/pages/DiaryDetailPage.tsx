@@ -588,31 +588,27 @@ function DiaryDetailPage({
           title={feedback.title}
           lead={feedback.kind === 'gotoRooms' ? t('share.goToRoomsAsk') : undefined}
           onDismiss={() => setFeedback(null)}
-          secondaryLabel={
-            feedback.kind === 'gotoRooms' ? t('common.cancel') : undefined
-          }
-          onSecondary={() => setFeedback(null)}
+          showClose
+          closeAriaLabel={t('common.close')}
           primaryLabel={
-            feedback.kind === 'gotoRooms' ? t('share.goToRooms') : t('common.close')
+            feedback.kind === 'gotoRooms' ? t('share.goToRooms') : undefined
           }
-          onPrimary={() => {
-            if (feedback.kind === 'gotoRooms') {
-              setFeedback(null);
-              onOpenRooms();
-              return;
-            }
-            setFeedback(null);
-          }}
+          onPrimary={
+            feedback.kind === 'gotoRooms'
+              ? () => {
+                  setFeedback(null);
+                  onOpenRooms();
+                }
+              : undefined
+          }
         />
       )}
       {confirmDelete && (
         <AppModal
           title={t('detail.confirm.delete')}
           onDismiss={() => setConfirmDelete(false)}
-          showClose={false}
+          showClose
           closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setConfirmDelete(false)}
           primaryDanger
           primaryLabel={t('common.delete')}
           onPrimary={handleDeleteConfirm}

@@ -112,8 +112,18 @@ export function waitForTipPurchase(
 
     const handle = (payload: TipPurchaseResult | undefined) => {
       if (!payload) return;
-      // 한 번에 하나만 결제하므로 productId가 달라도 응답은 수용
-      // (스토어가 base plan 접미사를 붙이는 경우 대비)
+      const got = (payload.productId ?? '').trim();
+      const want = productId.trim();
+      // 다른 상품 응답은 무시 (접미사 base plan 허용)
+      if (
+        got &&
+        want &&
+        got !== want &&
+        !got.startsWith(`${want}:`) &&
+        !want.startsWith(`${got}:`)
+      ) {
+        return;
+      }
       finish({
         ok: Boolean(payload.ok),
         cancelled: Boolean(payload.cancelled),

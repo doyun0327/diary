@@ -464,13 +464,15 @@ export function getRemainingAiDrawsToday() {
   return getRemainingFreeAiDraws();
 }
 
-/** 오늘 광고로 더 이상 AI 그림을 생성할 수 없음 */
+/** 오늘 광고로 더 이상 AI 그림을 생성할 수 없음 (팩 잔여 있으면 false) */
 export function isAiDailyLimitReached() {
   if (!AI_REWARD_AD_ENABLED) return false;
   const state = loadAccessState();
   normalizeDailyAiState(state);
   normalizeAiCredits(state);
+  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
   saveAccessState(state);
+  if (state.aiPackCredits > 0) return false;
   return (
     state.diaryCreatesToday >= FREE_DAILY_AI_AD_LIMIT &&
     state.aiDrawCredits <= 0
@@ -483,7 +485,9 @@ export function needsAiAdBeforeDraw() {
   const state = loadAccessState();
   normalizeDailyAiState(state);
   normalizeAiCredits(state);
+  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
   saveAccessState(state);
+  if (state.aiPackCredits > 0) return false;
   if (state.diaryCreatesToday >= FREE_DAILY_AI_AD_LIMIT) return false;
   return state.aiDrawCredits <= 0;
 }

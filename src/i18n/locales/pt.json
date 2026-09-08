@@ -250,6 +250,9 @@
     "aria": "Idioma",
     "zh-TW": "繁體中文"
   },
+  "nyangTicket": {
+    "packLabel": "{{n}}"
+  },
   "credits": {
     "moodIcons": "Ícones de humor: designed by {{author}} from Flaticon"
   },

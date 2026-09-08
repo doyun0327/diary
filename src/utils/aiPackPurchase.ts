@@ -1,4 +1,4 @@
-import { isFlutterApp, postDiaryNative } from './nativeShare';
+import { isFlutterApp } from './nativeShare';
 import {
   aiPackCreditsForProduct,
   type AiPackProductId,
@@ -31,5 +31,3 @@ export function grantAiPackLocally(productId: AiPackProductId) {
   if (credits > 0) grantAiPackCredits(credits);
   return credits;
 }
-
-export { postDiaryNative };

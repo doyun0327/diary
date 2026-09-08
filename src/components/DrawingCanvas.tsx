@@ -2302,10 +2302,8 @@ function DrawingCanvas({
               title={t('subscription.featureGateTitle')}
               lead={t('canvas.stickerPackPremiumLead')}
               onDismiss={() => setStickerPremiumOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.cancel')}
-              onSecondary={() => setStickerPremiumOpen(false)}
               primaryLabel={t('subscription.subscribeCta')}
               onPrimary={() => {
                 setStickerPremiumOpen(false);
@@ -2321,10 +2319,8 @@ function DrawingCanvas({
               title={t('canvas.clearAll')}
               lead={t('canvas.confirm.clear')}
               onDismiss={() => setClearConfirmOpen(false)}
-              showClose={false}
+              showClose
               closeAriaLabel={t('common.close')}
-              secondaryLabel={t('common.cancel')}
-              onSecondary={() => setClearConfirmOpen(false)}
               primaryDanger
               primaryLabel={t('canvas.clearAll')}
               onPrimary={applyClearAll}

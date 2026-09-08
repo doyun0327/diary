@@ -737,8 +737,8 @@ function AccountSheet({
           title={t('account.withdraw.title')}
           lead={t('account.withdraw.lead')}
           onDismiss={() => setWithdrawOpen(false)}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => setWithdrawOpen(false)}
+          showClose
+          closeAriaLabel={t('common.close')}
           primaryLabel={
             authBusy ? t('common.processing') : t('account.withdraw.confirm')
           }

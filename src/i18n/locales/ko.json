@@ -283,11 +283,13 @@
     "packsTitle": "AI 그림 충전",
     "packsTitleWithLeft": "AI 그림 충전 (잔여: {{n}}장)",
     "packsLead": "한 번 사면 바로 쓸 수 있어요.",
-    "packLabel": "AI {{n}}장",
+    "packLabel": "{{n}}장",
     "buy": "구매",
     "packDone": "AI 그림 {{n}}장이 충전됐어요!",
     "appOnly": "앱에서만 구매할 수 있어요",
     "noProduct": "상품을 찾지 못했어요. 스토어 설정을 확인해 주세요.",
+    "notConfigured": "결제 준비가 안 됐어요. 앱을 다시 실행해 주세요.",
+    "buyTimeout": "결제 응답이 늦어요. 잠시 후 다시 시도해 주세요.",
     "buyFailed": "구매에 실패했어요. 잠시 후 다시 시도해 주세요."
   },
   "credits": {

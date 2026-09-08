@@ -326,12 +326,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           onDismiss={() => {
             if (!busy) setConfirmDelete(false);
           }}
-          showClose={false}
+          showClose={!busy}
           closeAriaLabel={t('common.close')}
-          secondaryLabel={t('common.cancel')}
-          onSecondary={() => {
-            if (!busy) setConfirmDelete(false);
-          }}
           primaryDanger
           primaryLabel={busy ? t('rooms.deleting') : t('common.delete')}
           onPrimary={() => {

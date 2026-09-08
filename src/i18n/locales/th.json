@@ -250,6 +250,9 @@
     "aria": "ภาษา",
     "zh-TW": "繁體中文"
   },
+  "nyangTicket": {
+    "packLabel": "{{n}} ครั้ง"
+  },
   "credits": {
     "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon"
   },

@@ -398,7 +398,6 @@ function Header({
               <MenuItem
                 icon={<IconTicket />}
                 label={t('header.nyangTicket')}
-                hint={t('header.nyangTicketHint')}
                 tone="peach"
                 onClick={() => closeAnd(onOpenNyangTicket)}
               />

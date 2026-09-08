@@ -251,6 +251,9 @@
     "zh-TW": "繁體中文",
     "de": "Deutsch"
   },
+  "nyangTicket": {
+    "packLabel": "{{n}}"
+  },
   "credits": {
     "moodIcons": "Stimmungs-Icons: entworfen von {{author}} von Flaticon"
   },

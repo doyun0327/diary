@@ -250,6 +250,9 @@
     "aria": "Ngôn ngữ",
     "zh-TW": "繁體中文"
   },
+  "nyangTicket": {
+    "packLabel": "{{n}} lần"
+  },
   "credits": {
     "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"
   },

@@ -5,7 +5,6 @@ import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
   getAiPackCredits,
   getDiaryAccessState,
-  MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import { isFlutterApp } from '../utils/nativeShare';
@@ -110,11 +109,20 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
         setError(t('nyangTicket.appOnly'));
         return;
       }
-      if (result.error === 'no_product') {
+      if (result.error === 'no_product' || result.error === 'invalid_product') {
         setError(t('nyangTicket.noProduct'));
         return;
       }
+      if (result.error === 'not_configured') {
+        setError(t('nyangTicket.notConfigured'));
+        return;
+      }
+      if (result.error === 'timeout') {
+        setError(t('nyangTicket.buyTimeout'));
+        return;
+      }
       setError(t('nyangTicket.buyFailed'));
+      console.warn('[nyangTicket] pack purchase failed', result);
     } finally {
       setBusy(null);
     }
@@ -148,11 +156,6 @@ function NyangTicketSheet({ onClose, initialTab = 'subscribe' }: NyangTicketShee
             >
               {t('nyangTicket.title')}
             </h2>
-            <p className="nyang-ticket__head-lead">
-              {tab === 'subscribe'
-                ? t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })
-                : t('nyangTicket.packsLead')}
-            </p>
           </div>
           <button
             type="button"
