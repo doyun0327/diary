@@ -1464,7 +1464,6 @@ function DiaryWritePage({
           {aiStyleOpen && (
             <AppModal
               title={t('write.ai.styleTitle')}
-              lead={t('write.ai.styleLead')}
               onDismiss={() => setAiStyleOpen(false)}
               showClose
               closeAriaLabel={t('common.close')}
