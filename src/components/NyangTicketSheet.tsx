@@ -283,9 +283,14 @@ function NyangTicketSheet({
             className={tab === 'packs' ? 'is-active' : ''}
             onClick={() => setTab('packs')}
           >
-            {packLeft > 0
-              ? t('nyangTicket.packsTitleWithLeft', { n: packLeft })
-              : t('nyangTicket.packsTitle')}
+            <span className="nyang-ticket__tab-label">
+              <span>{t('nyangTicket.packsTitle')}</span>
+              {packLeft > 0 && (
+                <span className="nyang-ticket__tab-left">
+                  {t('nyangTicket.packsRemaining', { n: packLeft })}
+                </span>
+              )}
+            </span>
           </button>
         </div>
 

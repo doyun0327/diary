@@ -294,6 +294,7 @@
     "restoreHint": "기기를 바꾸거나 앱을 다시 설치했을 때, 이미 산 구독을 다시 불러와요.",
     "packsTitle": "AI 그림 충전",
     "packsTitleWithLeft": "AI 그림 충전 (잔여: {{n}}장)",
+    "packsRemaining": "잔여 : {{n}} 장",
     "packsLead": "한 번 사면 바로 쓸 수 있어요.",
     "packLabel": "{{n}}장",
     "buy": "구매",

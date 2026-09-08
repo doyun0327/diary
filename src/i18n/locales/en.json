@@ -294,6 +294,7 @@
     "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
     "packsTitle": "AI drawing packs",
     "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
     "packsLead": "Buy once and use right away.",
     "packLabel": "{{n}}",
     "buy": "Buy",
