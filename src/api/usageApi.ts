@@ -9,6 +9,11 @@ export type MonthlyUsageDto = {
   notice?: string | null;
 };
 
+export type AiPackCreditsDto = {
+  credits: number;
+  notice?: string | null;
+};
+
 function authHeaders(accessToken: string): HeadersInit {
   return {
     Accept: 'application/json',
@@ -66,4 +71,57 @@ export async function refundMonthlyUsage(
     throw new Error(await readError(res, '월간 한도 환불 실패'));
   }
   return (await res.json()) as MonthlyUsageDto;
+}
+
+export async function fetchAiPackCredits(
+  accessToken: string,
+): Promise<AiPackCreditsDto> {
+  const res = await fetch(apiUrl('/api/usage/ai-pack'), {
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, 'AI 팩 잔여 조회 실패'));
+  }
+  return (await res.json()) as AiPackCreditsDto;
+}
+
+export async function grantAiPackCreditsRemote(
+  accessToken: string,
+  count: number,
+): Promise<AiPackCreditsDto> {
+  const res = await fetch(apiUrl('/api/usage/ai-pack/grant'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ count }),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, 'AI 팩 지급 실패'));
+  }
+  return (await res.json()) as AiPackCreditsDto;
+}
+
+export async function consumeAiPackCreditsRemote(
+  accessToken: string,
+): Promise<AiPackCreditsDto> {
+  const res = await fetch(apiUrl('/api/usage/ai-pack/consume'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, 'AI 팩 차감 실패'));
+  }
+  return (await res.json()) as AiPackCreditsDto;
+}
+
+export async function refundAiPackCreditsRemote(
+  accessToken: string,
+): Promise<AiPackCreditsDto> {
+  const res = await fetch(apiUrl('/api/usage/ai-pack/refund'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, 'AI 팩 환불 실패'));
+  }
+  return (await res.json()) as AiPackCreditsDto;
 }

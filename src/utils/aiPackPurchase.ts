@@ -3,7 +3,12 @@ import {
   aiPackCreditsForProduct,
   type AiPackProductId,
 } from './aiPackProducts';
-import { grantAiPackCredits } from './diaryAccess';
+import {
+  applyAiPackCreditsFromServer,
+  grantAiPackCredits,
+} from './diaryAccess';
+import { getAccessToken } from '../hooks/useAuthSession';
+import { grantAiPackCreditsRemote } from '../api/usageApi';
 import {
   waitForTipPurchase,
   type TipPurchaseResult,
@@ -20,7 +25,18 @@ export async function purchaseAiPack(
   if (!result.ok) return result;
   const credits = aiPackCreditsForProduct(result.productId || productId);
   if (credits > 0) {
-    grantAiPackCredits(credits);
+    const token = getAccessToken();
+    if (token) {
+      try {
+        const view = await grantAiPackCreditsRemote(token, credits);
+        applyAiPackCreditsFromServer(view.credits);
+      } catch {
+        // 서버 실패 시 로컬이라도 지급 (재동기화 시 보정)
+        grantAiPackCredits(credits);
+      }
+    } else {
+      grantAiPackCredits(credits);
+    }
   }
   return { ...result, creditsGranted: credits };
 }

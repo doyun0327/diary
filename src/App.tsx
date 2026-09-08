@@ -59,6 +59,7 @@ import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
 import {
+  applyAiPackCreditsFromServer,
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
   getDiaryAccessState,
@@ -67,6 +68,7 @@ import {
   SUBSCRIPTION_CHANGE_EVENT,
 } from "./utils/diaryAccess";
 import {
+  fetchAiPackCredits,
   fetchMonthlyUsage,
 } from "./api/usageApi";
 import {
@@ -159,6 +161,7 @@ function App() {
   }, []);
 
   const fetchedProUsageUserRef = useRef<string | null>(null);
+  const fetchedAiPackUserRef = useRef<string | null>(null);
   const [appToast, setAppToast] = useState<string | null>(null);
   const appToastTimer = useRef<number | null>(null);
 
@@ -235,8 +238,22 @@ function App() {
   useEffect(() => {
     const token = getAccessToken();
     const userId = session?.userId;
-    if (!token || !userId || !canUseProAiQuota()) {
+    if (!token || !userId) {
       fetchedProUsageUserRef.current = null;
+      fetchedAiPackUserRef.current = null;
+      return;
+    }
+
+    if (fetchedAiPackUserRef.current !== userId) {
+      fetchedAiPackUserRef.current = userId;
+      void fetchAiPackCredits(token)
+        .then((view) => applyAiPackCreditsFromServer(view.credits))
+        .catch(() => {
+          fetchedAiPackUserRef.current = null;
+        });
+    }
+
+    if (!canUseProAiQuota()) {
       return;
     }
     if (fetchedProUsageUserRef.current === userId) return;

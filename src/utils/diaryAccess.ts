@@ -412,6 +412,14 @@ export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
+/** 서버 users.ai_pack_credits → 로컬 캐시 */
+export function applyAiPackCreditsFromServer(credits: number) {
+  const state = loadAccessState();
+  state.aiPackCredits = Math.max(0, Math.floor(credits));
+  saveAccessState(state);
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+}
+
 function normalizeAiCredits(state: AccessState) {
   state.aiDrawCredits = Math.max(0, state.aiDrawCredits);
   state.aiFreeDrawsUsed = Math.max(0, state.aiFreeDrawsUsed);

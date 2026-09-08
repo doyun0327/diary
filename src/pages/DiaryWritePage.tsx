@@ -25,6 +25,7 @@ import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
 import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
+  applyAiPackCreditsFromServer,
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
   consumeAiDrawDailyQuota,
@@ -63,7 +64,13 @@ import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resol
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
 import { getAccessToken } from '../hooks/useAuthSession';
-import { consumeMonthlyUsage, fetchMonthlyUsage, refundMonthlyUsage } from '../api/usageApi';
+import {
+  consumeAiPackCreditsRemote,
+  consumeMonthlyUsage,
+  fetchMonthlyUsage,
+  refundAiPackCreditsRemote,
+  refundMonthlyUsage,
+} from '../api/usageApi';
 import './DiaryWritePage.css';
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
@@ -746,8 +753,8 @@ function DiaryWritePage({
   };
 
   /** 월한도 소진 후 소모: 추가구매 팩 → 광고 일일 슬롯 */
-  const consumeProOverflowQuota = (): boolean => {
-    if (consumeAiPackCredit()) {
+  const consumeProOverflowQuota = async (): Promise<boolean> => {
+    if (await tryConsumeAiPack()) {
       aiQuotaKindRef.current = 'ai-pack';
       return true;
     }
@@ -756,6 +763,36 @@ function DiaryWritePage({
       return true;
     }
     return false;
+  };
+
+  const tryConsumeAiPack = async (): Promise<boolean> => {
+    const token = getAccessToken();
+    if (token) {
+      try {
+        const view = await consumeAiPackCreditsRemote(token);
+        applyAiPackCreditsFromServer(view.credits);
+        return true;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes('409')) return false;
+        return consumeAiPackCredit();
+      }
+    }
+    return consumeAiPackCredit();
+  };
+
+  const tryRefundAiPack = async (): Promise<void> => {
+    const token = getAccessToken();
+    if (token) {
+      try {
+        const view = await refundAiPackCreditsRemote(token);
+        applyAiPackCreditsFromServer(view.credits);
+        return;
+      } catch {
+        // fall through local
+      }
+    }
+    refundAiPackCredit();
   };
 
   const consumeAiDrawQuota = async (): Promise<boolean> => {
@@ -783,14 +820,14 @@ function DiaryWritePage({
               // ignore
             }
             // 서버 월한도 소진 → 팩/광고 폴백
-            if (!consumeProOverflowQuota()) {
+            if (!(await consumeProOverflowQuota())) {
               promptProMonthlyExhausted();
               return false;
             }
             return true;
           }
           if (!consumeProAiDrawQuota()) {
-            if (!consumeProOverflowQuota()) {
+            if (!(await consumeProOverflowQuota())) {
               promptProMonthlyExhausted();
               return false;
             }
@@ -801,7 +838,7 @@ function DiaryWritePage({
         }
       }
       if (!consumeProAiDrawQuota()) {
-        if (!consumeProOverflowQuota()) {
+        if (!(await consumeProOverflowQuota())) {
           promptProMonthlyExhausted();
           return false;
         }
@@ -813,7 +850,7 @@ function DiaryWritePage({
 
     // Pro 월한도 소진 → 팩/광고
     if (canUseProAiQuota() && isProAiMonthlyLimitReached()) {
-      if (!consumeProOverflowQuota()) {
+      if (!(await consumeProOverflowQuota())) {
         promptProMonthlyExhausted();
         return false;
       }
@@ -821,7 +858,7 @@ function DiaryWritePage({
     }
 
     // 무료 → 팩 잔여 → 광고 일일 슬롯
-    if (consumeAiPackCredit()) {
+    if (await tryConsumeAiPack()) {
       aiQuotaKindRef.current = 'ai-pack';
       return true;
     }
@@ -867,7 +904,7 @@ function DiaryWritePage({
       refundProAiDrawQuota();
       notice = notice || fallbackNotice;
     } else if (kind === 'ai-pack') {
-      refundAiPackCredit();
+      await tryRefundAiPack();
       notice = notice || fallbackNotice;
     } else if (kind === 'free') {
       refundAiDrawDailyQuota();
