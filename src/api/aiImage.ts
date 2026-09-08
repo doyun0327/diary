@@ -67,7 +67,10 @@ export class AiDrawJobError extends Error {
 }
 
 const POLL_INTERVAL_MS = 1500;
+/** 앱이 보이는 동안에만 카운트 (백그라운드 체류는 제외) */
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+const POLL_NETWORK_RETRY_MS = 2000;
+const POLL_MAX_NETWORK_RETRIES_IN_ROW = 40;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -147,33 +150,96 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
   return humanizeAiError(fallback);
 }
 
+/** 백그라운드면 포그라운드 복귀까지 대기 (폴링·타임아웃 일시정지) */
+function waitUntilDocumentVisible(): Promise<void> {
+  if (typeof document === 'undefined') return Promise.resolve();
+  if (document.visibilityState === 'visible') return Promise.resolve();
+  return new Promise((resolve) => {
+    const onChange = () => {
+      if (document.visibilityState !== 'visible') return;
+      document.removeEventListener('visibilitychange', onChange);
+      resolve();
+    };
+    document.addEventListener('visibilitychange', onChange);
+  });
+}
+
+/** 보이는 동안만 대기. 숨기면 중단하고 복귀 시 바로 다음 폴링 */
+async function sleepWhileVisible(ms: number): Promise<void> {
+  if (typeof document === 'undefined') {
+    await sleep(ms);
+    return;
+  }
+  await waitUntilDocumentVisible();
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    if (document.visibilityState === 'hidden') {
+      await waitUntilDocumentVisible();
+      return;
+    }
+    await sleep(Math.min(300, end - Date.now()));
+  }
+}
+
+async function fetchDrawJobStatus(jobId: string): Promise<DrawPayload> {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(`/api/ai/draw/${encodeURIComponent(jobId)}`), {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+  } catch {
+    throw new Error('network');
+  }
+
+  if (!response.ok) {
+    // 5xx·일시 오류는 재시도, 4xx는 즉시 실패
+    if (response.status >= 500 || response.status === 429) {
+      throw new Error('network');
+    }
+    throw new Error(await readErrorMessage(response, `그림 상태 조회 실패: HTTP ${response.status}`));
+  }
+
+  return (await response.json()) as DrawPayload;
+}
+
 async function pollDrawJob(
   jobId: string,
   onProgress?: (step: AiProgress) => void,
 ): Promise<AiDrawResult> {
-  const started = Date.now();
+  let visibleElapsed = 0;
+  let networkFailStreak = 0;
   onProgress?.('waiting');
 
-  while (Date.now() - started < POLL_TIMEOUT_MS) {
-    let response: Response;
+  while (visibleElapsed < POLL_TIMEOUT_MS) {
+    await waitUntilDocumentVisible();
+    const sliceStart = Date.now();
+
+    let data: DrawPayload;
     try {
-      response = await fetch(apiUrl(`/api/ai/draw/${encodeURIComponent(jobId)}`), {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-      });
-    } catch {
-      throw new Error(
-        isRemoteApi()
-          ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요'
-          : '서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요',
-      );
+      data = await fetchDrawJobStatus(jobId);
+      networkFailStreak = 0;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg === 'network') {
+        networkFailStreak += 1;
+        if (networkFailStreak > POLL_MAX_NETWORK_RETRIES_IN_ROW) {
+          throw new Error(
+            isRemoteApi()
+              ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요'
+              : '서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요',
+          );
+        }
+        console.warn('[AI] poll network retry', networkFailStreak, 'jobId=', jobId);
+        if (document.visibilityState === 'visible') {
+          visibleElapsed += Date.now() - sliceStart;
+        }
+        await sleepWhileVisible(POLL_NETWORK_RETRY_MS);
+        continue;
+      }
+      throw err instanceof Error ? err : new Error(msg);
     }
 
-    if (!response.ok) {
-      throw new Error(await readErrorMessage(response, `그림 상태 조회 실패: HTTP ${response.status}`));
-    }
-
-    const data = (await response.json()) as DrawPayload;
     const status = (data.status || '').toLowerCase();
     console.info('[AI] poll jobId=', jobId, 'status=', status);
 
@@ -199,7 +265,33 @@ async function pollDrawJob(
       onProgress?.('waiting');
     }
 
-    await sleep(POLL_INTERVAL_MS);
+    if (document.visibilityState === 'visible') {
+      visibleElapsed += Date.now() - sliceStart;
+    }
+    await sleepWhileVisible(POLL_INTERVAL_MS);
+    // sleep 구간은 타임아웃에 조금만 반영 (숨김 중 대기는 제외)
+    // sleepWhileVisible이 숨김으로 조기 반환하면 추가 시간 거의 없음
+  }
+
+  // 타임아웃 직전 한 번 더 확인 (백그라운드에서 이미 끝났을 수 있음)
+  try {
+    await waitUntilDocumentVisible();
+    const last = await fetchDrawJobStatus(jobId);
+    const status = (last.status || '').toLowerCase();
+    if (status === 'done') {
+      onProgress?.('finishing');
+      return parseImageResult(last);
+    }
+    if (status === 'failed') {
+      throw new AiDrawJobError(last.message?.trim() || '그림 생성에 실패했습니다', {
+        notice: last.notice,
+        refundUsage: last.refundUsage === 'true',
+        usageRefunded:
+          last.usageRefunded === 'true' || last.refundUsage === 'done',
+      });
+    }
+  } catch (err) {
+    if (err instanceof AiDrawJobError) throw err;
   }
 
   throw new Error('그림 생성이 너무 오래 걸려요. 잠시 후 다시 시도해 주세요');

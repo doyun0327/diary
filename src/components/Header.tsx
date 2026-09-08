@@ -10,6 +10,7 @@ interface HeaderProps {
   avatarUrl?: string | null;
   onOpenAccount?: () => void;
   onOpenLanguage?: () => void;
+  onOpenNyangTicket?: () => void;
   screenLockEnabled?: boolean;
   onToggleScreenLock?: () => void;
   onOpenDecorate?: () => void;
@@ -77,6 +78,29 @@ function IconGlobe() {
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6" fill="none" />
       <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.6" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </CrayonSvg>
+  );
+}
+
+function IconTicket() {
+  return (
+    <CrayonSvg>
+      <path
+        d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 10.4c.35-.55 1-.9 1.75-.9.95 0 1.7.7 1.75 1.6.05 1.1-.75 1.55-1.35 1.95-.55.35-.85.6-.85 1.15"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <circle cx="11" cy="16.2" r="0.85" fill="currentColor" />
     </CrayonSvg>
   );
 }
@@ -226,6 +250,7 @@ function Header({
   avatarUrl = null,
   onOpenAccount,
   onOpenLanguage,
+  onOpenNyangTicket,
   screenLockEnabled = false,
   onToggleScreenLock,
   onOpenDecorate,
@@ -345,6 +370,15 @@ function Header({
                 label={t('header.language')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenLanguage)}
+              />
+            )}
+            {onOpenNyangTicket && (
+              <MenuItem
+                icon={<IconTicket />}
+                label={t('header.nyangTicket')}
+                hint={t('header.nyangTicketHint')}
+                tone="peach"
+                onClick={() => closeAnd(onOpenNyangTicket)}
               />
             )}
             {onToggleScreenLock && (

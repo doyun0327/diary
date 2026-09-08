@@ -33,6 +33,7 @@ import {
   FREE_DAILY_AI_AD_LIMIT,
   getAiDrawsToday,
   getAiPackCredits,
+  getDiaryAccessState,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
@@ -42,8 +43,6 @@ import {
   refundProAiDrawQuota,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
-import { purchaseAiPack } from '../utils/aiPackPurchase';
-import type { AiPackProductId } from '../utils/aiPackProducts';
 import {
   isAiCoachSeen,
   isCharacterCoachSeen,
@@ -62,6 +61,7 @@ import {
 } from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
+import { openNyangTicket } from '../utils/openNyangTicket';
 import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
 import { getAccessToken } from '../hooks/useAuthSession';
 import { consumeMonthlyUsage, fetchMonthlyUsage, refundMonthlyUsage } from '../api/usageApi';
@@ -221,7 +221,6 @@ function DiaryWritePage({
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
-  const [aiPackBuying, setAiPackBuying] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
@@ -661,6 +660,7 @@ function DiaryWritePage({
       setAiDailyLimitOpen(false);
       setAdIncompleteOpen(false);
       setAiConfirmOpen(false);
+      // 월한도 추가구매 모달은 유지 (실드가 모달 클릭을 막지 않도록 AppModal z-index > shield)
       setAiError(null);
       contentRef.current?.blur();
       titleRef.current?.blur();
@@ -700,6 +700,16 @@ function DiaryWritePage({
 
   const aiQuota = (() => {
     void accessTick;
+    if (canUseProAiQuota()) {
+      const status = getDiaryAccessState();
+      const pack = getAiPackCredits();
+      // 월한도 + 추가구매 잔량 (0이어도 버튼은 눌러 구매 모달 가능)
+      const remaining = Math.max(0, status.monthlyRemaining) + pack;
+      return {
+        used: Math.max(0, status.monthlyLimit + pack - remaining),
+        limit: status.monthlyLimit + pack,
+      };
+    }
     if (writeQuota) {
       return {
         used: writeQuota.used,
@@ -714,7 +724,6 @@ function DiaryWritePage({
   const aiLeft = Math.max(0, aiQuota.limit - aiQuota.used);
 
   const promptAiDrawBlocked = () => {
-    if (isPurchaseShielded()) return;
     if (isAiDailyLimitReached()) {
       setAiDailyLimitOpen(true);
       return;
@@ -728,19 +737,13 @@ function DiaryWritePage({
 
   /** Pro 월 50회 소진 후: 팩 잔량 있으면 바로 진행, 없으면 구매/광고 모달 */
   const promptProMonthlyExhausted = () => {
-    if (isPurchaseShielded()) return;
     if (getAiPackCredits() > 0) {
       void runAiDraw();
       return;
     }
-    if (
-      AI_REWARD_AD_ENABLED &&
-      !isAiDailyLimitReached() &&
-      !needsAiAdBeforeDraw()
-    ) {
-      void runAiDraw();
-      return;
-    }
+    // 광고 1회를 이미 써도 10/20 추가구매 모달은 항상 열림
+    proPurchaseGuardUntilRef.current = 0;
+    setPurchaseClickShield(false);
     setProAiLimitOpen(true);
   };
 
@@ -876,7 +879,9 @@ function DiaryWritePage({
   };
 
   const handleAiDraw = () => {
-    if (isPurchaseShielded()) return;
+    // 결제/광고 복귀 실드가 AI 버튼을 가로채지 않게
+    proPurchaseGuardUntilRef.current = 0;
+    setPurchaseClickShield(false);
     if (!content.trim()) {
       setAiError(t('write.err.aiNeedContent'));
       return;
@@ -931,7 +936,6 @@ function DiaryWritePage({
   };
 
   const runAiDraw = async () => {
-    if (isPurchaseShielded()) return;
     setAiError(null);
     if (!(await consumeAiDrawQuota())) return;
 
@@ -1072,6 +1076,10 @@ function DiaryWritePage({
     if (isAiDailyLimitReached()) {
       setRewardPromptOpen(false);
       setProAiLimitOpen(false);
+      if (canUseProAiQuota()) {
+        onAppToast?.(t('write.err.aiAdDailyOnce'));
+        return;
+      }
       setAiDailyLimitOpen(true);
       return;
     }
@@ -1085,34 +1093,14 @@ function DiaryWritePage({
       return;
     }
     if (!grantAiDrawCreditWithDailyCap(1)) {
+      if (canUseProAiQuota()) {
+        onAppToast?.(t('write.err.aiAdDailyOnce'));
+        return;
+      }
       setAiDailyLimitOpen(true);
       return;
     }
     void runAiDraw();
-  };
-
-  const handleBuyAiPack = async (productId: AiPackProductId) => {
-    if (aiPackBuying || isPurchaseShielded()) return;
-    if (!isFlutterApp()) {
-      setAiError(t('write.err.adAppOnly'));
-      return;
-    }
-    setAiPackBuying(true);
-    setAiError(null);
-    armPurchaseShield(12_000);
-    try {
-      const result = await purchaseAiPack(productId);
-      if (!result.ok) {
-        if (!result.cancelled) {
-          setAiError(t('write.err.aiRetry'));
-        }
-        return;
-      }
-      setProAiLimitOpen(false);
-      void runAiDraw();
-    } finally {
-      setAiPackBuying(false);
-    }
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -1550,32 +1538,25 @@ function DiaryWritePage({
             <AppModal
               title={t('write.ai.monthlyLimitTitle')}
               lead={t('write.ai.monthlyLimitLead')}
-              onDismiss={() => !aiPackBuying && setProAiLimitOpen(false)}
-              showClose={!aiPackBuying}
+              onDismiss={() => setProAiLimitOpen(false)}
+              showClose
               closeAriaLabel={t('common.close')}
             >
               <div className="app-modal__actions diary-write__ai-pack-actions">
                 <button
                   type="button"
                   className="app-modal__btn app-modal__btn--primary"
-                  disabled={aiPackBuying}
-                  onClick={() => void handleBuyAiPack('pageby_ai_draw_10')}
+                  onClick={() => {
+                    setProAiLimitOpen(false);
+                    openNyangTicket('packs');
+                  }}
                 >
-                  {t('write.ai.buyPack10')}
-                </button>
-                <button
-                  type="button"
-                  className="app-modal__btn app-modal__btn--primary"
-                  disabled={aiPackBuying}
-                  onClick={() => void handleBuyAiPack('pageby_ai_draw_20')}
-                >
-                  {t('write.ai.buyPack20')}
+                  {t('write.ai.buyExtraTicket')}
                 </button>
                 {AI_REWARD_AD_ENABLED ? (
                   <button
                     type="button"
                     className="app-modal__btn"
-                    disabled={aiPackBuying}
                     onClick={() => void handleWatchAd()}
                   >
                     {t('write.ai.adOneFree')}

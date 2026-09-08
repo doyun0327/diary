@@ -8,6 +8,7 @@ import ProfileSetup from "./components/ProfileSetup";
 import AppIntro from "./components/AppIntro";
 import AccountSheet from "./components/AccountSheet";
 import LanguageSheet from "./components/LanguageSheet";
+import NyangTicketSheet from "./components/NyangTicketSheet";
 import ScreenLockGate from "./components/ScreenLockGate";
 import PinSetupScreen from "./components/PinSetupScreen";
 import PinVerifyScreen from "./components/PinVerifyScreen";
@@ -75,6 +76,10 @@ import {
   requestSubscriptionPurchaseAndSync,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
+import {
+  OPEN_NYANG_TICKET_EVENT,
+  type OpenNyangTicketDetail,
+} from "./utils/openNyangTicket";
 import "./App.css";
 
 export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
@@ -109,6 +114,10 @@ function App() {
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [nyangTicketOpen, setNyangTicketOpen] = useState(false);
+  const [nyangTicketTab, setNyangTicketTab] = useState<'subscribe' | 'packs'>(
+    'subscribe',
+  );
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
   const [lockDisableOpen, setLockDisableOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -199,6 +208,16 @@ function App() {
   useEffect(() => {
     if (!isFlutterApp()) return;
     syncSubscriptionFromNative();
+  }, []);
+
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<OpenNyangTicketDetail>).detail;
+      setNyangTicketTab(detail?.tab === 'packs' ? 'packs' : 'subscribe');
+      setNyangTicketOpen(true);
+    };
+    window.addEventListener(OPEN_NYANG_TICKET_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_NYANG_TICKET_EVENT, onOpen);
   }, []);
 
   useEffect(() => {
@@ -529,6 +548,10 @@ function App() {
       setLanguageOpen(false);
       return true;
     }
+    if (nyangTicketOpen) {
+      setNyangTicketOpen(false);
+      return true;
+    }
     if (googleLoginForProOpen) {
       setGoogleLoginForProOpen(false);
       return true;
@@ -571,6 +594,7 @@ function App() {
     exportOpen,
     searchOpen,
     languageOpen,
+    nyangTicketOpen,
     lockDisableOpen,
     lockSetupOpen,
     page,
@@ -819,6 +843,10 @@ function App() {
         avatarUrl={avatarUrl}
         onOpenAccount={() => setAccountOpen(true)}
         onOpenLanguage={() => setLanguageOpen(true)}
+        onOpenNyangTicket={() => {
+          setNyangTicketTab('subscribe');
+          setNyangTicketOpen(true);
+        }}
         screenLockEnabled={screenLock.enabled}
         onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
@@ -981,6 +1009,15 @@ function App() {
       {languageOpen &&
         createPortal(
           <LanguageSheet onClose={() => setLanguageOpen(false)} />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {nyangTicketOpen &&
+        createPortal(
+          <NyangTicketSheet
+            key={nyangTicketTab}
+            initialTab={nyangTicketTab}
+            onClose={() => setNyangTicketOpen(false)}
+          />,
           document.getElementById("root") ?? document.body,
         )}
       {lockSetupOpen &&

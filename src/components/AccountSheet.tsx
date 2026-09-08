@@ -672,7 +672,6 @@ function AccountSheet({
                 <p className="account-sheet__label account-sheet__label--sync">
                   {t('account.sync.label')}
                 </p>
-                <p className="account-sheet__sync-hint">{t('account.sync.hint')}</p>
               </div>
               <div className="account-sheet__oauth">
                 <div
