@@ -103,6 +103,38 @@ function getMonthKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
+/** Pro 구독 결제 주기 키 = RevenueCat 만료 ms. 없으면 null */
+export function getProBillingPeriodEndMs(): number | null {
+  const state = loadAccessState();
+  const until = state.premiumUntil;
+  if (until == null || until <= Date.now()) return null;
+  return until;
+}
+
+function getProBillingPeriodKey(state: AccessState = loadAccessState()): string {
+  if (state.premiumUntil != null && state.premiumUntil > Date.now()) {
+    return String(state.premiumUntil);
+  }
+  return getMonthKey();
+}
+
+function isLegacyCalendarMonthKey(key: string | null | undefined): boolean {
+  return typeof key === "string" && /^\d{4}-\d{2}$/.test(key);
+}
+
+/** 구독 주기가 바뀌면 로컬 월 카운트 리셋 (달력→결제주기 전환은 횟수 유지) */
+function resetLocalQuotaIfPeriodChanged(state: AccessState) {
+  const periodKey = getProBillingPeriodKey(state);
+  if (state.monthKey === periodKey) return false;
+  if (isLegacyCalendarMonthKey(state.monthKey)) {
+    state.monthKey = periodKey;
+    return true;
+  }
+  state.monthKey = periodKey;
+  state.monthlyLimitUsed = 0;
+  return true;
+}
+
 function getDiaryDayKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -292,11 +324,7 @@ export function getDiaryAccessState(
 ): DiaryAccessStatus {
   const now = Date.now();
   const state = loadAccessState();
-  const monthKey = getMonthKey(new Date(now));
-
-  if (state.monthKey !== monthKey) {
-    state.monthKey = monthKey;
-    state.monthlyLimitUsed = 0;
+  if (resetLocalQuotaIfPeriodChanged(state)) {
     saveAccessState(state);
   }
 
@@ -318,8 +346,8 @@ export function getDiaryAccessState(
       monthlyLimit: MONTHLY_AI_DRAW_LIMIT,
       message:
         remaining > 0
-          ? `Premium: ${remaining} entries left this month.`
-          : "Monthly AI drawing limit of 50 reached.",
+          ? `Premium: ${remaining} entries left this billing period.`
+          : "Billing-period AI drawing limit of 50 reached.",
     };
   }
 
@@ -363,13 +391,7 @@ export function isProAiMonthlyLimitReached() {
 /** Pro: AI 그림 1회 차감 (작성·수정 동일). 한도면 false */
 export function consumeProAiDrawQuota() {
   const state = loadAccessState();
-  const now = Date.now();
-  const monthKey = getMonthKey(new Date(now));
-
-  if (state.monthKey !== monthKey) {
-    state.monthKey = monthKey;
-    state.monthlyLimitUsed = 0;
-  }
+  resetLocalQuotaIfPeriodChanged(state);
 
   if (!canUseProAiQuota()) return false;
   if (state.monthlyLimitUsed >= MONTHLY_AI_DRAW_LIMIT) return false;
@@ -383,12 +405,7 @@ export function consumeProAiDrawQuota() {
 /** Pro: AI 그림 1회 차감 취소 (생성 실패 환불) */
 export function refundProAiDrawQuota() {
   const state = loadAccessState();
-  const now = Date.now();
-  const monthKey = getMonthKey(new Date(now));
-
-  if (state.monthKey !== monthKey) {
-    state.monthKey = monthKey;
-    state.monthlyLimitUsed = 0;
+  if (resetLocalQuotaIfPeriodChanged(state)) {
     saveAccessState(state);
     return false;
   }
@@ -401,12 +418,14 @@ export function refundProAiDrawQuota() {
 
 export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
   const state = loadAccessState();
-  const monthKey = yearMonth || getMonthKey();
-  if (state.monthKey !== monthKey) {
-    state.monthKey = monthKey;
+  const periodKey =
+    yearMonth ||
+    getProBillingPeriodKey(state);
+  if (state.monthKey !== periodKey) {
+    state.monthKey = periodKey;
     state.monthlyLimitUsed = 0;
   }
-  state.monthKey = monthKey;
+  state.monthKey = periodKey;
   state.monthlyLimitUsed = Math.max(0, Math.min(MONTHLY_AI_DRAW_LIMIT, Math.floor(used)));
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));

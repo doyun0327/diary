@@ -63,6 +63,7 @@ import {
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
   getDiaryAccessState,
+  getProBillingPeriodEndMs,
   setDiaryAccessAccountId,
   subscribeDiaryAccess,
   SUBSCRIPTION_CHANGE_EVENT,
@@ -264,8 +265,10 @@ function App() {
     if (!canUseProAiQuota()) {
       return;
     }
-    if (fetchedProUsageUserRef.current === userId) return;
-    fetchedProUsageUserRef.current = userId;
+    const periodEnd = getProBillingPeriodEndMs();
+    const usageFetchKey = `${userId}:${periodEnd ?? "none"}`;
+    if (fetchedProUsageUserRef.current === usageFetchKey) return;
+    fetchedProUsageUserRef.current = usageFetchKey;
     void fetchMonthlyUsage(token)
       .then((usage) =>
         applyMonthlyUsageFromServer(usage.used, usage.yearMonth),
