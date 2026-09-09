@@ -1341,7 +1341,9 @@ function DiaryWritePage({
                 lottieKey={aiLottieKey}
                 step={aiProgress}
                 sourceText={content}
-                durationHint={aiStyleRef.current === 'oilPastel'}
+                durationHintSeconds={
+                  aiStyleRef.current === 'oilPastel' ? 30 : 20
+                }
               />
             )}
             </div>

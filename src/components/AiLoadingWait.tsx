@@ -122,8 +122,8 @@ interface AiLoadingWaitProps {
   lottieKey: number;
   step: AiProgress;
   sourceText?: string;
-  /** 오일파스텔 등 오래 걸릴 때 안내 토스트 */
-  durationHint?: boolean;
+  /** 그리는 중 단계에만 보여줄 예상 초 (없으면 안내 없음) */
+  durationHintSeconds?: number | null;
 }
 
 export default function AiLoadingWait({
@@ -131,13 +131,13 @@ export default function AiLoadingWait({
   lottieKey,
   step,
   sourceText = '',
-  durationHint = false,
+  durationHintSeconds = null,
 }: AiLoadingWaitProps) {
   const { t } = useTranslation();
   const activeIndex = AI_PROGRESS_STEPS.indexOf(step);
   const keywords = useMemo(() => keywordsFromDiary(sourceText), [sourceText]);
   const [floaters, setFloaters] = useState<Floater[]>([]);
-  const [hintVisible, setHintVisible] = useState(durationHint);
+  const [hintVisible, setHintVisible] = useState(false);
   const [resumeKey, setResumeKey] = useState(0);
   const cursorRef = useRef(0);
   const idRef = useRef(MAX_FLOATING);
@@ -169,14 +169,18 @@ export default function AiLoadingWait({
   }, []);
 
   useEffect(() => {
-    if (!durationHint) {
+    const show =
+      step === 'drawing' &&
+      typeof durationHintSeconds === 'number' &&
+      durationHintSeconds > 0;
+    if (!show) {
       setHintVisible(false);
       return;
     }
     setHintVisible(true);
     const timer = window.setTimeout(() => setHintVisible(false), 5000);
     return () => window.clearTimeout(timer);
-  }, [durationHint]);
+  }, [step, durationHintSeconds]);
 
   useEffect(() => {
     const next: Floater[] = [];
@@ -257,9 +261,9 @@ export default function AiLoadingWait({
             <div className="ai-loading-wait__lottie" />
           )}
         </div>
-        {hintVisible ? (
+        {hintVisible && durationHintSeconds != null && durationHintSeconds > 0 ? (
           <div className="ai-loading-wait__toast" role="status">
-            {t('write.ai.durationHint')}
+            {t('write.ai.durationHint', { n: durationHintSeconds })}
           </div>
         ) : null}
         <div className="ai-loading-wait__track" aria-hidden>

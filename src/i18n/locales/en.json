@@ -586,7 +586,7 @@
           "desc": "Soft oil-pastel look · about 30 sec when not queued"
         }
       },
-      "durationHint": "This usually takes about 30 seconds",
+      "durationHint": "This usually takes about {{n}} seconds",
       "exGood1": "Good: We had a pizza party today",
       "exGood2": "Good: I played with a dog in the park",
       "exBad": "Weak: I felt good today",

@@ -565,7 +565,16 @@ export function describeCharacter(
           `SPECIES LOCK: draw exactly ${catCount} feline CAT(s) and ${dogCount} canine DOG(s) — do not swap species`,
         );
       }
+    } else {
+      // 펫이 전부 꺼짐 — 캐릭터 동반 동물 금지 (일기 장면 속 동물은 scene에서 처리)
+      parts.push(
+        '[NO_COMPANION_PET] character has no companion pet — do not draw a cat or dog beside the person as their pet',
+      );
     }
+  } else {
+    parts.push(
+      '[NO_COMPANION_PET] character has no companion pet — do not draw a cat or dog beside the person as their pet',
+    );
   }
 
   return parts.join(', ');
