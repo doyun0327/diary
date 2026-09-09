@@ -496,24 +496,26 @@ function describePet(pet: CharacterPet): string {
   const note = sanitizePetNote(pet.note);
   const color = PET_COLOR_EN[pet.color];
   const breed = petBreedHint(note);
+  const breedBit = breed ? `${breed} ` : '';
+  // 메모는 닉네임/품종 힌트만 — 종류(kind)를 바꾸지 말 것
+  const noteBit = note
+    ? ` (owner nickname/breed hint: "${note}" — must NOT change species)`
+    : '';
 
-  // 종류·색을 앞에 — 메모(이름/한글)를 앞에 두면 모델이 개/고양이로 헷갈림
+  // [PET:CAT]/[PET:DOG] 마커로 백엔드 종 고정.
+  // 반대 종 단어(dog/cat)는 부정문에 넣지 않음 — contains("dog") 오탐으로 종이 섞이던 원인
   if (pet.kind === 'cat') {
-    const breedBit = breed ? `${breed} ` : '';
-    const noteBit = note ? ` (owner notes: "${note}" — nickname/breed hint only)` : '';
     return (
-      `a ${color} ${breedBit}house cat` +
+      `[PET:CAT] one ${color} ${breedBit}domestic feline` +
       noteBit +
-      ' — must draw a real feline cat only; never a dog, puppy, wolf, or fox'
+      ' — pointed ears, whiskers, cat face and cat body only; never a canine'
     );
   }
 
-  const breedBit = breed ? `${breed} ` : '';
-  const noteBit = note ? ` (owner notes: "${note}" — nickname/breed hint only)` : '';
   return (
-    `a ${color} ${breedBit}dog` +
+    `[PET:DOG] one ${color} ${breedBit}domestic canine` +
     noteBit +
-    ' — must draw a real canine dog only; never a cat, kitten, or feline'
+    ' — dog snout, dog ears and dog body only; never a feline'
   );
 }
 
@@ -544,18 +546,24 @@ export function describeCharacter(
   if (profile.pets.length > 0) {
     const active = enabledPets(profile.pets);
     if (active.length > 0) {
-      const petList = active.map(describePet).join(', and ');
-      const hasCat = active.some((p) => p.kind === 'cat');
-      const hasDog = active.some((p) => p.kind === 'dog');
-      parts.push(
-        active.length === 1
-          ? `accompanied by ${petList} as their pet — must show this exact animal species`
-          : `accompanied by these pets: ${petList} — must show these exact animal species`,
-      );
-      if (hasCat && !hasDog) {
-        parts.push('no dogs in the picture');
-      } else if (hasDog && !hasCat) {
-        parts.push('no cats in the picture');
+      const catCount = active.filter((p) => p.kind === 'cat').length;
+      const dogCount = active.filter((p) => p.kind === 'dog').length;
+      const petList = active.map(describePet).join('; ');
+
+      parts.push(`pets (${active.length}): ${petList}`);
+
+      if (catCount > 0 && dogCount === 0) {
+        parts.push(
+          `SPECIES LOCK: draw exactly ${catCount} feline CAT(s) beside the person — zero canines`,
+        );
+      } else if (dogCount > 0 && catCount === 0) {
+        parts.push(
+          `SPECIES LOCK: draw exactly ${dogCount} canine DOG(s) beside the person — zero felines`,
+        );
+      } else {
+        parts.push(
+          `SPECIES LOCK: draw exactly ${catCount} feline CAT(s) and ${dogCount} canine DOG(s) — do not swap species`,
+        );
       }
     }
   }
