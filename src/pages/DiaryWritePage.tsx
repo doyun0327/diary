@@ -18,7 +18,7 @@ import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
-import { generateDiaryImage, AiDrawJobError, type AiProgress } from '../api/aiImage';
+import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
@@ -32,6 +32,7 @@ import {
   consumeAiPackCredit,
   consumeProAiDrawQuota,
   FREE_DAILY_AI_AD_LIMIT,
+  getAiDrawCredits,
   getAiDrawsToday,
   getAiPackCredits,
   getDiaryAccessState,
@@ -39,9 +40,6 @@ import {
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
-  refundAiDrawDailyQuota,
-  refundAiPackCredit,
-  refundProAiDrawQuota,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
@@ -67,9 +65,8 @@ import { getAccessToken } from '../hooks/useAuthSession';
 import {
   consumeAiPackCreditsRemote,
   consumeMonthlyUsage,
+  fetchAiPackCredits,
   fetchMonthlyUsage,
-  refundAiPackCreditsRemote,
-  refundMonthlyUsage,
 } from '../api/usageApi';
 import './DiaryWritePage.css';
 
@@ -752,17 +749,31 @@ function DiaryWritePage({
     setProAiLimitOpen(true);
   };
 
-  /** 월한도 소진 후 소모: 추가구매 팩 → 광고 일일 슬롯 */
-  const consumeProOverflowQuota = async (): Promise<boolean> => {
-    if (await tryConsumeAiPack()) {
+  /** 월한도 소진 후 예약: 추가구매 팩 → 광고 일일 슬롯 (아직 차감 안 함) */
+  const reserveProOverflowQuota = async (): Promise<boolean> => {
+    if (await reserveAiPack()) {
       aiQuotaKindRef.current = 'ai-pack';
       return true;
     }
-    if (consumeAiDrawDailyQuota()) {
+    if (getAiDrawCredits() > 0) {
       aiQuotaKindRef.current = 'free';
       return true;
     }
     return false;
+  };
+
+  const reserveAiPack = async (): Promise<boolean> => {
+    const token = getAccessToken();
+    if (token) {
+      try {
+        const view = await fetchAiPackCredits(token);
+        applyAiPackCreditsFromServer(view.credits);
+        return view.credits > 0;
+      } catch {
+        return getAiPackCredits() > 0;
+      }
+    }
+    return getAiPackCredits() > 0;
   };
 
   const tryConsumeAiPack = async (): Promise<boolean> => {
@@ -781,22 +792,8 @@ function DiaryWritePage({
     return consumeAiPackCredit();
   };
 
-  const tryRefundAiPack = async (): Promise<void> => {
-    const token = getAccessToken();
-    if (token) {
-      try {
-        const view = await refundAiPackCreditsRemote(token);
-        applyAiPackCreditsFromServer(view.credits);
-        return;
-      } catch {
-        // fall through local
-      }
-    }
-    refundAiPackCredit();
-  };
-
-  const consumeAiDrawQuota = async (): Promise<boolean> => {
-    // 브라우저(웹)에서는 개발·미리보기용으로 AI 제한 없음
+  /** 생성 전: 사용 가능 여부만 확인하고 차감 종류를 예약 (차감은 성공 후) */
+  const reserveAiDrawQuota = async (): Promise<boolean> => {
     if (!isFlutterApp()) {
       aiQuotaKindRef.current = 'none';
       return true;
@@ -806,115 +803,104 @@ function DiaryWritePage({
       const token = getAccessToken();
       if (token) {
         try {
-          const usage = await consumeMonthlyUsage(token);
+          const usage = await fetchMonthlyUsage(token);
           applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-          aiQuotaKindRef.current = 'pro-server';
-          return true;
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          if (message.includes('409')) {
-            try {
-              const usage = await fetchMonthlyUsage(token);
-              applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-            } catch {
-              // ignore
-            }
-            // 서버 월한도 소진 → 팩/광고 폴백
-            if (!(await consumeProOverflowQuota())) {
-              promptProMonthlyExhausted();
-              return false;
-            }
+          if (usage.allowed !== false && usage.used < usage.limit) {
+            aiQuotaKindRef.current = 'pro-server';
             return true;
           }
-          if (!consumeProAiDrawQuota()) {
-            if (!(await consumeProOverflowQuota())) {
-              promptProMonthlyExhausted();
-              return false;
-            }
-            return true;
+          if (!(await reserveProOverflowQuota())) {
+            promptProMonthlyExhausted();
+            return false;
           }
-          aiQuotaKindRef.current = 'pro-local';
           return true;
+        } catch {
+          // 로컬 잔여로 폴백
         }
       }
-      if (!consumeProAiDrawQuota()) {
-        if (!(await consumeProOverflowQuota())) {
-          promptProMonthlyExhausted();
-          return false;
-        }
+      if (getDiaryAccessState().monthlyRemaining > 0) {
+        aiQuotaKindRef.current = 'pro-local';
         return true;
       }
-      aiQuotaKindRef.current = 'pro-local';
-      return true;
-    }
-
-    // Pro 월한도 소진 → 팩/광고
-    if (canUseProAiQuota() && isProAiMonthlyLimitReached()) {
-      if (!(await consumeProOverflowQuota())) {
+      if (!(await reserveProOverflowQuota())) {
         promptProMonthlyExhausted();
         return false;
       }
       return true;
     }
 
-    // 무료 → 팩 잔여 → 광고 일일 슬롯
-    if (await tryConsumeAiPack()) {
+    if (canUseProAiQuota() && isProAiMonthlyLimitReached()) {
+      if (!(await reserveProOverflowQuota())) {
+        promptProMonthlyExhausted();
+        return false;
+      }
+      return true;
+    }
+
+    if (await reserveAiPack()) {
       aiQuotaKindRef.current = 'ai-pack';
       return true;
     }
-    if (!consumeAiDrawDailyQuota()) {
-      promptAiDrawBlocked();
-      return false;
+    if (getAiDrawCredits() > 0) {
+      aiQuotaKindRef.current = 'free';
+      return true;
     }
-    aiQuotaKindRef.current = 'free';
-    return true;
+    promptAiDrawBlocked();
+    return false;
   };
 
-  const refundAiDrawQuotaIfNeeded = async (err: unknown): Promise<string | null> => {
-    const jobErr = err instanceof AiDrawJobError ? err : null;
-    const shouldRefund =
-      Boolean(jobErr?.refundUsage) ||
-      Boolean(jobErr?.usageRefunded) ||
-      (err instanceof Error &&
-        /runware/i.test(err.message) &&
-        /\(400\)/.test(err.message));
-    if (!shouldRefund) return null;
-
-    const fallbackNotice = t('write.ai.usageNotDeducted');
-    let notice =
-      jobErr?.notice?.trim() ||
-      (jobErr?.usageRefunded ? fallbackNotice : null);
-
+  /** 그림 생성 성공 후에만 횟수 차감 */
+  const commitAiDrawQuota = async (): Promise<void> => {
     const kind = aiQuotaKindRef.current;
-    if (kind === 'pro-server' && !jobErr?.usageRefunded) {
+    aiQuotaKindRef.current = 'none';
+    if (kind === 'none') return;
+
+    if (kind === 'pro-server') {
       const token = getAccessToken();
       if (token) {
         try {
-          const usage = await refundMonthlyUsage(token);
+          const usage = await consumeMonthlyUsage(token);
           applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-          notice = usage.notice?.trim() || fallbackNotice;
-        } catch {
-          notice = notice || fallbackNotice;
+          return;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          if (message.includes('409')) {
+            if (await tryConsumeAiPack()) return;
+            if (consumeAiDrawDailyQuota()) return;
+            console.warn('[ai] commit monthly failed (409), image kept');
+            return;
+          }
+          if (consumeProAiDrawQuota()) return;
+          if (await tryConsumeAiPack()) return;
+          consumeAiDrawDailyQuota();
+          return;
         }
-      } else {
-        refundProAiDrawQuota();
-        notice = notice || fallbackNotice;
       }
-    } else if (kind === 'pro-local') {
-      refundProAiDrawQuota();
-      notice = notice || fallbackNotice;
-    } else if (kind === 'ai-pack') {
-      await tryRefundAiPack();
-      notice = notice || fallbackNotice;
-    } else if (kind === 'free') {
-      refundAiDrawDailyQuota();
-      notice = notice || fallbackNotice;
-    } else if (jobErr?.usageRefunded) {
-      notice = notice || fallbackNotice;
+      if (!consumeProAiDrawQuota()) {
+        if (!(await tryConsumeAiPack())) consumeAiDrawDailyQuota();
+      }
+      return;
     }
 
-    aiQuotaKindRef.current = 'none';
-    return notice;
+    if (kind === 'pro-local') {
+      if (!consumeProAiDrawQuota()) {
+        if (!(await tryConsumeAiPack())) consumeAiDrawDailyQuota();
+      }
+      return;
+    }
+
+    if (kind === 'ai-pack') {
+      if (!(await tryConsumeAiPack())) {
+        console.warn('[ai] commit pack failed, image kept');
+      }
+      return;
+    }
+
+    if (kind === 'free') {
+      if (!consumeAiDrawDailyQuota()) {
+        console.warn('[ai] commit free slot failed, image kept');
+      }
+    }
   };
 
   const handleAiDraw = () => {
@@ -974,7 +960,7 @@ function DiaryWritePage({
 
   const runAiDraw = async () => {
     setAiError(null);
-    if (!(await consumeAiDrawQuota())) return;
+    if (!(await reserveAiDrawQuota())) return;
 
     setAiProgress('waiting');
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
@@ -995,7 +981,7 @@ function DiaryWritePage({
         onProgress: setAiProgress,
       });
 
-      aiQuotaKindRef.current = 'none';
+      await commitAiDrawQuota();
       const priorAiCount = aiGeneratedImages.length;
       const nextHistory = [...aiGeneratedImages, imageUrl];
       setAiGeneratedImages(nextHistory);
@@ -1020,14 +1006,9 @@ function DiaryWritePage({
         setUsageNotice(notice);
         setUsageNoticeOpen(true);
       }
-    } catch (err) {
-      const notice = await refundAiDrawQuotaIfNeeded(err);
+    } catch {
+      aiQuotaKindRef.current = 'none';
       showAiRetryToast();
-      if (notice) {
-        setUsageNoticeKind('refund');
-        setUsageNotice(notice);
-        setUsageNoticeOpen(true);
-      }
     } finally {
       setAiLoading(false);
     }
