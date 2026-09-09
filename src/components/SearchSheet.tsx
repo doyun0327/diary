@@ -9,16 +9,30 @@ interface SearchSheetProps {
   entries: DiaryEntry[];
   onClose: () => void;
   onSelect: (id: string) => void;
+  /** Pro·체험 중이면 true. false면 검색어 입력 완료 시 게이트 */
+  canSearch?: boolean;
+  onRequirePremium?: () => void;
 }
 
 function normalize(text: string) {
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
-function SearchSheet({ entries, onClose, onSelect }: SearchSheetProps) {
+const SEARCH_GATE_IDLE_MS = 450;
+
+function SearchSheet({
+  entries,
+  onClose,
+  onSelect,
+  canSearch = true,
+  onRequirePremium,
+}: SearchSheetProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const gatedForNeedleRef = useRef<string | null>(null);
+  const onRequirePremiumRef = useRef(onRequirePremium);
+  onRequirePremiumRef.current = onRequirePremium;
 
   useEffect(() => {
     const timer = window.setTimeout(() => inputRef.current?.focus(), 50);
@@ -33,15 +47,36 @@ function SearchSheet({ entries, onClose, onSelect }: SearchSheetProps) {
   }, [onClose]);
 
   const needle = normalize(query);
+
+  /** 검색어 입력이 멈춘 뒤 — 무료면 결과 대신 게이트 */
+  useEffect(() => {
+    if (canSearch || !needle) {
+      if (!needle) gatedForNeedleRef.current = null;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      if (gatedForNeedleRef.current === needle) return;
+      gatedForNeedleRef.current = needle;
+      onRequirePremiumRef.current?.();
+    }, SEARCH_GATE_IDLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [needle, canSearch]);
+
   const results = useMemo(() => {
-    if (!needle) return [];
+    if (!canSearch || !needle) return [];
     return entries
       .filter((entry) => {
         const hay = normalize(`${entry.title} ${entry.content}`);
         return hay.includes(needle);
       })
       .sort((a, b) => b.date.localeCompare(a.date) || b.updatedAt.localeCompare(a.updatedAt));
-  }, [entries, needle]);
+  }, [entries, needle, canSearch]);
+
+  const requestPremiumNow = () => {
+    if (canSearch || !needle) return;
+    gatedForNeedleRef.current = needle;
+    onRequirePremiumRef.current?.();
+  };
 
   return (
     <div className="search-sheet" role="dialog" aria-label={t('diary.search.aria')}>
@@ -81,6 +116,12 @@ function SearchSheet({ entries, onClose, onSelect }: SearchSheetProps) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                requestPremiumNow();
+              }
+            }}
             placeholder={t('diary.search.placeholder')}
             enterKeyHint="search"
             autoCapitalize="none"
@@ -90,6 +131,8 @@ function SearchSheet({ entries, onClose, onSelect }: SearchSheetProps) {
         </label>
 
         {!needle ? (
+          <p className="search-sheet__hint">{t('diary.search.empty')}</p>
+        ) : !canSearch ? (
           <p className="search-sheet__hint">{t('diary.search.empty')}</p>
         ) : results.length === 0 ? (
           <p className="search-sheet__hint">{t('diary.search.noResults')}</p>

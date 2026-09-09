@@ -20,8 +20,12 @@ import {
   isPremiumStickerCategory,
   isPremiumStickerItem,
   PREMIUM_PACK_TAB_ICON,
-  toAssetStickerUrl,
 } from '../utils/assetStickers';
+import {
+  resolveAssetStickerSrc,
+  subscribeAssetStickerLocalCache,
+  warmAssetStickerLocalCache,
+} from '../utils/assetStickerLocalCache';
 import { getEmojiStickerImageUrl } from '../utils/emojiStickerImage';
 import { STICKER_CATEGORIES, stickerItemValue, type StickerCategoryId } from '../utils/stickers';
 import type { DiaryCanvasState } from '../types/diary';
@@ -269,13 +273,15 @@ const EMOJI_FONT =
   '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
 
 function stickerDisplaySrc(value: string): string | null {
-  if (isAssetStickerSrc(value)) return toAssetStickerUrl(value);
+  if (isAssetStickerSrc(value)) return resolveAssetStickerSrc(value);
   return getEmojiStickerImageUrl(value);
 }
 
 function layerDisplaySrc(layer: StickerLayer): string | null {
   if (layer.imageSrc) {
-    return isAssetStickerSrc(layer.imageSrc) ? toAssetStickerUrl(layer.imageSrc) : layer.imageSrc;
+    return isAssetStickerSrc(layer.imageSrc)
+      ? resolveAssetStickerSrc(layer.imageSrc)
+      : layer.imageSrc;
   }
   return getEmojiStickerImageUrl(layer.emoji);
 }
@@ -364,12 +370,22 @@ function DrawingCanvas({
   );
   const [eraserSizeId, setEraserSizeId] =
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
+  /** 일러스트 스티커 로컬 캐시 갱신 시 썸네일/오버레이 재렌더 */
+  const [, setAssetStickerCacheTick] = useState(0);
 
   useEffect(() => {
     if (!colorsOpen || mode !== 'pen' || fontOpen) {
       setCustomPickerOpen(false);
     }
   }, [colorsOpen, mode, fontOpen]);
+
+  useEffect(() => {
+    if (!stickerOpen || stickerCategoryId !== 'pack') return;
+    void warmAssetStickerLocalCache();
+    return subscribeAssetStickerLocalCache(() => {
+      setAssetStickerCacheTick((n) => n + 1);
+    });
+  }, [stickerOpen, stickerCategoryId]);
 
   useEffect(() => {
     if (!stickerOpen) return;
@@ -653,7 +669,7 @@ function DrawingCanvas({
         resolve(img);
       };
       img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
-      img.src = isAssetStickerSrc(src) ? toAssetStickerUrl(src) : src;
+      img.src = isAssetStickerSrc(src) ? resolveAssetStickerSrc(src) : src;
     });
   };
 

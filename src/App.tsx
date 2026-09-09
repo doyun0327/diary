@@ -389,11 +389,6 @@ function App() {
   };
 
   const handleSearchSelect = (id: string) => {
-    if (!getDiaryAccessState(entries.length).canUseSearchAndExport) {
-      pendingSearchSelectRef.current = id;
-      setSubscriptionModal("search");
-      return;
-    }
     handleSelect(id);
   };
 
@@ -1119,6 +1114,11 @@ function App() {
             entries={entries}
             onClose={() => setSearchOpen(false)}
             onSelect={handleSearchSelect}
+            canSearch={accessStatus.canUseSearchAndExport}
+            onRequirePremium={() => {
+              pendingSearchSelectRef.current = null;
+              setSubscriptionModal("search");
+            }}
           />,
           document.getElementById("root") ?? document.body,
         )}
@@ -1185,13 +1185,21 @@ function App() {
             onDismiss={closeSubscriptionModal}
             showClose
             primaryLabel={
-              subscribing
-                ? t("common.processing")
-                : isFlutterApp()
-                  ? t("subscription.subscribeCta")
-                  : t("subscription.appOnly")
+              subscriptionModal === "search" || subscriptionModal === "export"
+                ? t("write.ai.goPurchase")
+                : subscribing
+                  ? t("common.processing")
+                  : isFlutterApp()
+                    ? t("subscription.subscribeCta")
+                    : t("subscription.appOnly")
             }
             onPrimary={() => {
+              if (subscriptionModal === "search" || subscriptionModal === "export") {
+                closeSubscriptionModal();
+                setNyangTicketTab("subscribe");
+                setNyangTicketOpen(true);
+                return;
+              }
               if (subscribing) return;
               if (!isGoogleSignedIn()) {
                 setPendingNyangPurchase({ kind: "subscribe" });

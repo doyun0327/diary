@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomDetail, RoomPost } from '../types/room';
 import BackIcon from '../components/BackIcon';
@@ -50,6 +50,9 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [postsPage, setPostsPage] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
+  const [feedFlip, setFeedFlip] = useState<'none' | 'next' | 'prev'>('none');
+  const flipTimerRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
 
@@ -150,6 +153,52 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     void refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    return () => {
+      if (flipTimerRef.current != null) window.clearTimeout(flipTimerRef.current);
+    };
+  }, []);
+
+  const requestPostsPage = useCallback(
+    (next: number) => {
+      if (feedFlip !== 'none') return;
+      if (next === postsPage) return;
+      if (next < 0 || next >= postsPageCount) return;
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setPostsPage(next);
+        return;
+      }
+      const dir = next > postsPage ? 'next' : 'prev';
+      setFeedFlip(dir);
+      // 페이지 중간쯤에서 내용 교체 (책장 넘김감)
+      if (flipTimerRef.current != null) window.clearTimeout(flipTimerRef.current);
+      flipTimerRef.current = window.setTimeout(() => {
+        setPostsPage(next);
+      }, 220);
+    },
+    [feedFlip, postsPage, postsPageCount],
+  );
+
+  const onFeedFlipEnd = (e: { target: EventTarget | null; currentTarget: EventTarget }) => {
+    if (e.target !== e.currentTarget) return;
+    setFeedFlip('none');
+  };
+
+  const onFeedTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+  };
+
+  const onFeedTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
+    const startX = touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (startX == null || feedFlip !== 'none') return;
+    const endX = e.changedTouches[0]?.clientX ?? startX;
+    const dx = endX - startX;
+    if (Math.abs(dx) < 48) return;
+    if (dx < 0) requestPostsPage(postsPage + 1);
+    else requestPostsPage(postsPage - 1);
+  };
+
   const dismissCoach = () => {
     markRoomCommentCoachSeen();
     setShowCoach(false);
@@ -236,61 +285,73 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                   </button>
                 </div>
               )}
-              <ul className="rooms__gallery">
-                {visibleFeedPosts.map((post) => {
-                  const author = room.members.find((m) => m.userId === post.authorUserId);
-                  const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
-                  const authorName = roomAuthorLabel(
-                    post.authorNickname,
-                    withdrawn,
-                    t,
-                  );
-                  const avatarUrl = withdrawn ? '' : author?.avatarUrl?.trim() || '';
-                  const initial = (authorName || '?').slice(0, 1).toUpperCase();
-                  const isOwnPost = Boolean(userId && post.authorUserId === userId);
-                  const showNew = !isOwnPost && unreadPostIds.has(post.id);
-                  return (
-                  <li key={post.id}>
-                    <button
-                      type="button"
-                      className="rooms__gallery-item"
-                      onClick={() => handleOpenPost(post.id)}
-                      aria-label={t('rooms.openPostAria', {
-                        author: authorName,
-                        title: post.title || post.date,
-                      })}
-                    >
-                      <span className="rooms__gallery-author">
-                        <span className="rooms__gallery-avatar" aria-hidden>
-                          {avatarUrl ? (
-                            <img src={avatarUrl} alt="" />
-                          ) : (
-                            <span className="rooms__gallery-initial">{initial}</span>
-                          )}
-                        </span>
-                        <span className="rooms__gallery-name">{authorName}</span>
-                      </span>
-                      <span className="rooms__gallery-body">
-                        <RoomDiaryPaper post={post} compact />
-                        {showNew ? (
-                          <span
-                            className="rooms__gallery-new"
-                            aria-label={t('rooms.postNewAria')}
-                          >
-                            {t('rooms.postNew')}
+              <div
+                className="rooms__feed-stage"
+                data-no-swipe
+                onTouchStart={onFeedTouchStart}
+                onTouchEnd={onFeedTouchEnd}
+              >
+                <div
+                  className={`rooms__feed-page${feedFlip === 'next' ? ' is-flip-next' : ''}${feedFlip === 'prev' ? ' is-flip-prev' : ''}`}
+                  onAnimationEnd={onFeedFlipEnd}
+                >
+                  <ul className="rooms__gallery">
+                    {visibleFeedPosts.map((post) => {
+                      const author = room.members.find((m) => m.userId === post.authorUserId);
+                      const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
+                      const authorName = roomAuthorLabel(
+                        post.authorNickname,
+                        withdrawn,
+                        t,
+                      );
+                      const avatarUrl = withdrawn ? '' : author?.avatarUrl?.trim() || '';
+                      const initial = (authorName || '?').slice(0, 1).toUpperCase();
+                      const isOwnPost = Boolean(userId && post.authorUserId === userId);
+                      const showNew = !isOwnPost && unreadPostIds.has(post.id);
+                      return (
+                      <li key={post.id}>
+                        <button
+                          type="button"
+                          className="rooms__gallery-item"
+                          onClick={() => handleOpenPost(post.id)}
+                          aria-label={t('rooms.openPostAria', {
+                            author: authorName,
+                            title: post.title || post.date,
+                          })}
+                        >
+                          <span className="rooms__gallery-author">
+                            <span className="rooms__gallery-avatar" aria-hidden>
+                              {avatarUrl ? (
+                                <img src={avatarUrl} alt="" />
+                              ) : (
+                                <span className="rooms__gallery-initial">{initial}</span>
+                              )}
+                            </span>
+                            <span className="rooms__gallery-name">{authorName}</span>
                           </span>
-                        ) : null}
-                      </span>
-                    </button>
-                  </li>
-                  );
-                })}
-              </ul>
+                          <span className="rooms__gallery-body">
+                            <RoomDiaryPaper post={post} compact />
+                            {showNew ? (
+                              <span
+                                className="rooms__gallery-new"
+                                aria-label={t('rooms.postNewAria')}
+                              >
+                                {t('rooms.postNew')}
+                              </span>
+                            ) : null}
+                          </span>
+                        </button>
+                      </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
               {postsPageCount > 1 && (
                 <PagePager
                   page={postsPage}
                   pageCount={postsPageCount}
-                  onPageChange={setPostsPage}
+                  onPageChange={requestPostsPage}
                 />
               )}
             </div>

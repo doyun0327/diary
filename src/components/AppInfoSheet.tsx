@@ -213,6 +213,8 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
             <p>{t('appInfo.legal.termsBody')}</p>
             <h3>{t('appInfo.legal.privacyHeading')}</h3>
             <p>{t('appInfo.legal.privacyBody')}</p>
+            <h3>{t('appInfo.legal.refundHeading')}</h3>
+            <p>{t('appInfo.legal.refundBody')}</p>
           </div>
         )}
 
