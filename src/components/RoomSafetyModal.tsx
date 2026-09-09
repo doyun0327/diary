@@ -124,13 +124,15 @@ function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModal
       closeAriaLabel={t('common.close')}
     >
       <div className="room-safety__actions">
-        <button
-          type="button"
-          className="room-safety__action"
-          onClick={() => setStep('report')}
-        >
-          {t('rooms.safety.report')}
-        </button>
+        {target.kind === 'post' ? (
+          <button
+            type="button"
+            className="room-safety__action"
+            onClick={() => setStep('report')}
+          >
+            {t('rooms.safety.report')}
+          </button>
+        ) : null}
         <button
           type="button"
           className="room-safety__action room-safety__action--danger"

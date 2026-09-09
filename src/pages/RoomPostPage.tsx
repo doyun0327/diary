@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
@@ -53,8 +53,114 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [blockTick, setBlockTick] = useState(0);
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
+  const [commentFocused, setCommentFocused] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const commentFormRef = useRef<HTMLDivElement>(null);
+  const commentFocusedRef = useRef(false);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+
+  useEffect(() => {
+    commentFocusedRef.current = commentFocused;
+  }, [commentFocused]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const vv = window.visualViewport;
+
+    const measureInset = () => {
+      let inset = 0;
+      if (vv) {
+        inset = Math.max(
+          0,
+          Math.round(window.innerHeight - vv.height - vv.offsetTop),
+        );
+      }
+      // Flutter WebView 등은 visualViewport가 안 줄어듦 → 포커스 시 최소 들어 올림
+      if (commentFocusedRef.current) {
+        const fallback = Math.round(
+          Math.min(420, Math.max(260, window.innerHeight * 0.42)),
+        );
+        inset = Math.max(inset, fallback);
+      }
+      return inset;
+    };
+
+    const liftCommentForm = () => {
+      const form = commentFormRef.current;
+      if (!form || !commentFocusedRef.current) return;
+      // 입력칸이 보이는 영역 하단에 오도록 스크롤
+      const rootRect = root.getBoundingClientRect();
+      const formRect = form.getBoundingClientRect();
+      const visibleBottom = vv
+        ? Math.min(rootRect.bottom, vv.offsetTop + vv.height)
+        : rootRect.bottom;
+      const safeBottom = visibleBottom - 12;
+      if (formRect.bottom > safeBottom) {
+        root.scrollTop += formRect.bottom - safeBottom;
+      }
+    };
+
+    const syncKeyboardInset = () => {
+      const inset = measureInset();
+      root.style.setProperty('--rooms-keyboard-inset', `${inset}px`);
+      root.classList.toggle('rooms--keyboard-open', inset > 0);
+      if (commentFocusedRef.current) {
+        requestAnimationFrame(liftCommentForm);
+      }
+    };
+
+    vv?.addEventListener('resize', syncKeyboardInset);
+    vv?.addEventListener('scroll', syncKeyboardInset);
+    window.addEventListener('resize', syncKeyboardInset);
+    syncKeyboardInset();
+
+    return () => {
+      vv?.removeEventListener('resize', syncKeyboardInset);
+      vv?.removeEventListener('scroll', syncKeyboardInset);
+      window.removeEventListener('resize', syncKeyboardInset);
+      root.style.removeProperty('--rooms-keyboard-inset');
+      root.classList.remove('rooms--keyboard-open');
+    };
+  }, [commentFocused]);
+
+  const onCommentFocus = () => {
+    setCommentFocused(true);
+    commentFocusedRef.current = true;
+    const root = rootRef.current;
+    if (root) {
+      const fallback = Math.round(
+        Math.min(420, Math.max(260, window.innerHeight * 0.42)),
+      );
+      root.style.setProperty('--rooms-keyboard-inset', `${fallback}px`);
+      root.classList.add('rooms--keyboard-open');
+    }
+    // 키보드 애니메이션 동안 여러 번 올림
+    const bump = () => {
+      const form = commentFormRef.current;
+      const el = rootRef.current;
+      if (!form || !el) return;
+      form.scrollIntoView({ block: 'end', behavior: 'auto' });
+      const formRect = form.getBoundingClientRect();
+      const room = Math.min(window.innerHeight, el.getBoundingClientRect().bottom);
+      const need = formRect.bottom - (room - 16);
+      if (need > 0) el.scrollTop += need;
+    };
+    requestAnimationFrame(bump);
+    window.setTimeout(bump, 100);
+    window.setTimeout(bump, 280);
+    window.setTimeout(bump, 480);
+  };
+
+  const onCommentBlur = () => {
+    setCommentFocused(false);
+    commentFocusedRef.current = false;
+    const root = rootRef.current;
+    if (!root) return;
+    root.style.setProperty('--rooms-keyboard-inset', '0px');
+    root.classList.remove('rooms--keyboard-open');
+  };
 
   useEffect(() => {
     if (!post || post.authorWithdrawn) {
@@ -189,7 +295,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const authorInitial = (authorName || '?').slice(0, 1).toUpperCase();
 
   return (
-    <div className="rooms rooms--post">
+    <div ref={rootRef} className="rooms rooms--post">
       <div className="rooms__toolbar">
         <button
           type="button"
@@ -274,23 +380,6 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                     <strong className="rooms__comment-name">
                       {roomAuthorLabel(c.authorNickname, c.authorWithdrawn, t)}
                     </strong>
-                    <button
-                      type="button"
-                      className="rooms__comment-more"
-                      aria-label={t('rooms.safety.moreAria')}
-                      onClick={() =>
-                        openSafety({
-                          roomId,
-                          userId: c.authorUserId,
-                          nickname: c.authorNickname,
-                          kind: 'comment',
-                          postId,
-                          commentId: c.id,
-                        })
-                      }
-                    >
-                      ···
-                    </button>
                   </div>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>
@@ -298,13 +387,15 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
             );
           })}
         </ul>
-        <div className="rooms__comment-form">
+        <div ref={commentFormRef} className="rooms__comment-form">
           <input
             type="text"
             value={text}
             maxLength={200}
             placeholder={t('rooms.commentPlaceholder')}
             onChange={(e) => setText(e.target.value)}
+            onFocus={onCommentFocus}
+            onBlur={onCommentBlur}
             onKeyDown={(e) => {
               if (e.key === 'Enter') void handleComment();
             }}

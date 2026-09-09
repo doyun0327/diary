@@ -43,9 +43,15 @@ export function syncRoomPostsSeenBaseline(roomId: string, postIds: string[]) {
   saveStore(state);
 }
 
+/**
+ * 첫 baseline 이후에 생긴(또는 아직 안 연) 글만 NEW.
+ * 방 미초기화면 false — baseline 직전 깜빡임 방지.
+ */
 export function isRoomPostUnread(roomId: string, postId: string): boolean {
   if (!roomId || !postId) return false;
-  const seen = loadStore().seenPostIds[roomId] ?? [];
+  const state = loadStore();
+  if (!state.initialized[roomId]) return false;
+  const seen = state.seenPostIds[roomId] ?? [];
   return !seen.includes(postId);
 }
 

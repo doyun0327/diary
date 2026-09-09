@@ -153,6 +153,11 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     void refresh();
   }, [refresh]);
 
+  // 상세에서 돌아와도 NEW 상태 다시 계산
+  useEffect(() => {
+    setSeenTick((n) => n + 1);
+  }, [roomId]);
+
   useEffect(() => {
     return () => {
       if (flipTimerRef.current != null) window.clearTimeout(flipTimerRef.current);

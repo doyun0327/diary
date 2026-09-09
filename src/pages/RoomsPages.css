@@ -91,9 +91,21 @@
   -webkit-overflow-scrolling: touch;
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  padding-bottom: calc(
+    40px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
+  );
+  scroll-padding-bottom: calc(
+    48px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
+  );
   margin: 0;
   min-height: 0;
+}
+
+.rooms--post.rooms--keyboard-open {
+  /* 키보드가 올라온 동안 입력칸이 항상 보이게 */
+  scroll-padding-bottom: calc(
+    64px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
+  );
 }
 
 .rooms__toolbar {
@@ -1320,6 +1332,7 @@
   width: 100%;
   perspective: 1400px;
   perspective-origin: 50% 40%;
+  overflow: visible;
 }
 
 .rooms__feed-page {
@@ -1327,6 +1340,7 @@
   transform-origin: left center;
   transform-style: preserve-3d;
   will-change: transform, opacity;
+  overflow: visible;
 }
 
 .rooms__feed-page.is-flip-next {
@@ -1388,6 +1402,14 @@
   gap: 18px 12px;
   width: 100%;
   align-items: start;
+  /* N 스티커가 스크롤 컨테이너에 잘리지 않게 */
+  padding: 6px 4px 2px;
+  overflow: visible;
+}
+
+.rooms__gallery > li {
+  overflow: visible;
+  min-width: 0;
 }
 
 .rooms__gallery-item {
@@ -1404,6 +1426,7 @@
   font-family: inherit;
   color: var(--color-text);
   cursor: pointer;
+  overflow: visible;
 }
 
 .rooms__gallery-item:active .rooms__paper--compact {
@@ -1414,26 +1437,35 @@
   position: relative;
   width: 100%;
   min-width: 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.rooms__gallery-body > .rooms__paper,
+.rooms__gallery-body > .diary-detail__paper {
+  position: relative;
+  z-index: 0;
 }
 
 .rooms__gallery-new {
   position: absolute;
-  top: -5px;
-  right: -3px;
-  z-index: 2;
+  top: 7px;
+  right: 7px;
+  z-index: 8;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  font-size: 0.72rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1;
   color: #fff;
   pointer-events: none;
-  transform: rotate(10deg);
+  transform: rotate(12deg);
   background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
   box-shadow:
     0 3px 8px color-mix(in srgb, #ee5a24 40%, transparent),
@@ -1818,9 +1850,20 @@
 }
 
 .rooms__comment-form {
+  position: sticky;
+  bottom: var(--rooms-keyboard-inset, 0px);
+  z-index: 6;
   display: flex;
   gap: 8px;
   margin-top: 14px;
+  margin-left: -18px;
+  margin-right: -18px;
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  transition: bottom 0.18s ease-out;
 }
 
 .rooms__comment-form input {
