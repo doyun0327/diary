@@ -22,7 +22,7 @@ import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
-import { diaryFontStack, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
+import { diaryEditFontStack, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
   applyAiPackCreditsFromServer,
@@ -310,6 +310,7 @@ function DiaryWritePage({
   const paperRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const composingRef = useRef(false);
   /** 수정 모드 — AI 선택지에 넣을 원본 그림 (캔버스 로드 전에도 사용) */
   const editOriginalImageRef = useRef<string | null>(initialEntry?.imageUrl ?? null);
   /** AI 직전 캔버스 레이어 스냅샷 — 예전 그림 선택 시 PNG 합성이 아닌 원본 복원 */
@@ -336,6 +337,10 @@ function DiaryWritePage({
     if (resumeDraft?.fontId) return;
     setFontId(getPreferredFontId());
   }, [i18n.language, isEdit, resumeDraft?.fontId]);
+
+  useEffect(() => {
+    void ensureDiaryFontReady(fontId);
+  }, [fontId]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -384,6 +389,7 @@ function DiaryWritePage({
   }, []);
 
   useLayoutEffect(() => {
+    if (composingRef.current) return;
     syncContentTextareaHeight(contentRef.current);
   }, [content, fontId, fontSizeId]);
 
@@ -488,7 +494,7 @@ function DiaryWritePage({
     };
   }, [initialEntry?.imageUrl, initialEntry?.canvasState, resumeDraft?.hasDrawing]);
 
-  const flushWriteDraft = useCallback(async () => {
+  const flushWriteDraftMeta = useCallback(() => {
     const hasDrawing = Boolean(canvasRef.current?.hasContent());
     const meta = {
       date,
@@ -505,20 +511,6 @@ function DiaryWritePage({
       if (!isEdit) return;
     }
     saveWriteDraft(meta);
-    try {
-      await canvasRef.current?.prepareExport();
-      const rawState = canvasRef.current?.getCanvasState() ?? null;
-      const imageUrl = canvasRef.current?.toDataURL() ?? null;
-      await saveWriteDraftMedia({
-        canvasState: rawState,
-        imageUrl: imageUrl || null,
-      });
-      if (hasDrawing) {
-        saveWriteDraft({ ...meta, hasDrawing: true });
-      }
-    } catch (err) {
-      console.warn('[draft] canvas flush failed', err);
-    }
   }, [
     date,
     title,
@@ -530,13 +522,45 @@ function DiaryWritePage({
     isEdit,
   ]);
 
-  // 텍스트·설정 자동 임시저장
+  const flushWriteDraftMedia = useCallback(async () => {
+    try {
+      await canvasRef.current?.prepareExport();
+      const rawState = canvasRef.current?.getCanvasState() ?? null;
+      const imageUrl = canvasRef.current?.toDataURL() ?? null;
+      const hasDrawing = Boolean(canvasRef.current?.hasContent());
+      await saveWriteDraftMedia({
+        canvasState: rawState,
+        imageUrl: imageUrl || null,
+      });
+      if (hasDrawing) {
+        saveWriteDraft({
+          date,
+          title,
+          content,
+          mood,
+          fontId,
+          fontSize: fontSizeId,
+          editingId: initialEntry?.id ?? null,
+          hasDrawing: true,
+        });
+      }
+    } catch (err) {
+      console.warn('[draft] canvas flush failed', err);
+    }
+  }, [date, title, content, mood, fontId, fontSizeId, initialEntry?.id]);
+
+  const flushWriteDraft = useCallback(async () => {
+    flushWriteDraftMeta();
+    await flushWriteDraftMedia();
+  }, [flushWriteDraftMeta, flushWriteDraftMedia]);
+
+  // 텍스트·설정만 가볍게 자동 임시저장 (캔버스 export는 타이핑마다 하지 않음)
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      void flushWriteDraft();
+      flushWriteDraftMeta();
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [flushWriteDraft]);
+  }, [flushWriteDraftMeta]);
 
   // 배포 새로고침·백그라운드 전환 직전 flush
   useEffect(() => {
@@ -1190,7 +1214,20 @@ function DiaryWritePage({
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-    syncContentTextareaHeight(e.target, { extraBlankLine: true });
+    if (!composingRef.current) {
+      syncContentTextareaHeight(e.target, { extraBlankLine: true });
+    }
+  };
+
+  const handleContentCompositionStart = () => {
+    composingRef.current = true;
+  };
+
+  const handleContentCompositionEnd = (
+    e: React.CompositionEvent<HTMLTextAreaElement>,
+  ) => {
+    composingRef.current = false;
+    syncContentTextareaHeight(e.currentTarget, { extraBlankLine: true });
   };
 
   const aiStatusKey =
@@ -1231,7 +1268,7 @@ function DiaryWritePage({
         ref={paperRef}
         className={`diary-write__paper${canvasCollapsed ? ' diary-write__paper--canvas-collapsed' : ''}`}
         style={{
-          ['--diary-font' as string]: diaryFontStack(findFont(fontId).family),
+          ['--diary-font' as string]: diaryEditFontStack(findFont(fontId).family),
           ['--diary-font-size' as string]: fontSizeCss(fontSizeId),
         }}
       >
@@ -1446,6 +1483,8 @@ function DiaryWritePage({
             className="diary-write__content"
             value={content}
             onChange={handleContentChange}
+            onCompositionStart={handleContentCompositionStart}
+            onCompositionEnd={handleContentCompositionEnd}
             onFocus={handleContentFocus}
             placeholder={t('write.contentPlaceholder')}
           />

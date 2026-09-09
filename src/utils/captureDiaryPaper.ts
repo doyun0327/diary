@@ -115,7 +115,7 @@ function waitDocumentFonts(): Promise<void> {
   return fontsReadyOnce;
 }
 
-/** Google Fonts CSS를 data URL 폰트로 바꿔 캡처 SVG에 심음 (폰트별 1회) */
+/** 로컬 @font-face CSS를 data URL 폰트로 바꿔 캡처 SVG에 심음 (폰트별 1회) */
 function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
   const name = primaryFontName(fontFamily);
   if (!name || name === 'cursive' || name === 'sans-serif') return Promise.resolve('');
@@ -125,12 +125,20 @@ function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
 
   const pending = (async () => {
     try {
-      const cssUrl =
-        `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name)}:wght@400;700&display=swap`;
-      let css = await fetch(cssUrl).then((r) => {
+      // 로컬 diary-fonts.css 에서 해당 family @font-face 만 뽑아 data URL 로 심음
+      let css = await fetch('/fonts/diary-fonts.css').then((r) => {
         if (!r.ok) throw new Error(`font css ${r.status}`);
         return r.text();
       });
+
+      const blocks = css.split(/(?=@font-face\s*\{)/);
+      const relevant = blocks.filter((block) => {
+        if (!block.includes('@font-face')) return false;
+        const fam = block.match(/font-family:\s*['"]?([^;'"}]+)/i)?.[1]?.trim();
+        return fam === name;
+      });
+      if (relevant.length === 0) return '';
+      css = relevant.join('\n');
 
       const urls = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) =>
         m[1].replace(/['"]/g, ''),
@@ -138,7 +146,10 @@ function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
 
       await Promise.all(
         urls.map(async (url) => {
-          const res = await fetch(url);
+          const abs = url.startsWith('http') || url.startsWith('data:')
+            ? url
+            : new URL(url, window.location.origin).href;
+          const res = await fetch(abs);
           if (!res.ok) return;
           const buf = await res.arrayBuffer();
           const mime =

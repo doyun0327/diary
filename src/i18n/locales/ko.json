@@ -300,7 +300,7 @@
     "packsLead": "한 번 사면 바로 쓸 수 있어요.",
     "packLabel": "{{n}}장",
     "buy": "구매",
-    "packDone": "AI 그림 {{n}}장이 충전됐어요!",
+    "packDone": "{{n}}장을 구매했어요",
     "appOnly": "앱에서만 구매할 수 있어요",
     "noProduct": "상품을 찾지 못했어요. 스토어 설정을 확인해 주세요.",
     "notConfigured": "결제 준비가 안 됐어요. 앱을 다시 실행해 주세요.",
@@ -315,7 +315,7 @@
     "historyLoadFailed": "구매 내역을 불러오지 못했어요.",
     "historyDone": "완료",
     "historyItemSubscription": "PRO 구독",
-    "historyItemPack": "AI 그림 {{n}}장"
+    "historyItemPack": "{{n}}장"
   },
   "credits": {
     "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon",
@@ -414,7 +414,7 @@
       "copyCode": "코드 복사하기",
       "share": "공유하기",
       "shareTitle": "PageBy 친구 방 초대",
-      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}",
+      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}\n\n앱에서 친구방 > 코드로 입장 > 초대코드 입력하면 들어올 수 있어요!",
       "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
@@ -513,6 +513,9 @@
     },
     "card": {
       "imageAlt": "{{date}} 그림"
+    },
+    "coach": {
+      "writeFab": "첫 번째 일기를 쓰러 갈까요?"
     }
   },
   "subscription": {

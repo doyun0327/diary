@@ -332,7 +332,7 @@
       "copyCode": "Copiar código",
       "share": "Compartir",
       "shareTitle": "Invitación a sala PageBy",
-      "shareText": "¿Quieres probar un diario ilustrado? 🖍️\n¡Dibujemos uno juntos cada día!\n\nCódigo: {{code}}",
+      "shareText": "¿Quieres probar un diario ilustrado? 🖍️\n¡Dibujemos uno juntos cada día!\n\nCódigo: {{code}}\n\nEn la app: Salas de amigos > Unirse con código > introduce el código de invitación",
       "enterRoom": "Entrar a la sala",
       "created": "¡Sala creada!\n\nCódigo de invitación: {{code}}\n\nComparte este código con amigos."
     },
@@ -448,6 +448,9 @@
     },
     "card": {
       "imageAlt": "Dibujo del {{date}}"
+    },
+    "coach": {
+      "writeFab": "¿Escribimos tu primer diario?"
     }
   },
   "subscription": {

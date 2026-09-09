@@ -333,7 +333,7 @@
       "copyCode": "Code kopieren",
       "share": "Teilen",
       "shareTitle": "PageBy-Raumeinladung",
-      "shareText": "Lust auf ein Bildertagebuch? 🖍️\nLass uns jeden Tag zusammen malen!\n\nEinladungscode: {{code}}",
+      "shareText": "Lust auf ein Bildertagebuch? 🖍️\nLass uns jeden Tag zusammen malen!\n\nEinladungscode: {{code}}\n\nIn der App: Freundesräume > Mit Code beitreten > Einladungscode eingeben",
       "enterRoom": "Raum betreten",
       "created": "Raum erstellt!\n\nEinladungscode: {{code}}\n\nTeile diesen Code mit Freunden."
     },
@@ -449,6 +449,9 @@
     },
     "card": {
       "imageAlt": "Zeichnung vom {{date}}"
+    },
+    "coach": {
+      "writeFab": "Schreibst du dein erstes Tagebuch?"
     }
   },
   "subscription": {

@@ -1,0 +1,206 @@
+/**
+ * Google Fonts → public/fonts 에 **통짜** woff + @font-face CSS 생성
+ * (Chrome UA 는 CJK unicode-range 수백 조각으로 쪼개서 타이핑 시 깨져 보임)
+ * Usage: node scripts/download-diary-fonts.mjs
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
+const OUT_DIR = path.join(ROOT, 'public', 'fonts');
+const CSS_OUT = path.join(OUT_DIR, 'diary-fonts.css');
+
+/** fonts.ts 와 동일한 family 이름 */
+const FAMILIES = [
+  // ko
+  'Gaegu',
+  'Dongle',
+  'Hi Melody',
+  'Single Day',
+  'Cute Font',
+  'Jua',
+  'Gamja Flower',
+  'Poor Story',
+  'Nanum Pen Script',
+  'Nanum Brush Script',
+  'East Sea Dokdo',
+  'Yeon Sung',
+  'Noto Sans KR',
+  'Nanum Gothic',
+  'Gowun Dodum',
+  'Gowun Batang',
+  'Nanum Myeongjo',
+  'Song Myung',
+  'Do Hyeon',
+  'IBM Plex Sans KR',
+  // latin / vi
+  'Caveat',
+  'Patrick Hand',
+  'Indie Flower',
+  'Dancing Script',
+  'Shadows Into Light',
+  'Pacifico',
+  'Nunito',
+  'Lora',
+  'Libre Baskerville',
+  'Karla',
+  'Source Serif 4',
+  'IBM Plex Sans',
+  'Great Vibes',
+  'Be Vietnam Pro',
+  // ja
+  'Yomogi',
+  'Hachi Maru Pop',
+  'Zen Kurenaido',
+  'Yusei Magic',
+  'Kiwi Maru',
+  'Noto Sans JP',
+  'Zen Maru Gothic',
+  'M PLUS Rounded 1c',
+  'Kosugi Maru',
+  'Noto Serif JP',
+  'Shippori Mincho',
+  // zh
+  'ZCOOL KuaiLe',
+  'Ma Shan Zheng',
+  'Liu Jian Mao Cao',
+  'Long Cang',
+  'Zhi Mang Xing',
+  'Noto Sans SC',
+  'ZCOOL XiaoWei',
+  'ZCOOL QingKe HuangYou',
+  'Noto Serif SC',
+  // zh-TW
+  'LXGW WenKai TC',
+  'Noto Sans TC',
+  'Noto Serif TC',
+  // th
+  'Charm',
+  'Charmonman',
+  'Sriracha',
+  'Mali',
+  'Pattaya',
+  'Noto Sans Thai',
+  'Sarabun',
+  'Prompt',
+  'Kanit',
+  'IBM Plex Sans Thai',
+  // edit/fallback
+  'Noto Sans',
+];
+
+/** unicode-range 없는 통짜 파일용 (구형 Firefox) */
+const UA_FULL =
+  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0';
+
+function slugFamily(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function cssFamilyQuery(name) {
+  return `family=${encodeURIComponent(name).replace(/%20/g, '+')}:wght@400;700`;
+}
+
+async function fetchText(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': UA_FULL } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
+  return res.text();
+}
+
+async function fetchBuf(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': UA_FULL } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
+function extractFontUrls(css) {
+  const urls = [];
+  const re = /url\((https:\/\/fonts\.gstatic\.com\/[^)]+\.(?:woff2|woff))\)/g;
+  let m;
+  while ((m = re.exec(css))) urls.push(m[1]);
+  return [...new Set(urls)];
+}
+
+async function downloadFamily(family) {
+  const dir = path.join(OUT_DIR, slugFamily(family));
+  fs.mkdirSync(dir, { recursive: true });
+
+  let css;
+  try {
+    css = await fetchText(
+      `https://fonts.googleapis.com/css2?${cssFamilyQuery(family)}&display=swap`,
+    );
+  } catch {
+    css = await fetchText(
+      `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}&display=swap`,
+    );
+  }
+
+  // 통짜 모드인데 unicode-range 가 있으면 Chrome CSS 가 섞인 것 — 경고
+  if (css.includes('unicode-range')) {
+    console.warn(`\n[warn] ${family}: still has unicode-range (subset CSS)`);
+  }
+
+  const urls = extractFontUrls(css);
+  if (urls.length === 0) {
+    console.warn(`[skip] no font files for ${family}`);
+    return '';
+  }
+
+  let localCss = css;
+  let i = 0;
+  for (const url of urls) {
+    i += 1;
+    const ext = url.includes('.woff2') ? 'woff2' : 'woff';
+    const fileName = `${String(i).padStart(3, '0')}.${ext}`;
+    const filePath = path.join(dir, fileName);
+    if (!fs.existsSync(filePath)) {
+      const buf = await fetchBuf(url);
+      fs.writeFileSync(filePath, buf);
+      process.stdout.write('.');
+    } else {
+      process.stdout.write('=');
+    }
+    const publicUrl = `/fonts/${slugFamily(family)}/${fileName}`;
+    localCss = localCss.split(url).join(publicUrl);
+  }
+
+  return `/* ${family} */\n${localCss}\n`;
+}
+
+async function main() {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  // 이전 조각 폰트 전부 제거
+  for (const name of fs.readdirSync(OUT_DIR)) {
+    const p = path.join(OUT_DIR, name);
+    fs.rmSync(p, { recursive: true, force: true });
+  }
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+
+  const parts = [];
+  console.log(`Downloading ${FAMILIES.length} families (full faces) → ${OUT_DIR}`);
+  for (const family of FAMILIES) {
+    process.stdout.write(`\n${family} `);
+    try {
+      const css = await downloadFamily(family);
+      if (css) parts.push(css);
+    } catch (err) {
+      console.warn(`\n[fail] ${family}:`, err instanceof Error ? err.message : err);
+    }
+  }
+  const banner = `/* Auto-generated by scripts/download-diary-fonts.mjs — full faces, do not edit */\n`;
+  fs.writeFileSync(CSS_OUT, banner + parts.join('\n'), 'utf8');
+  console.log(`\nWrote ${CSS_OUT}`);
+  const faces = (banner + parts.join('\n')).match(/@font-face/g)?.length ?? 0;
+  console.log(`@font-face count: ${faces}`);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

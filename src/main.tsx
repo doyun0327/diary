@@ -2,11 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { testBackendConnection } from './api/testApi'
 import './i18n'
+import { applyLanguageFonts } from './utils/fonts'
 import { applyStoredTheme } from './utils/theme'
 import './index.css'
 import App from './App.tsx'
 
 applyStoredTheme()
+applyLanguageFonts()
 
 if (import.meta.env.DEV) {
   testBackendConnection()

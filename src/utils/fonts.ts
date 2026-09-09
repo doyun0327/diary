@@ -375,81 +375,9 @@ const LANG_DEFAULT_FONT: Record<AppLanguage, string> = {
   th: 'charm',
 };
 
-const LANG_GOOGLE_FONTS: Partial<Record<AppLanguage, string>> = {
-  en: [
-    'family=Caveat:wght@400;700',
-    'family=Patrick+Hand',
-    'family=Indie+Flower',
-    'family=Dancing+Script:wght@400;700',
-    'family=Shadows+Into+Light',
-    'family=Pacifico',
-    'family=Lora:wght@400;700',
-    'family=Libre+Baskerville:wght@400;700',
-    'family=Karla:wght@400;700',
-    'family=Source+Serif+4:wght@400;700',
-    'family=IBM+Plex+Sans:wght@400;700',
-  ].join('&'),
-  ja: [
-    'family=Yomogi',
-    'family=Hachi+Maru+Pop',
-    'family=Zen+Kurenaido',
-    'family=Yusei+Magic',
-    'family=Kiwi+Maru',
-    'family=Zen+Maru+Gothic:wght@400;700',
-    'family=M+PLUS+Rounded+1c:wght@400;700',
-    'family=Kosugi+Maru',
-    'family=Noto+Sans+JP:wght@400;700',
-    'family=Noto+Serif+JP:wght@400;700',
-    'family=Shippori+Mincho:wght@400;700',
-  ].join('&'),
-  zh: [
-    'family=ZCOOL+KuaiLe',
-    'family=Ma+Shan+Zheng',
-    'family=Liu+Jian+Mao+Cao',
-    'family=Long+Cang',
-    'family=Zhi+Mang+Xing',
-    'family=ZCOOL+XiaoWei',
-    'family=ZCOOL+QingKe+HuangYou',
-    'family=Noto+Sans+SC:wght@400;700',
-    'family=Noto+Serif+SC:wght@400;700',
-  ].join('&'),
-  'zh-TW': [
-    'family=LXGW+WenKai+TC',
-    'family=Ma+Shan+Zheng',
-    'family=Liu+Jian+Mao+Cao',
-    'family=Long+Cang',
-    'family=Zhi+Mang+Xing',
-    'family=Noto+Sans+TC:wght@400;700',
-    'family=Noto+Serif+TC:wght@400;700',
-  ].join('&'),
-  th: [
-    'family=Charm:wght@400;700',
-    'family=Charmonman',
-    'family=Sriracha',
-    'family=Mali:wght@400;700',
-    'family=Pattaya',
-    'family=Noto+Sans+Thai:wght@400;700',
-    'family=Sarabun:wght@400;700',
-    'family=Prompt:wght@400;700',
-    'family=Kanit:wght@400;700',
-    'family=IBM+Plex+Sans+Thai:wght@400;700',
-  ].join('&'),
-  vi: [
-    'family=Dancing+Script:wght@400;700',
-    'family=Pacifico',
-    'family=Great+Vibes',
-    'family=Be+Vietnam+Pro:wght@400;700',
-    'family=Lora:wght@400;700',
-    'family=Source+Serif+4:wght@400;700',
-    'family=IBM+Plex+Sans:wght@400;700',
-  ].join('&'),
-};
-
-LANG_GOOGLE_FONTS.es = LANG_GOOGLE_FONTS.en;
-LANG_GOOGLE_FONTS.fr = LANG_GOOGLE_FONTS.en;
-LANG_GOOGLE_FONTS.de = LANG_GOOGLE_FONTS.en;
-LANG_GOOGLE_FONTS.pt = LANG_GOOGLE_FONTS.en;
-LANG_GOOGLE_FONTS.id = LANG_GOOGLE_FONTS.en;
+/** public/fonts — scripts/download-diary-fonts.mjs 로 생성 */
+export const LOCAL_DIARY_FONTS_CSS = '/fonts/diary-fonts.css';
+const LOCAL_FONTS_LINK_ID = 'diary-local-fonts';
 
 export const DEFAULT_FONT_ID = 'gaegu';
 
@@ -473,6 +401,26 @@ export function diaryFontStack(primaryFamily: string): string {
   return primary ? `${primary}, ${DIARY_FONT_FALLBACKS}` : DIARY_FONT_FALLBACKS;
 }
 
+/**
+ * 작성 화면용 — 시스템 한글 fallback 최소화.
+ * Malgun 등과 섞이면 메트릭이 튀어 깨져 보임. 통짜 웹폰트 로드 후엔 primary만 씀.
+ */
+export function diaryEditFontStack(primaryFamily: string): string {
+  const primary = primaryFamily
+    .split(',')
+    .map((part) => part.trim())
+    .filter(
+      (part) =>
+        part &&
+        part !== 'cursive' &&
+        part !== 'sans-serif' &&
+        part !== 'serif' &&
+        !DIARY_FONT_FALLBACKS.includes(part),
+    )
+    .join(', ');
+  return primary ? `${primary}, cursive` : 'cursive';
+}
+
 export function fontsForLanguage(lang: AppLanguage = getStoredLanguage()): FontOption[] {
   return FONTS.filter((f) => f.langs.includes(lang));
 }
@@ -481,16 +429,124 @@ export function defaultFontIdForLanguage(lang: AppLanguage = getStoredLanguage()
   return LANG_DEFAULT_FONT[lang] ?? DEFAULT_FONT_ID;
 }
 
-export function loadLanguageFonts(lang: AppLanguage = getStoredLanguage()) {
-  const query = LANG_GOOGLE_FONTS[lang];
-  if (!query || typeof document === 'undefined') return;
-  const id = `diary-lang-fonts-${lang}`;
-  if (document.getElementById(id)) return;
+/** 로컬 woff2 @font-face CSS 한 번만 로드 (Google CDN 미사용) */
+export function loadLanguageFonts(_lang?: AppLanguage) {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById(LOCAL_FONTS_LINK_ID)) return;
   const el = document.createElement('link');
-  el.id = id;
+  el.id = LOCAL_FONTS_LINK_ID;
   el.rel = 'stylesheet';
-  el.href = `https://fonts.googleapis.com/css2?${query}&display=swap`;
+  el.href = LOCAL_DIARY_FONTS_CSS;
   document.head.appendChild(el);
+}
+
+function primaryFontName(family: string): string | null {
+  const first = family.split(',')[0]?.trim() ?? '';
+  if (!first || first === 'cursive' || first === 'sans-serif' || first === 'serif') {
+    return null;
+  }
+  return first.replace(/^['"]|['"]$/g, '').trim() || null;
+}
+
+/** 로컬 CSS에 모든 글씨체가 포함되어 있으므로 링크만 보장 */
+export function loadFontFaceStylesheet(
+  _familyName?: string,
+  _display: 'block' | 'swap' = 'swap',
+) {
+  loadLanguageFonts();
+}
+
+function isStylesheetApplied(el: HTMLLinkElement): boolean {
+  try {
+    if (el.sheet) return true;
+  } catch {
+    // cross-origin sheet 접근 불가
+  }
+  const href = el.href;
+  if (!href) return false;
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      if (sheet.href === href) return true;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
+}
+
+function waitForLinkElement(
+  el: HTMLLinkElement | null,
+  timeoutMs = 10_000,
+): Promise<void> {
+  if (!el) return Promise.resolve();
+  if (isStylesheetApplied(el)) return Promise.resolve();
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const timer = window.setTimeout(done, timeoutMs);
+    el.addEventListener('load', done, { once: true });
+    el.addEventListener('error', done, { once: true });
+    // 이미 load가 끝난 뒤 리스너를 단 경우
+    queueMicrotask(() => {
+      if (isStylesheetApplied(el)) done();
+    });
+  });
+}
+
+const FONT_LOAD_SAMPLE =
+  '가나다라마바사아자차카타파하한글테스트 ABCabc あいうえお 漢字 你好 สวัสดี';
+
+async function loadFontFaces(familyName: string): Promise<void> {
+  if (!document.fonts?.load) return;
+  try {
+    await Promise.all([
+      document.fonts.load(`400 24px "${familyName}"`, FONT_LOAD_SAMPLE),
+      document.fonts.load(`700 24px "${familyName}"`, FONT_LOAD_SAMPLE),
+    ]);
+  } catch {
+    // 개별 폰트 실패는 무시
+  }
+}
+
+const fontPreloadStarted = new Set<AppLanguage>();
+const fontFaceReady = new Set<string>();
+
+/** 특정 일기 글씨체가 실제로 쓸 수 있을 때까지 대기 */
+export async function ensureDiaryFontReady(
+  fontId?: string | null,
+): Promise<void> {
+  if (typeof document === 'undefined') return;
+  const font = findFont(fontId);
+  const name = primaryFontName(font.family);
+  if (!name) return;
+  if (fontFaceReady.has(name) && document.fonts?.check?.(`400 24px "${name}"`)) {
+    return;
+  }
+
+  loadFontFaceStylesheet(name, 'swap');
+  const link = document.getElementById(LOCAL_FONTS_LINK_ID) as HTMLLinkElement | null;
+  await waitForLinkElement(link);
+  await loadFontFaces(name);
+  fontFaceReady.add(name);
+}
+
+/** 선호 글씨체만 미리 올림 — 언어 전체 preload 는 대역폭만 잡아먹고 타이핑을 방해함 */
+export async function preloadLanguageFonts(
+  lang: AppLanguage = getStoredLanguage(),
+): Promise<void> {
+  if (typeof document === 'undefined') return;
+
+  loadLanguageFonts(lang);
+  if (fontPreloadStarted.has(lang)) return;
+  fontPreloadStarted.add(lang);
+
+  const preferredId = getPreferredFontId(lang);
+  await ensureDiaryFontReady(preferredId);
 }
 
 /** 새 일기 기본 글씨체 (언어별) */
@@ -580,6 +636,7 @@ export function applyLanguageFonts(lang: AppLanguage = getStoredLanguage()) {
   const font = findFont(getPreferredFontId(lang));
   document.documentElement.style.setProperty('--diary-font', diaryFontStack(font.family));
   applyDiaryFontSize(getPreferredFontSizeId());
+  void preloadLanguageFonts(lang);
 }
 
 /** 일기 엔트리에 저장된 글씨체 (구버전 일기는 기본값) */

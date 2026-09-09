@@ -332,7 +332,7 @@
       "copyCode": "Sao chép mã",
       "share": "Chia sẻ",
       "shareTitle": "Lời mời phòng PageBy",
-      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}",
+      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}\n\nTrong app: Phòng bạn bè > Tham gia bằng mã > nhập mã mời",
       "enterRoom": "Vào phòng",
       "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
     },
@@ -448,6 +448,9 @@
     },
     "card": {
       "imageAlt": "Tranh ngày {{date}}"
+    },
+    "coach": {
+      "writeFab": "Viết nhật ký đầu tiên nhé?"
     }
   },
   "subscription": {

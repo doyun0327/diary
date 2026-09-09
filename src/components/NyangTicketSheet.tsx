@@ -41,6 +41,8 @@ interface NyangTicketSheetProps {
   /** 로그인 후 자동 결제할 항목 (앱에서 넘김) */
   autoPurchase?: PendingNyangPurchase | null;
   onAutoPurchaseConsumed?: () => void;
+  /** 저장 토스트와 동일한 하단 안내 */
+  onAppToast?: (message: string) => void;
 }
 
 function formatPurchaseDate(ms: number, locale: string) {
@@ -60,6 +62,7 @@ function NyangTicketSheet({
   initialTab = 'subscribe',
   autoPurchase = null,
   onAutoPurchaseConsumed,
+  onAppToast,
 }: NyangTicketSheetProps) {
   const { t, i18n } = useTranslation();
   const { signInWithGoogleIdToken } = useAuthSession();
@@ -203,11 +206,8 @@ function NyangTicketSheet({
       const result = await purchaseAiPack(productId);
       if (result.cancelled) return;
       if (result.ok) {
-        setMessage(
-          t('nyangTicket.packDone', {
-            n: result.creditsGranted ?? aiPackCreditsLabel(productId),
-          }),
-        );
+        const n = result.creditsGranted ?? aiPackCreditsLabel(productId);
+        onAppToast?.(t('nyangTicket.packDone', { n }));
         void loadHistory();
         return;
       }
@@ -346,9 +346,7 @@ function NyangTicketSheet({
             className={tab === 'subscribe' ? 'is-active' : ''}
             onClick={() => setTab('subscribe')}
           >
-            {isPro
-              ? t('nyangTicket.subscribeTitleWithLeft', { n: subLeft })
-              : t('nyangTicket.subscribeTitle')}
+            {t('nyangTicket.subscribeTitle')}
           </button>
           <button
             type="button"
@@ -357,14 +355,7 @@ function NyangTicketSheet({
             className={tab === 'packs' ? 'is-active' : ''}
             onClick={() => setTab('packs')}
           >
-            <span className="nyang-ticket__tab-label">
-              <span>{t('nyangTicket.packsTitle')}</span>
-              {packLeft > 0 && (
-                <span className="nyang-ticket__tab-left">
-                  {t('nyangTicket.packsRemaining', { n: packLeft })}
-                </span>
-              )}
-            </span>
+            {t('nyangTicket.packsTitle')}
           </button>
           <button
             type="button"
@@ -379,25 +370,39 @@ function NyangTicketSheet({
 
         {tab === 'subscribe' && (
           <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
-            <button
-              type="button"
-              className="account-sheet__btn account-sheet__btn--solid nyang-ticket__btn"
-              disabled={busy != null || isPro}
-              onClick={() => void handleSubscribe()}
-            >
-              {busy === 'google'
-                ? t('nyangTicket.signingIn')
-                : busy === 'sub'
-                  ? t('common.processing')
-                  : isPro
-                    ? t('nyangTicket.subscribed')
+            {isPro ? (
+              <div className="nyang-ticket__sub-status" aria-live="polite">
+                <span className="nyang-ticket__sub-status-title">
+                  {t('nyangTicket.subscribed')}
+                </span>
+                <span className="nyang-ticket__sub-status-left">
+                  {t('nyangTicket.packsRemaining', { n: subLeft })}
+                </span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="account-sheet__btn account-sheet__btn--solid nyang-ticket__btn"
+                disabled={busy != null}
+                onClick={() => void handleSubscribe()}
+              >
+                {busy === 'google'
+                  ? t('nyangTicket.signingIn')
+                  : busy === 'sub'
+                    ? t('common.processing')
                     : t('nyangTicket.subscribeCta')}
-            </button>
+              </button>
+            )}
           </section>
         )}
 
         {tab === 'packs' && (
           <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
+            <div className="nyang-ticket__sub-status" aria-live="polite">
+              <span className="nyang-ticket__sub-status-title">
+                {t('nyangTicket.packsRemaining', { n: packLeft })}
+              </span>
+            </div>
             <ul className="nyang-ticket__packs">
               {AI_PACK_PRODUCTS.map((pack) => (
                 <li key={pack.id}>

@@ -406,24 +406,35 @@ function App() {
 
   /** Google 로그인 중이면 서버와 LWW 동기화 (업·다운로드) */
   const queueCloudSync = useCallback(
-    (options?: SyncCloudOptions) => {
+    (options?: SyncCloudOptions & { showLoading?: boolean }) => {
       const auth = getAuthSession();
       if (!getAccessToken() || auth?.provider !== "google") return;
 
+      const showLoading = options?.showLoading === true;
+      if (showLoading) setCloudSyncLoading(true);
+
       syncChainRef.current = syncChainRef.current
         .then(async () => {
-          const latest = getAuthSession();
-          if (!getAccessToken() || latest?.provider !== "google") return;
-          const pullOnly = options?.pullOnly === true;
-          const month = options?.month ?? viewMonthKey;
-          const result = await syncWithCloud(pullOnly ? null : latest.lastSyncedAt ?? null, {
-            month,
-            pullOnly,
-          });
-          markSynced(result.serverTime);
+          try {
+            const latest = getAuthSession();
+            if (!getAccessToken() || latest?.provider !== "google") return;
+            const pullOnly = options?.pullOnly === true;
+            const month = options?.month ?? viewMonthKey;
+            const result = await syncWithCloud(
+              pullOnly ? null : latest.lastSyncedAt ?? null,
+              {
+                month,
+                pullOnly,
+              },
+            );
+            markSynced(result.serverTime);
+          } finally {
+            if (showLoading) setCloudSyncLoading(false);
+          }
         })
         .catch((err) => {
           console.warn("[sync] cloud sync failed", err);
+          if (showLoading) setCloudSyncLoading(false);
         });
     },
     [syncWithCloud, markSynced, viewMonthKey],
@@ -459,7 +470,7 @@ function App() {
     if (prevCalendarMonthRef.current === viewMonthKey) return;
 
     prevCalendarMonthRef.current = viewMonthKey;
-    queueCloudSync({ month: viewMonthKey, pullOnly: true });
+    queueCloudSync({ month: viewMonthKey, pullOnly: true, showLoading: true });
   }, [calYear, calMonth, ready, page, queueCloudSync, viewMonthKey]);
 
   /** 저장·삭제 직후 — 현재 달 기준 동기화 */
@@ -1021,7 +1032,12 @@ function App() {
           />
         )}
       </main>
-      {page === "home" && <WriteFab onClick={handleNewWrite} />}
+      {page === "home" && (
+        <WriteFab
+          onClick={handleNewWrite}
+          showFirstWriteCoach={entries.length === 0}
+        />
+      )}
       {accountOpen &&
         createPortal(
           <AccountSheet
@@ -1064,6 +1080,7 @@ function App() {
             initialTab={nyangTicketTab}
             autoPurchase={nyangAutoPurchase}
             onAutoPurchaseConsumed={() => setNyangAutoPurchase(null)}
+            onAppToast={showAppToast}
             onClose={() => {
               setNyangTicketOpen(false);
               setNyangAutoPurchase(null);

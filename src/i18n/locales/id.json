@@ -332,7 +332,7 @@
       "copyCode": "Salin kode",
       "share": "Bagikan",
       "shareTitle": "Undangan ruang PageBy",
-      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}",
+      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}\n\nDi aplikasi: Ruang teman > Gabung dengan kode > masukkan kode undangan",
       "enterRoom": "Masuk ruang",
       "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
     },
@@ -448,6 +448,9 @@
     },
     "card": {
       "imageAlt": "Gambar {{date}}"
+    },
+    "coach": {
+      "writeFab": "Mau tulis diary pertama?"
     }
   },
   "subscription": {

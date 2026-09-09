@@ -332,7 +332,7 @@
       "copyCode": "复制邀请码",
       "share": "分享",
       "shareTitle": "PageBy 好友房邀请",
-      "shareText": "要不要一起画图日记？ 🖍️\n我们每天画一张吧！\n\n邀请码：{{code}}",
+      "shareText": "要不要一起画图日记？ 🖍️\n我们每天画一张吧！\n\n邀请码：{{code}}\n\n在应用中：好友房 > 用邀请码加入 > 输入邀请码即可进入",
       "enterRoom": "进入房间",
       "created": "房间已创建！\n\n邀请码：{{code}}\n\n把这个码分享给朋友吧。"
     },
@@ -448,6 +448,9 @@
     },
     "card": {
       "imageAlt": "{{date}} 的画"
+    },
+    "coach": {
+      "writeFab": "要去写第一篇日记吗？"
     }
   },
   "subscription": {

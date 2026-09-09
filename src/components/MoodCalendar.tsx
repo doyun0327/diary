@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, DiarySticker } from '../types/diary';
 import { isMood } from '../types/diary';
@@ -27,6 +28,23 @@ function toDateString(year: number, month: number, day: number): string {
 
 const CALENDAR_MAX_WEEKS = 6;
 
+/** 브라우저 디코드 완료된 썸네일 URL */
+const preloadedThumbUrls = new Set<string>();
+
+function preloadImage(url: string): Promise<void> {
+  if (preloadedThumbUrls.has(url)) return Promise.resolve();
+  return new Promise((resolve) => {
+    const img = new Image();
+    const done = () => {
+      preloadedThumbUrls.add(url);
+      resolve();
+    };
+    img.onload = done;
+    img.onerror = done;
+    img.src = url;
+  });
+}
+
 function MoodCalendar({
   entries,
   viewYear,
@@ -42,6 +60,7 @@ function MoodCalendar({
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const todayStr = toDateString(now.getFullYear(), now.getMonth(), now.getDate());
   const weekCount = Math.ceil((firstWeekday + daysInMonth) / 7);
+  const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
 
   const cells: (number | null)[] = [
     ...Array<null>(firstWeekday).fill(null),
@@ -49,15 +68,60 @@ function MoodCalendar({
   ];
   while (cells.length < weekCount * 7) cells.push(null);
 
-  const markByDate = new Map<string, DayMark>();
-  for (const entry of entries) {
-    if (markByDate.has(entry.date)) continue;
-    const sticker = entry.mood;
-    const imageUrl = entry.imageUrl?.trim() ? entry.imageUrl : undefined;
-    if (sticker || imageUrl) {
-      markByDate.set(entry.date, { sticker, moodPack: entry.moodPack, imageUrl });
+  const markByDate = useMemo(() => {
+    const map = new Map<string, DayMark>();
+    for (const entry of entries) {
+      if (!entry.date.startsWith(monthPrefix)) continue;
+      if (map.has(entry.date)) continue;
+      const sticker = entry.mood;
+      const imageUrl = entry.imageUrl?.trim() ? entry.imageUrl : undefined;
+      if (sticker || imageUrl) {
+        map.set(entry.date, { sticker, moodPack: entry.moodPack, imageUrl });
+      }
     }
-  }
+    return map;
+  }, [entries, monthPrefix]);
+
+  const monthThumbUrls = useMemo(() => {
+    const urls: string[] = [];
+    const seen = new Set<string>();
+    for (const mark of markByDate.values()) {
+      const url = mark.imageUrl;
+      if (!url || seen.has(url)) continue;
+      seen.add(url);
+      urls.push(url);
+    }
+    return urls;
+  }, [markByDate]);
+
+  const thumbBatchKey = `${monthPrefix}|${monthThumbUrls.join('\0')}`;
+  const [readyBatchKey, setReadyBatchKey] = useState<string | null>(() =>
+    monthThumbUrls.length === 0 || monthThumbUrls.every((u) => preloadedThumbUrls.has(u))
+      ? thumbBatchKey
+      : null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const urls = monthThumbUrls;
+    const key = thumbBatchKey;
+
+    if (urls.length === 0 || urls.every((u) => preloadedThumbUrls.has(u))) {
+      setReadyBatchKey(key);
+      return;
+    }
+
+    setReadyBatchKey(null);
+    void Promise.all(urls.map(preloadImage)).then(() => {
+      if (!cancelled) setReadyBatchKey(key);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [monthThumbUrls, thumbBatchKey]);
+
+  const thumbsReady = readyBatchKey === thumbBatchKey;
 
   const moveMonth = (delta: number) => {
     const d = new Date(viewYear, viewMonth + delta, 1);
@@ -105,7 +169,7 @@ function MoodCalendar({
           const mark = markByDate.get(dateStr);
           const sticker = mark?.sticker;
           const imageUrl = mark?.imageUrl;
-          const showDrawing = Boolean(imageUrl);
+          const showDrawing = Boolean(imageUrl) && thumbsReady;
           const showMood = Boolean(sticker) && !showDrawing;
           const isToday = dateStr === todayStr;
           const moodLabel = sticker

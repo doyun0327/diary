@@ -115,7 +115,7 @@
   background: none;
   font-family: var(--diary-font);
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--color-text);
   text-align: left;
   cursor: pointer;
@@ -440,7 +440,7 @@
   border-radius: var(--radius-md);
   font-family: var(--diary-font);
   font-size: calc(var(--diary-font-size, 1.2rem) * 1.04);
-  font-weight: 700;
+  font-weight: 400;
   background: var(--color-bg-input);
   color: var(--color-text);
   transition: border-color 0.15s, box-shadow 0.15s;

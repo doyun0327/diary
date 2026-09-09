@@ -332,7 +332,7 @@
       "copyCode": "Copier le code",
       "share": "Partager",
       "shareTitle": "Invitation salon PageBy",
-      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}",
+      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}\n\nDans l’app : Salons d’amis > Rejoindre avec un code > saisissez le code d’invitation",
       "enterRoom": "Entrer dans le salon",
       "created": "Salon créé !\n\nCode d'invitation : {{code}}\n\nPartagez ce code avec vos amis."
     },
@@ -448,6 +448,9 @@
     },
     "card": {
       "imageAlt": "Dessin du {{date}}"
+    },
+    "coach": {
+      "writeFab": "On écrit ton premier journal ?"
     }
   },
   "subscription": {

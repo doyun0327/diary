@@ -300,7 +300,7 @@
     "packsLead": "Buy once and use right away.",
     "packLabel": "{{n}}",
     "buy": "Buy",
-    "packDone": "{{n}} AI drawings added!",
+    "packDone": "Purchased {{n}} drawings",
     "appOnly": "Purchases are available in the app only",
     "noProduct": "Product not found. Check store setup.",
     "notConfigured": "Billing isn’t ready. Please restart the app.",
@@ -315,7 +315,7 @@
     "historyLoadFailed": "Couldn't load purchase history.",
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
-    "historyItemPack": "AI drawings ×{{n}}"
+    "historyItemPack": "{{n}}"
   },
   "credits": {
     "moodIcons": "Mood icons: designed by {{author}} from Flaticon",
@@ -414,7 +414,7 @@
       "copyCode": "Copy code",
       "share": "Share",
       "shareTitle": "PageBy room invite",
-      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}",
+      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}\n\nIn the app: Friend rooms > Join with code > enter the invite code",
       "enterRoom": "Enter room",
       "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
     },
@@ -513,6 +513,9 @@
     },
     "card": {
       "imageAlt": "Drawing for {{date}}"
+    },
+    "coach": {
+      "writeFab": "Shall we write your first diary?"
     }
   },
   "subscription": {
