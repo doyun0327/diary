@@ -1,4 +1,4 @@
-export type NyangTicketTab = 'subscribe' | 'packs';
+export type NyangTicketTab = 'subscribe' | 'packs' | 'history';
 
 export const OPEN_NYANG_TICKET_EVENT = 'diary-open-nyang-ticket';
 

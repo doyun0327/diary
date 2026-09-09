@@ -308,7 +308,14 @@
     "buyFailed": "구매에 실패했어요. 잠시 후 다시 시도해 주세요.",
     "googleRequired": "결제하려면 Google 로그인이 필요해요",
     "googleLoginFailed": "Google 로그인에 실패했어요. 다시 시도해 주세요.",
-    "signingIn": "로그인 중…"
+    "signingIn": "로그인 중…",
+    "historyTitle": "구매내역",
+    "historyEmpty": "아직 구매 내역이 없어요.",
+    "historyNeedLogin": "구매 내역은 Google 로그인 후 볼 수 있어요.",
+    "historyLoadFailed": "구매 내역을 불러오지 못했어요.",
+    "historyDone": "완료",
+    "historyItemSubscription": "PRO 구독",
+    "historyItemPack": "AI 그림 {{n}}장"
   },
   "credits": {
     "moodIcons": "기분 아이콘: designed by {{author}} from Flaticon",

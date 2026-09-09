@@ -8,7 +8,7 @@ import {
   grantAiPackCredits,
 } from './diaryAccess';
 import { getAccessToken, isGoogleSignedIn } from '../hooks/useAuthSession';
-import { grantAiPackCreditsRemote } from '../api/usageApi';
+import { grantAiPackCreditsRemote, recordPurchaseRemote } from '../api/usageApi';
 import {
   waitForTipPurchase,
   type TipPurchaseResult,
@@ -29,13 +29,23 @@ export async function purchaseAiPack(
   const credits = aiPackCreditsForProduct(result.productId || productId);
   if (credits > 0) {
     const token = getAccessToken();
+    const product = result.productId || productId;
     if (token) {
       try {
-        const view = await grantAiPackCreditsRemote(token, credits);
+        const view = await grantAiPackCreditsRemote(token, credits, product);
         applyAiPackCreditsFromServer(view.credits);
       } catch {
         // 서버 실패 시 로컬이라도 지급 (재동기화 시 보정)
         grantAiPackCredits(credits);
+        try {
+          await recordPurchaseRemote(token, {
+            kind: 'ai_pack',
+            productId: product,
+            creditsGranted: credits,
+          });
+        } catch (err) {
+          console.warn('[aiPack] purchase history save failed', err);
+        }
       }
     } else {
       grantAiPackCredits(credits);

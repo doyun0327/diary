@@ -104,16 +104,66 @@ export async function fetchAiPackCredits(
 export async function grantAiPackCreditsRemote(
   accessToken: string,
   count: number,
+  productId?: string,
 ): Promise<AiPackCreditsDto> {
   const res = await fetch(apiUrl('/api/usage/ai-pack/grant'), {
     method: 'POST',
     headers: authHeaders(accessToken),
-    body: JSON.stringify({ count }),
+    body: JSON.stringify({
+      count,
+      ...(productId ? { productId } : {}),
+    }),
   });
   if (!res.ok) {
     throw new Error(await readError(res, 'AI 팩 지급 실패'));
   }
   return (await res.json()) as AiPackCreditsDto;
+}
+
+export type PurchaseKind = 'ai_pack' | 'subscription';
+
+export type PurchaseRecordDto = {
+  id: string;
+  kind: PurchaseKind | string;
+  productId: string;
+  creditsGranted: number;
+  /** epoch ms */
+  createdAt: number;
+};
+
+export type PurchaseRecordsDto = {
+  items: PurchaseRecordDto[];
+};
+
+export async function fetchPurchaseRecords(
+  accessToken: string,
+): Promise<PurchaseRecordsDto> {
+  const res = await fetch(apiUrl('/api/usage/purchases'), {
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '구매 내역 조회 실패'));
+  }
+  return (await res.json()) as PurchaseRecordsDto;
+}
+
+export async function recordPurchaseRemote(
+  accessToken: string,
+  body: {
+    kind: PurchaseKind;
+    productId: string;
+    creditsGranted?: number;
+  },
+): Promise<PurchaseRecordDto> {
+  const res = await fetch(apiUrl('/api/usage/purchases'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '구매 내역 저장 실패'));
+  }
+  return (await res.json()) as PurchaseRecordDto;
 }
 
 export async function consumeAiPackCreditsRemote(

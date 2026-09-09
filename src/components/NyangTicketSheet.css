@@ -32,6 +32,10 @@
   align-items: stretch;
 }
 
+.nyang-ticket__tabs--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .nyang-ticket__tabs button {
   min-height: 36px;
   height: 100%;
@@ -143,3 +147,61 @@
   color: #c44b4b;
   text-align: center;
 }
+
+.nyang-ticket__hint {
+  margin: 24px 8px 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.nyang-ticket__history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(52vh, 360px);
+  overflow-y: auto;
+}
+
+.nyang-ticket__history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--color-border-soft);
+  background: var(--color-surface);
+}
+
+.nyang-ticket__history-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nyang-ticket__history-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.nyang-ticket__history-date {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.nyang-ticket__history-status {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+

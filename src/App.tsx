@@ -124,9 +124,9 @@ function App() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [nyangTicketOpen, setNyangTicketOpen] = useState(false);
-  const [nyangTicketTab, setNyangTicketTab] = useState<'subscribe' | 'packs'>(
-    'subscribe',
-  );
+  const [nyangTicketTab, setNyangTicketTab] = useState<
+    'subscribe' | 'packs' | 'history'
+  >('subscribe');
   const [nyangAutoPurchase, setNyangAutoPurchase] =
     useState<PendingNyangPurchase | null>(null);
   const [lockSetupOpen, setLockSetupOpen] = useState(false);
@@ -225,7 +225,13 @@ function App() {
   useEffect(() => {
     const onOpen = (event: Event) => {
       const detail = (event as CustomEvent<OpenNyangTicketDetail>).detail;
-      setNyangTicketTab(detail?.tab === 'packs' ? 'packs' : 'subscribe');
+      setNyangTicketTab(
+        detail?.tab === 'packs'
+          ? 'packs'
+          : detail?.tab === 'history'
+            ? 'history'
+            : 'subscribe',
+      );
       setNyangTicketOpen(true);
     };
     window.addEventListener(OPEN_NYANG_TICKET_EVENT, onOpen);

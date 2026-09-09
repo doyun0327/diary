@@ -308,7 +308,14 @@
     "buyFailed": "Purchase failed. Please try again later.",
     "googleRequired": "Google sign-in is required to purchase",
     "googleLoginFailed": "Google sign-in failed. Please try again.",
-    "signingIn": "Signing in…"
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemPack": "AI drawings ×{{n}}"
   },
   "credits": {
     "moodIcons": "Mood icons: designed by {{author}} from Flaticon",

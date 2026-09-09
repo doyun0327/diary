@@ -1,5 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  fetchPurchaseRecords,
+  recordPurchaseRemote,
+  type PurchaseRecordDto,
+} from '../api/usageApi';
 import { AI_PACK_PRODUCTS, type AiPackProductId } from '../utils/aiPackProducts';
 import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
@@ -18,14 +23,16 @@ import {
   setPendingNyangPurchase,
   type PendingNyangPurchase,
 } from '../utils/pendingNyangPurchase';
-import { isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
+import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn } from '../lib/googleAuth';
 import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 import './NyangTicketSheet.css';
 
-type TabId = 'subscribe' | 'packs';
+type TabId = 'subscribe' | 'packs' | 'history';
 type BusyState = 'sub' | 'google' | AiPackProductId | null;
+
+const SUB_PRODUCT_ID = 'pageby_monthly';
 
 interface NyangTicketSheetProps {
   onClose: () => void;
@@ -36,19 +43,34 @@ interface NyangTicketSheetProps {
   onAutoPurchaseConsumed?: () => void;
 }
 
+function formatPurchaseDate(ms: number, locale: string) {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(ms));
+  } catch {
+    return new Date(ms).toLocaleDateString();
+  }
+}
+
 function NyangTicketSheet({
   onClose,
   initialTab = 'subscribe',
   autoPurchase = null,
   onAutoPurchaseConsumed,
 }: NyangTicketSheetProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { signInWithGoogleIdToken } = useAuthSession();
   const [tab, setTab] = useState<TabId>(initialTab);
   const [accessTick, setAccessTick] = useState(0);
   const [busy, setBusy] = useState<BusyState>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<PurchaseRecordDto[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -71,11 +93,51 @@ function NyangTicketSheet({
     requestSubscriptionRestore();
   }, []);
 
+  const loadHistory = useCallback(async () => {
+    const token = getAccessToken();
+    if (!token || !isGoogleSignedIn()) {
+      setHistory([]);
+      setHistoryError(null);
+      return;
+    }
+    setHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const data = await fetchPurchaseRecords(token);
+      setHistory(data.items ?? []);
+    } catch (err) {
+      setHistoryError(
+        err instanceof Error ? err.message : t('nyangTicket.historyLoadFailed'),
+      );
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (tab === 'history') void loadHistory();
+  }, [tab, loadHistory]);
+
   void accessTick;
   const access = getDiaryAccessState();
   const packLeft = getAiPackCredits();
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
+
+  const recordSubscriptionPurchase = async (productId?: string | null) => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      await recordPurchaseRemote(token, {
+        kind: 'subscription',
+        productId: (productId && productId.trim()) || SUB_PRODUCT_ID,
+        creditsGranted: 0,
+      });
+      void loadHistory();
+    } catch (err) {
+      console.warn('[nyangTicket] subscription history save failed', err);
+    }
+  };
 
   /** 비회원 → Google 회원 만든 뒤 true. 웹은 계정 시트로 보냄 */
   const ensureGoogleMember = async (
@@ -124,6 +186,7 @@ function NyangTicketSheet({
       const ok = await requestSubscriptionPurchaseAndSync();
       if (ok) {
         setMessage(t('nyangTicket.subscribeDone'));
+        await recordSubscriptionPurchase(SUB_PRODUCT_ID);
       }
     } finally {
       setBusy(null);
@@ -145,6 +208,7 @@ function NyangTicketSheet({
             n: result.creditsGranted ?? aiPackCreditsLabel(productId),
           }),
         );
+        void loadHistory();
         return;
       }
       if (result.error === 'need_google') {
@@ -225,6 +289,16 @@ function NyangTicketSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const purchaseTitle = (row: PurchaseRecordDto) => {
+    if (row.kind === 'subscription') {
+      return t('nyangTicket.historyItemSubscription');
+    }
+    if (row.creditsGranted > 0) {
+      return t('nyangTicket.historyItemPack', { n: row.creditsGranted });
+    }
+    return row.productId;
+  };
+
   return (
     <div className="account-sheet" role="dialog" aria-label={t('nyangTicket.aria')}>
       <div className="account-sheet__backdrop" onClick={onClose} />
@@ -264,7 +338,7 @@ function NyangTicketSheet({
           </button>
         </header>
 
-        <div className="nyang-ticket__tabs" role="tablist" aria-label={t('nyangTicket.tabsAria')}>
+        <div className="nyang-ticket__tabs nyang-ticket__tabs--3" role="tablist" aria-label={t('nyangTicket.tabsAria')}>
           <button
             type="button"
             role="tab"
@@ -291,6 +365,15 @@ function NyangTicketSheet({
                 </span>
               )}
             </span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'history'}
+            className={tab === 'history' ? 'is-active' : ''}
+            onClick={() => setTab('history')}
+          >
+            {t('nyangTicket.historyTitle')}
           </button>
         </div>
 
@@ -338,6 +421,40 @@ function NyangTicketSheet({
                 </li>
               ))}
             </ul>
+          </section>
+        )}
+
+        {tab === 'history' && (
+          <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
+            {!isGoogleSignedIn() ? (
+              <p className="nyang-ticket__hint">{t('nyangTicket.historyNeedLogin')}</p>
+            ) : historyLoading ? (
+              <p className="nyang-ticket__hint">{t('common.loading')}</p>
+            ) : historyError ? (
+              <p className="nyang-ticket__err" role="alert">
+                {historyError}
+              </p>
+            ) : history.length === 0 ? (
+              <p className="nyang-ticket__hint">{t('nyangTicket.historyEmpty')}</p>
+            ) : (
+              <ul className="nyang-ticket__history">
+                {history.map((row) => (
+                  <li key={row.id} className="nyang-ticket__history-row">
+                    <div className="nyang-ticket__history-main">
+                      <span className="nyang-ticket__history-title">
+                        {purchaseTitle(row)}
+                      </span>
+                      <span className="nyang-ticket__history-date">
+                        {formatPurchaseDate(row.createdAt, i18n.language)}
+                      </span>
+                    </div>
+                    <span className="nyang-ticket__history-status">
+                      {t('nyangTicket.historyDone')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )}
 
