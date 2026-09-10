@@ -31,7 +31,15 @@ import { useDeployMaintenance } from "./hooks/useDeployMaintenance";
 import { useCharacter } from "./hooks/useCharacter";
 import { useClientProfile } from "./hooks/useClientProfile";
 import { useScreenLock } from "./hooks/useScreenLock";
-import { getAccessToken, getAuthSession, isGoogleSignedIn, useAuthSession, AUTH_CHANGE_EVENT } from "./hooks/useAuthSession";
+import {
+  getAccessToken,
+  getAuthSession,
+  isGoogleSignedIn,
+  useAuthSession,
+  AUTH_CHANGE_EVENT,
+  GOOGLE_REAUTH_EVENT,
+  clearGoogleSessionIfInvalid,
+} from "./hooks/useAuthSession";
 import {
   usePushOpenHandler,
   usePushRegistration,
@@ -41,7 +49,7 @@ import {
   markProfileSetupDone,
 } from "./utils/onboarding";
 import type { DiaryEntry } from "./types/diary";
-import { formatYearMonth, monthKey } from "./utils/date";
+import { formatYearMonth, monthKey, today } from "./utils/date";
 import type { SyncCloudOptions } from "./api/diariesApi";
 import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import {
@@ -107,13 +115,16 @@ function App() {
   const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries, syncWithCloud, ready } =
     useDiary();
-  const { session, markSynced, ensureGuestSession } = useAuthSession();
+  const { session, markSynced, ensureGuestSession, refreshMe } = useAuthSession();
+  const googleReauthToastShownRef = useRef(false);
   const { character, setCharacter } = useCharacter();
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } =
     useClientProfile();
   const screenLock = useScreenLock();
   const [page, setPage] = useState<Page>(() => readResumeWrite().page);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  /** 메인 달력에서 고른 날짜 — 새 일기 작성 시 사용 */
+  const [selectedDate, setSelectedDate] = useState(() => today());
   const [editingId, setEditingId] = useState<string | null>(
     () => readResumeWrite().editingId,
   );
@@ -350,6 +361,17 @@ function App() {
       window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, onSubscriptionChange);
   }, [subscriptionModal, entries.length, bookEntries, closeSubscriptionModal]);
 
+  // Google로 보이는 세션이면 /me 로 서버에서도 한 번 확인 (폐기·만료 대응)
+  useEffect(() => {
+    if (needsProfileSetup) return;
+    if (getAuthSession()?.provider !== "google") return;
+    if (!getAccessToken()) {
+      clearGoogleSessionIfInvalid();
+      return;
+    }
+    void refreshMe();
+  }, [needsProfileSetup, refreshMe, session?.userId]);
+
   useEffect(() => {
     if (needsProfileSetup) return;
     if (getAccessToken()) return;
@@ -359,7 +381,7 @@ function App() {
       .catch((err) => {
       console.warn("[guest] auto session failed", err);
     });
-  }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t]);
+  }, [needsProfileSetup, clientId, nickname, ensureGuestSession, t, session?.provider]);
 
   usePushRegistration(!needsProfileSetup, session?.userId ?? clientId);
 
@@ -485,6 +507,39 @@ function App() {
     if (appToastTimer.current != null) window.clearTimeout(appToastTimer.current);
     appToastTimer.current = window.setTimeout(() => setAppToast(null), durationMs);
   }, []);
+
+  // Google JWT 만료·소실 시 세션 정리 + 계정(로그인) 화면
+  useEffect(() => {
+    const openReauth = () => {
+      setGoogleLoginForProOpen(false);
+      setAccountOpen(true);
+      if (!googleReauthToastShownRef.current) {
+        googleReauthToastShownRef.current = true;
+        showAppToast(t("account.sync.sessionExpired"), 2800);
+      }
+    };
+    const check = () => {
+      if (clearGoogleSessionIfInvalid()) openReauth();
+    };
+    check();
+    const onReauth = () => openReauth();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") check();
+    };
+    window.addEventListener(GOOGLE_REAUTH_EVENT, onReauth);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", check);
+    return () => {
+      window.removeEventListener(GOOGLE_REAUTH_EVENT, onReauth);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", check);
+    };
+  }, [showAppToast, t]);
+
+  useEffect(() => {
+    if (!isGoogleSignedIn()) return;
+    googleReauthToastShownRef.current = false;
+  }, [session?.provider, session?.userId]);
 
   const persistNewEntry = useCallback(
     async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
@@ -932,6 +987,8 @@ function App() {
             onSelect={handleSelect}
             viewYear={calYear}
             viewMonth={calMonth}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
             onViewChange={(year, month) => {
               setCalYear(year);
               setCalMonth(month);
@@ -940,9 +997,10 @@ function App() {
         )}
         {page === "write" && (
           <DiaryWritePage
-            key={editingId ?? "new"}
+            key={editingId ?? `new-${selectedDate}`}
             character={character}
             initialEntry={editingEntry}
+            initialDate={editingEntry ? undefined : selectedDate}
             onSave={handleSave}
             onCancel={handleWriteCancel}
             onOpenCharacter={() => setCharacterOpen(true)}
@@ -975,6 +1033,7 @@ function App() {
             nickname={nickname}
             avatarUrl={avatarUrl}
             clientId={clientId}
+            userId={session?.userId ?? ""}
             ensureGuestSession={ensureGuestSession}
             onOpenAccount={() => setAccountOpen(true)}
             onBack={() => setPage("home")}

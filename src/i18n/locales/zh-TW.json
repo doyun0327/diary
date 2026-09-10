@@ -216,6 +216,7 @@
       "errGoogleNetwork": "請檢查網路後重試",
       "errGoogleToken": "未取得 Google 權杖。請檢查 SHA-1 和 Web 用戶端 ID",
       "errSync": "無法同步",
+      "sessionExpired": "登入已過期，請重新使用 Google 登入",
       "noAccountPhoto": "此賬號沒有頭像",
       "loadingDiaries": "正在載入日記…"
     },

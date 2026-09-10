@@ -64,3 +64,21 @@ export function markRoomPostSeen(roomId: string, postId: string) {
   state.initialized[roomId] = true;
   saveStore(state);
 }
+
+/** 방 목록용 — 다른 사람 글 중 안 읽은 게 있으면 true */
+export function roomHasUnreadPosts(
+  roomId: string,
+  posts: Array<{ id: string; authorUserId?: string }>,
+  currentUserId?: string | null,
+): boolean {
+  if (!roomId || posts.length === 0) return false;
+  const state = loadStore();
+  if (!state.initialized[roomId]) return false;
+  const seen = state.seenPostIds[roomId] ?? [];
+  const seenSet = new Set(seen);
+  return posts.some((p) => {
+    if (!p.id || seenSet.has(p.id)) return false;
+    if (currentUserId && p.authorUserId === currentUserId) return false;
+    return true;
+  });
+}

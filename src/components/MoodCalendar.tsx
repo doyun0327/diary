@@ -13,6 +13,7 @@ interface MoodCalendarProps {
   viewMonth: number;
   onViewChange: (year: number, month: number) => void;
   onSelectDate?: (date: string) => void;
+  selectedDate?: string;
   hideHeader?: boolean;
 }
 
@@ -51,6 +52,7 @@ function MoodCalendar({
   viewMonth,
   onViewChange,
   onSelectDate,
+  selectedDate,
   hideHeader = false,
 }: MoodCalendarProps) {
   const { t } = useTranslation();
@@ -172,6 +174,7 @@ function MoodCalendar({
           const showDrawing = Boolean(imageUrl) && thumbsReady;
           const showMood = Boolean(sticker) && !showDrawing;
           const isToday = dateStr === todayStr;
+          const isSelected = Boolean(selectedDate) && dateStr === selectedDate;
           const moodLabel = sticker
             ? isMood(sticker)
               ? t(`mood.${sticker}`)
@@ -187,7 +190,9 @@ function MoodCalendar({
                 showDrawing ? 'has-drawing' : '',
                 showMood ? 'has-mood' : '',
                 isToday ? 'today' : '',
+                isSelected ? 'selected' : '',
               ].filter(Boolean).join(' ')}
+              aria-pressed={isSelected || undefined}
               onClick={() => onSelectDate?.(dateStr)}
               aria-label={`${day}${moodLabel ? ` ${moodLabel}` : ''}`}
             >

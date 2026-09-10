@@ -216,6 +216,7 @@
       "errGoogleNetwork": "ตรวจสอบเครือข่ายแล้วลองใหม่",
       "errGoogleToken": "ไม่ได้โทเค็น Google ตรวจสอบ SHA-1 และ Web Client ID",
       "errSync": "ซิงค์ไม่ได้",
+      "sessionExpired": "เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบด้วย Google อีกครั้ง",
       "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์",
       "loadingDiaries": "กำลังโหลดไดอารี่…"
     },

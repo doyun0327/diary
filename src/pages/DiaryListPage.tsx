@@ -14,6 +14,8 @@ interface DiaryListPageProps {
   viewYear: number;
   viewMonth: number;
   onViewChange: (year: number, month: number) => void;
+  selectedDate?: string;
+  onSelectDate?: (date: string) => void;
 }
 
 function DiaryListPage({
@@ -22,6 +24,8 @@ function DiaryListPage({
   viewYear,
   viewMonth,
   onViewChange,
+  selectedDate,
+  onSelectDate,
 }: DiaryListPageProps) {
   const { t } = useTranslation();
   const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
@@ -44,6 +48,7 @@ function DiaryListPage({
   const visibleEntries = expanded ? monthEntries : monthEntries.slice(0, PREVIEW_LIMIT);
 
   const handleCalendarDate = (date: string) => {
+    onSelectDate?.(date);
     const entry = entries.find((e) => e.date === date);
     if (entry) onSelect(entry.id);
   };
@@ -62,6 +67,7 @@ function DiaryListPage({
         viewYear={viewYear}
         viewMonth={viewMonth}
         onViewChange={onViewChange}
+        selectedDate={selectedDate}
         onSelectDate={handleCalendarDate}
         hideHeader
       />

@@ -248,6 +248,7 @@
       "errGoogleNetwork": "Check your network and try again",
       "errGoogleToken": "Didn't get a Google token. Check SHA-1 and the Web Client ID",
       "errSync": "Couldn't upload",
+      "sessionExpired": "Your sign-in expired. Please sign in with Google again",
       "noAccountPhoto": "This account has no profile photo"
     },
     "ok": {

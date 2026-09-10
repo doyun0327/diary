@@ -216,6 +216,7 @@
       "errGoogleNetwork": "请检查网络后重试",
       "errGoogleToken": "未获取到 Google令牌。请检查 SHA-1 和 Web 客户端 ID",
       "errSync": "无法同步",
+      "sessionExpired": "登录已过期，请重新使用 Google 登录",
       "noAccountPhoto": "此账号没有头像",
       "loadingDiaries": "正在加载日记…"
     },

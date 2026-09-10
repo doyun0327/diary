@@ -216,6 +216,7 @@
       "errGoogleNetwork": "Prüfe deine Netzwerkverbindung und versuche es erneut",
       "errGoogleToken": "Kein Google-Token erhalten. Prüfe SHA-1 und die Web-Client-ID",
       "errSync": "Synchronisierung fehlgeschlagen",
+      "sessionExpired": "Anmeldung abgelaufen. Bitte erneut mit Google anmelden",
       "noAccountPhoto": "Dieses Konto hat kein Profilfoto",
       "loadingDiaries": "Tagebücher werden geladen…"
     },

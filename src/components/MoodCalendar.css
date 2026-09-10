@@ -186,6 +186,18 @@
   box-shadow: inset 0 0 0 1.5px var(--color-border);
 }
 
+.mood-cal__day.selected {
+  font-weight: 700;
+  color: var(--color-accent-text, var(--color-text));
+  background: var(--color-accent-soft);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+.mood-cal__day.selected.today {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
 .mood-cal__day.has-mood {
   color: unset;
   background: transparent;
@@ -277,7 +289,19 @@
   outline-offset: -2px;
 }
 
+.mood-cal__day.has-mood.selected {
+  background: transparent;
+  box-shadow: none;
+  outline: 2.5px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
 .mood-cal__day.has-drawing.today {
   background: var(--color-accent-soft);
   box-shadow: inset 0 0 0 1.5px var(--color-accent);
+}
+
+.mood-cal__day.has-drawing.selected {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 0 0 2px var(--color-accent);
 }

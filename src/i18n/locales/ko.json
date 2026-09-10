@@ -248,6 +248,7 @@
       "errGoogleNetwork": "네트워크를 확인한 뒤 다시 시도해 주세요",
       "errGoogleToken": "Google 토큰을 받지 못했어요. SHA-1과 Web Client ID를 확인해 주세요",
       "errSync": "업로드하지 못했어요",
+      "sessionExpired": "로그인이 만료됐어요. 다시 Google로 로그인해 주세요",
       "noAccountPhoto": "이 계정에는 프로필 사진이 없어요"
     },
     "ok": {

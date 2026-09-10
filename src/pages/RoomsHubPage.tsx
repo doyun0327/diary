@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { RoomSummary } from "../types/room";
 import * as roomsApi from "../api/roomsApi";
@@ -16,19 +16,23 @@ import {
 } from "../utils/roomCovers";
 import { letterAvatarDataUrl } from "../utils/letterAvatar";
 import {
+  getCachedRoomFeed,
   getCachedRoomsList,
   invalidateRoomsList,
 } from "../utils/roomCache";
-import { prefetchRoomFeed, prefetchRoomsList, prefetchVisibleRoomFeeds } from "../utils/roomPrefetch";
+import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
+import { roomHasUnreadPosts } from "../utils/roomPostSeen";
 import { isNetworkError, resolveNetworkErrorTitle } from "../utils/networkError";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
+const HUB_FEED_PREFETCH = 5;
 
 interface RoomsHubPageProps {
   nickname: string;
   avatarUrl: string | null;
   clientId: string;
+  userId?: string | null;
   ensureGuestSession: (clientId: string, nickname: string) => Promise<unknown>;
   onOpenAccount: () => void;
   onOpenRoom: (roomId: string) => void;
@@ -67,6 +71,7 @@ function RoomsHubPage({
   nickname,
   avatarUrl,
   clientId,
+  userId,
   ensureGuestSession,
   onOpenAccount,
   onOpenRoom,
@@ -78,6 +83,7 @@ function RoomsHubPage({
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [unreadTick, setUnreadTick] = useState(0);
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [roomName, setRoomName] = useState("");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
@@ -165,13 +171,36 @@ function RoomsHubPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 프로필 준비될 때 다시 로드
   }, [shareReady, nickname, clientId]);
 
+  // 방 목록 피드 최신화 → 친구 새 글 N 배지
   useEffect(() => {
     if (!shareReady || rooms.length === 0) return;
-    prefetchVisibleRoomFeeds(
-      rooms.map((r) => r.id),
-      5,
-    );
+    let cancelled = false;
+    const ids = rooms.map((r) => r.id).filter(Boolean).slice(0, HUB_FEED_PREFETCH);
+    void (async () => {
+      await Promise.all(
+        ids.map((id) =>
+          prefetchRoomFeed(id, { page: 0, size: 10, force: true }).catch(() => {}),
+        ),
+      );
+      if (!cancelled) setUnreadTick((n) => n + 1);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [shareReady, rooms]);
+
+  const unreadRoomIds = useMemo(() => {
+    void unreadTick;
+    const set = new Set<string>();
+    for (const room of rooms) {
+      const feed = getCachedRoomFeed(room.id, 0, 10, { allowStale: true });
+      if (!feed) continue;
+      if (roomHasUnreadPosts(room.id, feed.posts, userId)) {
+        set.add(room.id);
+      }
+    }
+    return set;
+  }, [rooms, userId, unreadTick]);
 
   const onRoomsPageChange = (nextPage: number) => {
     if (nextPage === page || loading) return;
@@ -493,6 +522,7 @@ function RoomsHubPage({
                 room.coverPreset,
                 room.coverUrl,
               );
+              const showNew = unreadRoomIds.has(room.id);
               return (
                 <li
                   key={room.id}
@@ -512,16 +542,26 @@ function RoomsHubPage({
                     onPointerDown={() => void prefetchRoomFeed(room.id)}
                     onClick={() => onOpenRoom(room.id)}
                   >
-                    {cover.kind === "image" ? (
-                      <span className="rooms__polaroid-photo rooms__polaroid-photo--image">
-                        <img src={cover.url} alt="" />
-                      </span>
-                    ) : (
-                      <span
-                        className={`rooms__polaroid-photo ${coverClassName(cover.id)}`}
-                        aria-hidden
-                      />
-                    )}
+                    <span className="rooms__polaroid-photo-wrap">
+                      {cover.kind === "image" ? (
+                        <span className="rooms__polaroid-photo rooms__polaroid-photo--image">
+                          <img src={cover.url} alt="" />
+                        </span>
+                      ) : (
+                        <span
+                          className={`rooms__polaroid-photo ${coverClassName(cover.id)}`}
+                          aria-hidden
+                        />
+                      )}
+                      {showNew ? (
+                        <span
+                          className="rooms__polaroid-new"
+                          aria-label={t("rooms.postNewAria")}
+                        >
+                          {t("rooms.postNew")}
+                        </span>
+                      ) : null}
+                    </span>
                     <span className="rooms__polaroid-caption">
                       <span className="rooms__polaroid-copy">
                         <span className="rooms__room-name">{room.name}</span>

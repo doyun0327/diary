@@ -150,6 +150,8 @@ interface DiaryWritePageProps {
   character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
+  /** 새 글일 때 기본 날짜 (메인 달력 선택일) */
+  initialDate?: string;
   onSave: (
     entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'> & {
       clearDrawing?: boolean;
@@ -167,6 +169,7 @@ interface DiaryWritePageProps {
 function DiaryWritePage({
   character,
   initialEntry,
+  initialDate,
   onSave,
   onCancel,
   onOpenCharacter,
@@ -191,7 +194,7 @@ function DiaryWritePage({
   const globalPack = useMoodPackId();
   const writePackId = isEdit ? entryMoodPack(initialEntry) : globalPack;
   const [date, setDate] = useState(
-    () => resumeDraft?.date ?? initialEntry?.date ?? today(),
+    () => resumeDraft?.date ?? initialEntry?.date ?? initialDate ?? today(),
   );
   const [title, setTitle] = useState(
     () => resumeDraft?.title ?? initialEntry?.title ?? '',
@@ -297,7 +300,7 @@ function DiaryWritePage({
   const drawingTouchedRef = useRef(false);
   const drawingClearedRef = useRef(false);
   const baselineRef = useRef({
-    date: resumeDraft?.date ?? initialEntry?.date ?? today(),
+    date: resumeDraft?.date ?? initialEntry?.date ?? initialDate ?? today(),
     title: resumeDraft?.title ?? initialEntry?.title ?? '',
     content: resumeDraft?.content ?? initialEntry?.content ?? '',
     mood: (resumeDraft?.mood ??

@@ -216,6 +216,7 @@
       "errGoogleNetwork": "Comprueba la red e inténtalo de nuevo",
       "errGoogleToken": "No se obtuvo el token de Google. Revisa el SHA-1 y el Web Client ID",
       "errSync": "No se pudo sincronizar",
+      "sessionExpired": "La sesión caducó. Vuelve a iniciar sesión con Google",
       "noAccountPhoto": "Esta cuenta no tiene foto de perfil",
       "loadingDiaries": "Cargando tu diario…"
     },
