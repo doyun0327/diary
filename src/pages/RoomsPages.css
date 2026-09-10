@@ -91,21 +91,21 @@
   -webkit-overflow-scrolling: touch;
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: calc(
-    40px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
-  );
-  scroll-padding-bottom: calc(
-    48px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
-  );
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(12px + env(safe-area-inset-bottom));
   margin: 0;
   min-height: 0;
 }
 
-.rooms--post.rooms--keyboard-open {
-  /* 키보드가 올라온 동안 입력칸이 항상 보이게 */
-  scroll-padding-bottom: calc(
-    64px + env(safe-area-inset-bottom) + var(--rooms-keyboard-inset, 0px)
-  );
+/* 공유 일기 상세: 댓글 입력 아래 큰 빈칸 제거 */
+.rooms--post {
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+
+.rooms--post:focus-within {
+  /* 키보드 포커스 중엔 하단 패딩이 입력칸·키보드 사이 가짜 틈이 됨 */
+  padding-bottom: 0;
+  scroll-padding-bottom: 0;
 }
 
 .rooms__toolbar {
@@ -1849,21 +1849,15 @@
   padding: 16px;
 }
 
+.rooms__comment-spacer {
+  height: 0;
+  pointer-events: none;
+}
+
 .rooms__comment-form {
-  position: sticky;
-  bottom: var(--rooms-keyboard-inset, 0px);
-  z-index: 6;
   display: flex;
   gap: 8px;
   margin-top: 14px;
-  margin-left: -18px;
-  margin-right: -18px;
-  padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
-  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
-  transition: bottom 0.18s ease-out;
 }
 
 .rooms__comment-form input {

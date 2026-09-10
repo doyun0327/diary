@@ -399,6 +399,7 @@
     "pokeFail": "ぽちっを送れませんでした",
     "sharePushBody": "日記を共有しました！",
     "commentPushBody": "コメントを残しました！",
+    "newCommentToast": "新しいコメントが届きました！",
     "postNew": "N",
     "postNewAria": "新しい日記"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "50回追加購入",
       "buyPack100": "100回追加購入",
       "adOneFree": "広告を見て1回無料",
+      "freeDailyUsedToast": "今日の無料イラストは使い切りました。明日1回チャージされます。",
       "rewardLead": "広告を最後まで見るとAI描画が1回使えます。",
       "rewardLeadProOverflow": "今月のAI描画50回を使い切りました。広告を見ると今日もう1回描けます。",
       "rewardCta": "広告を見る",

@@ -399,6 +399,7 @@
     "pokeFail": "Impossible d'envoyer le poke",
     "sharePushBody": "A partagé un journal !",
     "commentPushBody": "A laissé un commentaire !",
+    "newCommentToast": "Un nouveau commentaire est arrivé !",
     "postNew": "N",
     "postNewAria": "Nouveau journal"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "Acheter 50 de plus",
       "buyPack100": "Acheter 100 de plus",
       "adOneFree": "Pub · 1 gratuit",
+      "freeDailyUsedToast": "Vous avez utilisé le dessin gratuit d’aujourd’hui. 1 fois se recharge demain.",
       "rewardLead": "Regardez la pub jusqu’à la fin pour débloquer un dessin IA.",
       "rewardLeadProOverflow": "Vous avez utilisé les 50 dessins IA de ce mois. Regardez une pub pour en faire 1 de plus aujourd’hui.",
       "rewardCta": "Voir la pub",

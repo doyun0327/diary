@@ -400,6 +400,7 @@
     "pokeFail": "Anstupsen fehlgeschlagen",
     "sharePushBody": "Hat ein Tagebuch geteilt!",
     "commentPushBody": "Hat einen Kommentar hinterlassen!",
+    "newCommentToast": "Ein neuer Kommentar ist da!",
     "postNew": "N",
     "postNewAria": "Neues Tagebuch"
   },
@@ -516,6 +517,7 @@
       "buyPack50": "50 zusätzlich kaufen",
       "buyPack100": "100 zusätzlich kaufen",
       "adOneFree": "Werbung · 1× gratis",
+      "freeDailyUsedToast": "Dein kostenloses Bild für heute ist aufgebraucht. Morgen wird 1× aufgeladen.",
       "rewardLead": "Schau die Werbung bis zum Ende, um eine KI-Zeichnung freizuschalten.",
       "rewardLeadProOverflow": "Du hast alle 50 KI-Zeichnungen diesen Monat verbraucht. Mit Werbung kannst du heute 1× weiterzeichnen.",
       "rewardCta": "Werbung ansehen",

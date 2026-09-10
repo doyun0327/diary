@@ -399,6 +399,7 @@
     "pokeFail": "Không gửi được chọc",
     "sharePushBody": "Đã chia sẻ nhật ký!",
     "commentPushBody": "Đã bình luận!",
+    "newCommentToast": "Có bình luận mới!",
     "postNew": "N",
     "postNewAria": "Nhật ký mới"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "Mua thêm 50",
       "buyPack100": "Mua thêm 100",
       "adOneFree": "Xem quảng cáo · miễn phí 1 lần",
+      "freeDailyUsedToast": "Bạn đã dùng hết ảnh miễn phí hôm nay. Ngày mai được nạp lại 1 lần.",
       "rewardLead": "Xem hết quảng cáo để mở khóa một lần vẽ AI.",
       "rewardLeadProOverflow": "Bạn đã dùng hết 50 lần vẽ AI tháng này. Xem quảng cáo để vẽ thêm 1 lần hôm nay.",
       "rewardCta": "Xem quảng cáo",

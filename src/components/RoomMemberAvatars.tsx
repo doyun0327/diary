@@ -119,7 +119,7 @@ function RoomMemberAvatars({
 
   const overflow = activeMembers.length > VISIBLE_MAX;
   const visible = overflow ? activeMembers.slice(0, VISIBLE_MAX) : activeMembers;
-  const hiddenCount = activeMembers.length - VISIBLE_MAX;
+  const hiddenMembers = overflow ? activeMembers.slice(VISIBLE_MAX) : [];
 
   return (
     <div className="room-members" ref={rootRef}>
@@ -161,18 +161,7 @@ function RoomMemberAvatars({
           <button
             type="button"
             className="room-members__more"
-            aria-label={t('rooms.membersMoreAria', { n: hiddenCount })}
-            aria-expanded={expanded}
-            onClick={() => setExpanded((v) => !v)}
-          >
-            +{hiddenCount}
-          </button>
-        )}
-        {!overflow && activeMembers.length > 1 && (
-          <button
-            type="button"
-            className="room-members__more room-members__more--list"
-            aria-label={t('rooms.membersPanelAria')}
+            aria-label={t('rooms.membersMoreAria', { n: hiddenMembers.length })}
             aria-expanded={expanded}
             onClick={() => setExpanded((v) => !v)}
           >
@@ -181,10 +170,10 @@ function RoomMemberAvatars({
         )}
       </div>
 
-      {expanded && (
+      {expanded && hiddenMembers.length > 0 && (
         <div className="room-members__panel" role="dialog" aria-label={t('rooms.membersPanelAria')}>
           <ul className="room-members__list">
-            {activeMembers.map((member) => {
+            {hiddenMembers.map((member) => {
               const isSelf = Boolean(currentUserId && member.userId === currentUserId);
               return (
                 <li key={member.userId} className="room-members__row">

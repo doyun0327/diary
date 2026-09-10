@@ -56,8 +56,8 @@
 .room-members__stack {
   display: inline-flex;
   align-items: center;
-  flex-direction: row-reverse;
-  justify-content: flex-start;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .room-members__avatar,
@@ -72,7 +72,7 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border-soft) 70%, transparent);
 }
 
-.room-members__stack > :last-child {
+.room-members__stack > :first-child {
   margin-left: 0;
 }
 
@@ -121,8 +121,9 @@
   padding: 0;
   background: var(--color-bg-muted);
   color: var(--color-text-muted);
-  font-size: 0.72rem;
+  font-size: 0.95rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
   cursor: pointer;
 }
 
@@ -183,11 +184,6 @@
 
 .room-members__safety:active {
   background: var(--color-bg-muted);
-}
-
-.room-members__more--list {
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
 }
 
 .room-members__row-btn {

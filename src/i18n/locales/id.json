@@ -399,6 +399,7 @@
     "pokeFail": "Gagal mengirim colek",
     "sharePushBody": "Membagikan diary!",
     "commentPushBody": "Meninggalkan komentar!",
+    "newCommentToast": "Ada komentar baru!",
     "postNew": "N",
     "postNewAria": "Diary baru"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "Beli tambahan 50",
       "buyPack100": "Beli tambahan 100",
       "adOneFree": "Tonton iklan · 1 gratis",
+      "freeDailyUsedToast": "Kuota gambar gratis hari ini habis. Besok terisi 1 kali lagi.",
       "rewardLead": "Tonton iklan sampai selesai untuk membuka satu gambar AI.",
       "rewardLeadProOverflow": "Kuota 50 gambar AI bulan ini habis. Tonton iklan untuk menggambar 1 kali lagi hari ini.",
       "rewardCta": "Tonton iklan",

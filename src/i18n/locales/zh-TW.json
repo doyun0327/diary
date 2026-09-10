@@ -399,6 +399,7 @@
     "pokeFail": "戳失敗",
     "sharePushBody": "分享了日記！",
     "commentPushBody": "留言了！",
+    "newCommentToast": "有新留言了！",
     "postNew": "N",
     "postNewAria": "新日記"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "加購 50 次",
       "buyPack100": "加購 100 次",
       "adOneFree": "看廣告免費 1 次",
+      "freeDailyUsedToast": "今天的免費畫已經用完了。明天會再充 1 次。",
       "rewardLead": "完整觀看廣告可解鎖一次 AI 繪畫。",
       "rewardLeadProOverflow": "本月 50 次 AI 繪畫已用完。看廣告可再畫 1 次（今日）。",
       "rewardCta": "看廣告",

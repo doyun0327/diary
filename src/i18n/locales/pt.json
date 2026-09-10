@@ -399,6 +399,7 @@
     "pokeFail": "Não foi possível enviar o cutucão",
     "sharePushBody": "Compartilhou um diário!",
     "commentPushBody": "Deixou um comentário!",
+    "newCommentToast": "Chegou um comentário novo!",
     "postNew": "N",
     "postNewAria": "Diário novo"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "Comprar mais 50",
       "buyPack100": "Comprar mais 100",
       "adOneFree": "Ver anúncio · 1 grátis",
+      "freeDailyUsedToast": "Você usou o desenho grátis de hoje. Amanhã recarrega 1 vez.",
       "rewardLead": "Assista ao anúncio até o fim para liberar um desenho IA.",
       "rewardLeadProOverflow": "Você usou os 50 desenhos IA deste mês. Assista a um anúncio para desenhar mais 1 vez hoje.",
       "rewardCta": "Ver anúncio",

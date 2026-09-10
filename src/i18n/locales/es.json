@@ -399,6 +399,7 @@
     "pokeFail": "No se pudo enviar el toque",
     "sharePushBody": "¡Compartió un diario!",
     "commentPushBody": "¡Dejó un comentario!",
+    "newCommentToast": "¡Hay un comentario nuevo!",
     "postNew": "N",
     "postNewAria": "Diario nuevo"
   },
@@ -515,6 +516,7 @@
       "buyPack50": "Comprar 50 más",
       "buyPack100": "Comprar 100 más",
       "adOneFree": "Ver anuncio · 1 gratis",
+      "freeDailyUsedToast": "Ya usaste el dibujo gratis de hoy. Mañana se recarga 1 vez.",
       "rewardLead": "Mira el anuncio hasta el final para desbloquear un dibujo IA.",
       "rewardLeadProOverflow": "Has usado los 50 dibujos IA de este mes. Mira un anuncio para dibujar 1 vez más hoy.",
       "rewardCta": "Ver anuncio",

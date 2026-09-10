@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
@@ -35,6 +35,19 @@ function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
   return map;
 }
 
+/** 키보드와 댓글 입력칸 사이 여유(px) */
+const COMMENT_KEYBOARD_GAP = 8;
+
+function measureKeyboardCover(): number {
+  const vv = window.visualViewport;
+  if (!vv) return 0;
+  const covered = Math.max(
+    0,
+    Math.round(window.innerHeight - vv.height - vv.offsetTop),
+  );
+  return covered >= 40 ? covered : 0;
+}
+
 function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const { t } = useTranslation();
   const { nickname } = useClientProfile();
@@ -53,113 +66,105 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [blockTick, setBlockTick] = useState(0);
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
-  const [commentFocused, setCommentFocused] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const commentListRef = useRef<HTMLUListElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
+  const commentInputRef = useRef<HTMLInputElement>(null);
+  const commentSpacerRef = useRef<HTMLDivElement>(null);
   const commentFocusedRef = useRef(false);
+  const heightOnFocusRef = useRef(0);
+  const syncKeyboardScrollRef = useRef<() => void>(() => {});
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
 
   useEffect(() => {
-    commentFocusedRef.current = commentFocused;
-  }, [commentFocused]);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
     const vv = window.visualViewport;
 
-    const measureInset = () => {
-      let inset = 0;
-      if (vv) {
-        inset = Math.max(
-          0,
-          Math.round(window.innerHeight - vv.height - vv.offsetTop),
-        );
-      }
-      // Flutter WebView 등은 visualViewport가 안 줄어듦 → 포커스 시 최소 들어 올림
-      if (commentFocusedRef.current) {
-        const fallback = Math.round(
-          Math.min(420, Math.max(260, window.innerHeight * 0.42)),
-        );
-        inset = Math.max(inset, fallback);
-      }
-      return inset;
-    };
-
-    const liftCommentForm = () => {
+    const syncKeyboardScroll = () => {
+      if (!commentFocusedRef.current) return;
+      const spacer = commentSpacerRef.current;
+      const root = pageRef.current;
       const form = commentFormRef.current;
-      if (!form || !commentFocusedRef.current) return;
-      // 입력칸이 보이는 영역 하단에 오도록 스크롤
-      const rootRect = root.getBoundingClientRect();
-      const formRect = form.getBoundingClientRect();
-      const visibleBottom = vv
-        ? Math.min(rootRect.bottom, vv.offsetTop + vv.height)
-        : rootRect.bottom;
-      const safeBottom = visibleBottom - 12;
-      if (formRect.bottom > safeBottom) {
-        root.scrollTop += formRect.bottom - safeBottom;
+      if (!root || !form) return;
+
+      const cover = measureKeyboardCover();
+      const shrunk = Math.max(
+        0,
+        heightOnFocusRef.current - window.innerHeight,
+      );
+      const gap = COMMENT_KEYBOARD_GAP;
+      // WebView가 줄어든 경우에도 gap만큼 스크롤 여유가 있어야 틈이 생김
+      if (spacer) {
+        if (shrunk >= 40) {
+          spacer.style.height = `${gap}px`;
+        } else if (cover > 0) {
+          spacer.style.height = `${cover + gap}px`;
+        } else {
+          spacer.style.height = `${gap}px`;
+        }
       }
+
+      const alignFormToKeyboard = () => {
+        if (!commentFocusedRef.current || !root || !form) return;
+        const visibleBottom = vv
+          ? vv.offsetTop + vv.height
+          : window.innerHeight;
+        const targetBottom = visibleBottom - gap;
+        const delta = form.getBoundingClientRect().bottom - targetBottom;
+        if (Math.abs(delta) > 0.5) root.scrollTop += delta;
+      };
+
+      alignFormToKeyboard();
+      requestAnimationFrame(alignFormToKeyboard);
     };
 
-    const syncKeyboardInset = () => {
-      const inset = measureInset();
-      root.style.setProperty('--rooms-keyboard-inset', `${inset}px`);
-      root.classList.toggle('rooms--keyboard-open', inset > 0);
-      if (commentFocusedRef.current) {
-        requestAnimationFrame(liftCommentForm);
-      }
+    syncKeyboardScrollRef.current = syncKeyboardScroll;
+
+    const onViewportChange = () => {
+      if (commentFocusedRef.current) syncKeyboardScroll();
     };
 
-    vv?.addEventListener('resize', syncKeyboardInset);
-    vv?.addEventListener('scroll', syncKeyboardInset);
-    window.addEventListener('resize', syncKeyboardInset);
-    syncKeyboardInset();
+    vv?.addEventListener('resize', onViewportChange);
+    vv?.addEventListener('scroll', onViewportChange);
+    window.addEventListener('resize', onViewportChange);
 
     return () => {
-      vv?.removeEventListener('resize', syncKeyboardInset);
-      vv?.removeEventListener('scroll', syncKeyboardInset);
-      window.removeEventListener('resize', syncKeyboardInset);
-      root.style.removeProperty('--rooms-keyboard-inset');
-      root.classList.remove('rooms--keyboard-open');
+      vv?.removeEventListener('resize', onViewportChange);
+      vv?.removeEventListener('scroll', onViewportChange);
+      window.removeEventListener('resize', onViewportChange);
+      commentFocusedRef.current = false;
+      const spacer = commentSpacerRef.current;
+      if (spacer) spacer.style.height = '0px';
     };
-  }, [commentFocused]);
+  }, []);
+
+  /** 댓글이 추가돼도 입력칸은 키보드 위, 새 댓글은 위로 밀림 */
+  useLayoutEffect(() => {
+    if (!commentFocusedRef.current) return;
+    syncKeyboardScrollRef.current();
+  }, [comments.length]);
 
   const onCommentFocus = () => {
-    setCommentFocused(true);
     commentFocusedRef.current = true;
-    const root = rootRef.current;
-    if (root) {
-      const fallback = Math.round(
-        Math.min(420, Math.max(260, window.innerHeight * 0.42)),
-      );
-      root.style.setProperty('--rooms-keyboard-inset', `${fallback}px`);
-      root.classList.add('rooms--keyboard-open');
-    }
-    // 키보드 애니메이션 동안 여러 번 올림
-    const bump = () => {
-      const form = commentFormRef.current;
-      const el = rootRef.current;
-      if (!form || !el) return;
-      form.scrollIntoView({ block: 'end', behavior: 'auto' });
-      const formRect = form.getBoundingClientRect();
-      const room = Math.min(window.innerHeight, el.getBoundingClientRect().bottom);
-      const need = formRect.bottom - (room - 16);
-      if (need > 0) el.scrollTop += need;
-    };
-    requestAnimationFrame(bump);
-    window.setTimeout(bump, 100);
-    window.setTimeout(bump, 280);
-    window.setTimeout(bump, 480);
+    heightOnFocusRef.current = window.innerHeight;
+    const run = () => syncKeyboardScrollRef.current();
+    run();
+    window.setTimeout(run, 80);
+    window.setTimeout(run, 220);
+    window.setTimeout(run, 400);
   };
 
-  const onCommentBlur = () => {
-    setCommentFocused(false);
-    commentFocusedRef.current = false;
-    const root = rootRef.current;
-    if (!root) return;
-    root.style.setProperty('--rooms-keyboard-inset', '0px');
-    root.classList.remove('rooms--keyboard-open');
+  const onCommentBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const next = e.relatedTarget as Node | null;
+    if (next && commentFormRef.current?.contains(next)) return;
+
+    window.setTimeout(() => {
+      if (commentFormRef.current?.contains(document.activeElement)) return;
+      commentFocusedRef.current = false;
+      heightOnFocusRef.current = 0;
+      const spacer = commentSpacerRef.current;
+      if (spacer) spacer.style.height = '0px';
+    }, 120);
   };
 
   useEffect(() => {
@@ -254,14 +259,38 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     if (!body || busy) return;
     setBusy(true);
     setError(null);
+    const prevIds = new Set(comments.map((c) => c.id));
     try {
       const commentNick = nickname.trim() || t('common.anonymous');
       const created = await roomsApi.createComment(roomId, postId, body, {
         pushTitle: commentNick,
         pushBody: t('rooms.commentPushBody'),
       });
-      setComments((prev) => [...prev, created]);
+      // 화면에 붙이기 전: 서버 최신 목록 확인 → 상대 새 댓글 반영 후 내 댓글 포함 표시
+      let list: RoomComment[] | null = null;
+      try {
+        list = await roomsApi.listComments(roomId, postId);
+      } catch {
+        list = null;
+      }
+      if (list) {
+        const freshFromOthers = list.filter(
+          (c) => !prevIds.has(c.id) && c.authorUserId !== userId,
+        );
+        if (freshFromOthers.length > 0) {
+          setToast(t('rooms.newCommentToast'));
+        }
+        setComments(list);
+      } else {
+        setComments((prev) => [...prev, created]);
+      }
       setText('');
+      commentFocusedRef.current = true;
+      commentInputRef.current?.focus({ preventScroll: true });
+      requestAnimationFrame(() => {
+        syncKeyboardScrollRef.current();
+        window.setTimeout(() => syncKeyboardScrollRef.current(), 50);
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : t('rooms.err.comment'));
     } finally {
@@ -295,7 +324,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const authorInitial = (authorName || '?').slice(0, 1).toUpperCase();
 
   return (
-    <div ref={rootRef} className="rooms rooms--post">
+    <div ref={pageRef} className="rooms rooms--post">
       <div className="rooms__toolbar">
         <button
           type="button"
@@ -359,7 +388,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
       <section className="rooms__comments">
         <h3>{t('rooms.comments', { n: visibleComments.length })}</h3>
-        <ul className="rooms__comment-list">
+        <ul ref={commentListRef} className="rooms__comment-list">
           {visibleComments.map((c, i) => {
             const prev = visibleComments[i - 1];
             const showName = !prev || prev.authorUserId !== c.authorUserId;
@@ -389,6 +418,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
         </ul>
         <div ref={commentFormRef} className="rooms__comment-form">
           <input
+            ref={commentInputRef}
             type="text"
             value={text}
             maxLength={200}
@@ -397,18 +427,25 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
             onFocus={onCommentFocus}
             onBlur={onCommentBlur}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') void handleComment();
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                void handleComment();
+              }
             }}
           />
           <button
             type="button"
             className="rooms__btn primary"
             disabled={busy || !text.trim()}
+            onMouseDown={(e) => e.preventDefault()}
+            onPointerDown={(e) => e.preventDefault()}
             onClick={() => void handleComment()}
           >
             {t('rooms.commentSubmit')}
           </button>
         </div>
+        {/* 키보드가 가린 만큼 스크롤 여유 — 입력칸만 fixed로 띄우지 않음 */}
+        <div ref={commentSpacerRef} className="rooms__comment-spacer" aria-hidden />
       </section>
 
       {confirmDelete && (

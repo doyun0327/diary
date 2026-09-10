@@ -1005,7 +1005,11 @@ function DiaryWritePage({
         onProgress: setAiProgress,
       });
 
+      const quotaKind = aiQuotaKindRef.current;
       await commitAiDrawQuota();
+      if (quotaKind === 'free') {
+        onAppToast?.(t('write.ai.freeDailyUsedToast'), 4000);
+      }
       const priorAiCount = aiGeneratedImages.length;
       const nextHistory = [...aiGeneratedImages, imageUrl];
       setAiGeneratedImages(nextHistory);
