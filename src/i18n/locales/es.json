@@ -326,6 +326,8 @@
     "comments": "Comentarios ({{n}})",
     "commentPlaceholder": "Escribe un comentario",
     "commentSubmit": "Publicar",
+    "commentSending": "Enviando…",
+    "commentFailedRetry": "Error · Reintentar",
     "alert": {
       "createdTitle": "¡Sala creada!",
       "createdLead": "Comparte este código de invitación con tus amigos.",

@@ -326,6 +326,8 @@
     "comments": "评论（{{n}}）",
     "commentPlaceholder": "写评论",
     "commentSubmit": "发送",
+    "commentSending": "发送中…",
+    "commentFailedRetry": "失败 · 重试",
     "alert": {
       "createdTitle": "房间已创建！",
       "createdLead": "把邀请码分享给朋友吧。",

@@ -1694,6 +1694,34 @@
   border-radius: 4px 14px 14px 14px;
 }
 
+.rooms__comment--sending .rooms__comment-bubble {
+  opacity: 0.72;
+}
+
+.rooms__comment--failed .rooms__comment-bubble {
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.rooms__comment-status {
+  margin: 3px 2px 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-muted);
+}
+
+.rooms__comment-status--fail {
+  color: #c0392b;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .rooms__comment--c0 {
   --rooms-comment-bg: #ffe8c8;
   --rooms-comment-fg: #5a3d1a;

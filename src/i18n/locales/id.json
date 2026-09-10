@@ -326,6 +326,8 @@
     "comments": "Komentar ({{n}})",
     "commentPlaceholder": "Tulis komentar",
     "commentSubmit": "Kirim",
+    "commentSending": "Mengirim…",
+    "commentFailedRetry": "Gagal · Coba lagi",
     "alert": {
       "createdTitle": "Ruang dibuat!",
       "createdLead": "Bagikan kode undangan ini ke teman.",

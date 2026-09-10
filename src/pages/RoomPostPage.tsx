@@ -24,6 +24,27 @@ interface RoomPostPageProps {
   onBack: () => void;
 }
 
+type CommentSendStatus = 'sending' | 'failed';
+
+/** 화면용 댓글 — 전송 중/실패는 클라이언트 전용 */
+type DisplayComment = RoomComment & {
+  sendStatus?: CommentSendStatus;
+};
+
+function newTempCommentId() {
+  return `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/** 서버 목록 + 아직 전송 중/실패한 로컬 댓글 유지 */
+function mergeServerComments(
+  server: RoomComment[],
+  local: DisplayComment[],
+): DisplayComment[] {
+  const serverIds = new Set(server.map((c) => c.id));
+  const pending = local.filter((c) => c.sendStatus && !serverIds.has(c.id));
+  return [...server, ...pending];
+}
+
 /** 스레드에 등장한 순서 기준 0~9 색 인덱스 */
 function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
   const map = new Map<string, number>();
@@ -56,7 +77,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     [roomId, postId],
   );
   const [post, setPost] = useState<RoomPost | null>(cachedPost);
-  const [comments, setComments] = useState<RoomComment[]>([]);
+  const [comments, setComments] = useState<DisplayComment[]>([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(!cachedPost);
   const [busy, setBusy] = useState(false);
@@ -268,45 +289,94 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
   const handleComment = async () => {
     const body = text.trim();
-    if (!body || busy) return;
-    setBusy(true);
+    if (!body) return;
+
+    const commentNick = nickname.trim() || t('common.anonymous');
+    const tempId = newTempCommentId();
+    const optimistic: DisplayComment = {
+      id: tempId,
+      postId,
+      authorUserId: userId,
+      authorNickname: commentNick,
+      text: body,
+      createdAt: new Date().toISOString(),
+      sendStatus: 'sending',
+    };
+
     setError(null);
-    const prevIds = new Set(comments.map((c) => c.id));
+    setText('');
+    setComments((prev) => [...prev, optimistic]);
+    commentFocusedRef.current = true;
+    commentInputRef.current?.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      syncKeyboardScrollRef.current();
+      window.setTimeout(() => syncKeyboardScrollRef.current(), 50);
+    });
+
     try {
-      const commentNick = nickname.trim() || t('common.anonymous');
       const created = await roomsApi.createComment(roomId, postId, body, {
         pushTitle: commentNick,
         pushBody: t('rooms.commentPushBody'),
       });
-      // 화면에 붙이기 전: 서버 최신 목록 확인 → 상대 새 댓글 반영 후 내 댓글 포함 표시
-      let list: RoomComment[] | null = null;
+      setComments((prev) =>
+        prev.map((c) => (c.id === tempId ? { ...created } : c)),
+      );
+
+      // 백그라운드로 최신 목록 맞춰 상대 새 댓글도 반영 (전송 중 로컬 댓글 유지)
       try {
-        list = await roomsApi.listComments(roomId, postId);
+        const list = await roomsApi.listComments(roomId, postId);
+        setComments((prev) => {
+          const confirmedIds = new Set(
+            prev.filter((c) => !c.sendStatus).map((c) => c.id),
+          );
+          const freshFromOthers = list.filter(
+            (c) => !confirmedIds.has(c.id) && c.authorUserId !== userId,
+          );
+          if (freshFromOthers.length > 0) {
+            queueMicrotask(() => setToast(t('rooms.newCommentToast')));
+          }
+          return mergeServerComments(list, prev);
+        });
       } catch {
-        list = null;
+        // 낙관적 반영은 유지
       }
-      if (list) {
-        const freshFromOthers = list.filter(
-          (c) => !prevIds.has(c.id) && c.authorUserId !== userId,
-        );
-        if (freshFromOthers.length > 0) {
-          setToast(t('rooms.newCommentToast'));
-        }
-        setComments(list);
-      } else {
-        setComments((prev) => [...prev, created]);
-      }
-      setText('');
-      commentFocusedRef.current = true;
-      commentInputRef.current?.focus({ preventScroll: true });
-      requestAnimationFrame(() => {
-        syncKeyboardScrollRef.current();
-        window.setTimeout(() => syncKeyboardScrollRef.current(), 50);
-      });
     } catch (err) {
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === tempId ? { ...c, sendStatus: 'failed' as const } : c,
+        ),
+      );
       setError(err instanceof Error ? err.message : t('rooms.err.comment'));
-    } finally {
-      setBusy(false);
+    }
+  };
+
+  const retryComment = async (failed: DisplayComment) => {
+    if (failed.sendStatus !== 'failed') return;
+    const body = failed.text.trim();
+    if (!body) return;
+
+    setError(null);
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === failed.id ? { ...c, sendStatus: 'sending' as const } : c,
+      ),
+    );
+
+    try {
+      const created = await roomsApi.createComment(roomId, postId, body, {
+        pushTitle: failed.authorNickname,
+        pushBody: t('rooms.commentPushBody'),
+      });
+      setComments((prev) =>
+        prev.map((c) => (c.id === failed.id ? { ...created } : c)),
+      );
+    } catch (err) {
+      setComments((prev) =>
+        prev.map((c) =>
+          c.id === failed.id ? { ...c, sendStatus: 'failed' as const } : c,
+        ),
+      );
+      setError(err instanceof Error ? err.message : t('rooms.err.comment'));
     }
   };
 
@@ -409,6 +479,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
             const showName = !prev || prev.authorUserId !== c.authorUserId;
             const isMine = c.authorUserId === userId;
             const colorIdx = colorMap.get(c.authorUserId) ?? 0;
+            const sending = c.sendStatus === 'sending';
+            const failed = c.sendStatus === 'failed';
             return (
               <li
                 key={c.id}
@@ -417,7 +489,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   isMine ? 'rooms__comment--mine' : 'rooms__comment--other',
                   showName ? 'rooms__comment--named' : 'rooms__comment--cont',
                   `rooms__comment--c${colorIdx}`,
-                ].join(' ')}
+                  sending ? 'rooms__comment--sending' : '',
+                  failed ? 'rooms__comment--failed' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
               >
                 {showName && !isMine && (
                   <div className="rooms__comment-head">
@@ -427,6 +503,20 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   </div>
                 )}
                 <span className="rooms__comment-bubble">{c.text}</span>
+                {sending ? (
+                  <span className="rooms__comment-status" aria-live="polite">
+                    {t('rooms.commentSending')}
+                  </span>
+                ) : null}
+                {failed ? (
+                  <button
+                    type="button"
+                    className="rooms__comment-status rooms__comment-status--fail"
+                    onClick={() => void retryComment(c)}
+                  >
+                    {t('rooms.commentFailedRetry')}
+                  </button>
+                ) : null}
               </li>
             );
           })}
@@ -451,7 +541,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           <button
             type="button"
             className="rooms__btn primary"
-            disabled={busy || !text.trim()}
+            disabled={!text.trim()}
             onMouseDown={(e) => e.preventDefault()}
             onPointerDown={(e) => e.preventDefault()}
             onClick={() => void handleComment()}

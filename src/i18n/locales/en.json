@@ -409,6 +409,8 @@
     "comments": "Comments ({{n}})",
     "commentPlaceholder": "Write a comment",
     "commentSubmit": "Post",
+    "commentSending": "Sending…",
+    "commentFailedRetry": "Failed · Tap to retry",
     "alert": {
       "createdTitle": "Room created!",
       "createdLead": "Share this invite code with your friends.",

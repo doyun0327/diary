@@ -326,6 +326,8 @@
     "comments": "ความคิดเห็น ({{n}})",
     "commentPlaceholder": "เขียนความคิดเห็น",
     "commentSubmit": "โพสต์",
+    "commentSending": "กำลังส่ง…",
+    "commentFailedRetry": "ล้มเหลว · ลองอีกครั้ง",
     "alert": {
       "createdTitle": "สร้างห้องแล้ว!",
       "createdLead": "แชร์รหัสเชิญนี้ให้เพื่อน",

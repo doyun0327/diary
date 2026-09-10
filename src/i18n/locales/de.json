@@ -327,6 +327,8 @@
     "comments": "Kommentare ({{n}})",
     "commentPlaceholder": "Kommentar schreiben",
     "commentSubmit": "Posten",
+    "commentSending": "Wird gesendet…",
+    "commentFailedRetry": "Fehler · Erneut",
     "alert": {
       "createdTitle": "Raum erstellt!",
       "createdLead": "Teile diesen Einladungscode mit deinen Freunden.",

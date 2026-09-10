@@ -409,6 +409,8 @@
     "comments": "댓글 {{n}}",
     "commentPlaceholder": "댓글을 남겨 보세요",
     "commentSubmit": "등록",
+    "commentSending": "보내는 중…",
+    "commentFailedRetry": "실패 · 다시 시도",
     "alert": {
       "createdTitle": "방이 만들어졌어요!",
       "createdLead": "친구에게 아래 초대코드를 알려 주세요.",

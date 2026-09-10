@@ -326,6 +326,8 @@
     "comments": "コメント（{{n}}）",
     "commentPlaceholder": "コメントを書く",
     "commentSubmit": "投稿",
+    "commentSending": "送信中…",
+    "commentFailedRetry": "失敗 · 再試行",
     "alert": {
       "createdTitle": "ルームを作成しました！",
       "createdLead": "この招待コードを友達に共有してください。",

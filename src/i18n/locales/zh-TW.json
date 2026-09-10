@@ -326,6 +326,8 @@
     "comments": "評論（{{n}}）",
     "commentPlaceholder": "寫評論",
     "commentSubmit": "發送",
+    "commentSending": "傳送中…",
+    "commentFailedRetry": "失敗 · 重試",
     "alert": {
       "createdTitle": "房間已建立！",
       "createdLead": "把邀請碼分享給朋友吧。",

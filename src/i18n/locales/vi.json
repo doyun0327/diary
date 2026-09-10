@@ -326,6 +326,8 @@
     "comments": "Bình luận ({{n}})",
     "commentPlaceholder": "Viết bình luận",
     "commentSubmit": "Đăng",
+    "commentSending": "Đang gửi…",
+    "commentFailedRetry": "Lỗi · Thử lại",
     "alert": {
       "createdTitle": "Đã tạo phòng!",
       "createdLead": "Chia sẻ mã mời này với bạn bè.",
