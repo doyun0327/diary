@@ -50,8 +50,6 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [postsPage, setPostsPage] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
-  const [feedFlip, setFeedFlip] = useState<'none' | 'next' | 'prev'>('none');
-  const flipTimerRef = useRef<number | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
@@ -153,41 +151,18 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     void refresh();
   }, [refresh]);
 
-  // 상세에서 돌아와도 NEW 상태 다시 계산
   useEffect(() => {
     setSeenTick((n) => n + 1);
   }, [roomId]);
 
-  useEffect(() => {
-    return () => {
-      if (flipTimerRef.current != null) window.clearTimeout(flipTimerRef.current);
-    };
-  }, []);
-
   const requestPostsPage = useCallback(
     (next: number) => {
-      if (feedFlip !== 'none') return;
       if (next === postsPage) return;
       if (next < 0 || next >= postsPageCount) return;
-      if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        setPostsPage(next);
-        return;
-      }
-      const dir = next > postsPage ? 'next' : 'prev';
-      setFeedFlip(dir);
-      // 페이지 중간쯤에서 내용 교체 (책장 넘김감)
-      if (flipTimerRef.current != null) window.clearTimeout(flipTimerRef.current);
-      flipTimerRef.current = window.setTimeout(() => {
-        setPostsPage(next);
-      }, 220);
+      setPostsPage(next);
     },
-    [feedFlip, postsPage, postsPageCount],
+    [postsPage, postsPageCount],
   );
-
-  const onFeedFlipEnd = (e: { target: EventTarget | null; currentTarget: EventTarget }) => {
-    if (e.target !== e.currentTarget) return;
-    setFeedFlip('none');
-  };
 
   const onFeedTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
     touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
@@ -196,7 +171,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const onFeedTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
     const startX = touchStartXRef.current;
     touchStartXRef.current = null;
-    if (startX == null || feedFlip !== 'none') return;
+    if (startX == null) return;
     const endX = e.changedTouches[0]?.clientX ?? startX;
     const dx = endX - startX;
     if (Math.abs(dx) < 48) return;
@@ -296,10 +271,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                 onTouchStart={onFeedTouchStart}
                 onTouchEnd={onFeedTouchEnd}
               >
-                <div
-                  className={`rooms__feed-page${feedFlip === 'next' ? ' is-flip-next' : ''}${feedFlip === 'prev' ? ' is-flip-prev' : ''}`}
-                  onAnimationEnd={onFeedFlipEnd}
-                >
+                <div className="rooms__feed-page">
                   <ul className="rooms__gallery">
                     {visibleFeedPosts.map((post) => {
                       const author = room.members.find((m) => m.userId === post.authorUserId);

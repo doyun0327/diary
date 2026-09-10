@@ -1330,74 +1330,12 @@
 /* 공유 일기: 일기장 테마 유지, 칸 크기는 방 목록 폴라로이드와 동일 */
 .rooms__feed-stage {
   width: 100%;
-  perspective: 1400px;
-  perspective-origin: 50% 40%;
   overflow: visible;
 }
 
 .rooms__feed-page {
   width: 100%;
-  transform-origin: left center;
   overflow: visible;
-}
-
-.rooms__feed-page.is-flip-next,
-.rooms__feed-page.is-flip-prev {
-  transform-style: preserve-3d;
-  will-change: transform, opacity;
-}
-
-.rooms__feed-page.is-flip-next {
-  animation: rooms-feed-flip-next 0.48s ease forwards;
-}
-
-.rooms__feed-page.is-flip-prev {
-  animation: rooms-feed-flip-prev 0.48s ease forwards;
-}
-
-@keyframes rooms-feed-flip-next {
-  0% {
-    transform: rotateY(0deg);
-    opacity: 1;
-  }
-  48% {
-    transform: rotateY(-82deg);
-    opacity: 0.35;
-  }
-  52% {
-    transform: rotateY(82deg);
-    opacity: 0.35;
-  }
-  100% {
-    transform: rotateY(0deg);
-    opacity: 1;
-  }
-}
-
-@keyframes rooms-feed-flip-prev {
-  0% {
-    transform: rotateY(0deg);
-    opacity: 1;
-  }
-  48% {
-    transform: rotateY(82deg);
-    opacity: 0.35;
-  }
-  52% {
-    transform: rotateY(-82deg);
-    opacity: 0.35;
-  }
-  100% {
-    transform: rotateY(0deg);
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rooms__feed-page.is-flip-next,
-  .rooms__feed-page.is-flip-prev {
-    animation: none;
-  }
 }
 
 .rooms__gallery {
@@ -1469,8 +1407,7 @@
   line-height: 1;
   color: #fff;
   pointer-events: none;
-  /* 3D 페이지 플립과 겹쳐도 앞으로 나오게 */
-  transform: translateZ(32px) rotate(12deg);
+  transform: rotate(12deg);
   background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
   box-shadow:
     0 3px 8px color-mix(in srgb, #ee5a24 40%, transparent),
