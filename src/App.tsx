@@ -979,7 +979,7 @@ function App() {
             onOpenAccount={() => setAccountOpen(true)}
             onBack={() => setPage("home")}
             onOpenRoom={(roomId) => {
-              void prefetchRoomFeed(roomId);
+              void prefetchRoomFeed(roomId, { force: true });
               setActiveRoomId(roomId);
               setActivePostId(null);
               setPage("room");

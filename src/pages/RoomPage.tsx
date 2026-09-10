@@ -117,14 +117,14 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   roomRef.current = room;
 
   const refresh = useCallback(async () => {
-    // 삭제 등으로 캐시가 비었으면 반드시 서버에서 다시 읽음
+    // 캐시가 있어도 화면은 먼저 그리고, 네트워크는 항상 다시 받아
+    // (신선 캐시 early-return 시 그사이 공유된 새 일기·N 배지가 안 뜸)
     const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
     if (cached) {
       applyFeed(cached);
       setLoading(false);
-      if (!cached.stale) return;
     } else if (!roomRef.current) {
       setLoading(true);
     }

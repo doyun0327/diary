@@ -1338,9 +1338,13 @@
 .rooms__feed-page {
   width: 100%;
   transform-origin: left center;
+  overflow: visible;
+}
+
+.rooms__feed-page.is-flip-next,
+.rooms__feed-page.is-flip-prev {
   transform-style: preserve-3d;
   will-change: transform, opacity;
-  overflow: visible;
 }
 
 .rooms__feed-page.is-flip-next {
@@ -1449,9 +1453,9 @@
 
 .rooms__gallery-new {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  z-index: 8;
+  top: 6px;
+  right: 6px;
+  z-index: 20;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1465,7 +1469,8 @@
   line-height: 1;
   color: #fff;
   pointer-events: none;
-  transform: rotate(12deg);
+  /* 3D 페이지 플립과 겹쳐도 앞으로 나오게 */
+  transform: translateZ(32px) rotate(12deg);
   background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
   box-shadow:
     0 3px 8px color-mix(in srgb, #ee5a24 40%, transparent),
