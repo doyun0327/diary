@@ -5,7 +5,6 @@ import Header from "./components/Header";
 import WriteFab from "./components/WriteFab";
 import CharacterSetup from "./components/CharacterSetup";
 import ProfileSetup from "./components/ProfileSetup";
-import AppIntro from "./components/AppIntro";
 import AccountSheet from "./components/AccountSheet";
 import LanguageSheet from "./components/LanguageSheet";
 import NyangTicketSheet from "./components/NyangTicketSheet";
@@ -38,9 +37,7 @@ import {
   usePushRegistration,
 } from "./hooks/usePushRegistration";
 import {
-  isAppIntroDone,
   isProfileSetupDone,
-  markAppIntroDone,
   markProfileSetupDone,
 } from "./utils/onboarding";
 import type { DiaryEntry } from "./types/diary";
@@ -202,7 +199,6 @@ function App() {
 
   const [onboardingTick, setOnboardingTick] = useState(0);
   const needsProfileSetup = !isProfileSetupDone();
-  const needsAppIntro = !needsProfileSetup && !isAppIntroDone();
   void onboardingTick;
 
   useEffect(() => {
@@ -755,17 +751,18 @@ function App() {
     setPage("rooms");
   };
 
-  const handleToggleScreenLock = () => {
-    if (screenLock.enabled) {
-      setLockDisableOpen(true);
-      return;
-    }
-    if (screenLock.hasPin) {
-      screenLock.turnOn();
-      return;
-    }
-    setLockSetupOpen(true);
-  };
+  // 화면 잠금 메뉴 임시 비활성
+  // const handleToggleScreenLock = () => {
+  //   if (screenLock.enabled) {
+  //     setLockDisableOpen(true);
+  //     return;
+  //   }
+  //   if (screenLock.hasPin) {
+  //     screenLock.turnOn();
+  //     return;
+  //   }
+  //   setLockSetupOpen(true);
+  // };
 
   const moveCalendarMonth = (delta: number) => {
     const d = new Date(calYear, calMonth + delta, 1);
@@ -799,7 +796,7 @@ function App() {
       }
 
       const visible =
-        !needsProfileSetup && !needsAppIntro && !hideNativeChrome;
+        !needsProfileSetup && !hideNativeChrome;
 
       // 채널만 있으면 전송 (isFlutterApp 게이트 제거 — 플래그 미설정 시에도 숨김 반영)
       postDiaryNative({
@@ -841,7 +838,6 @@ function App() {
     calYear,
     calMonth,
     needsProfileSetup,
-    needsAppIntro,
     editingId,
     writeSaveEnabled,
     writeSaving,
@@ -871,20 +867,6 @@ function App() {
     );
   }
 
-  if (needsAppIntro) {
-    return (
-      <div className="app">
-        <AppIntro
-          onFinish={() => {
-            markAppIntroDone();
-            setOnboardingTick((n) => n + 1);
-            setPage("home");
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="app">
       <Header
@@ -906,8 +888,9 @@ function App() {
           setNyangTicketTab('subscribe');
           setNyangTicketOpen(true);
         }}
-        screenLockEnabled={screenLock.enabled}
-        onToggleScreenLock={handleToggleScreenLock}
+        // 화면 잠금 메뉴 임시 비활성
+        // screenLockEnabled={screenLock.enabled}
+        // onToggleScreenLock={handleToggleScreenLock}
         onOpenDecorate={() => setDecorateOpen(true)}
         onOpenExport={() => setExportOpen(true)}
         onOpenSearch={() => setSearchOpen(true)}
@@ -1166,7 +1149,9 @@ function App() {
           />,
           document.getElementById("root") ?? document.body,
         )}
-      {page === "home" &&
+      {/* 화면 잠금 게이트 임시 비활성 (SCREEN_LOCK_ENABLED=false) */}
+      {false &&
+        page === "home" &&
         screenLock.locked &&
         createPortal(
           <ScreenLockGate

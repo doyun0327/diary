@@ -127,6 +127,7 @@ function IconTicket() {
   );
 }
 
+/* 화면 잠금 메뉴 임시 비활성
 function IconLock() {
   return (
     <CrayonSvg>
@@ -135,6 +136,7 @@ function IconLock() {
     </CrayonSvg>
   );
 }
+*/
 
 function IconUsers() {
   return (
@@ -230,6 +232,7 @@ function MenuItem({
   );
 }
 
+/* 화면 잠금 메뉴 임시 비활성
 function MenuToggleItem({
   icon,
   label,
@@ -266,6 +269,7 @@ function MenuToggleItem({
     </li>
   );
 }
+*/
 
 function Header({
   nickname = '',
@@ -273,8 +277,8 @@ function Header({
   onOpenAccount,
   onOpenLanguage,
   onOpenNyangTicket,
-  screenLockEnabled = false,
-  onToggleScreenLock,
+  // screenLockEnabled = false,
+  // onToggleScreenLock,
   onOpenDecorate,
   onOpenExport,
   onOpenRooms,
@@ -402,6 +406,7 @@ function Header({
                 onClick={() => closeAnd(onOpenNyangTicket)}
               />
             )}
+            {/* 화면 잠금 메뉴 임시 비활성
             {onToggleScreenLock && (
               <MenuToggleItem
                 icon={<IconLock />}
@@ -411,6 +416,7 @@ function Header({
                 onToggle={() => closeAnd(onToggleScreenLock)}
               />
             )}
+            */}
             {onOpenRooms && (
               <MenuItem
                 icon={<IconUsers />}

@@ -378,8 +378,9 @@ function RoomsHubPage({
 
   const handleJoin = async () => {
     if (!shareReady || busy) return;
-    const code = inviteCode.replace(/\D/g, "").slice(0, 6);
-    if (code.length !== 6) {
+    const code = inviteCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 8);
+    const valid = code.length === 8 || /^\d{6}$/.test(code);
+    if (!valid) {
       setError(t("rooms.err.codeRequired"));
       return;
     }
@@ -795,12 +796,20 @@ function RoomsHubPage({
             <div className="rooms-sheet__body">
               <input
                 type="text"
-                inputMode="numeric"
+                inputMode="text"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
                 value={inviteCode}
-                maxLength={6}
+                maxLength={8}
                 placeholder={t("rooms.invitePlaceholder")}
                 onChange={(e) =>
-                  setInviteCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  setInviteCode(
+                    e.target.value
+                      .replace(/[^a-zA-Z0-9]/g, "")
+                      .toUpperCase()
+                      .slice(0, 8),
+                  )
                 }
               />
               <button

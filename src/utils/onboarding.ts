@@ -75,7 +75,9 @@ export function markProfileSetupDone() {
 
 export function isAppIntroDone(): boolean {
   migrateProfileIntroFlags();
-  return readFlag(INTRO_DONE_KEY);
+  // 첫 실행 소개 슬라이드는 사용하지 않음
+  if (!readFlag(INTRO_DONE_KEY)) writeFlag(INTRO_DONE_KEY);
+  return true;
 }
 
 export function markAppIntroDone() {

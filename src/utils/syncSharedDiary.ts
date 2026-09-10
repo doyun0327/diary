@@ -1,7 +1,7 @@
 import * as roomsApi from '../api/roomsApi';
 import { getAccessToken } from '../hooks/useAuthSession';
 import type { DiaryEntry } from '../types/diary';
-import { invalidateRoomFeed } from './roomCache';
+import { invalidateRoomFeed, invalidateRoomsList } from './roomCache';
 import { resolveEntryImageForRoomShare } from './resolveRoomShareImage';
 import { rememberSharedDiaryFont } from './roomPostFont';
 import {
@@ -59,6 +59,9 @@ export async function syncSharedDiaryAfterDelete(diaryId: string): Promise<void>
     const res = await roomsApi.deleteSharedDiary(diaryId);
     for (const roomId of res.roomIds ?? []) {
       invalidateRoomFeed(roomId);
+    }
+    if ((res.roomIds?.length ?? 0) > 0) {
+      invalidateRoomsList();
     }
   } catch (err) {
     console.warn('[rooms] shared diary delete failed', err);

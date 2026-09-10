@@ -117,13 +117,13 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   roomRef.current = room;
 
   const refresh = useCallback(async () => {
+    // 삭제 등으로 캐시가 비었으면 반드시 서버에서 다시 읽음
     const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
     if (cached) {
       applyFeed(cached);
       setLoading(false);
-      // 신선하면 끝, stale이면 백그라운드 갱신
       if (!cached.stale) return;
     } else if (!roomRef.current) {
       setLoading(true);
@@ -134,7 +134,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
       await prefetchRoomFeed(roomId, {
         page: postsPage,
         size: ROOM_POSTS_PAGE_SIZE,
-        force: Boolean(cached?.stale),
+        force: true,
       });
       const fresh = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
         allowStale: true,

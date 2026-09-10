@@ -4,7 +4,7 @@
 ==========================================================
 
 [ 목표 ]
-- 친구끼리 방을 만들고(6자리 초대코드), 일기를 공유하고 댓글을 달 수 있다.
+- 친구끼리 방을 만들고(영문·숫자 8자리 초대코드), 일기를 공유하고 댓글을 달 수 있다.
 - 프론트엔드: React (Vite 프록시 /api → http://localhost:8080)
 - 로그인(OAuth) 없이 MVP: 클라이언트 ID + 닉네임 헤더로 신원 구분
 
@@ -32,7 +32,7 @@ CORS (직접 8080 호출 시):
 ----------------------------------------------------------
 
 Room
-  id, name, inviteCode(6자리 숫자 문자열), createdAt, createdByClientId,
+  id, name, inviteCode(영문·숫자 8자리 문자열), createdAt, createdByClientId,
   coverPreset(nullable, 짧은 문자열 — kraft/mint/rose/sky/lilac/cream 등 CSS 프리셋 id),
   coverUrl(nullable, TEXT — 갤러리 커버 data URL 또는 http(s). 있으면 coverPreset보다 우선)
 
@@ -48,8 +48,9 @@ RoomComment
   id, postId, authorClientId, authorNickname, text, createdAt
 
 초대코드:
-  - 000000~999999 중 랜덤 6자리 (앞에 0 패딩)
+  - A–Z / 2–9 중 랜덤 8자리 (0/O, 1/I/L 제외, 대문자)
   - 생성 시 중복이면 재시도
+  - 입장 시 레거시 숫자 6자리 코드도 허용
 
 
 ----------------------------------------------------------
@@ -65,7 +66,7 @@ Body: {
   "coverPreset": "kraft",
   "coverUrl": "data:image/jpeg;base64,..."
 }
-  ※ inviteCode 는 요청에 넣지 않는다. 서버가 숫자 6자리를 자동 생성한다.
+  ※ inviteCode 는 요청에 넣지 않는다. 서버가 영문·숫자 8자리를 자동 생성한다.
   ※ nickname, avatarUrl 은 optional. 있으면 생성자 RoomMember 에 저장.
   ※ coverPreset 은 optional. 스크랩 커버 프리셋 id (예: kraft, mint, rose, sky, lilac, cream).
     없거나 알 수 없는 값이면 서버/클라 모두 기본값 kraft 로 취급.
@@ -75,14 +76,14 @@ Response 200:
 {
   "id": "uuid",
   "name": "우리반 일기방",
-  "inviteCode": "482913",
+  "inviteCode": "A7K2M9QX",
   "createdAt": "2026-07-24T10:00:00",
   "memberCount": 1,
   "coverPreset": "kraft",
   "coverUrl": null
 }
 - 생성자를 RoomMember 에 자동 추가
-- inviteCode: 000000~999999 랜덤, 앞에 0 패딩, 중복 시 재시도
+- inviteCode: 영문·숫자 8자리 랜덤, 중복 시 재시도
 - coverPreset / coverUrl 은 Room 에 저장하고 목록·상세 응답에 포함
   (coverUrl 이 data URL 이면 TEXT/MEDIUMTEXT 권장)
 
@@ -100,7 +101,7 @@ Response 200: RoomSummary (갱신된 coverPreset / coverUrl 포함)
 
 (2) 초대코드로 입장
 POST /api/rooms/join
-Body: { "inviteCode": "482913", "nickname": "민지", "avatarUrl": "data:image/..." }
+Body: { "inviteCode": "A7K2M9QX", "nickname": "민지", "avatarUrl": "data:image/..." }
 Response 200: RoomSummary (위와 동일)
 - 이미 멤버면 그대로 방 정보 반환 (nickname/avatarUrl 이 오면 갱신 권장)
 - 코드 없으면 404

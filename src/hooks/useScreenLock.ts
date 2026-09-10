@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'picture-diary-screen-lock';
+/** false면 잠금 UI·게이트 전부 비활성 (저장된 PIN은 유지) */
+export const SCREEN_LOCK_ENABLED = false;
 
 export interface ScreenLockConfig {
   enabled: boolean;
@@ -52,7 +54,7 @@ export function useScreenLock() {
   const [unlocked, setUnlocked] = useState(false);
 
   const hasPin = Boolean(config?.passwordHash && config.salt);
-  const enabled = Boolean(config?.enabled && hasPin);
+  const enabled = SCREEN_LOCK_ENABLED && Boolean(config?.enabled && hasPin);
   const locked = enabled && !unlocked;
 
   useEffect(() => {

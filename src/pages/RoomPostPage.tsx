@@ -6,7 +6,7 @@ import AppModal from '../components/AppModal';
 import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomSafetyModal, { type SafetyTarget } from '../components/RoomSafetyModal';
-import { getCachedRoomDetail, getCachedRoomPost } from '../utils/roomCache';
+import { getCachedRoomDetail, getCachedRoomPost, invalidateRoomFeed, invalidateRoomsList } from '../utils/roomCache';
 import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
 import {
@@ -221,7 +221,17 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       if (fromCache) {
         const list = await roomsApi.listComments(roomId, postId);
         setComments(list);
-        void roomsApi.getRoomPost(roomId, postId).then(setPost).catch(() => {});
+        try {
+          const fresh = await roomsApi.getRoomPost(roomId, postId);
+          setPost(fresh);
+        } catch (err) {
+          // 서버에 없으면 캐시 글도 제거 (삭제된 글이 밑에 남는 문제)
+          setPost(null);
+          setComments([]);
+          setError(
+            err instanceof Error ? err.message : t('rooms.err.loadPost'),
+          );
+        }
         return;
       }
       const [detail, list] = await Promise.all([
@@ -231,6 +241,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       setPost(detail);
       setComments(list);
     } catch (err) {
+      setPost(null);
+      setComments([]);
       setError(err instanceof Error ? err.message : t('rooms.err.loadPost'));
     } finally {
       setLoading(false);
@@ -304,7 +316,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setError(null);
     try {
       await roomsApi.deleteRoomPost(roomId, postId);
+      invalidateRoomFeed(roomId);
+      invalidateRoomsList();
       setConfirmDelete(false);
+      setPost(null);
       onBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : t('rooms.err.delete'));
