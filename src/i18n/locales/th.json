@@ -384,8 +384,8 @@
       "coverImage": "โหลดรูปปกไม่ได้",
       "coverUpdate": "อัปเดตปกไม่ได้"
     },
-    "pokePushTitle": "แคะ!",
-    "pokePushBody": "{{name}}~ มาเขียนไดอารี่กัน",
+    "pokePushTitle": "{{name}} - แคะ!",
+    "pokePushBody": "มาเขียนไดอารี่กัน 🖍️",
     "pokeSent": "แคะแล้ว!",
     "membersAria": "สมาชิกในห้อง",
     "membersMoreAria": "แสดงสมาชิกอีก {{n}} คน",

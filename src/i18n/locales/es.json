@@ -384,8 +384,8 @@
       "coverImage": "No se pudo cargar la portada",
       "coverUpdate": "No se pudo actualizar la portada"
     },
-    "pokePushTitle": "¡Toque!",
-    "pokePushBody": "{{name}}~ escribe tu diario",
+    "pokePushTitle": "{{name}} - ¡Toque!",
+    "pokePushBody": "Escribe tu diario 🖍️",
     "pokeSent": "¡Toque enviado!",
     "membersAria": "Miembros de la sala",
     "membersMoreAria": "Mostrar {{n}} miembros más",

@@ -384,8 +384,8 @@
       "coverImage": "Não foi possível carregar a capa",
       "coverUpdate": "Não foi possível atualizar a capa"
     },
-    "pokePushTitle": "Cutucar!",
-    "pokePushBody": "{{name}}~ vamos escrever o diário",
+    "pokePushTitle": "{{name}} - Cutucar!",
+    "pokePushBody": "Vamos escrever o diário 🖍️",
     "pokeSent": "Cutucada enviada!",
     "membersAria": "Membros da sala",
     "membersMoreAria": "Mostrar mais {{n}} membros",

@@ -384,8 +384,8 @@
       "coverImage": "Không tải được ảnh bìa",
       "coverUpdate": "Không cập nhật được ảnh bìa"
     },
-    "pokePushTitle": "Chọc!",
-    "pokePushBody": "{{name}}~ viết nhật ký đi",
+    "pokePushTitle": "{{name}} - Chọc!",
+    "pokePushBody": "Viết nhật ký đi 🖍️",
     "pokeSent": "Đã chọc!",
     "membersAria": "Thành viên phòng",
     "membersMoreAria": "Xem thêm {{n}} thành viên",

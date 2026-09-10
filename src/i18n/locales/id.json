@@ -384,8 +384,8 @@
       "coverImage": "Tidak bisa memuat foto sampul",
       "coverUpdate": "Tidak bisa memperbarui sampul"
     },
-    "pokePushTitle": "Colek!",
-    "pokePushBody": "{{name}}~ ayo tulis diary",
+    "pokePushTitle": "{{name}} - Colek!",
+    "pokePushBody": "Ayo tulis diary 🖍️",
     "pokeSent": "Colek terkirim!",
     "membersAria": "Anggota ruang",
     "membersMoreAria": "Tampilkan {{n}} anggota lagi",

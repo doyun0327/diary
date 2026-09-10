@@ -384,8 +384,8 @@
       "coverImage": "无法加载封面照片",
       "coverUpdate": "无法更新封面"
     },
-    "pokePushTitle": "戳一下!",
-    "pokePushBody": "{{name}}~来写日记吧",
+    "pokePushTitle": "{{name}} - 戳一下!",
+    "pokePushBody": "来写日记吧 🖍️",
     "pokeSent": "戳一下完成!",
     "membersAria": "房间成员",
     "membersMoreAria": "再显示 {{n}} 位成员",

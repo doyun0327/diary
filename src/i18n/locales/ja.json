@@ -384,8 +384,8 @@
       "coverImage": "カバー写真を読み込めませんでした",
       "coverUpdate": "カバーを更新できませんでした"
     },
-    "pokePushTitle": "ぽちっ!",
-    "pokePushBody": "{{name}}〜日記書こう",
+    "pokePushTitle": "{{name}} - ぽちっ!",
+    "pokePushBody": "日記書こう 🖍️",
     "pokeSent": "ぽちっ完了!",
     "membersAria": "ルームメンバー",
     "membersMoreAria": "メンバーをあと{{n}}人表示",

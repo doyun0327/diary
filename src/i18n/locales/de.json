@@ -385,8 +385,8 @@
       "coverImage": "Cover-Foto konnte nicht geladen werden",
       "coverUpdate": "Cover konnte nicht aktualisiert werden"
     },
-    "pokePushTitle": "Anstupsen!",
-    "pokePushBody": "{{name}}~ schreib ein Tagebuch",
+    "pokePushTitle": "{{name}} - Anstupsen!",
+    "pokePushBody": "Schreib ein Tagebuch 🖍️",
     "pokeSent": "Anstupsen gesendet!",
     "membersAria": "Raummitglieder",
     "membersMoreAria": "{{n}} weitere Mitglieder anzeigen",

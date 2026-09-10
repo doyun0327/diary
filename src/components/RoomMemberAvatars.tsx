@@ -103,9 +103,12 @@ function RoomMemberAvatars({
 
     setPokingId(member.userId);
     try {
+      const pokerName =
+        activeMembers.find((m) => m.userId === currentUserId)?.nickname.trim() ||
+        t('common.anonymous');
       await roomsApi.pokeMember(roomId, member.userId, {
-        title: t('rooms.pokePushTitle'),
-        body: t('rooms.pokePushBody', { name: member.nickname }),
+        title: t('rooms.pokePushTitle', { name: pokerName }),
+        body: t('rooms.pokePushBody'),
       });
       lastPokeAt.current.set(member.userId, Date.now());
       onDismissPokeCoach?.();
