@@ -22,7 +22,7 @@ import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
 import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
-import { diaryEditFontStack, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId } from '../utils/fonts';
+import { diaryEditFontStack, defaultFontIdForLanguage, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
   applyAiPackCreditsFromServer,
@@ -61,7 +61,9 @@ import {
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
-import { getAccessToken } from '../hooks/useAuthSession';
+import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
+import { requestNativeGoogleSignIn, mountGoogleSignInButton } from '../lib/googleAuth';
+import { claimWelcomeAiCredits } from '../utils/welcomeAiCredits';
 import {
   consumeAiPackCreditsRemote,
   consumeMonthlyUsage,
@@ -149,7 +151,9 @@ interface DiaryWritePageProps {
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
   onSave: (
-    entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'>,
+    entry: Omit<DiaryEntry, 'id' | 'createdAt' | 'updatedAt'> & {
+      clearDrawing?: boolean;
+    },
   ) => void | Promise<void>;
   onCancel: () => void;
   onOpenCharacter: () => void;
@@ -167,7 +171,7 @@ function DiaryWritePage({
   onCancel,
   onOpenCharacter,
   onNativeSaveStateChange,
-  writeQuota,
+  writeQuota: _writeQuota,
   onAppToast,
 }: DiaryWritePageProps) {
   const { t, i18n } = useTranslation();
@@ -202,14 +206,17 @@ function DiaryWritePage({
       defaultStickerForPack(getStoredMoodPackId()),
   );
   const [fontId, setFontId] = useState(
-    () => resumeDraft?.fontId ?? initialEntry?.fontId ?? getPreferredFontId(),
+    () =>
+      resumeDraft?.fontId ??
+      initialEntry?.fontId ??
+      (initialEntry ? defaultFontIdForLanguage() : getPreferredFontId()),
   );
   const [fontSizeId, setFontSizeId] = useState(
     () =>
       parseFontSizeId(
         resumeDraft?.fontSize ??
           initialEntry?.fontSize ??
-          getPreferredFontSizeId(),
+          (initialEntry ? DEFAULT_FONT_SIZE_ID : getPreferredFontSizeId()),
       ),
   );
   const [canvasCollapsed, setCanvasCollapsed] = useState(false);
@@ -227,6 +234,11 @@ function DiaryWritePage({
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  const [aiLoginOpen, setAiLoginOpen] = useState(false);
+  const [aiLoginBusy, setAiLoginBusy] = useState(false);
+  const [aiLoginError, setAiLoginError] = useState<string | null>(null);
+  const googleBtnHostRef = useRef<HTMLDivElement>(null);
+  const { signInWithGoogleIdToken } = useAuthSession();
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
@@ -283,6 +295,7 @@ function DiaryWritePage({
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const drawingTouchedRef = useRef(false);
+  const drawingClearedRef = useRef(false);
   const baselineRef = useRef({
     date: resumeDraft?.date ?? initialEntry?.date ?? today(),
     title: resumeDraft?.title ?? initialEntry?.title ?? '',
@@ -290,11 +303,14 @@ function DiaryWritePage({
     mood: (resumeDraft?.mood ??
       initialEntry?.mood ??
       defaultStickerForPack(getStoredMoodPackId())) as DiarySticker,
-    fontId: resumeDraft?.fontId ?? initialEntry?.fontId ?? getPreferredFontId(),
+    fontId:
+      resumeDraft?.fontId ??
+      initialEntry?.fontId ??
+      (initialEntry ? defaultFontIdForLanguage() : getPreferredFontId()),
     fontSizeId: parseFontSizeId(
       resumeDraft?.fontSize ??
         initialEntry?.fontSize ??
-        getPreferredFontSizeId(),
+        (initialEntry ? DEFAULT_FONT_SIZE_ID : getPreferredFontSizeId()),
     ),
     hadImage:
       Boolean(initialEntry?.imageUrl) || Boolean(resumeDraft?.hasDrawing),
@@ -322,6 +338,10 @@ function DiaryWritePage({
     savingRef.current = saving;
     onNativeSaveStateChange?.(!aiLoading && !saving, saving);
   }, [aiLoading, saving, onNativeSaveStateChange]);
+
+  useEffect(() => {
+    drawingClearedRef.current = false;
+  }, [initialEntry?.id]);
 
   useEffect(() => {
     editOriginalImageRef.current = initialEntry?.imageUrl ?? null;
@@ -721,21 +741,23 @@ function DiaryWritePage({
 
   const aiQuota = (() => {
     void accessTick;
+    const pack = getAiPackCredits();
     if (canUseProAiQuota()) {
       const status = getDiaryAccessState();
-      const pack = getAiPackCredits();
-      // 월한도 + 추가구매 잔량 (0이어도 버튼은 눌러 구매 모달 가능)
+      // 월한도 + 추가구매·환영 팩 잔량
       const remaining = Math.max(0, status.monthlyRemaining) + pack;
       return {
         used: Math.max(0, status.monthlyLimit + pack - remaining),
         limit: status.monthlyLimit + pack,
       };
     }
-    if (writeQuota) {
-      return {
-        used: writeQuota.used,
-        limit: writeQuota.limit,
-      };
+    // 무료: 환영/팩이 있으면 3→2→1, 다 쓰면 광고 일일 1
+    if (pack > 0) {
+      return { used: 0, limit: pack };
+    }
+    const adCredits = getAiDrawCredits();
+    if (adCredits > 0) {
+      return { used: 0, limit: adCredits };
     }
     return {
       used: getAiDrawsToday(),
@@ -743,6 +765,9 @@ function DiaryWritePage({
     };
   })();
   const aiLeft = Math.max(0, aiQuota.limit - aiQuota.used);
+  /** 미로그인 + 오늘 광고 1회 소진 → 로그인만 (광고 스킵 숨김). 내일 리셋되면 다시 둘 다 */
+  const guestDailyAiExhausted =
+    !isGoogleSignedIn() && isAiDailyLimitReached();
 
   const promptAiDrawBlocked = () => {
     if (getAiPackCredits() > 0) {
@@ -933,8 +958,104 @@ function DiaryWritePage({
       setAiError(t('write.err.aiNeedContent'));
       return;
     }
-    setAiStyleOpen(true);
+    // 미연동: 로그인하면 무료 3편 — Google 로그인 유도
+    if (!isGoogleSignedIn()) {
+      setAiLoginError(null);
+      setAiLoginOpen(true);
+      return;
+    }
+    void (async () => {
+      await claimWelcomeAiCredits();
+      setAiStyleOpen(true);
+    })();
   };
+
+  const continueAsGuestAiDraw = useCallback(() => {
+    setAiLoginOpen(false);
+    setAiLoginBusy(false);
+    setAiLoginError(null);
+    setAiStyleOpen(true);
+  }, []);
+
+  const finishAiLoginAndDraw = useCallback(async () => {
+    await claimWelcomeAiCredits();
+    setAiLoginOpen(false);
+    setAiLoginBusy(false);
+    setAiLoginError(null);
+    setAiStyleOpen(true);
+  }, []);
+
+  const handleAiGoogleLogin = () => {
+    if (aiLoginBusy) return;
+    if (!isFlutterApp()) return;
+    setAiLoginError(null);
+    setAiLoginBusy(true);
+    const signInPromise = requestNativeGoogleSignIn();
+    void (async () => {
+      try {
+        const idToken = await signInPromise;
+        await signInWithGoogleIdToken(idToken);
+        if (!isGoogleSignedIn()) {
+          setAiLoginError(t('write.ai.loginFailed'));
+          return;
+        }
+        await finishAiLoginAndDraw();
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : '';
+        if (reason !== 'cancelled') {
+          setAiLoginError(t('write.ai.loginFailed'));
+        }
+      } finally {
+        setAiLoginBusy(false);
+      }
+    })();
+  };
+
+  const handleAiGoogleIdToken = useCallback(
+    (idToken: string) => {
+      setAiLoginBusy(true);
+      setAiLoginError(null);
+      void (async () => {
+        try {
+          await signInWithGoogleIdToken(idToken);
+          if (!isGoogleSignedIn()) {
+            setAiLoginError(t('write.ai.loginFailed'));
+            return;
+          }
+          await finishAiLoginAndDraw();
+        } catch {
+          setAiLoginError(t('write.ai.loginFailed'));
+        } finally {
+          setAiLoginBusy(false);
+        }
+      })();
+    },
+    [finishAiLoginAndDraw, signInWithGoogleIdToken, t],
+  );
+
+  useEffect(() => {
+    if (!aiLoginOpen || isFlutterApp()) return;
+    const host = googleBtnHostRef.current;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+    if (!host || !clientId) return;
+    const ac = new AbortController();
+    let dispose: (() => void) | undefined;
+    void mountGoogleSignInButton(host, clientId, handleAiGoogleIdToken, ac.signal)
+      .then((cleanup) => {
+        if (ac.signal.aborted) {
+          cleanup();
+          return;
+        }
+        dispose = cleanup;
+      })
+      .catch(() => {
+        setAiLoginError(t('write.ai.loginFailed'));
+      });
+    return () => {
+      ac.abort();
+      dispose?.();
+    };
+  }, [aiLoginOpen, handleAiGoogleIdToken, t]);
 
   const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
     aiStyleRef.current = styleId;
@@ -958,7 +1079,8 @@ function DiaryWritePage({
       return;
     }
     if (needsAiAdBeforeDraw()) {
-      setRewardPromptOpen(true);
+      // 스타일 고른 뒤 확인 모달 없이 바로 보상형 광고
+      void handleWatchAd();
       return;
     }
     void runAiDraw();
@@ -1155,32 +1277,35 @@ function DiaryWritePage({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (saving || aiLoading) return;
-    setSaving(true);
+    // setSaving 전에 캡처 — 저장 중 레이아웃/리사이즈로 펜 잉크가 비는 것 방지
     let imageUrl: string | undefined;
     let canvasState: DiaryCanvasState | undefined;
     try {
-      await canvasRef.current?.prepareExport();
-      const rawState = canvasRef.current?.getCanvasState() ?? null;
-      canvasState = await resolveCanvasStateForSave(rawState);
-      const raw = canvasRef.current?.toDataURL();
-      // 친구방 공유·로컬 표시용 합성본 — 8/26처럼 data URL 유지 (GCS 업로드는 sync 시)
-      imageUrl = raw || undefined;
+      const captured = await canvasRef.current?.captureForSave();
+      if (captured?.hasContent) {
+        canvasState = await resolveCanvasStateForSave(captured.canvasState ?? null);
+        imageUrl = captured.imageUrl || undefined;
+        if (!imageUrl && !canvasState) {
+          setSaveError(t('write.err.saveImage'));
+          return;
+        }
+      }
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : t('write.err.saveImage'));
-      setSaving(false);
-      return;
-    }
-    if (!title.trim() && !content.trim() && !imageUrl) {
-      setAiError(t('write.err.empty'));
-      setSaving(false);
       return;
     }
 
+    if (!title.trim() && !content.trim() && !imageUrl && !isEdit) {
+      setAiError(t('write.err.empty'));
+      return;
+    }
+
+    setSaving(true);
     setAiError(null);
     setSaveError(null);
     clearWriteDraft();
     try {
-      await onSave({
+      const payload: Parameters<typeof onSave>[0] = {
         date,
         title: title.trim(),
         content: content.trim(),
@@ -1188,9 +1313,19 @@ function DiaryWritePage({
         moodPack: writePackId,
         fontId,
         fontSize: fontSizeId,
-        imageUrl,
-        canvasState,
-      });
+      };
+      if (imageUrl || canvasState) {
+        payload.imageUrl = imageUrl;
+        payload.canvasState = canvasState;
+      } else if (isEdit && drawingClearedRef.current) {
+        // 전체 지우기 후에만 기존 그림 삭제 (빈 캡처로 undefined 덮어쓰기 금지)
+        payload.imageUrl = undefined;
+        payload.canvasState = undefined;
+        payload.clearDrawing = true;
+      }
+      // 수정 + 그림 없음 + 지우기 안 함 → 미디어 필드 생략 = 기존 유지
+      await onSave(payload);
+      drawingClearedRef.current = false;
     } catch (err) {
       setSaveError(
         err instanceof Error ? err.message : t('write.err.saveFailed'),
@@ -1375,6 +1510,9 @@ function DiaryWritePage({
               onFontIdChange={setFontId}
               fontSizeId={fontSizeId}
               onFontSizeChange={setFontSizeId}
+              onCleared={() => {
+                drawingClearedRef.current = true;
+              }}
             />
             {aiLoading && !purchaseClickShield && (
               <AiLoadingWait
@@ -1577,6 +1715,60 @@ function DiaryWritePage({
               primaryLabel={t('common.ok')}
               onPrimary={() => setUsageNoticeOpen(false)}
             />
+          )}
+          {aiLoginOpen && (
+            <AppModal
+              title={t('write.ai.loginForFreeTitle')}
+              lead={t('write.ai.loginForFreeLead')}
+              onDismiss={() => {
+                if (aiLoginBusy) return;
+                if (guestDailyAiExhausted) {
+                  // 오늘 광고분 소진 — 닫기만 (광고로 이어가지 않음)
+                  setAiLoginOpen(false);
+                  setAiLoginError(null);
+                  return;
+                }
+                continueAsGuestAiDraw();
+              }}
+              showClose={!aiLoginBusy}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={
+                isFlutterApp()
+                  ? aiLoginBusy
+                    ? t('write.ai.loginBusy')
+                    : t('write.ai.loginForFreeCta')
+                  : undefined
+              }
+              onPrimary={
+                isFlutterApp() && !aiLoginBusy
+                  ? () => handleAiGoogleLogin()
+                  : undefined
+              }
+              secondaryLabel={
+                aiLoginBusy || guestDailyAiExhausted
+                  ? undefined
+                  : t('write.ai.loginSkipCta')
+              }
+              onSecondary={
+                aiLoginBusy || guestDailyAiExhausted
+                  ? undefined
+                  : () => continueAsGuestAiDraw()
+              }
+            >
+              {!isFlutterApp() && (
+                <div className="diary-write__ai-login-google">
+                  <div ref={googleBtnHostRef} />
+                  {aiLoginBusy && (
+                    <p className="diary-write__ai-login-busy">{t('write.ai.loginBusy')}</p>
+                  )}
+                </div>
+              )}
+              {aiLoginError && (
+                <p className="diary-write__ai-login-error" role="alert">
+                  {aiLoginError}
+                </p>
+              )}
+            </AppModal>
           )}
           {rewardPromptOpen && (
             <AppModal

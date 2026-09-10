@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { syncDiaries, type DiarySyncResult, type SyncCloudOptions } from '../api/diariesApi';
 import { getAccessToken } from './useAuthSession';
 import type { DiaryCanvasState, DiaryEntry } from '../types/diary';
@@ -174,13 +175,20 @@ async function persistEntryMedia(
   entryId: string,
   imageUrl: string | undefined,
   canvasState: DiaryCanvasState | undefined,
+  opts?: { clearDrawing?: boolean },
 ) {
+  if (opts?.clearDrawing) {
+    await deleteDiaryImage(entryId);
+    await deleteDiaryCanvasJson(entryId);
+    return;
+  }
+
   if (isEmbeddedDataUrl(imageUrl)) {
     await putDiaryImage(entryId, imageUrl!);
   }
 
   if (!canvasState) {
-    await deleteDiaryCanvasJson(entryId);
+    // 캔버스 필드 없음 = 레이어 백업은 유지 (undefined로 덮어 삭제하지 않음)
     return;
   }
 
@@ -397,26 +405,56 @@ export function useDiary() {
   );
 
   const updateEntry = useCallback(
-    async (id: string, patch: Partial<Omit<DiaryEntry, 'id' | 'createdAt'>>) => {
-      if ('imageUrl' in patch || 'canvasState' in patch) {
+    async (
+      id: string,
+      patch: Partial<Omit<DiaryEntry, 'id' | 'createdAt'>> & {
+        clearDrawing?: boolean;
+      },
+    ) => {
+      const { clearDrawing, ...entryPatch } = patch;
+      const hasMediaPatch =
+        clearDrawing === true ||
+        'imageUrl' in entryPatch ||
+        'canvasState' in entryPatch;
+
+      if (hasMediaPatch) {
         try {
-          await persistEntryMedia(id, patch.imageUrl, patch.canvasState);
+          await persistEntryMedia(
+            id,
+            entryPatch.imageUrl,
+            entryPatch.canvasState,
+            { clearDrawing: clearDrawing === true },
+          );
         } catch (err) {
           console.error('[diary] update image failed', err);
           throw err instanceof Error ? err : new Error('그림 저장에 실패했어요');
         }
       }
-      let next: DiaryEntry[] = [];
-      setEntries((prev) => {
-        next = prev.map((e) =>
-          e.id === id
-            ? { ...e, ...patch, updatedAt: new Date().toISOString() }
-            : e,
-        );
-        if (!persistEntries(next)) {
-          console.error('[diary] meta persist failed after update');
-        }
-        return next;
+
+      const updatedAt = new Date().toISOString();
+      flushSync(() => {
+        setEntries((prev) => {
+          const next = prev.map((e) => {
+            if (e.id !== id) return e;
+            const merged: DiaryEntry = {
+              ...e,
+              ...entryPatch,
+              updatedAt,
+            };
+            if (clearDrawing) {
+              merged.imageUrl = undefined;
+              merged.canvasState = undefined;
+            } else {
+              if (!('imageUrl' in entryPatch)) merged.imageUrl = e.imageUrl;
+              if (!('canvasState' in entryPatch)) merged.canvasState = e.canvasState;
+            }
+            return merged;
+          });
+          if (!persistEntries(next)) {
+            console.error('[diary] meta persist failed after update');
+          }
+          return next;
+        });
       });
     },
     [],

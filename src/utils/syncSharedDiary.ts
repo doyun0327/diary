@@ -3,10 +3,15 @@ import { getAccessToken } from '../hooks/useAuthSession';
 import type { DiaryEntry } from '../types/diary';
 import { invalidateRoomFeed } from './roomCache';
 import { resolveEntryImageForRoomShare } from './resolveRoomShareImage';
+import { rememberSharedDiaryFont } from './roomPostFont';
+import {
+  DEFAULT_FONT_SIZE_ID,
+  defaultFontIdForLanguage,
+} from './fonts';
 
 type SharedDiaryFields = Pick<
   DiaryEntry,
-  'title' | 'date' | 'content' | 'mood' | 'moodPack' | 'imageUrl'
+  'title' | 'date' | 'content' | 'mood' | 'moodPack' | 'imageUrl' | 'fontId' | 'fontSize'
 >;
 
 /** 일기 수정 후, 친구방에 공유된 동일 일기 게시글을 서버에 맞춰 갱신 */
@@ -22,6 +27,9 @@ export async function syncSharedDiaryAfterEdit(
       imageUrl: entry.imageUrl,
     });
 
+    const fontId = entry.fontId?.trim() || defaultFontIdForLanguage();
+    const fontSize = entry.fontSize?.trim() || DEFAULT_FONT_SIZE_ID;
+
     const res = await roomsApi.updateSharedDiary(diaryId, {
       title: entry.title,
       date: entry.date,
@@ -29,7 +37,11 @@ export async function syncSharedDiaryAfterEdit(
       mood: entry.mood,
       moodPack: entry.moodPack,
       imageUrl,
+      fontId,
+      fontSize,
     });
+
+    rememberSharedDiaryFont(diaryId, fontId, fontSize);
 
     for (const roomId of res.roomIds ?? []) {
       invalidateRoomFeed(roomId);

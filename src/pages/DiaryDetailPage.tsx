@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomSummary } from '../types/room';
 import { formatDate } from '../utils/date';
-import { diaryFontStack, findFont, fontSizeCss } from '../utils/fonts';
+import { diaryFontStack, ensureDiaryFontReady, findFont, fontSizeCss, defaultFontIdForLanguage, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
+import { rememberSharedDiaryFont } from '../utils/roomPostFont';
 import { prefetchDiaryShareBlob, shareDiaryTo } from '../utils/shareStory';
 import * as roomsApi from '../api/roomsApi';
 import { coverClassName, resolveRoomCover } from '../utils/roomCovers';
@@ -93,6 +94,10 @@ function DiaryDetailPage({
   useEffect(() => {
     resetShareImagePrep();
   }, [entry.id]);
+
+  useEffect(() => {
+    void ensureDiaryFontReady(entry.fontId);
+  }, [entry.fontId]);
 
   useEffect(() => {
     return () => {
@@ -264,6 +269,9 @@ function DiaryDetailPage({
 
     const shareNick = nickname.trim() || t('common.anonymous');
 
+    const shareFontId = entry.fontId?.trim() || defaultFontIdForLanguage();
+    const shareFontSize = entry.fontSize?.trim() || DEFAULT_FONT_SIZE_ID;
+
     const body = {
       diaryId: entry.id,
       title: entry.title,
@@ -272,6 +280,8 @@ function DiaryDetailPage({
       mood: entry.mood,
       moodPack: entry.moodPack,
       imageUrl,
+      fontId: shareFontId,
+      fontSize: shareFontSize,
       pushTitle: shareNick,
       pushBody: t('rooms.sharePushBody'),
     };
@@ -284,15 +294,20 @@ function DiaryDetailPage({
         targets.map((room) => roomsApi.createRoomPost(room.id, body)),
       );
 
+      let sharedOk = false;
       results.forEach((result, i) => {
         const room = targets[i];
         if (result.status === 'fulfilled') {
           okNames.push(room.name);
+          sharedOk = true;
           invalidateRoomFeed(room.id);
         } else {
           failNames.push(room.name);
         }
       });
+      if (sharedOk) {
+        rememberSharedDiaryFont(entry.id, shareFontId, shareFontSize);
+      }
 
       closeShare({ force: true });
 

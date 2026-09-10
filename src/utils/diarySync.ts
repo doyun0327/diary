@@ -20,6 +20,7 @@ export function mergeDiaryEntries(
     if (!prev || isSameOrNewer(entry.updatedAt, prev.updatedAt)) {
       const next = normalizeEntry(entry);
       if (!next.moodPack && prev?.moodPack) next.moodPack = prev.moodPack;
+      if (!next.fontId && prev?.fontId) next.fontId = prev.fontId;
       if (!next.fontSize && prev?.fontSize) next.fontSize = prev.fontSize;
       if (!next.canvasState && prev?.canvasState) next.canvasState = prev.canvasState;
       if (!next.imageUrl && prev?.imageUrl) next.imageUrl = prev.imageUrl;

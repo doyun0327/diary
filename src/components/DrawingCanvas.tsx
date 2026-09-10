@@ -53,6 +53,12 @@ export interface DrawingCanvasHandle {
   loadCanvasState: (state: DiaryCanvasState, fallbackSrc?: string) => Promise<void>;
   prepareExport: () => Promise<void>;
   hasContent: () => boolean;
+  /** 저장 직전 — 리사이즈를 막고 비트맵·레이어를 한 번에 캡처 */
+  captureForSave: () => Promise<{
+    imageUrl?: string;
+    canvasState: DiaryCanvasState | null;
+    hasContent: boolean;
+  }>;
 }
 
 interface DrawingCanvasProps {
@@ -62,6 +68,10 @@ interface DrawingCanvasProps {
   onFontIdChange?: (fontId: string) => void;
   fontSizeId?: FontSizeId;
   onFontSizeChange?: (fontSizeId: FontSizeId) => void;
+  /** 전체 지우기 확정 시 */
+  onCleared?: () => void;
+  /** 사용자가 그림/사진/스티커를 실제로 바꿨을 때 (로드 제외) */
+  onDirty?: () => void;
 }
 
 interface PhotoLayer {
@@ -292,6 +302,8 @@ function DrawingCanvas({
   onFontIdChange,
   fontSizeId: fontSizeIdProp,
   onFontSizeChange,
+  onCleared,
+  onDirty,
 }: DrawingCanvasProps) {
   const { t, i18n } = useTranslation();
   const langFonts = fontsForLanguage(resolveAppLanguage(i18n.language));
@@ -304,9 +316,16 @@ function DrawingCanvas({
   const stickerTabsRef = useRef<HTMLDivElement>(null);
   const hueWheelRef = useRef<HTMLDivElement>(null);
   const suppressResizeRef = useRef(false);
+  const suppressDirtyRef = useRef(false);
   const drawing = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const hasDrawn = useRef(false);
+  const onDirtyRef = useRef(onDirty);
+  onDirtyRef.current = onDirty;
+  const notifyDirty = () => {
+    if (suppressDirtyRef.current) return;
+    onDirtyRef.current?.();
+  };
   const undoStack = useRef<HTMLCanvasElement[]>([]);
   const strokeSnapshotPushed = useRef(false);
   const photoImages = useRef<Map<string, HTMLImageElement>>(new Map());
@@ -413,7 +432,11 @@ function DrawingCanvas({
     });
   }, []);
 
-  /** 도구줄(dock-bar) 높이만큼 그리기 영역·저장에서 제외 */
+  /**
+   * 그리기 비트맵 크기는 dock-bar 기준으로만 잡는다.
+   * 펜 악세서리(색/종류)까지 넣으면 열릴 때마다 캔버스가 리사이즈되며
+   * 펜 스트로크가 날아가거나 저장이 비는 것처럼 보인다.
+   */
   useEffect(() => {
     const wrap = wrapRef.current;
     const dockBar = dockBarRef.current;
@@ -517,14 +540,33 @@ function DrawingCanvas({
           const width = Math.round(rect.width * dpr);
           const height = Math.round(rect.height * dpr);
           if (canvas.width !== width || canvas.height !== height) {
+            let snapshot: HTMLCanvasElement | null = null;
+            if (hasDrawn.current && canvas.width > 0 && canvas.height > 0) {
+              snapshot = document.createElement('canvas');
+              snapshot.width = canvas.width;
+              snapshot.height = canvas.height;
+              snapshot.getContext('2d')?.drawImage(canvas, 0, 0);
+            }
             canvas.width = width;
             canvas.height = height;
-          }
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.setTransform(1, 0, 0, 1, 0, 0);
+              ctx.clearRect(0, 0, width, height);
+              if (snapshot) {
+                ctx.drawImage(snapshot, 0, 0, width, height);
+              }
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              ctx.lineCap = 'round';
+              ctx.lineJoin = 'round';
+            }
+          } else {
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              ctx.lineCap = 'round';
+              ctx.lineJoin = 'round';
+            }
           }
           return rect;
         }
@@ -552,6 +594,7 @@ function DrawingCanvas({
 
   const rematerializePhotosForExport = async () => {
     const layers = photoLayersRef.current;
+    let changed = false;
     for (const layer of layers) {
       if (!layer.src || layer.src.startsWith('data:') || layer.src.startsWith('blob:')) {
         continue;
@@ -560,12 +603,17 @@ function DrawingCanvas({
         const safe = await materializeImageSrc(layer.src);
         const img = await loadHtmlImage(safe);
         photoImages.current.set(layer.id, img);
-        layer.src = safe;
+        if (layer.src !== safe) {
+          layer.src = safe;
+          changed = true;
+        }
       } catch (err) {
         console.warn('[canvas] rematerialize photo failed', layer.id, err);
       }
     }
-    setPhotoLayers([...photoLayersRef.current]);
+    if (changed) {
+      setPhotoLayers([...photoLayersRef.current]);
+    }
   };
 
   const clearUndoStack = () => {
@@ -602,6 +650,7 @@ function DrawingCanvas({
     ctx.drawImage(snap, 0, 0, canvas.width, canvas.height);
     ctx.restore();
     setCanUndo(undoStack.current.length > 0);
+    notifyDirty();
   };
 
   const exportDataUrl = (): string | undefined => {
@@ -744,13 +793,15 @@ function DrawingCanvas({
       canvas.height = height;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      if (snapshot) {
+        // device pixel 좌표계로 복원 — transform(dpr) 위에서 그리면 잉크가 비는 경우가 있음
+        ctx.drawImage(snapshot, 0, 0, width, height);
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      clearInk();
-      if (snapshot) {
-        ctx.drawImage(snapshot, 0, 0, rect.width, rect.height);
-      }
     };
 
     resize();
@@ -996,11 +1047,13 @@ function DrawingCanvas({
       if (overlayPinch.current) {
         if (overlayPointers.current.size >= 2) return;
         resumeOverlayMove();
+        notifyDirty();
         return;
       }
       if (overlayPointers.current.size > 0) return;
 
       const drag = photoDrag.current;
+      const sDrag = stickerDrag.current;
       if (
         drag &&
         drag.kind === 'move' &&
@@ -1013,6 +1066,8 @@ function DrawingCanvas({
         setColorsOpen(false);
         setFontOpen(false);
         setStickerOpen(false);
+      } else if (drag || sDrag) {
+        notifyDirty();
       }
 
       photoDrag.current = null;
@@ -1046,6 +1101,64 @@ function DrawingCanvas({
       hasDrawn.current ||
       photoLayersRef.current.length > 0 ||
       stickerLayersRef.current.length > 0,
+    captureForSave: async () => {
+      suppressResizeRef.current = true;
+      try {
+        await rematerializePhotosForExport();
+        const hasContent =
+          hasDrawn.current ||
+          photoLayersRef.current.length > 0 ||
+          stickerLayersRef.current.length > 0;
+        // useImperativeHandle 클로저의 getCanvasState/exportDataUrl와 동일 로직
+        const canvas = canvasRef.current;
+        let canvasState: DiaryCanvasState | null = null;
+        let imageUrl: string | undefined;
+        if (canvas && hasContent) {
+          const rect = canvas.getBoundingClientRect();
+          const photos = photoLayersRef.current;
+          const stickers = stickerLayersRef.current;
+          const hasInk = hasDrawn.current;
+          const vw = Math.max(1, rect.width);
+          const vh = Math.max(1, rect.height);
+          let inkUrl: string | undefined;
+          if (hasInk && canvas.width > 1 && canvas.height > 1) {
+            try {
+              inkUrl = canvas.toDataURL('image/png');
+            } catch {
+              inkUrl = undefined;
+            }
+          }
+          if (photos.length > 0 || stickers.length > 0 || hasInk) {
+            canvasState = {
+              viewWidth: vw,
+              viewHeight: vh,
+              normalized: true,
+              photos: photos.map((p) => ({
+                ...p,
+                x: p.x / vw,
+                y: p.y / vh,
+                width: p.width / vw,
+                height: p.height / vh,
+              })),
+              stickers: stickers.map((s) => ({
+                id: s.id,
+                emoji: s.emoji,
+                ...(s.imageSrc ? { imageSrc: s.imageSrc } : {}),
+                x: s.x / vw,
+                y: s.y / vh,
+                size: s.size / vw,
+                rotation: s.rotation,
+              })),
+              inkUrl,
+            };
+          }
+          imageUrl = exportDataUrl();
+        }
+        return { imageUrl, canvasState, hasContent };
+      } finally {
+        suppressResizeRef.current = false;
+      }
+    },
     getCanvasState: () => {
       const canvas = canvasRef.current;
       if (!canvas) return null;
@@ -1093,6 +1206,7 @@ function DrawingCanvas({
       const canvas = canvasRef.current;
       if (!canvas) throw new Error(t('canvas.err.noCanvas'));
       suppressResizeRef.current = true;
+      suppressDirtyRef.current = true;
       try {
         clearUndoStack();
         clearInk();
@@ -1224,9 +1338,12 @@ function DrawingCanvas({
         }
       } finally {
         suppressResizeRef.current = false;
+        suppressDirtyRef.current = false;
       }
     },
     loadImage: async (src: string) => {
+      suppressDirtyRef.current = true;
+      try {
       clearUndoStack();
       clearInk();
       hasDrawn.current = false;
@@ -1238,6 +1355,9 @@ function DrawingCanvas({
       await ensureCanvasLayout();
       const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, true);
+      } finally {
+        suppressDirtyRef.current = false;
+      }
     },
     appendImages: async (srcs: string[]) => {
       if (srcs.length === 0) return;
@@ -1249,6 +1369,8 @@ function DrawingCanvas({
     },
     loadImages: async (srcs: string[]) => {
       if (srcs.length === 0) return;
+      suppressDirtyRef.current = true;
+      try {
       clearUndoStack();
       clearInk();
       hasDrawn.current = false;
@@ -1295,8 +1417,13 @@ function DrawingCanvas({
       setColorsOpen(false);
       setFontOpen(false);
       setStickerOpen(false);
+      } finally {
+        suppressDirtyRef.current = false;
+      }
     },
     loadEditableImage: async (src: string) => {
+      suppressDirtyRef.current = true;
+      try {
       clearUndoStack();
       clearInk();
       hasDrawn.current = false;
@@ -1308,6 +1435,9 @@ function DrawingCanvas({
       await ensureCanvasLayout();
       const safeSrc = await resolveLayerSrc(src);
       await addPhotoLayerAsync(safeSrc, 0.85, false);
+      } finally {
+        suppressDirtyRef.current = false;
+      }
     },
   }));
 
@@ -1334,6 +1464,7 @@ function DrawingCanvas({
     photoImages.current.delete(activePhotoId);
     setPhotoLayers((prev) => prev.filter((l) => l.id !== activePhotoId));
     setActivePhotoId(null);
+    notifyDirty();
   };
 
   const removeActiveSticker = () => {
@@ -1344,6 +1475,7 @@ function DrawingCanvas({
     setMode('none');
     setStickerOpen(false);
     setColorsOpen(false);
+    notifyDirty();
   };
 
   const confirmActiveOverlay = () => {
@@ -1479,6 +1611,7 @@ function DrawingCanvas({
         setColorsOpen(false);
         setFontOpen(false);
         setStickerOpen(false);
+        notifyDirty();
         resolve();
       };
       img.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
@@ -1517,6 +1650,7 @@ function DrawingCanvas({
       setStickerLayers((prev) => [...prev, layer]);
       setActiveStickerId(id);
       activeStickerIdRef.current = id;
+      notifyDirty();
     };
 
     if (imageSrc) {
@@ -1709,6 +1843,7 @@ function DrawingCanvas({
     if (!strokeSnapshotPushed.current) {
       pushUndoSnapshot();
       strokeSnapshotPushed.current = true;
+      notifyDirty();
     }
 
     const pos = getPos(e);
@@ -1763,6 +1898,8 @@ function DrawingCanvas({
     setStickerLayers([]);
     setActiveStickerId(null);
     setClearConfirmOpen(false);
+    onCleared?.();
+    notifyDirty();
   };
 
   const editingOverlay = Boolean(activePhotoId || activeStickerId);
@@ -1961,20 +2098,6 @@ function DrawingCanvas({
         <div className="drawing__dock">
           {colorsOpen && mode === 'pen' && !editingOverlay && !fontOpen && (
             <>
-              <div className="drawing__pen-kinds" role="group" aria-label={t('canvas.penKindAria')}>
-                {PEN_KINDS.map((kind) => (
-                  <button
-                    key={kind}
-                    type="button"
-                    className={`drawing__pen-kind ${penKind === kind ? 'active' : ''}`}
-                    aria-label={t(`canvas.penKind.${kind}`)}
-                    title={t(`canvas.penKind.${kind}`)}
-                    onClick={() => setPenKind(kind)}
-                  >
-                    <PenKindIcon kind={kind} />
-                  </button>
-                ))}
-              </div>
               {customPickerOpen && (
                 <div className="drawing__color-picker" role="dialog" aria-label={t('canvas.pickColorTitle')}>
                   <div className="drawing__color-picker-head">
@@ -2054,34 +2177,51 @@ function DrawingCanvas({
                   </div>
                 </div>
               )}
-              <div className="drawing__colors" role="listbox" aria-label={t('canvas.pickColorTitle')}>
-                {COLORS.map((c) => (
+              <div className="drawing__pen-accessories">
+                <div className="drawing__pen-kinds" role="group" aria-label={t('canvas.penKindAria')}>
+                  {PEN_KINDS.map((kind) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      className={`drawing__pen-kind ${penKind === kind ? 'active' : ''}`}
+                      aria-label={t(`canvas.penKind.${kind}`)}
+                      title={t(`canvas.penKind.${kind}`)}
+                      onClick={() => setPenKind(kind)}
+                    >
+                      <PenKindIcon kind={kind} />
+                    </button>
+                  ))}
+                </div>
+                <span className="drawing__pen-accessories-sep" aria-hidden />
+                <div className="drawing__colors" role="listbox" aria-label={t('canvas.pickColorTitle')}>
+                  {COLORS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      role="option"
+                      aria-selected={color === c}
+                      className={`drawing__color ${color === c ? 'selected' : ''}`}
+                      style={{ backgroundColor: c }}
+                      aria-label={t(`canvas.colorAria`, { c })}
+                      onClick={() => {
+                        setCustomPickerOpen(false);
+                        setColor(c);
+                      }}
+                    />
+                  ))}
                   <button
-                    key={c}
                     type="button"
-                    role="option"
-                    aria-selected={color === c}
-                    className={`drawing__color ${color === c ? 'selected' : ''}`}
-                    style={{ backgroundColor: c }}
-                    aria-label={t(`canvas.colorAria`, { c })}
-                    onClick={() => {
-                      setCustomPickerOpen(false);
-                      setColor(c);
-                    }}
-                  />
-                ))}
-                <button
-                  type="button"
-                  className={`drawing__color drawing__color--custom ${
-                    color === customColor || customPickerOpen ? 'selected' : ''
-                  }`}
-                  title={t('canvas.pickColorTitle')}
-                  aria-label={t('canvas.pickColorTitle')}
-                  aria-expanded={customPickerOpen}
-                  onClick={() => setCustomPickerOpen((open) => !open)}
-                >
-                  <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
-                </button>
+                    className={`drawing__color drawing__color--custom ${
+                      color === customColor || customPickerOpen ? 'selected' : ''
+                    }`}
+                    title={t('canvas.pickColorTitle')}
+                    aria-label={t('canvas.pickColorTitle')}
+                    aria-expanded={customPickerOpen}
+                    onClick={() => setCustomPickerOpen((open) => !open)}
+                  >
+                    <span className="drawing__color-dot" style={{ backgroundColor: customColor }} />
+                  </button>
+                </div>
               </div>
             </>
           )}

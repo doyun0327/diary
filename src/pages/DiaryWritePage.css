@@ -202,6 +202,27 @@
   margin: 0;
 }
 
+.diary-write__ai-login-google {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.diary-write__ai-login-busy {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.diary-write__ai-login-error {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: #c0392b;
+  text-align: center;
+}
+
 .diary-write__ai-block {
   display: flex;
   flex-direction: column;

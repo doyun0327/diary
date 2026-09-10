@@ -1,24 +1,52 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomPost } from '../types/room';
 import { formatDate } from '../utils/date';
+import {
+  diaryFontStack,
+  ensureDiaryFontReady,
+  findFont,
+  fontSizeCss,
+} from '../utils/fonts';
+import { resolveRoomPostFont } from '../utils/roomPostFont';
 import MoodIcon from './MoodIcon';
 import '../pages/DiaryDetailPage.css';
 
 interface RoomDiaryPaperProps {
-  post: Pick<RoomPost, 'date' | 'title' | 'content' | 'mood' | 'moodPack' | 'imageUrl'>;
+  post: Pick<
+    RoomPost,
+    | 'diaryId'
+    | 'date'
+    | 'title'
+    | 'content'
+    | 'mood'
+    | 'moodPack'
+    | 'imageUrl'
+    | 'fontId'
+    | 'fontSize'
+  >;
   /** 갤러리용 축소 paper */
   compact?: boolean;
   className?: string;
 }
 
-/** PDF/상세 diary-detail__paper 와 동일한 구성 */
+/** PDF/상세 diary-detail__paper 와 동일한 구성 — 작성 당시 글씨체 유지 */
 function RoomDiaryPaper({ post, compact = false, className = '' }: RoomDiaryPaperProps) {
   const { t } = useTranslation();
   const label = post.title || formatDate(post.date);
+  const { fontId, fontSize } = resolveRoomPostFont(post);
+
+  useEffect(() => {
+    void ensureDiaryFontReady(fontId);
+  }, [fontId]);
 
   return (
     <article
       className={`diary-detail__paper rooms__paper${compact ? ' rooms__paper--compact' : ''}${className ? ` ${className}` : ''}`}
+      style={{
+        ['--diary-font' as string]: diaryFontStack(findFont(fontId).family),
+        ['--diary-font-size' as string]: fontSizeCss(fontSize),
+      }}
     >
       <div className="diary-detail__dateline">
         <span>{formatDate(post.date)}</span>

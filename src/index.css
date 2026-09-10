@@ -12,7 +12,7 @@
   --diary-font-size: 1.2rem;
   --diary-ruled-lh: 2.35;
   --diary-drawing-ratio: 1 / 1.55; /* 그림판 전체(도구줄 포함) */
-  --diary-drawing-dock-reserve: 58px; /* 도구줄(dock-bar) + 여백 — DrawingCanvas 와 동일 */
+  --diary-drawing-dock-reserve: 58px; /* dock 초기값 — 열리면 DrawingCanvas가 전체 높이로 갱신 */
   --diary-drawing-stage-ratio: 1 / 1.38; /* 저장·상세 표시 — 그리기 영역만 (≈375px 기준) */
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 

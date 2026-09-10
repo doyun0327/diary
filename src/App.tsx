@@ -502,7 +502,9 @@ function App() {
 
   const persistDiarySave = useCallback(
     async (
-      entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">,
+      entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt"> & {
+        clearDrawing?: boolean;
+      },
       editId: string | null,
     ) => {
       if (editId) {

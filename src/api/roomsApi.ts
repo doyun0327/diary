@@ -12,6 +12,7 @@ import {
   getDevMockRoomPost,
   isMockPagingPost,
 } from './mockRoomPosts';
+import { enrichRoomPostFont, enrichRoomPostsFont } from '../utils/roomPostFont';
 import { getAccessToken } from '../hooks/useAuthSession';
 
 async function parseError(res: Response): Promise<string> {
@@ -227,7 +228,7 @@ export async function listRoomPosts(
     const totalPages = Math.max(1, Math.ceil(totalElements / size) || 1);
     const start = page * size;
     return {
-      content: raw.slice(start, start + size),
+      content: enrichRoomPostsFont(raw.slice(start, start + size)),
       page,
       size,
       totalElements,
@@ -236,7 +237,7 @@ export async function listRoomPosts(
   }
   const content = Array.isArray(raw?.content) ? raw.content : [];
   return {
-    content,
+    content: enrichRoomPostsFont(content),
     page: typeof raw?.page === 'number' ? raw.page : page,
     size: typeof raw?.size === 'number' ? raw.size : size,
     totalElements:
@@ -250,17 +251,24 @@ export async function listRoomPosts(
 
 export async function getRoomPost(roomId: string, postId: string): Promise<RoomPost> {
   const mock = getDevMockRoomPost(roomId, postId);
-  if (mock) return mock;
-  return request<RoomPost>(`/api/rooms/${roomId}/posts/${postId}`);
+  if (mock) return enrichRoomPostFont(mock);
+  const post = await request<RoomPost>(`/api/rooms/${roomId}/posts/${postId}`);
+  return enrichRoomPostFont(post);
 }
 
-export function createRoomPost(
+export async function createRoomPost(
   roomId: string,
   body: CreateRoomPostBody,
 ): Promise<RoomPost> {
-  return request<RoomPost>(`/api/rooms/${roomId}/posts`, {
+  const created = await request<RoomPost>(`/api/rooms/${roomId}/posts`, {
     method: 'POST',
     body: JSON.stringify(body),
+  });
+  return enrichRoomPostFont({
+    ...created,
+    fontId: created.fontId || body.fontId,
+    fontSize: created.fontSize || body.fontSize,
+    diaryId: created.diaryId || body.diaryId,
   });
 }
 

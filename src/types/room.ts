@@ -49,6 +49,10 @@ export interface RoomPost {
   mood: DiarySticker;
   moodPack?: MoodPackId;
   imageUrl?: string;
+  /** 작성 당시 글씨체 (없으면 언어 기본) */
+  fontId?: string;
+  /** 작성 당시 글씨 크기 */
+  fontSize?: string;
   createdAt: string;
   /** 완전 탈퇴 작성자 */
   authorWithdrawn?: boolean;
@@ -81,6 +85,8 @@ export interface CreateRoomPostBody {
   mood: DiarySticker;
   moodPack?: MoodPackId;
   imageUrl?: string;
+  fontId?: string;
+  fontSize?: string;
   /** 푸시 제목 — 공유한 사람 닉네임 (앱 언어) */
   pushTitle?: string;
   /** 푸시 본문 — 앱 언어 */

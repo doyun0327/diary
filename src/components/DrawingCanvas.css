@@ -213,18 +213,39 @@
   bottom: 100%;
 }
 
-.drawing__pen-kinds {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+.drawing__pen-accessories {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   box-sizing: border-box;
-  padding: 5px 6px;
+  padding: 4px 8px 4px 4px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--sheet-bg) 90%, transparent);
   backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow: var(--shadow-float);
+  pointer-events: auto;
+  min-width: 0;
+}
+
+.drawing__pen-accessories-sep {
+  flex: 0 0 1px;
+  align-self: stretch;
+  margin: 4px 0;
+  background: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+.drawing__pen-kinds {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
   pointer-events: auto;
 }
 
@@ -232,9 +253,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
   min-width: 0;
-  padding: 7px 0;
+  padding: 0;
   border: none;
   border-radius: 999px;
   background: transparent;
@@ -299,7 +322,8 @@
 
 .drawing__dock-bar,
 .drawing__colors,
-.drawing__pen-kinds {
+.drawing__pen-kinds,
+.drawing__pen-accessories {
   pointer-events: auto;
 }
 
@@ -370,13 +394,16 @@
 
 .drawing__colors {
   display: flex;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sheet-bg) 90%, transparent);
-  backdrop-filter: blur(14px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: var(--shadow-float);
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 1px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -387,9 +414,10 @@
 
 .drawing__color {
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
-  border: 2px solid #fff;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #fff;
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
@@ -398,7 +426,7 @@
 }
 
 .drawing__color.selected {
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 1.5px var(--color-accent);
 }
 
 .drawing__color--custom {
@@ -419,10 +447,10 @@
 }
 
 .drawing__color-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  border: 1.5px solid #fffefc;
+  border: 1px solid #fffefc;
   box-shadow: 0 0 0 1px rgba(70, 50, 40, 0.1);
   pointer-events: none;
 }

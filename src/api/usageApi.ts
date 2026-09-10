@@ -120,6 +120,20 @@ export async function grantAiPackCreditsRemote(
   return (await res.json()) as AiPackCreditsDto;
 }
 
+/** Google 연동 계정 무료 AI 3회 (계정당 1회) */
+export async function claimWelcomeAiPackCredits(
+  accessToken: string,
+): Promise<AiPackCreditsDto> {
+  const res = await fetch(apiUrl('/api/usage/ai-pack/welcome'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '무료 AI 지급 실패'));
+  }
+  return (await res.json()) as AiPackCreditsDto;
+}
+
 export type PurchaseKind = 'ai_pack' | 'subscription';
 
 export type PurchaseRecordDto = {

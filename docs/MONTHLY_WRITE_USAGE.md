@@ -43,6 +43,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS ai_pack_credits INT NOT NULL DEFAULT 
 | `POST` | `/api/usage/monthly/refund` | body `{ periodEnd }`. 생성 실패 시 1회 환불 |
 | `GET` | `/api/usage/ai-pack` | `{ credits }` |
 | `POST` | `/api/usage/ai-pack/grant` | body `{ count }` IAP 지급 |
+| `POST` | `/api/usage/ai-pack/welcome` | Google 연동 계정 무료 AI **3회** (계정당 1회) |
 | `POST` | `/api/usage/ai-pack/consume` | 팩 1회 차감. 0이면 **409** |
 | `POST` | `/api/usage/ai-pack/refund` | 팩 1회 환불 |
 
