@@ -315,6 +315,7 @@
     "sharedDiaries": "Diary bersama",
     "sharedEmpty": "Belum ada diary bersama.\nCoba “Bagikan ke ruang” di diary Anda.",
     "sharePrompt": "Mau bagikan diary?",
+    "emptyNoDiaries": "Belum ada diary.",
     "shareDiary": "Bagikan diary",
     "shareDiaryDone": "Dibagikan ke ruang",
     "pickDiaryTitle": "Diary mana yang dibagikan?",
@@ -325,7 +326,8 @@
     "openPostAria": "Buka diary {{title}} milik {{author}}",
     "coach": {
       "comment": "Tinggalkan komentar!",
-      "poke": "Ketuk foto profil untuk mengirim colekan!"
+      "poke": "Ketuk foto profil untuk mengirim colekan!",
+      "share": "Ketuk ikon bagikan di atas untuk memposting diary!"
     },
     "backToRoom": "← Ke ruang",
     "backToRoomAria": "Kembali ke ruang",

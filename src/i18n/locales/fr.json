@@ -315,6 +315,7 @@
     "sharedDiaries": "Journaux partagés",
     "sharedEmpty": "Pas encore de journaux partagés.\nEssayez « Partager dans un salon » sur votre journal.",
     "sharePrompt": "Partager un journal ?",
+    "emptyNoDiaries": "Aucun journal pour le moment.",
     "shareDiary": "Partager un journal",
     "shareDiaryDone": "Partagé dans la salle",
     "pickDiaryTitle": "Quel journal partager ?",
@@ -325,7 +326,8 @@
     "openPostAria": "Ouvrir le journal {{title}} de {{author}}",
     "coach": {
       "comment": "Laissez un commentaire !",
-      "poke": "Appuyez sur une photo pour envoyer un toc!"
+      "poke": "Appuyez sur une photo pour envoyer un toc!",
+      "share": "Appuyez sur l'icone de partage en haut pour publier un journal!"
     },
     "backToRoom": "← Au salon",
     "backToRoomAria": "Retour au salon",

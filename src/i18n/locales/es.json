@@ -315,6 +315,7 @@
     "sharedDiaries": "Diarios compartidos",
     "sharedEmpty": "Aún no hay diarios compartidos.\nPrueba “Compartir en sala” en tu diario.",
     "sharePrompt": "¿Quieres compartir un diario?",
+    "emptyNoDiaries": "Aún no hay diarios.",
     "shareDiary": "Compartir diario",
     "shareDiaryDone": "Compartido en la sala",
     "pickDiaryTitle": "¿Qué diario compartir?",
@@ -325,7 +326,8 @@
     "openPostAria": "Abrir el diario {{title}} de {{author}}",
     "coach": {
       "comment": "¡Deja un comentario!",
-      "poke": "Toca una foto para avisar a un amigo!"
+      "poke": "Toca una foto para avisar a un amigo!",
+      "share": "Toca el icono de compartir arriba para publicar un diario!"
     },
     "backToRoom": "← A la sala",
     "backToRoomAria": "Volver a la sala",

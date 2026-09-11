@@ -396,6 +396,7 @@
     "newCommentToast": "A new comment arrived!",
     "sharedEmpty": "No shared diaries yet.\nOpen a diary and tap Share → Friend rooms.",
     "sharePrompt": "Want to share a diary?",
+    "emptyNoDiaries": "No diaries yet.",
     "shareDiary": "Share diary",
     "shareDiaryDone": "Shared to the room",
     "pickDiaryTitle": "Which diary to share?",
@@ -408,7 +409,8 @@
     "postNewAria": "New diary",
     "coach": {
       "comment": "Leave a comment!",
-      "poke": "Tap a profile to send a nudge!"
+      "poke": "Tap a profile to send a nudge!",
+      "share": "Tap the share icon above to post a diary!"
     },
     "backToRoom": "← To room",
     "backToRoomAria": "Back to room",

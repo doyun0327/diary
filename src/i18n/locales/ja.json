@@ -315,6 +315,7 @@
     "sharedDiaries": "共有された日記",
     "sharedEmpty": "まだ共有された日記はありません。\n日記詳細の「ルームに共有」を試してみてください。",
     "sharePrompt": "日記を共有しますか？",
+    "emptyNoDiaries": "作成された日記がありません。",
     "shareDiary": "日記を共有",
     "shareDiaryDone": "ルームに共有しました",
     "pickDiaryTitle": "どの日記を共有しますか？",
@@ -325,7 +326,8 @@
     "openPostAria": "{{author}}の日記「{{title}}」を開く",
     "coach": {
       "comment": "コメントを残してみてね！",
-      "poke": "プロフィールを押すと友だちに通知が届きます!"
+      "poke": "プロフィールを押すと友だちに通知が届きます!",
+      "share": "上の共有アイコンから日記を投稿してみましょう!"
     },
     "backToRoom": "← ルームへ",
     "backToRoomAria": "ルームへ",

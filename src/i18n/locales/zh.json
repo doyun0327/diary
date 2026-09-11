@@ -315,6 +315,7 @@
     "sharedDiaries": "分享的日记",
     "sharedEmpty": "还没有分享的日记。\n可在日记详情里点「分享到好友房」。",
     "sharePrompt": "要分享日记吗？",
+    "emptyNoDiaries": "还没有日记。",
     "shareDiary": "分享日记",
     "shareDiaryDone": "已分享到房间",
     "pickDiaryTitle": "要分享哪篇日记？",
@@ -325,7 +326,8 @@
     "openPostAria": "打开{{author}}的日记{{title}}",
     "coach": {
       "comment": "留言试试吧！",
-      "poke": "点头像就能提醒朋友写日记!"
+      "poke": "点头像就能提醒朋友写日记!",
+      "share": "点上方分享图标发布日记吧!"
     },
     "backToRoom": "← 返回房间",
     "backToRoomAria": "返回房间",

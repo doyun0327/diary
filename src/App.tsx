@@ -1090,11 +1090,6 @@ function App() {
               setActivePostId(null);
               setPage("rooms");
             }}
-            onGoHome={() => {
-              setActiveRoomId(null);
-              setActivePostId(null);
-              setPage("home");
-            }}
             onOpenPost={(postId) => {
               setActivePostId(postId);
               setPage("room-post");

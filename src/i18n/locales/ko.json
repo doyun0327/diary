@@ -396,6 +396,7 @@
     "newCommentToast": "새로운 댓글이 생겼어요!",
     "sharedEmpty": "아직 공유된 일기가 없어요.\n일기를 열고 「공유 → 친구 방」을 눌러 보세요.",
     "sharePrompt": "일기를 공유해볼까요?",
+    "emptyNoDiaries": "작성된 일기가 없습니다.",
     "shareDiary": "일기 공유",
     "shareDiaryDone": "방에 공유했어요",
     "pickDiaryTitle": "어떤 일기를 공유할까요?",
@@ -408,7 +409,8 @@
     "postNewAria": "새 일기",
     "coach": {
       "comment": "댓글을 남겨보세요!",
-      "poke": "프사를 누르면 친구에게 알림이 가요!"
+      "poke": "프사를 누르면 친구에게 알림이 가요!",
+      "share": "위 공유 아이콘을 눌러 일기를 올려보세요!"
     },
     "backToRoom": "← 방으로",
     "backToRoomAria": "방으로",

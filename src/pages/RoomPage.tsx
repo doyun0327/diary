@@ -7,6 +7,7 @@ import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomDiaryPickerSheet from '../components/RoomDiaryPickerSheet';
 import RoomMemberAvatars from '../components/RoomMemberAvatars';
+import PlusIcon from '../components/PlusIcon';
 import {
   isRoomCommentCoachSeen,
   isRoomPokeCoachSeen,
@@ -39,7 +40,6 @@ interface RoomPageProps {
   clientId: string;
   ensureGuestSession: (clientId: string, nickname: string) => Promise<unknown>;
   onBack: () => void;
-  onGoHome: () => void;
   onOpenPost: (postId: string) => void;
 }
 
@@ -51,7 +51,6 @@ function RoomPage({
   clientId,
   ensureGuestSession,
   onBack,
-  onGoHome,
   onOpenPost,
 }: RoomPageProps) {
   const { t } = useTranslation();
@@ -63,6 +62,7 @@ function RoomPage({
   const [error, setError] = useState<string | null>(null);
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
   const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
+  const [showShareCoach, setShowShareCoach] = useState(true);
   const [postsPage, setPostsPage] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
@@ -226,11 +226,16 @@ function RoomPage({
     onOpenPost(postId);
   };
 
-  const openPicker = () => setPickerOpen(true);
+  const openPicker = () => {
+    setShowShareCoach(false);
+    setPickerOpen(true);
+  };
 
   const otherMembers =
     room?.members.filter((m) => !userId || m.userId !== userId) ?? [];
   const canShowPokeCoach = showPokeCoach && otherMembers.length > 0;
+  const canShowShareCoach =
+    Boolean(room) && !loading && totalElements === 0 && showShareCoach;
 
   return (
     <div className="rooms rooms--in-room">
@@ -244,14 +249,32 @@ function RoomPage({
           <BackIcon />
         </button>
         <h2>{room?.name ?? t('rooms.title')}</h2>
-        <button
-          type="button"
-          className="rooms__toolbar-action"
-          onClick={openPicker}
-          aria-label={t('rooms.shareDiary')}
-        >
-          {t('rooms.shareDiary')}
-        </button>
+        <div className="rooms__toolbar-share-wrap">
+          {canShowShareCoach && (
+            <div className="rooms__share-coach" role="status">
+              <p>{t('rooms.sharePrompt')}</p>
+              <button
+                type="button"
+                className="rooms__share-coach-dismiss"
+                aria-label={t('common.close')}
+                onClick={() => setShowShareCoach(false)}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            className={`rooms__toolbar-action rooms__toolbar-action--icon${
+              canShowShareCoach ? ' is-coach' : ''
+            }`}
+            onClick={openPicker}
+            aria-label={t('rooms.shareDiary')}
+            title={t('rooms.shareDiary')}
+          >
+            <PlusIcon size={16} strokeWidth={2} />
+          </button>
+        </div>
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
@@ -277,29 +300,11 @@ function RoomPage({
           )}
           {!loading && visibleFeedPosts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
-              <p className="rooms__empty-title rooms__empty-title--multiline">
+              <p className="rooms__empty-title">
                 {totalElements === 0
-                  ? t('rooms.sharePrompt')
+                  ? t('rooms.emptyNoDiaries')
                   : t('rooms.safety.feedEmptyBlocked')}
               </p>
-              {totalElements === 0 ? (
-                <>
-                  <button
-                    type="button"
-                    className="rooms__btn primary"
-                    onClick={openPicker}
-                  >
-                    {t('rooms.shareDiary')}
-                  </button>
-                  <button
-                    type="button"
-                    className="rooms__btn rooms__btn--ghost"
-                    onClick={onGoHome}
-                  >
-                    {t('rooms.goHome')}
-                  </button>
-                </>
-              ) : null}
             </div>
           )}
           {!loading && visibleFeedPosts.length > 0 && (

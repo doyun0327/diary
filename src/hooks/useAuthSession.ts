@@ -238,7 +238,12 @@ export function useAuthSession() {
   }, []);
 
   /** 닉네임·프사 있는 기기의 친구 방용 게스트 세션 확보 */
-  const ensureGuestSession = useCallback(async (clientId: string, nickname: string) => {
+  const ensureGuestSession = useCallback(
+    async (
+      clientId: string,
+      nickname: string,
+      opts?: { force?: boolean },
+    ) => {
     const nick = nickname.trim();
     if (!clientId.trim() || !nick) {
       throw new Error('닉네임이 필요해요');
@@ -254,9 +259,13 @@ export function useAuthSession() {
       saveSession(null);
       notifyGoogleReauth();
     }
-    // 이미 게스트 JWT가 있으면 매번 /auth/guest 호출하지 않음
+    // 이미 게스트 JWT가 있으면 매번 /auth/guest 호출하지 않음 (닉 변경 시 force)
     const after = loadSession();
-    if (after?.provider === 'guest' && isAccessTokenUsable(loadToken())) {
+    if (
+      !opts?.force &&
+      after?.provider === 'guest' &&
+      isAccessTokenUsable(loadToken())
+    ) {
       return after;
     }
     const auth = await loginAsGuest(clientId.trim(), nick);
@@ -266,7 +275,8 @@ export function useAuthSession() {
     saveSession(next);
     setSession(next);
     return next;
-  }, []);
+  },
+  []);
 
   const signIn = useCallback(async (provider: AuthProvider) => {
     if (provider === 'apple') {

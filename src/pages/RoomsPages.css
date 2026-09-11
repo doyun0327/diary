@@ -343,6 +343,113 @@
   text-overflow: ellipsis;
 }
 
+.rooms__toolbar-action--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--color-text-muted);
+  overflow: visible;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.rooms__toolbar-action--icon svg {
+  display: block;
+}
+
+.rooms__toolbar-action--icon:hover {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border);
+}
+
+.rooms__toolbar-action--icon:active {
+  transform: scale(0.94);
+  background: var(--color-bg-muted);
+}
+
+.rooms__toolbar-share-wrap {
+  position: relative;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  /* 뒤로가기와 대칭되게, 화면 끝으로 과도하게 붙지 않게 */
+  margin-right: 8px;
+}
+
+.rooms__share-coach {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: max-content;
+  max-width: min(240px, 78vw);
+  padding: 10px 10px 10px 12px;
+  border-radius: 14px;
+  background: #1a1a1a;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  text-align: left;
+  animation: rooms-coach-in 0.28s var(--ease-out, ease);
+}
+
+.rooms__share-coach::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  bottom: 100%;
+  border: 7px solid transparent;
+  border-bottom-color: #1a1a1a;
+}
+
+.rooms__share-coach p {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.rooms__share-coach-dismiss {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin: -2px -2px 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rooms__toolbar-action--icon.is-coach {
+  animation: rooms-share-icon-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rooms-share-icon-pulse {
+  0%,
+  100% {
+    border-color: var(--color-border-soft);
+    transform: scale(1);
+  }
+  50% {
+    border-color: var(--color-border);
+    transform: scale(1.05);
+  }
+}
+
 .rooms-sheet__panel--diary-picker {
   max-height: min(78vh, 640px);
   display: flex;

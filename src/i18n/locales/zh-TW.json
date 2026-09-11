@@ -315,6 +315,7 @@
     "sharedDiaries": "分享的日記",
     "sharedEmpty": "還沒有分享的日記。\n可在日記詳情裡點「分享到好友房」。",
     "sharePrompt": "要分享日記嗎？",
+    "emptyNoDiaries": "還沒有日記。",
     "shareDiary": "分享日記",
     "shareDiaryDone": "已分享到房間",
     "pickDiaryTitle": "要分享哪篇日記？",
@@ -325,7 +326,8 @@
     "openPostAria": "打開{{author}}的日記{{title}}",
     "coach": {
       "comment": "留言試試吧！",
-      "poke": "點頭像就能提醒朋友寫日記!"
+      "poke": "點頭像就能提醒朋友寫日記!",
+      "share": "點上方分享圖示發布日記吧!"
     },
     "backToRoom": "← 返回房間",
     "backToRoomAria": "返回房間",

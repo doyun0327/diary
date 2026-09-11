@@ -316,6 +316,7 @@
     "sharedDiaries": "Geteilte Tagebücher",
     "sharedEmpty": "Noch keine geteilten Tagebücher.\nÖffne ein Tagebuch und tippe auf Teilen → Freundesräume.",
     "sharePrompt": "Möchtest du ein Tagebuch teilen?",
+    "emptyNoDiaries": "Noch keine Tagebücher.",
     "shareDiary": "Tagebuch teilen",
     "shareDiaryDone": "Im Raum geteilt",
     "pickDiaryTitle": "Welches Tagebuch teilen?",
@@ -326,7 +327,8 @@
     "openPostAria": "Tagebuch von {{author}} öffnen: {{title}}",
     "coach": {
       "comment": "Hinterlasse einen Kommentar!",
-      "poke": "Tippe auf ein Profilbild zum Anstupsen!"
+      "poke": "Tippe auf ein Profilbild zum Anstupsen!",
+      "share": "Tippe oben aufs Teilen-Symbol, um ein Tagebuch zu posten!"
     },
     "backToRoom": "← Zum Raum",
     "backToRoomAria": "Zurück zum Raum",

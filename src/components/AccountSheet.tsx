@@ -70,16 +70,17 @@ function fileToAvatarDataUrl(file: File, t: (key: string) => string): Promise<st
 }
 
 /** 서버에 프로필 반영 (엔드포인트 없으면 무시) */
-function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | null }) {
+async function syncProfileToRooms(patch: {
+  nickname?: string;
+  avatarUrl?: string | null;
+}) {
   if (!getAccessToken()) return;
-  void roomsApi
-    .updateMyProfile(patch)
-    .then(() => {
-      invalidateAllRoomCaches();
-    })
-    .catch(() => {
-      // 백엔드 미구현·오프라인 시 로컬만 유지
-    });
+  try {
+    await roomsApi.updateMyProfile(patch);
+    invalidateAllRoomCaches();
+  } catch {
+    // 백엔드 미구현·오프라인 시 로컬만 유지
+  }
 }
 
 // function formatSyncedAt(iso: string | null, locale: string, neverLabel: string): string {
@@ -437,7 +438,17 @@ function AccountSheet({
     const name = nameDraft.trim();
     if (!name) return;
     onNicknameChange(name);
-    syncProfileToRooms({ nickname: name, avatarUrl });
+    void (async () => {
+      try {
+        // 게스트: /auth/guest 로 users.name·JWT 갱신 후 방 프로필도 맞춤
+        if (!cloudSignedIn) {
+          await ensureGuestSession(clientId, name, { force: true });
+        }
+        await syncProfileToRooms({ nickname: name, avatarUrl });
+      } catch {
+        await syncProfileToRooms({ nickname: name, avatarUrl });
+      }
+    })();
     showToast(t('account.ok.nameSaved'));
   };
 
