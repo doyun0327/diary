@@ -237,6 +237,10 @@ function DiaryWritePage({
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  /** 미리보기 펼친 스타일 — null 이면 접힘 */
+  const [aiStylePreviewId, setAiStylePreviewId] = useState<AiDrawStyleId | null>(
+    null,
+  );
   const [aiLoginOpen, setAiLoginOpen] = useState(false);
   const [aiLoginBusy, setAiLoginBusy] = useState(false);
   const [aiLoginError, setAiLoginError] = useState<string | null>(null);
@@ -1661,27 +1665,90 @@ function DiaryWritePage({
           {aiStyleOpen && (
             <AppModal
               title={t('write.ai.styleTitle')}
-              onDismiss={() => setAiStyleOpen(false)}
+              onDismiss={() => {
+                setAiStyleOpen(false);
+                setAiStylePreviewId(null);
+              }}
               showClose
               closeAriaLabel={t('common.close')}
             >
+              <p className="diary-write__ai-style-lead">{t('write.ai.styleLead')}</p>
               <div className="diary-write__ai-styles" role="list">
-                {AI_DRAW_STYLES.map((style) => (
-                  <button
-                    key={style.id}
-                    type="button"
-                    className="diary-write__ai-style-btn"
-                    role="listitem"
-                    onClick={() => proceedAfterStylePick(style.id)}
-                  >
-                    <span className="diary-write__ai-style-name">
-                      {t(`write.ai.style.${style.id}.name`)}
-                    </span>
-                    <span className="diary-write__ai-style-desc">
-                      {t(`write.ai.style.${style.id}.desc`)}
-                    </span>
-                  </button>
-                ))}
+                {AI_DRAW_STYLES.map((style) => {
+                  const previewOpen = aiStylePreviewId === style.id;
+                  return (
+                    <div
+                      key={style.id}
+                      className={`diary-write__ai-style-item${previewOpen ? ' is-preview-open' : ''}`}
+                      role="listitem"
+                    >
+                      <div className="diary-write__ai-style-row">
+                        <button
+                          type="button"
+                          className="diary-write__ai-style-btn"
+                          onClick={() => {
+                            setAiStylePreviewId(null);
+                            proceedAfterStylePick(style.id);
+                          }}
+                        >
+                          <span className="diary-write__ai-style-name">
+                            {t(`write.ai.style.${style.id}.name`)}
+                          </span>
+                          <span className="diary-write__ai-style-desc">
+                            {t(`write.ai.style.${style.id}.desc`)}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className="diary-write__ai-style-preview-toggle"
+                          aria-expanded={previewOpen}
+                          aria-label={
+                            previewOpen
+                              ? t('write.ai.stylePreviewHide')
+                              : t('write.ai.stylePreview')
+                          }
+                          onClick={() =>
+                            setAiStylePreviewId(previewOpen ? null : style.id)
+                          }
+                        >
+                          <svg
+                            className="diary-write__ai-style-chevron"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            aria-hidden
+                          >
+                            <path
+                              d="M6 9l6 6 6-6"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      {previewOpen && (
+                        <div
+                          className="diary-write__ai-style-preview-grid"
+                          aria-label={t('write.ai.stylePreview')}
+                        >
+                          {style.previewSrcs.map((src) => (
+                            <img
+                              key={src}
+                              src={src}
+                              alt=""
+                              className="diary-write__ai-style-preview-img"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </AppModal>
           )}

@@ -38,7 +38,7 @@ import {
   useAuthSession,
   AUTH_CHANGE_EVENT,
   GOOGLE_REAUTH_EVENT,
-  clearGoogleSessionIfInvalid,
+  tryRecoverGoogleSession,
 } from "./hooks/useAuthSession";
 import {
   usePushOpenHandler,
@@ -82,6 +82,7 @@ import {
   installSubscriptionBridge,
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
+  restoreSubscriptionAfterAuth,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
 import {
@@ -252,10 +253,36 @@ function App() {
   useEffect(() => {
     if (!isFlutterApp()) return;
     const userId = session?.userId ?? clientId;
-    if (userId) identifySubscriptionUser(userId);
-    // 계정 전환·로그인 직후 Pro 상태 다시 받아 AI 광고 스킵되게
-    syncSubscriptionFromNative();
-  }, [session?.userId, clientId]);
+    if (userId) {
+      // Google 로그인·계정 전환 시 스토어 구독 복원 → "구독 중" 유지
+      if (session?.provider === "google") {
+        restoreSubscriptionAfterAuth(userId);
+      } else {
+        identifySubscriptionUser(userId);
+        syncSubscriptionFromNative();
+      }
+    }
+  }, [session?.userId, session?.provider, clientId]);
+
+  // Google 로그인 완료 직후 Pro 재동기화 (토큰 만료 후 재로그인 포함)
+  useEffect(() => {
+    const onAuth = () => {
+      if (!isGoogleSignedIn()) return;
+      const auth = getAuthSession();
+      restoreSubscriptionAfterAuth(auth?.userId ?? null);
+      setAccessTick((n) => n + 1);
+
+      const pending = takePendingNyangPurchase();
+      if (!pending) return;
+      setGoogleLoginForProOpen(false);
+      setAccountOpen(false);
+      setNyangAutoPurchase(pending);
+      setNyangTicketTab(pending.kind === "pack" ? "packs" : "subscribe");
+      setNyangTicketOpen(true);
+    };
+    window.addEventListener(AUTH_CHANGE_EVENT, onAuth);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, onAuth);
+  }, []);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -301,22 +328,6 @@ function App() {
     window.addEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
     return () =>
       window.removeEventListener(REQUIRE_GOOGLE_FOR_PRO_EVENT, onNeedGoogle);
-  }, []);
-
-  // Google 로그인 완료 후 보류된 구독/팩 결제 이어서
-  useEffect(() => {
-    const onAuth = () => {
-      if (!isGoogleSignedIn()) return;
-      const pending = takePendingNyangPurchase();
-      if (!pending) return;
-      setGoogleLoginForProOpen(false);
-      setAccountOpen(false);
-      setNyangAutoPurchase(pending);
-      setNyangTicketTab(pending.kind === "pack" ? "packs" : "subscribe");
-      setNyangTicketOpen(true);
-    };
-    window.addEventListener(AUTH_CHANGE_EVENT, onAuth);
-    return () => window.removeEventListener(AUTH_CHANGE_EVENT, onAuth);
   }, []);
 
   const closeSubscriptionModal = useCallback(() => {
@@ -365,10 +376,7 @@ function App() {
   useEffect(() => {
     if (needsProfileSetup) return;
     if (getAuthSession()?.provider !== "google") return;
-    if (!getAccessToken()) {
-      clearGoogleSessionIfInvalid();
-      return;
-    }
+    if (!getAccessToken()) return; // 만료 복구는 tryRecoverGoogleSession 이 담당
     void refreshMe();
   }, [needsProfileSetup, refreshMe, session?.userId]);
 
@@ -508,8 +516,9 @@ function App() {
     appToastTimer.current = window.setTimeout(() => setAppToast(null), durationMs);
   }, []);
 
-  // Google JWT 만료·소실 시 세션 정리 + 계정(로그인) 화면
+  // Google JWT 만료·소실 — 같은 기기는 조용히 재발급, 안 되면 로그인 화면
   useEffect(() => {
+    let cancelled = false;
     const openReauth = () => {
       setGoogleLoginForProOpen(false);
       setAccountOpen(true);
@@ -519,22 +528,39 @@ function App() {
       }
     };
     const check = () => {
-      if (clearGoogleSessionIfInvalid()) openReauth();
+      const auth = getAuthSession();
+      if (auth?.provider !== "google") return;
+      if (getAccessToken()) return;
+      const nick = nickname.trim() || t("common.anonymous");
+      void tryRecoverGoogleSession(clientId, nick).then((result) => {
+        if (cancelled) return;
+        if (result === "restored") {
+          setAccountOpen(false);
+          googleReauthToastShownRef.current = false;
+          const userId = getAuthSession()?.userId;
+          restoreSubscriptionAfterAuth(userId ?? null);
+          queueCloudSync({ month: viewMonthKey, showLoading: false });
+          setAccessTick((n) => n + 1);
+          return;
+        }
+        if (result === "need-reauth") openReauth();
+      });
     };
-    check();
     const onReauth = () => openReauth();
     const onVisible = () => {
       if (document.visibilityState === "visible") check();
     };
+    check();
     window.addEventListener(GOOGLE_REAUTH_EVENT, onReauth);
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", check);
     return () => {
+      cancelled = true;
       window.removeEventListener(GOOGLE_REAUTH_EVENT, onReauth);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", check);
     };
-  }, [showAppToast, t]);
+  }, [showAppToast, t, clientId, nickname, queueCloudSync, viewMonthKey]);
 
   useEffect(() => {
     if (!isGoogleSignedIn()) return;

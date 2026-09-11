@@ -624,6 +624,15 @@
   color: var(--color-danger);
 }
 
+.diary-write__ai-style-lead {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-align: left;
+  line-height: 1.4;
+}
+
 .diary-write__ai-styles {
   display: flex;
   flex-direction: column;
@@ -632,16 +641,33 @@
   text-align: left;
 }
 
-.diary-write__ai-style-btn {
+.diary-write__ai-style-item {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  padding: 14px 16px;
+  gap: 0;
   border: 1.5px solid var(--color-border-soft);
   border-radius: 16px;
   background: var(--color-bg);
+  overflow: hidden;
+}
+
+.diary-write__ai-style-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.diary-write__ai-style-btn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 8px 14px 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   font-family: inherit;
   cursor: pointer;
   color: inherit;
@@ -650,7 +676,51 @@
 }
 
 .diary-write__ai-style-btn:active {
-  transform: scale(0.99);
+  transform: none;
+  opacity: 0.88;
+}
+
+.diary-write__ai-style-preview-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.diary-write__ai-style-preview-toggle:active {
+  opacity: 0.75;
+}
+
+.diary-write__ai-style-chevron {
+  display: block;
+  transition: transform 0.18s ease;
+}
+
+.diary-write__ai-style-item.is-preview-open .diary-write__ai-style-chevron {
+  transform: rotate(180deg);
+}
+
+.diary-write__ai-style-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 0 12px 12px;
+}
+
+.diary-write__ai-style-preview-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--color-border-soft);
+  display: block;
 }
 
 .diary-write__ai-style-name {

@@ -25,26 +25,81 @@ const FEATURE_TRIAL_MS = FEATURE_TRIAL_DAYS * 24 * 60 * 60 * 1000;
 const FEATURE_TRIAL_START_KEY = "picture-diary-search-export-trial-start-v2";
 
 const STORAGE_KEY = "picture-diary-access-v1";
+/** 계정 키와 무관 — 이 기기에서 확인된 Pro 만료 (재로그인·게스트 전환 대비) */
+const DEVICE_PREMIUM_UNTIL_KEY = "picture-diary-device-premium-until-v1";
 const ENTRIES_KEY = "picture-diary-entries";
 
 export const SUBSCRIPTION_CHANGE_EVENT = "diary-subscription-change";
 
 let accessAccountId = "guest";
 
+function readDevicePremiumUntil(): number | null {
+  try {
+    const raw = localStorage.getItem(DEVICE_PREMIUM_UNTIL_KEY);
+    if (!raw) return null;
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n <= Date.now()) {
+      localStorage.removeItem(DEVICE_PREMIUM_UNTIL_KEY);
+      return null;
+    }
+    return n;
+  } catch {
+    return null;
+  }
+}
+
+function writeDevicePremiumUntil(until: number | null) {
+  try {
+    if (until != null && until > Date.now()) {
+      localStorage.setItem(DEVICE_PREMIUM_UNTIL_KEY, String(until));
+    } else {
+      localStorage.removeItem(DEVICE_PREMIUM_UNTIL_KEY);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+/** 계정별 상태에 기기 Pro가 더 길면 반영. 바뀌면 true */
+function hydratePremiumFromDevice(state: AccessState): boolean {
+  const deviceUntil = readDevicePremiumUntil();
+  if (!deviceUntil) return false;
+  if (state.premiumUntil != null && state.premiumUntil >= deviceUntil) {
+    return false;
+  }
+  state.premiumUntil = deviceUntil;
+  return true;
+}
+
 export function setDiaryAccessAccountId(accountId: string) {
   const next = accountId.trim() || "guest";
-  if (accessAccountId === next) return;
+  if (accessAccountId === next) {
+    const state = loadAccessState();
+    if (hydratePremiumFromDevice(state)) {
+      saveAccessState(state);
+      window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+    }
+    return;
+  }
   // 계정 키 바꾸기 전 premium 보존 (guest→user 전환 시 Pro 상태 유실 방지)
   const prev = loadAccessState();
   accessAccountId = next;
   const state = loadAccessState();
+  let changed = false;
   if (
     prev.premiumUntil &&
     prev.premiumUntil > Date.now() &&
     (!state.premiumUntil || state.premiumUntil < prev.premiumUntil)
   ) {
     state.premiumUntil = prev.premiumUntil;
+    changed = true;
+  }
+  if (hydratePremiumFromDevice(state)) changed = true;
+  if (changed) {
     saveAccessState(state);
+    if (state.premiumUntil && state.premiumUntil > Date.now()) {
+      writeDevicePremiumUntil(state.premiumUntil);
+    }
   }
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
@@ -261,14 +316,22 @@ export function applySubscriptionStatus(
       until != null && until > now
         ? until
         : now + 30 * 24 * 60 * 60 * 1000;
+    writeDevicePremiumUntil(state.premiumUntil);
   } else {
     const localValid = Boolean(state.premiumUntil && state.premiumUntil > now);
     // 초기화 전 false / 모호한 inactive 가 유효 Pro를 지우지 않게
     // 만료 시각이 과거로 명시된 경우에만 해제
     if (localValid && (until == null || until > now)) {
+      writeDevicePremiumUntil(state.premiumUntil);
+      return;
+    }
+    if (hydratePremiumFromDevice(state) && (until == null || until > now)) {
+      saveAccessState(state);
+      window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
       return;
     }
     state.premiumUntil = null;
+    writeDevicePremiumUntil(null);
   }
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
@@ -324,6 +387,9 @@ export function getDiaryAccessState(
 ): DiaryAccessStatus {
   const now = Date.now();
   const state = loadAccessState();
+  if (hydratePremiumFromDevice(state)) {
+    saveAccessState(state);
+  }
   if (resetLocalQuotaIfPeriodChanged(state)) {
     saveAccessState(state);
   }

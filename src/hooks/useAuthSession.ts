@@ -128,20 +128,6 @@ export function isGoogleSignedIn(): boolean {
   return session?.provider === 'google' && isAccessTokenUsable(loadToken());
 }
 
-/**
- * Google 세션인데 토큰 없음/만료면 로컬 세션 제거.
- * @returns true 이면 방금 클리어함 → 재로그인 UI 필요
- */
-export function clearGoogleSessionIfInvalid(): boolean {
-  const session = loadSession();
-  if (session?.provider !== 'google') return false;
-  if (isAccessTokenUsable(loadToken())) return false;
-  saveToken(null);
-  saveSession(null);
-  notifyGoogleReauth();
-  return true;
-}
-
 function sessionFromAuth(
   provider: AuthProvider,
   auth: Awaited<ReturnType<typeof loginAsGuest>>,
@@ -155,6 +141,69 @@ function sessionFromAuth(
     photoUrl: auth.user.photoUrl,
     lastSyncedAt: prevSynced,
   };
+}
+
+function providerFromAuthUser(provider: string | null | undefined): AuthProvider {
+  if (provider === 'google') return 'google';
+  if (provider === 'apple') return 'apple';
+  return 'guest';
+}
+
+/**
+ * Google 세션인데 토큰 없음/만료면 로컬 세션 제거.
+ * @returns true 이면 방금 클리어함 → 재로그인 UI 필요
+ * @deprecated prefer tryRecoverGoogleSession — 같은 기기면 JWT만 재발급 가능
+ */
+export function clearGoogleSessionIfInvalid(): boolean {
+  const session = loadSession();
+  if (session?.provider !== 'google') return false;
+  if (isAccessTokenUsable(loadToken())) return false;
+  saveToken(null);
+  saveSession(null);
+  notifyGoogleReauth();
+  return true;
+}
+
+/**
+ * 만료된 Google JWT 복구.
+ * 같은 deviceId 로 서버에 Google 계정이 있으면 /auth/guest 로 새 JWT 를 받아
+ * Google 세션을 유지(재로그인 UI 불필요). 못하면 reauth 이벤트.
+ * @returns 'restored' | 'need-reauth' | 'ok'(만료 아님)
+ */
+export async function tryRecoverGoogleSession(
+  clientId: string,
+  nickname: string,
+): Promise<'ok' | 'restored' | 'need-reauth'> {
+  const session = loadSession();
+  if (session?.provider !== 'google') return 'ok';
+  if (isAccessTokenUsable(loadToken())) return 'ok';
+
+  const prevSynced = session.lastSyncedAt;
+  const nick = nickname.trim() || 'User';
+  if (!clientId.trim()) {
+    saveToken(null);
+    saveSession(null);
+    notifyGoogleReauth();
+    return 'need-reauth';
+  }
+
+  try {
+    const auth = await loginAsGuest(clientId.trim(), nick);
+    const provider = providerFromAuthUser(auth.user.provider);
+    const next = sessionFromAuth(provider, auth, prevSynced);
+    saveToken(auth.accessToken);
+    saveSession(next);
+    if (provider === 'google') {
+      return 'restored';
+    }
+    notifyGoogleReauth();
+    return 'need-reauth';
+  } catch {
+    saveToken(null);
+    saveSession(null);
+    notifyGoogleReauth();
+    return 'need-reauth';
+  }
 }
 
 /**
@@ -211,7 +260,8 @@ export function useAuthSession() {
       return after;
     }
     const auth = await loginAsGuest(clientId.trim(), nick);
-    const next = sessionFromAuth('guest', auth, current?.lastSyncedAt ?? null);
+    const provider = providerFromAuthUser(auth.user.provider);
+    const next = sessionFromAuth(provider, auth, current?.lastSyncedAt ?? null);
     saveToken(auth.accessToken);
     saveSession(next);
     setSession(next);

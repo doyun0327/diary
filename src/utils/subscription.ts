@@ -147,6 +147,18 @@ export function requestSubscriptionRestore() {
   return true;
 }
 
+/**
+ * Google 재로그인·계정 전환 직후 — RevenueCat identify + 복원 + 동기화.
+ * 냥티켓 "구독 중" UI가 다시 맞게 표시되도록 함.
+ */
+export function restoreSubscriptionAfterAuth(userId?: string | null) {
+  const id = userId?.trim();
+  if (id) identifySubscriptionUser(id);
+  if (!isFlutterApp()) return;
+  requestSubscriptionRestore();
+  scheduleSubscriptionSyncAfterPurchase();
+}
+
 export function installSubscriptionBridge() {
   window.__onDiarySubscriptionStatus = (payload) => {
     applyPayload(payload);

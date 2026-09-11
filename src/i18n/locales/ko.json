@@ -592,6 +592,8 @@
       "tipAsk": "를 적어 주세요.",
       "styleTitle": "어떤 스타일로 그릴까요?",
       "styleLead": "마음에 드는 그림체를 골라 주세요.",
+      "stylePreview": "미리보기",
+      "stylePreviewHide": "미리보기 접기",
       "style": {
         "storybook": {
           "name": "영어동화책 st",

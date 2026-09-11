@@ -592,6 +592,8 @@
       "tipAsk": " — please write them.",
       "styleTitle": "Which style?",
       "styleLead": "Pick a look for your diary drawing.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
       "style": {
         "storybook": {
           "name": "Storybook",
