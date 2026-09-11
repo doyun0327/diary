@@ -329,6 +329,14 @@ function RoomsHubPage({
       setError(t("rooms.err.nameRequired"));
       return;
     }
+    const pendingCover = coverUrl;
+    const pendingAvatar = profileAvatar();
+    // data URL 아바타/커버 업로드는 GCS까지 가서 느림 → 방 생성만 먼저, 이미지는 뒤에서
+    const avatarForApi =
+      pendingAvatar.startsWith("http://") || pendingAvatar.startsWith("https://")
+        ? pendingAvatar
+        : null;
+
     setBusy(true);
     setError(null);
     try {
@@ -336,23 +344,79 @@ function RoomsHubPage({
       const room = await roomsApi.createRoom(
         name,
         nickname.trim(),
-        profileAvatar(),
+        avatarForApi,
         null,
-        coverUrl,
+        null,
       );
-      rememberRoomCover(room.id, {
-        preset: null,
-        url: coverUrl,
-      });
+
+      if (pendingCover) {
+        rememberRoomCover(room.id, { preset: null, url: pendingCover });
+      }
+
       setRoomName("");
       setCoverUrl(null);
       setSheet(null);
       setCreatedRoom({ id: room.id, inviteCode: room.inviteCode });
-      invalidateRoomsList();
-      await refresh(0);
+      setBusy(false);
+
+      const optimistic: RoomSummary = {
+        ...room,
+        owner: room.owner ?? true,
+        memberCount: room.memberCount ?? 1,
+        coverUrl: pendingCover ?? room.coverUrl,
+      };
+      setRooms((prev) =>
+        [optimistic, ...prev.filter((r) => r.id !== room.id)].slice(
+          0,
+          HUB_PAGE_SIZE,
+        ),
+      );
+      setPage(0);
+
+      void (async () => {
+        try {
+          if (pendingCover) {
+            const updated = await roomsApi.updateRoomCover(room.id, {
+              coverUrl: pendingCover,
+            });
+            rememberRoomCover(room.id, {
+              preset: null,
+              url: updated.coverUrl ?? pendingCover,
+            });
+            setRooms((prev) =>
+              prev.map((r) =>
+                r.id === room.id
+                  ? {
+                      ...r,
+                      coverUrl: updated.coverUrl ?? r.coverUrl,
+                      coverPreset: updated.coverPreset,
+                    }
+                  : r,
+              ),
+            );
+          }
+          if (!avatarForApi && pendingAvatar) {
+            await roomsApi
+              .updateMyProfile({
+                nickname: nickname.trim(),
+                avatarUrl: pendingAvatar,
+              })
+              .catch(() => {});
+          }
+        } catch {
+          // 커버 업로드 실패해도 초대코드·로컬 커버는 유지
+        } finally {
+          invalidateRoomsList();
+          const result = await prefetchRoomsList(0, HUB_PAGE_SIZE);
+          if (result) {
+            setRooms(result.content);
+            setPage(result.page);
+            setPageCount(Math.max(1, result.totalPages));
+          }
+        }
+      })();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("rooms.err.create"));
-    } finally {
       setBusy(false);
     }
   };
@@ -432,30 +496,46 @@ function RoomsHubPage({
 
   const handleRoomAction = async () => {
     if (!roomAction || actionBusy) return;
+    const action = roomAction;
     setActionBusy(true);
     setError(null);
+
+    // UI는 바로 닫고 목록에서 제거 — API·새로고침은 뒤에서
+    const removed = rooms.find((r) => r.id === action.id) ?? null;
+    setRoomAction(null);
+    setRooms((prev) => prev.filter((r) => r.id !== action.id));
+    setActionBusy(false);
+
     try {
       await ensureAuth();
-      if (roomAction.kind === "delete") {
-        await roomsApi.deleteRoom(roomAction.id);
+      if (action.kind === "delete") {
+        await roomsApi.deleteRoom(action.id);
       } else {
-        await roomsApi.leaveRoom(roomAction.id);
+        await roomsApi.leaveRoom(action.id);
       }
-      setRoomAction(null);
       invalidateRoomsList();
-      await refresh(0);
+      void prefetchRoomsList(0, HUB_PAGE_SIZE).then((result) => {
+        if (!result) return;
+        setRooms(result.content);
+        setPage(result.page);
+        setPageCount(Math.max(1, result.totalPages));
+      });
     } catch (err) {
+      if (removed) {
+        setRooms((prev) => {
+          if (prev.some((r) => r.id === removed.id)) return prev;
+          return [removed, ...prev].slice(0, HUB_PAGE_SIZE);
+        });
+      }
       setError(
         err instanceof Error
           ? err.message
           : t(
-              roomAction.kind === "delete"
+              action.kind === "delete"
                 ? "rooms.err.deleteRoom"
                 : "rooms.err.leave",
             ),
       );
-    } finally {
-      setActionBusy(false);
     }
   };
 

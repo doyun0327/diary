@@ -485,6 +485,7 @@ export function useDiary() {
    * @param since 마지막 성공 동기화 시각 — 있으면 그 이후 변경·미업로드 그림만 push, pull도 since 기준
    * @param options.month YYYY-MM — 해당 월만 pull
    * @param options.pullOnly true면 로컬 업로드 없이 pull만
+   * @param options.pushOnly true면 업로드·삭제만 (pull 병합 생략)
    */
   const syncWithCloud = useCallback(async (since: string | null, options?: SyncCloudOptions) => {
     const token = getAccessToken();
@@ -493,6 +494,7 @@ export function useDiary() {
     }
 
     const pullOnly = options?.pullOnly === true;
+    const pushOnly = options?.pushOnly === true && !pullOnly;
     const pendingDeletes = pullOnly ? [] : loadDeletedIds();
     const localEntries = await hydrateEntries(loadEntries());
     const uploadCandidates = pullOnly
@@ -517,8 +519,37 @@ export function useDiary() {
       since: pullOnly ? null : since,
       entries: entriesForSync,
       deletedIds: pendingDeletes,
-      month: options?.month ?? null,
+      month: pushOnly ? null : (options?.month ?? null),
     });
+
+    if (pushOnly) {
+      // 로그아웃 직전: pull 병합 없이 보낸 삭제만 정리
+      const sentDeletes = new Set(pendingDeletes);
+      const serverDeleted = new Set(res.deletedIds ?? []);
+      const serverEntryIds = new Set((res.entries ?? []).map((e) => e.id));
+      if (sentDeletes.size > 0) {
+        setDeletedIds((prev) => {
+          const next = prev.filter((id) => {
+            if (!sentDeletes.has(id)) return true;
+            if (serverDeleted.has(id)) return false;
+            if (!serverEntryIds.has(id)) return false;
+            return true;
+          });
+          persistDeletedIds(next);
+          return next;
+        });
+      }
+      // https로 바뀐 그림 URL은 로컬에 반영해 두었다가 clear 전에 일관성 유지
+      if (hadUploads) {
+        persistEntries(localEntries);
+        setEntries(localEntries);
+      }
+      return {
+        serverTime: res.serverTime || new Date().toISOString(),
+        entryCount: localEntries.length,
+        upToDate: !hadDeletes && !hadUploads,
+      } satisfies DiarySyncResult;
+    }
 
     // 삭제·저장이 동기화 도중 일어날 수 있어 merge 직전에 최신 로컬을 다시 읽음
     const latestDeletes = loadDeletedIds();

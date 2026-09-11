@@ -130,7 +130,7 @@ function AccountSheet({
   const onGoogleTokenRef = useRef<(idToken: string) => void>(() => {});
   const [nameDraft, setNameDraft] = useState(nickname);
   const [busy, setBusy] = useState(false);
-  const [authBusy, setAuthBusy] = useState<'google' | 'sync' | null>(null);
+  const [authBusy, setAuthBusy] = useState<'google' | 'sync' | 'signOut' | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
@@ -398,18 +398,36 @@ function AccountSheet({
     }
   };
 
-  const handleSignOut = () => {
-    // 계정 전환 시 이전 Google 계정 일기가 다음 계정으로 올라가지 않도록 로컬 비움
-    if (cloudSignedIn) {
+  const handleSignOut = async () => {
+    if (!cloudSignedIn || authBusy) return;
+    setAuthBusy('signOut');
+    setAuthError(null);
+    setAuthSuccess(null);
+    try {
+      // 마지막 동기화 이후 변경분·미업로드 그림을 먼저 올린 뒤 로그아웃아웃
+      const result = await onSyncDiaries(session?.lastSyncedAt ?? null, {
+        pushOnly: true,
+      });
+      markSynced(result.serverTime);
       onClearLocalDiaries?.();
+      signOut();
+      nativeGoogleSignOut();
+      const nick = nickname.trim() || t('common.anonymous');
+      void ensureGuestSession(clientId, nick).catch(() => {
+        // ignore
+      });
+      setAuthSuccess(t('account.sync.okSignedOut'));
+      showToast(t('account.sync.okSignedOut'));
+    } catch (err) {
+      console.warn('[account] sync before sign-out failed', err);
+      const message =
+        err instanceof Error && err.message.trim()
+          ? err.message
+          : t('account.sync.errSync');
+      setAuthError(message);
+    } finally {
+      setAuthBusy(null);
     }
-    signOut();
-    nativeGoogleSignOut();
-    // 친구 방용 게스트 세션 복구 (Google 없이도 공유 가능)
-    const nick = nickname.trim() || t('common.anonymous');
-    void ensureGuestSession(clientId, nick).catch(() => {
-      // ignore
-    });
   };
 
   const handleWithdraw = async () => {
@@ -644,9 +662,11 @@ function AccountSheet({
             type="button"
             className="account-sheet__account-action"
             disabled={authBusy !== null}
-            onClick={handleSignOut}
+            onClick={() => void handleSignOut()}
           >
-            {t('account.sync.signOut')}
+            {authBusy === 'signOut'
+              ? t('account.sync.syncing')
+              : t('account.sync.signOut')}
           </button>
           <button
             type="button"

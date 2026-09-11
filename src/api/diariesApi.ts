@@ -14,6 +14,8 @@ export type SyncCloudOptions = {
   month?: string | null;
   /** true면 업로드 없이 해당 월만 받기 */
   pullOnly?: boolean;
+  /** true면 로컬→서버 업로드·삭제만 (로그아웃 직전용, pull 병합 생략) */
+  pushOnly?: boolean;
 };
 
 export interface DiarySyncResponse {
