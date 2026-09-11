@@ -113,11 +113,11 @@
       "termsHeading": "Termos de Serviço",
       "termsBody": "PageBy é um app de diário pessoal. Use o serviço respeitando as leis aplicáveis. Você é responsável pela conta, apelido e conteúdo do diário. Não é permitido publicar ou compartilhar conteúdo que viole direitos de terceiros. Os recursos podem mudar sem aviso.",
       "privacyHeading": "Política de Privacidade",
-      "privacyBody": "Entradas, desenhos e dados de perfil podem ser salvos no seu dispositivo e sincronizados com o servidor ao usar salas de amigos. Usamos esses dados apenas para armazenamento, compartilhamento e recursos do app. Não vendemos dados pessoais e não os compartilhamos, exceto quando exigido por lei. Entre em contato pelos canais do app para solicitações de privacidade."
+      "privacyBody": "Entradas, desenhos e dados de perfil podem ser salvos no seu dispositivo e sincronizados com o servidor ao usar salas de amigos. Usamos esses dados apenas para armazenamento, compartilhamento e recursos do app. Não vendemos dados pessoais e não os compartilhamos, exceto quando exigido por lei."
     },
     "licenses": {
-      "menu": "Licenças open-source e créditos",
-      "title": "Licenças · Créditos",
+      "menu": "Atribuição de recursos",
+      "title": "Atribuição de recursos",
       "iconsHeading": "Créditos de ícones",
       "libsHeading": "Bibliotecas open-source",
       "note": "Ícones gratuitos do Flaticon exigem atribuição. O link acima é esse crédito."

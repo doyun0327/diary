@@ -113,11 +113,11 @@
       "termsHeading": "Nutzungsbedingungen",
       "termsBody": "PageBy ist eine persönliche Tagebuch-App. Bitte halte dich bei der Nutzung an geltendes Recht. Du bist für dein Konto, deinen Nicknamen und deine Tagebuchinhalte verantwortlich. Inhalte zu posten oder zu teilen, die Rechte anderer verletzen, ist nicht erlaubt. Funktionen können ohne Vorankündigung geändert werden.",
       "privacyHeading": "Datenschutzerklärung",
-      "privacyBody": "Tagebucheinträge, Zeichnungen und Profildaten können auf deinem Gerät gespeichert werden und bei Nutzung von Freundesräumen mit dem Server synchronisiert werden. Wir verwenden diese Daten nur für Tagebuchspeicherung, Teilen und App-Funktionen. Wir verkaufen keine personenbezogenen Daten und geben sie nur weiter, wenn das Gesetz es verlangt. Datenschutzanfragen kannst du über die In-App-Kanäle stellen."
+      "privacyBody": "Tagebucheinträge, Zeichnungen und Profildaten können auf deinem Gerät gespeichert werden und bei Nutzung von Freundesräumen mit dem Server synchronisiert werden. Wir verwenden diese Daten nur für Tagebuchspeicherung, Teilen und App-Funktionen. Wir verkaufen keine personenbezogenen Daten und geben sie nur weiter, wenn das Gesetz es verlangt."
     },
     "licenses": {
-      "menu": "Open-Source-Lizenzen & Credits",
-      "title": "Lizenzen · Credits",
+      "menu": "Ressourcenangabe",
+      "title": "Ressourcenangabe",
       "iconsHeading": "Icon-Credits",
       "libsHeading": "Open-Source-Bibliotheken",
       "note": "Kostenlose Flaticon-Icons erfordern eine Nennung. Der Link oben ist diese Nennung."

@@ -130,13 +130,13 @@
       "termsHeading": "Terms of Service",
       "termsBody": "PageBy is a personal diary app. Please follow applicable laws while using the service. You are responsible for your account, nickname, and diary content. Posting or sharing content that infringes others' rights is not allowed. Features may change without notice.",
       "privacyHeading": "Privacy Policy",
-      "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use friend rooms. We use this data only to provide diary storage, sharing, and app features. In friend rooms you can report posts/comments or block users. We do not sell personal data, and we do not share it except when required by law. Contact us through in-app channels for privacy requests.",
+      "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use friend rooms. We use this data only to provide diary storage, sharing, and app features. In friend rooms you can report posts/comments or block users. We do not sell personal data, and we do not share it except when required by law.",
       "refundHeading": "Refund Policy",
-      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store or contact us via in-app channels. Statutory cooling-off or refund rights under applicable law still apply where required."
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
-      "menu": "Flaticon credits",
-      "title": "Flaticon credits",
+      "menu": "Resource credits",
+      "title": "Resource credits",
       "iconsHeading": "Icons used",
       "note": "Free Flaticon resources require attribution. The links above are that credit.",
       "usage": {

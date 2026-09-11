@@ -113,11 +113,11 @@
       "termsHeading": "Điều khoản sử dụng",
       "termsBody": "PageBy là ứng dụng nhật ký cá nhân. Vui lòng tuân thủ luật hiện hành khi dùng dịch vụ. Bạn chịu trách nhiệm về tài khoản, biệt danh và nội dung nhật ký. Không được đăng hoặc chia sẻ nội dung xâm phạm quyền của người khác. Tính năng có thể thay đổi mà không báo trước.",
       "privacyHeading": "Chính sách riêng tư",
-      "privacyBody": "Nhật ký, tranh vẽ và dữ liệu hồ sơ có thể lưu trên thiết bị của bạn, và có thể đồng bộ lên máy chủ khi dùng phòng bạn bè. Chúng tôi chỉ dùng dữ liệu này để lưu nhật ký, chia sẻ và các tính năng của app. Chúng tôi không bán dữ liệu cá nhân và không chia sẻ trừ khi pháp luật yêu cầu. Liên hệ qua kênh trong app cho các yêu cầu về riêng tư."
+      "privacyBody": "Nhật ký, tranh vẽ và dữ liệu hồ sơ có thể lưu trên thiết bị của bạn, và có thể đồng bộ lên máy chủ khi dùng phòng bạn bè. Chúng tôi chỉ dùng dữ liệu này để lưu nhật ký, chia sẻ và các tính năng của app. Chúng tôi không bán dữ liệu cá nhân và không chia sẻ trừ khi pháp luật yêu cầu."
     },
     "licenses": {
-      "menu": "Giấy phép mã nguồn mở & ghi công",
-      "title": "Giấy phép · Ghi công",
+      "menu": "Ghi nguồn tài nguyên",
+      "title": "Ghi nguồn tài nguyên",
       "iconsHeading": "Ghi công biểu tượng",
       "libsHeading": "Thư viện mã nguồn mở",
       "note": "Biểu tượng miễn phí Flaticon cần ghi nguồn. Liên kết phía trên chính là ghi công đó."

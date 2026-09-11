@@ -113,11 +113,11 @@
       "termsHeading": "Conditions d'utilisation",
       "termsBody": "PageBy est une application de journal personnel. Veuillez respecter les lois applicables lors de l'utilisation du service. Vous êtes responsable de votre compte, de votre pseudo et du contenu de votre journal. Il est interdit de publier ou de partager du contenu portant atteinte aux droits d'autrui. Les fonctionnalités peuvent changer sans préavis.",
       "privacyHeading": "Politique de confidentialité",
-      "privacyBody": "Les entrées de journal, dessins et données de profil peuvent être stockés sur votre appareil, et synchronisés avec le serveur lorsque vous utilisez les salons d'amis. Nous utilisons ces données uniquement pour le stockage, le partage et les fonctionnalités de l'app. Nous ne vendons pas de données personnelles et ne les partageons que lorsque la loi l'exige. Contactez-nous via les canaux de l'app pour toute demande relative à la confidentialité."
+      "privacyBody": "Les entrées de journal, dessins et données de profil peuvent être stockés sur votre appareil, et synchronisés avec le serveur lorsque vous utilisez les salons d'amis. Nous utilisons ces données uniquement pour le stockage, le partage et les fonctionnalités de l'app. Nous ne vendons pas de données personnelles et ne les partageons que lorsque la loi l'exige."
     },
     "licenses": {
-      "menu": "Licences open source et crédits",
-      "title": "Licences · Crédits",
+      "menu": "Attribution des ressources",
+      "title": "Attribution des ressources",
       "iconsHeading": "Crédits des icônes",
       "libsHeading": "Bibliothèques open source",
       "note": "Les icônes gratuites Flaticon nécessitent une attribution. Le lien ci-dessus est ce crédit."

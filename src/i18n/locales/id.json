@@ -113,11 +113,11 @@
       "termsHeading": "Syarat Layanan",
       "termsBody": "PageBy adalah aplikasi diary pribadi. Harap patuhi hukum yang berlaku saat menggunakan layanan. Anda bertanggung jawab atas akun, nama panggilan, dan isi diary. Dilarang memposting atau membagikan konten yang melanggar hak orang lain. Fitur dapat berubah tanpa pemberitahuan.",
       "privacyHeading": "Kebijakan Privasi",
-      "privacyBody": "Diary, gambar, dan data profil dapat disimpan di perangkat Anda, dan dapat disinkronkan ke server saat memakai ruang teman. Kami memakai data ini hanya untuk penyimpanan diary, berbagi, dan fitur aplikasi. Kami tidak menjual data pribadi, dan tidak membagikannya kecuali diwajibkan hukum. Hubungi kami lewat saluran di aplikasi untuk permintaan privasi."
+      "privacyBody": "Diary, gambar, dan data profil dapat disimpan di perangkat Anda, dan dapat disinkronkan ke server saat memakai ruang teman. Kami memakai data ini hanya untuk penyimpanan diary, berbagi, dan fitur aplikasi. Kami tidak menjual data pribadi, dan tidak membagikannya kecuali diwajibkan hukum."
     },
     "licenses": {
-      "menu": "Lisensi open-source & kredit",
-      "title": "Lisensi · Kredit",
+      "menu": "Penyataan sumber daya",
+      "title": "Penyataan sumber daya",
       "iconsHeading": "Kredit ikon",
       "libsHeading": "Pustaka open-source",
       "note": "Ikon Flaticon gratis memerlukan atribusi. Tautan di atas adalah kredit tersebut."
