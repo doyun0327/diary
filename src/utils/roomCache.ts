@@ -142,3 +142,9 @@ export function setCachedRoomsList(data: RoomSummaryPage): void {
 export function invalidateRoomsList(): void {
   roomsList = null;
 }
+
+/** 프로필(닉·프사) 변경 후 방/피드 캐시 전부 무효화 */
+export function invalidateAllRoomCaches(): void {
+  feedByKey.clear();
+  roomsList = null;
+}

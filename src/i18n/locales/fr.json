@@ -315,6 +315,12 @@
     "sharedDiaries": "Journaux partagés",
     "sharedEmpty": "Pas encore de journaux partagés.\nEssayez « Partager dans un salon » sur votre journal.",
     "sharePrompt": "Partager un journal ?",
+    "shareDiary": "Partager un journal",
+    "shareDiaryDone": "Partagé dans la salle",
+    "pickDiaryTitle": "Quel journal partager ?",
+    "pickDiaryHint": "Choisissez un journal pour {{name}}",
+    "pickDiaryAria": "Choisir un journal pour {{name}}",
+    "pickDiaryEmpty": "Pas encore de journal. Écrivez-en un d’abord.",
     "goHome": "Accueil",
     "openPostAria": "Ouvrir le journal {{title}} de {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "Connecte-toi pour poker",
     "pokeFail": "Impossible d'envoyer le poke",
     "sharePushBody": "A partagé un journal !",
-    "commentPushBody": "A laissé un commentaire !",
+    "commentPushBody": "{{name}}💛 a laissé un commentaire !",
     "newCommentToast": "Un nouveau commentaire est arrivé !",
     "postNew": "N",
     "postNewAria": "Nouveau journal"

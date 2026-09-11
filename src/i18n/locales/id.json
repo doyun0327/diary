@@ -315,6 +315,12 @@
     "sharedDiaries": "Diary bersama",
     "sharedEmpty": "Belum ada diary bersama.\nCoba “Bagikan ke ruang” di diary Anda.",
     "sharePrompt": "Mau bagikan diary?",
+    "shareDiary": "Bagikan diary",
+    "shareDiaryDone": "Dibagikan ke ruang",
+    "pickDiaryTitle": "Diary mana yang dibagikan?",
+    "pickDiaryHint": "Pilih diary untuk {{name}}",
+    "pickDiaryAria": "Pilih diary untuk {{name}}",
+    "pickDiaryEmpty": "Belum ada diary. Tulis dulu.",
     "goHome": "Ke beranda",
     "openPostAria": "Buka diary {{title}} milik {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "Masuk untuk mencolek",
     "pokeFail": "Gagal mengirim colek",
     "sharePushBody": "Membagikan diary!",
-    "commentPushBody": "Meninggalkan komentar!",
+    "commentPushBody": "{{name}}💛 meninggalkan komentar!",
     "newCommentToast": "Ada komentar baru!",
     "postNew": "N",
     "postNewAria": "Diary baru"

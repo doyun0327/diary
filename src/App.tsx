@@ -1007,19 +1007,26 @@ function App() {
             : undefined
         }
       >
-        {page === "home" && (
-          <DiaryListPage
-            entries={entries}
-            onSelect={handleSelect}
-            viewYear={calYear}
-            viewMonth={calMonth}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            onViewChange={(year, month) => {
-              setCalYear(year);
-              setCalMonth(month);
-            }}
-          />
+        {(page === "home" || page === "write" || page === "detail") && (
+          <div
+            className={
+              page === "home" ? "app-home" : "app-home app-home--parked"
+            }
+            aria-hidden={page !== "home"}
+          >
+            <DiaryListPage
+              entries={entries}
+              onSelect={handleSelect}
+              viewYear={calYear}
+              viewMonth={calMonth}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              onViewChange={(year, month) => {
+                setCalYear(year);
+                setCalMonth(month);
+              }}
+            />
+          </div>
         )}
         {page === "write" && (
           <DiaryWritePage
@@ -1075,6 +1082,10 @@ function App() {
           <RoomPage
             roomId={activeRoomId}
             userId={session?.userId ?? ""}
+            entries={entries}
+            nickname={nickname}
+            clientId={clientId}
+            ensureGuestSession={ensureGuestSession}
             onBack={() => {
               setActivePostId(null);
               setPage("rooms");

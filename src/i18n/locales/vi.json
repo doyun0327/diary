@@ -315,6 +315,12 @@
     "sharedDiaries": "Nhật ký đã chia sẻ",
     "sharedEmpty": "Chưa có nhật ký chia sẻ.\nThử “Chia sẻ vào phòng” trên nhật ký của bạn.",
     "sharePrompt": "Muốn chia sẻ nhật ký?",
+    "shareDiary": "Chia sẻ nhật ký",
+    "shareDiaryDone": "Đã chia sẻ vào phòng",
+    "pickDiaryTitle": "Chọn nhật ký nào?",
+    "pickDiaryHint": "Chọn nhật ký để đăng vào {{name}}",
+    "pickDiaryAria": "Chọn nhật ký cho {{name}}",
+    "pickDiaryEmpty": "Chưa có nhật ký. Hãy viết trước.",
     "goHome": "Về trang chủ",
     "openPostAria": "Mở nhật ký {{title}} của {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "Đăng nhập để chọc",
     "pokeFail": "Không gửi được chọc",
     "sharePushBody": "Đã chia sẻ nhật ký!",
-    "commentPushBody": "Đã bình luận!",
+    "commentPushBody": "{{name}}💛 đã bình luận!",
     "newCommentToast": "Có bình luận mới!",
     "postNew": "N",
     "postNewAria": "Nhật ký mới"

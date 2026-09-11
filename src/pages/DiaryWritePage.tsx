@@ -350,6 +350,8 @@ function DiaryWritePage({
     drawingClearedRef.current = false;
   }, [initialEntry?.id]);
 
+  // 엔트리 id가 바뀔 때만 원본 스냅샷 갱신 — 저장 직후 props(imageUrl/canvas) 변경으로
+  // AI 선택지·캔버스가 리셋되면 수정 내용이 사라진 것처럼 깜박임
   useEffect(() => {
     editOriginalImageRef.current = initialEntry?.imageUrl ?? null;
     previousCanvasStateRef.current = cloneCanvasState(initialEntry?.canvasState);
@@ -357,7 +359,8 @@ function DiaryWritePage({
     setAiPickOptions([]);
     setAiPickSelected(new Set());
     setAiPickOpen(false);
-  }, [initialEntry?.id, initialEntry?.imageUrl, initialEntry?.canvasState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount / 다른 일기 편집 시에만
+  }, [initialEntry?.id]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -467,9 +470,14 @@ function DiaryWritePage({
     };
   }, []);
 
+  // 초기 1회만 캔버스 하이드레이션. 저장 시 entries 갱신·초안 삭제로
+  // imageUrl/canvasState/hasDrawing이 바뀌며 재로드되면 그림이 사라졌다가 다시 그려짐
   useEffect(() => {
     let cancelled = false;
     let attempts = 0;
+    const entryCanvas = initialEntry?.canvasState;
+    const entryImage = initialEntry?.imageUrl;
+    const draftHasDrawing = resumeDraft?.hasDrawing;
 
     const applyCanvas = (
       state: DiaryCanvasState | null | undefined,
@@ -505,7 +513,7 @@ function DiaryWritePage({
     };
 
     void (async () => {
-      if (resumeDraft?.hasDrawing) {
+      if (draftHasDrawing) {
         const media = await loadWriteDraftMedia();
         if (cancelled) return;
         if (media.canvasState || media.imageUrl) {
@@ -513,13 +521,14 @@ function DiaryWritePage({
           return;
         }
       }
-      applyCanvas(initialEntry?.canvasState, initialEntry?.imageUrl);
+      applyCanvas(entryCanvas, entryImage);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [initialEntry?.imageUrl, initialEntry?.canvasState, resumeDraft?.hasDrawing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- entryId 변경(또는 새 글 마운트) 시에만
+  }, [initialEntry?.id]);
 
   const flushWriteDraftMeta = useCallback(() => {
     const hasDrawing = Boolean(canvasRef.current?.hasContent());
@@ -1284,34 +1293,36 @@ function DiaryWritePage({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (saving || aiLoading) return;
-    // setSaving 전에 캡처 — 저장 중 레이아웃/리사이즈로 펜 잉크가 비는 것 방지
-    let imageUrl: string | undefined;
-    let canvasState: DiaryCanvasState | undefined;
-    try {
-      const captured = await canvasRef.current?.captureForSave();
-      if (captured?.hasContent) {
-        canvasState = await resolveCanvasStateForSave(captured.canvasState ?? null);
-        imageUrl = captured.imageUrl || undefined;
-        if (!imageUrl && !canvasState) {
-          setSaveError(t('write.err.saveImage'));
-          return;
-        }
-      }
-    } catch (err) {
-      setSaveError(err instanceof Error ? err.message : t('write.err.saveImage'));
-      return;
-    }
-
-    if (!title.trim() && !content.trim() && !imageUrl && !isEdit) {
-      setAiError(t('write.err.empty'));
-      return;
-    }
-
     setSaving(true);
     setAiError(null);
     setSaveError(null);
-    clearWriteDraft();
     try {
+      let imageUrl: string | undefined;
+      let canvasState: DiaryCanvasState | undefined;
+      try {
+        const captured = await canvasRef.current?.captureForSave();
+        if (captured?.hasContent) {
+          canvasState = await resolveCanvasStateForSave(
+            captured.canvasState ?? null,
+          );
+          imageUrl = captured.imageUrl || undefined;
+          if (!imageUrl && !canvasState) {
+            setSaveError(t('write.err.saveImage'));
+            return;
+          }
+        }
+      } catch (err) {
+        setSaveError(
+          err instanceof Error ? err.message : t('write.err.saveImage'),
+        );
+        return;
+      }
+
+      if (!title.trim() && !content.trim() && !imageUrl && !isEdit) {
+        setAiError(t('write.err.empty'));
+        return;
+      }
+
       const payload: Parameters<typeof onSave>[0] = {
         date,
         title: title.trim(),
@@ -1332,6 +1343,8 @@ function DiaryWritePage({
       }
       // 수정 + 그림 없음 + 지우기 안 함 → 미디어 필드 생략 = 기존 유지
       await onSave(payload);
+      // 저장 성공 후에만 초안 삭제 — 저장 중 삭제하면 캔버스 이펙트가 재실행되며 깜박임
+      clearWriteDraft();
       drawingClearedRef.current = false;
     } catch (err) {
       setSaveError(

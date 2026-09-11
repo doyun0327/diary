@@ -315,6 +315,12 @@
     "sharedDiaries": "Diários compartilhados",
     "sharedEmpty": "Ainda não há diários compartilhados.\nExperimente “Compartilhar na sala” no seu diário.",
     "sharePrompt": "Quer compartilhar um diário?",
+    "shareDiary": "Compartilhar diário",
+    "shareDiaryDone": "Compartilhado na sala",
+    "pickDiaryTitle": "Qual diário compartilhar?",
+    "pickDiaryHint": "Escolha um diário para {{name}}",
+    "pickDiaryAria": "Escolher diário para {{name}}",
+    "pickDiaryEmpty": "Ainda não há diários. Escreva um primeiro.",
     "goHome": "Ir ao início",
     "openPostAria": "Abrir o diário {{title}} de {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "Entre para cutucar",
     "pokeFail": "Não foi possível enviar o cutucão",
     "sharePushBody": "Compartilhou um diário!",
-    "commentPushBody": "Deixou um comentário!",
+    "commentPushBody": "{{name}}💛 deixou um comentário!",
     "newCommentToast": "Chegou um comentário novo!",
     "postNew": "N",
     "postNewAria": "Diário novo"

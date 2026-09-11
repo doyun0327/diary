@@ -316,6 +316,12 @@
     "sharedDiaries": "Geteilte Tagebücher",
     "sharedEmpty": "Noch keine geteilten Tagebücher.\nÖffne ein Tagebuch und tippe auf Teilen → Freundesräume.",
     "sharePrompt": "Möchtest du ein Tagebuch teilen?",
+    "shareDiary": "Tagebuch teilen",
+    "shareDiaryDone": "Im Raum geteilt",
+    "pickDiaryTitle": "Welches Tagebuch teilen?",
+    "pickDiaryHint": "Wähle ein Tagebuch für {{name}}",
+    "pickDiaryAria": "Tagebuch für {{name}} auswählen",
+    "pickDiaryEmpty": "Noch keine Tagebücher. Schreib zuerst eins.",
     "goHome": "Zur Startseite",
     "openPostAria": "Tagebuch von {{author}} öffnen: {{title}}",
     "coach": {
@@ -402,7 +408,7 @@
     "pokeNeedLogin": "Zum Anstupsen anmelden",
     "pokeFail": "Anstupsen fehlgeschlagen",
     "sharePushBody": "Hat ein Tagebuch geteilt!",
-    "commentPushBody": "Hat einen Kommentar hinterlassen!",
+    "commentPushBody": "{{name}}💛 left a comment!",
     "newCommentToast": "Ein neuer Kommentar ist da!",
     "postNew": "N",
     "postNewAria": "Neues Tagebuch"

@@ -315,6 +315,12 @@
     "sharedDiaries": "共有された日記",
     "sharedEmpty": "まだ共有された日記はありません。\n日記詳細の「ルームに共有」を試してみてください。",
     "sharePrompt": "日記を共有しますか？",
+    "shareDiary": "日記を共有",
+    "shareDiaryDone": "ルームに共有しました",
+    "pickDiaryTitle": "どの日記を共有しますか？",
+    "pickDiaryHint": "{{name}}に載せる日記を選んでください",
+    "pickDiaryAria": "{{name}}に共有する日記を選択",
+    "pickDiaryEmpty": "共有できる日記がありません。先に日記を書いてください。",
     "goHome": "ホームへ",
     "openPostAria": "{{author}}の日記「{{title}}」を開く",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "ログインしてぽちっ",
     "pokeFail": "ぽちっを送れませんでした",
     "sharePushBody": "日記を共有しました！",
-    "commentPushBody": "コメントを残しました！",
+    "commentPushBody": "{{name}}💛 コメントしました！",
     "newCommentToast": "新しいコメントが届きました！",
     "postNew": "N",
     "postNewAria": "新しい日記"

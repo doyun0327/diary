@@ -315,6 +315,12 @@
     "sharedDiaries": "ไดอารี่ที่แชร์",
     "sharedEmpty": "ยังไม่มีไดอารี่ที่แชร์\nลอง “แชร์ไปห้อง” ในไดอารี่ของคุณ",
     "sharePrompt": "อยากแชร์ไดอารี่ไหม?",
+    "shareDiary": "แชร์ไดอารี่",
+    "shareDiaryDone": "แชร์ไปที่ห้องแล้ว",
+    "pickDiaryTitle": "จะแชร์ไดอารี่ไหน?",
+    "pickDiaryHint": "เลือกไดอารี่สำหรับ {{name}}",
+    "pickDiaryAria": "เลือกไดอารี่สำหรับ {{name}}",
+    "pickDiaryEmpty": "ยังไม่มีไดอารี่ เขียนก่อนนะ",
     "goHome": "ไปหน้าหลัก",
     "openPostAria": "เปิดไดอารี่ {{title}} ของ {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "เข้าสู่ระบบเพื่อจิ้ม",
     "pokeFail": "ส่งการจิ้มไม่สำเร็จ",
     "sharePushBody": "แชร์ไดอารี่แล้ว!",
-    "commentPushBody": "แสดงความคิดเห็นแล้ว!",
+    "commentPushBody": "{{name}}💛 แสดงความคิดเห็นแล้ว!",
     "newCommentToast": "มีความคิดเห็นใหม่!",
     "postNew": "N",
     "postNewAria": "ไดอารี่ใหม่"

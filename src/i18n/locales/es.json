@@ -315,6 +315,12 @@
     "sharedDiaries": "Diarios compartidos",
     "sharedEmpty": "Aún no hay diarios compartidos.\nPrueba “Compartir en sala” en tu diario.",
     "sharePrompt": "¿Quieres compartir un diario?",
+    "shareDiary": "Compartir diario",
+    "shareDiaryDone": "Compartido en la sala",
+    "pickDiaryTitle": "¿Qué diario compartir?",
+    "pickDiaryHint": "Elige un diario para {{name}}",
+    "pickDiaryAria": "Elegir diario para {{name}}",
+    "pickDiaryEmpty": "Aún no hay diarios. Escribe uno primero.",
     "goHome": "Ir al inicio",
     "openPostAria": "Abrir el diario {{title}} de {{author}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "Inicia sesión para tocar",
     "pokeFail": "No se pudo enviar el toque",
     "sharePushBody": "¡Compartió un diario!",
-    "commentPushBody": "¡Dejó un comentario!",
+    "commentPushBody": "{{name}}💛 ¡Dejó un comentario!",
     "newCommentToast": "¡Hay un comentario nuevo!",
     "postNew": "N",
     "postNewAria": "Diario nuevo"

@@ -315,6 +315,12 @@
     "sharedDiaries": "分享的日記",
     "sharedEmpty": "還沒有分享的日記。\n可在日記詳情裡點「分享到好友房」。",
     "sharePrompt": "要分享日記嗎？",
+    "shareDiary": "分享日記",
+    "shareDiaryDone": "已分享到房間",
+    "pickDiaryTitle": "要分享哪篇日記？",
+    "pickDiaryHint": "選擇要發到 {{name}} 的日記",
+    "pickDiaryAria": "選擇要分享到 {{name}} 的日記",
+    "pickDiaryEmpty": "還沒有日記。請先寫一篇。",
     "goHome": "回到主頁",
     "openPostAria": "打開{{author}}的日記{{title}}",
     "coach": {
@@ -401,7 +407,7 @@
     "pokeNeedLogin": "登入後才能戳",
     "pokeFail": "戳失敗",
     "sharePushBody": "分享了日記！",
-    "commentPushBody": "留言了！",
+    "commentPushBody": "{{name}}💛 留言了！",
     "newCommentToast": "有新留言了！",
     "postNew": "N",
     "postNewAria": "新日記"

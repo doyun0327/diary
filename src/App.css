@@ -25,6 +25,11 @@
   overflow: hidden;
 }
 
+/* 쓰기/상세 중에도 메인 달력 DOM 유지 — 썸네일 재디코드·전체 리로드 방지 */
+.app-home--parked {
+  display: none;
+}
+
 @keyframes app-fade-in {
   from {
     opacity: 0;

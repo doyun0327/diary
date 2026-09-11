@@ -6,9 +6,11 @@ import CloseIcon from './CloseIcon';
 import {
   useAuthSession,
   type AuthSession,
+  getAccessToken,
 } from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
 import { isFlutterApp } from '../utils/nativeShare';
+import { invalidateAllRoomCaches } from '../utils/roomCache';
 import './AccountSheet.css';
 import type { DiarySyncResult, SyncCloudOptions } from '../api/diariesApi';
 
@@ -69,9 +71,15 @@ function fileToAvatarDataUrl(file: File, t: (key: string) => string): Promise<st
 
 /** 서버에 프로필 반영 (엔드포인트 없으면 무시) */
 function syncProfileToRooms(patch: { nickname?: string; avatarUrl?: string | null }) {
-  void roomsApi.updateMyProfile(patch).catch(() => {
-    // 백엔드 미구현·오프라인 시 로컬만 유지
-  });
+  if (!getAccessToken()) return;
+  void roomsApi
+    .updateMyProfile(patch)
+    .then(() => {
+      invalidateAllRoomCaches();
+    })
+    .catch(() => {
+      // 백엔드 미구현·오프라인 시 로컬만 유지
+    });
 }
 
 // function formatSyncedAt(iso: string | null, locale: string, neverLabel: string): string {

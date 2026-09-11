@@ -75,7 +75,7 @@
 }
 
 .rooms--hub > :not(.rooms__toolbar):not(.rooms-cover-picker__file):not(.rooms-sheet):not(.app-modal),
-.rooms--in-room > :not(.rooms__toolbar),
+.rooms--in-room > :not(.rooms__toolbar):not(.rooms-sheet),
 .rooms--post > :not(.rooms__toolbar) {
   padding-left: 18px;
   padding-right: 18px;
@@ -322,6 +322,82 @@
 .rooms__btn--block {
   width: 100%;
   margin-top: 6px;
+}
+
+.rooms__btn--ghost {
+  background: transparent;
+  border: 1.5px solid var(--color-border-soft);
+  color: var(--color-text-muted);
+  box-shadow: none;
+}
+
+.rooms__btn--ghost:active {
+  transform: scale(0.98);
+  opacity: 0.85;
+}
+
+.rooms__toolbar-action {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rooms-sheet__panel--diary-picker {
+  max-height: min(78vh, 640px);
+  display: flex;
+  flex-direction: column;
+}
+
+.rooms-diary-picker__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 4px 12px;
+  text-align: left;
+}
+
+.rooms-diary-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rooms-diary-picker__row {
+  position: relative;
+}
+
+.rooms-diary-picker__row.is-shared .diary-row {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.rooms-diary-picker__row.is-busy .diary-row {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.rooms-diary-picker__badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent-soft) 85%, #fff);
+  color: var(--color-accent-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.rooms-diary-picker__checking {
+  margin: 10px 0 0;
+  text-align: center;
 }
 
 .rooms__btn:disabled,

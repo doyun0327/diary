@@ -1,23 +1,10 @@
 import { getDiaryImage } from './diaryImageStore';
 import { compressDataUrlForShare } from './shareImageUrl';
 
-async function remoteUrlToDataUrl(url: string): Promise<string | undefined> {
-  try {
-    const res = await fetch(url, { mode: 'cors' });
-    if (!res.ok) return undefined;
-    const blob = await res.blob();
-    return await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return undefined;
-  }
-}
-
-/** 친구방 공유용 — 8/26 방식: IndexedDB·data URL에서 그림을 찾아 압축 JPEG data URL로 전달 */
+/** 친구방 공유용 이미지.
+ * - 이미 http(s)(GCS 등)면 다운·압축·재업로드 없이 URL 그대로
+ * - data URL / IndexedDB 만 trim+JPEG 압축 후 전달 (서버가 GCS에 올림)
+ */
 export async function resolveEntryImageForRoomShare(
   entry: { id: string; imageUrl?: string | null },
 ): Promise<string | undefined> {
@@ -32,12 +19,7 @@ export async function resolveEntryImageForRoomShare(
   if (!raw) return undefined;
 
   if (raw.startsWith('http://') || raw.startsWith('https://')) {
-    const dataUrl = await remoteUrlToDataUrl(raw);
-    if (dataUrl) {
-      raw = dataUrl;
-    } else {
-      return raw;
-    }
+    return raw;
   }
 
   return compressDataUrlForShare(raw);

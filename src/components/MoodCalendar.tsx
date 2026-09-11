@@ -96,34 +96,26 @@ function MoodCalendar({
     return urls;
   }, [markByDate]);
 
-  const thumbBatchKey = `${monthPrefix}|${monthThumbUrls.join('\0')}`;
-  const [readyBatchKey, setReadyBatchKey] = useState<string | null>(() =>
-    monthThumbUrls.length === 0 || monthThumbUrls.every((u) => preloadedThumbUrls.has(u))
-      ? thumbBatchKey
-      : null,
-  );
+  /** preload 완료 시 리렌더 — 모듈 Set만으로는 구독이 안 됨 */
+  const [thumbReadyTick, setThumbReadyTick] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    const urls = monthThumbUrls;
-    const key = thumbBatchKey;
-
-    if (urls.length === 0 || urls.every((u) => preloadedThumbUrls.has(u))) {
-      setReadyBatchKey(key);
+    const missing = monthThumbUrls.filter((u) => !preloadedThumbUrls.has(u));
+    if (missing.length === 0) {
+      setThumbReadyTick((n) => n + 1);
       return;
     }
-
-    setReadyBatchKey(null);
-    void Promise.all(urls.map(preloadImage)).then(() => {
-      if (!cancelled) setReadyBatchKey(key);
+    // 이미 디코드된 URL은 그대로 두고, 새 URL만 프리로드 (전체 숨김 금지)
+    void Promise.all(missing.map(preloadImage)).then(() => {
+      if (!cancelled) setThumbReadyTick((n) => n + 1);
     });
-
     return () => {
       cancelled = true;
     };
-  }, [monthThumbUrls, thumbBatchKey]);
+  }, [monthThumbUrls]);
 
-  const thumbsReady = readyBatchKey === thumbBatchKey;
+  void thumbReadyTick;
 
   const moveMonth = (delta: number) => {
     const d = new Date(viewYear, viewMonth + delta, 1);
@@ -171,7 +163,8 @@ function MoodCalendar({
           const mark = markByDate.get(dateStr);
           const sticker = mark?.sticker;
           const imageUrl = mark?.imageUrl;
-          const showDrawing = Boolean(imageUrl) && thumbsReady;
+          const showDrawing =
+            Boolean(imageUrl) && preloadedThumbUrls.has(imageUrl!);
           const showMood = Boolean(sticker) && !showDrawing;
           const isToday = dateStr === todayStr;
           const isSelected = Boolean(selectedDate) && dateStr === selectedDate;

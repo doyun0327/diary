@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { DiaryEntry } from '../types/diary';
 import type { RoomDetail, RoomPost } from '../types/room';
 import BackIcon from '../components/BackIcon';
 import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
+import RoomDiaryPickerSheet from '../components/RoomDiaryPickerSheet';
 import RoomMemberAvatars from '../components/RoomMemberAvatars';
 import {
   isRoomCommentCoachSeen,
@@ -32,12 +34,26 @@ export const ROOM_POSTS_PAGE_SIZE = 10;
 interface RoomPageProps {
   roomId: string;
   userId?: string | null;
+  entries: DiaryEntry[];
+  nickname: string;
+  clientId: string;
+  ensureGuestSession: (clientId: string, nickname: string) => Promise<unknown>;
   onBack: () => void;
   onGoHome: () => void;
   onOpenPost: (postId: string) => void;
 }
 
-function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProps) {
+function RoomPage({
+  roomId,
+  userId,
+  entries,
+  nickname,
+  clientId,
+  ensureGuestSession,
+  onBack,
+  onGoHome,
+  onOpenPost,
+}: RoomPageProps) {
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
   const [posts, setPosts] = useState<RoomPost[]>([]);
@@ -50,9 +66,17 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   const [postsPage, setPostsPage] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 1800);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const visibleFeedPosts = useMemo(() => {
     void blockTick;
@@ -60,6 +84,13 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   }, [posts, blockTick]);
 
   const postsPageCount = Math.max(1, totalPages);
+
+  const feedSharedDiaryIds = useMemo(() => {
+    if (!userId) return [] as string[];
+    return posts
+      .filter((p) => p.authorUserId === userId && p.diaryId?.trim())
+      .map((p) => p.diaryId);
+  }, [posts, userId]);
 
   const unreadPostIds = useMemo(() => {
     void seenTick;
@@ -70,6 +101,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
 
   useEffect(() => {
     setPostsPage(0);
+    setPickerOpen(false);
     const warm = getCachedRoomFeed(roomId, 0, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
@@ -115,8 +147,6 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
   roomRef.current = room;
 
   const refresh = useCallback(async () => {
-    // 캐시가 있어도 화면은 먼저 그리고, 네트워크는 항상 다시 받아
-    // (신선 캐시 early-return 시 그사이 공유된 새 일기·N 배지가 안 뜸)
     const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
@@ -196,6 +226,8 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
     onOpenPost(postId);
   };
 
+  const openPicker = () => setPickerOpen(true);
+
   const otherMembers =
     room?.members.filter((m) => !userId || m.userId !== userId) ?? [];
   const canShowPokeCoach = showPokeCoach && otherMembers.length > 0;
@@ -212,7 +244,14 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
           <BackIcon />
         </button>
         <h2>{room?.name ?? t('rooms.title')}</h2>
-        <span className="rooms__toolbar-balance" aria-hidden />
+        <button
+          type="button"
+          className="rooms__toolbar-action"
+          onClick={openPicker}
+          aria-label={t('rooms.shareDiary')}
+        >
+          {t('rooms.shareDiary')}
+        </button>
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
@@ -240,13 +279,26 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
             <div className="rooms__empty rooms__empty--share-cta">
               <p className="rooms__empty-title rooms__empty-title--multiline">
                 {totalElements === 0
-                  ? t('rooms.sharedEmpty')
+                  ? t('rooms.sharePrompt')
                   : t('rooms.safety.feedEmptyBlocked')}
               </p>
               {totalElements === 0 ? (
-                <button type="button" className="rooms__btn primary" onClick={onGoHome}>
-                  {t('rooms.goHome')}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="rooms__btn primary"
+                    onClick={openPicker}
+                  >
+                    {t('rooms.shareDiary')}
+                  </button>
+                  <button
+                    type="button"
+                    className="rooms__btn rooms__btn--ghost"
+                    onClick={onGoHome}
+                  >
+                    {t('rooms.goHome')}
+                  </button>
+                </>
               ) : null}
             </div>
           )}
@@ -277,7 +329,7 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
                       const author = room.members.find((m) => m.userId === post.authorUserId);
                       const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
                       const authorName = roomAuthorLabel(
-                        post.authorNickname,
+                        author?.nickname || post.authorNickname,
                         withdrawn,
                         t,
                       );
@@ -334,6 +386,29 @@ function RoomPage({ roomId, userId, onBack, onGoHome, onOpenPost }: RoomPageProp
             </div>
           )}
         </section>
+      )}
+
+      {pickerOpen && room && (
+        <RoomDiaryPickerSheet
+          roomId={roomId}
+          roomName={room.name}
+          feedSharedDiaryIds={feedSharedDiaryIds}
+          entries={entries}
+          nickname={nickname}
+          clientId={clientId}
+          ensureGuestSession={ensureGuestSession}
+          onClose={() => setPickerOpen(false)}
+          onShared={() => {
+            setToast(t('rooms.shareDiaryDone'));
+            void refresh();
+          }}
+        />
+      )}
+
+      {toast && (
+        <div className="rooms__toast" role="status">
+          {toast}
+        </div>
       )}
     </div>
   );

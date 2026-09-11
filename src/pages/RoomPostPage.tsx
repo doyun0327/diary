@@ -87,6 +87,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [blockTick, setBlockTick] = useState(0);
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
+  /** 방 멤버 최신 닉·프사 (포스트/댓글 스냅샷보다 우선) */
+  const [memberNickByUserId, setMemberNickByUserId] = useState<
+    Record<string, string>
+  >({});
   const pageRef = useRef<HTMLDivElement>(null);
   const commentListRef = useRef<HTMLUListElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
@@ -189,30 +193,44 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   };
 
   useEffect(() => {
-    if (!post || post.authorWithdrawn) {
+    if (!post) {
       setAuthorAvatarUrl('');
       return;
     }
-    const fromCache = getCachedRoomDetail(roomId)
-      ?.members.find((m) => m.userId === post.authorUserId)
-      ?.avatarUrl?.trim();
-    if (fromCache) {
-      setAuthorAvatarUrl(fromCache);
-      return;
+    const applyMembers = (
+      members: { userId: string; nickname: string; avatarUrl?: string | null; withdrawn?: boolean }[],
+    ) => {
+      const nicks: Record<string, string> = {};
+      for (const m of members) {
+        if (m.nickname?.trim()) nicks[m.userId] = m.nickname.trim();
+      }
+      setMemberNickByUserId(nicks);
+      if (post.authorWithdrawn) {
+        setAuthorAvatarUrl('');
+        return;
+      }
+      const url =
+        members.find((m) => m.userId === post.authorUserId)?.avatarUrl?.trim() ||
+        '';
+      setAuthorAvatarUrl(url);
+    };
+
+    const cached = getCachedRoomDetail(roomId, { allowStale: true });
+    if (cached?.members?.length) {
+      applyMembers(cached.members);
     }
+
     let cancelled = false;
     void roomsApi
       .getRoom(roomId)
       .then((detail) => {
         if (cancelled) return;
-        const url =
-          detail.members
-            .find((m) => m.userId === post.authorUserId)
-            ?.avatarUrl?.trim() || '';
-        setAuthorAvatarUrl(url);
+        applyMembers(detail.members);
       })
       .catch(() => {
-        if (!cancelled) setAuthorAvatarUrl('');
+        if (!cancelled && !cached) {
+          setAuthorAvatarUrl('');
+        }
       });
     return () => {
       cancelled = true;
@@ -292,6 +310,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     if (!body) return;
 
     const commentNick = nickname.trim() || t('common.anonymous');
+    const roomName =
+      getCachedRoomDetail(roomId)?.name?.trim() || t('rooms.title');
     const tempId = newTempCommentId();
     const optimistic: DisplayComment = {
       id: tempId,
@@ -315,8 +335,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
     try {
       const created = await roomsApi.createComment(roomId, postId, body, {
-        pushTitle: commentNick,
-        pushBody: t('rooms.commentPushBody'),
+        pushTitle: roomName,
+        pushBody: t('rooms.commentPushBody', { name: commentNick }),
       });
       setComments((prev) =>
         prev.map((c) => (c.id === tempId ? { ...created } : c)),
@@ -363,9 +383,13 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     );
 
     try {
+      const roomName =
+        getCachedRoomDetail(roomId)?.name?.trim() || t('rooms.title');
       const created = await roomsApi.createComment(roomId, postId, body, {
-        pushTitle: failed.authorNickname,
-        pushBody: t('rooms.commentPushBody'),
+        pushTitle: roomName,
+        pushBody: t('rooms.commentPushBody', {
+          name: failed.authorNickname || t('common.anonymous'),
+        }),
       });
       setComments((prev) =>
         prev.map((c) => (c.id === failed.id ? { ...created } : c)),
@@ -402,8 +426,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setSafetyTarget(target);
   };
 
+  const liveAuthorNick = post
+    ? memberNickByUserId[post.authorUserId] || post.authorNickname
+    : '';
   const authorName = post
-    ? roomAuthorLabel(post.authorNickname, post.authorWithdrawn, t)
+    ? roomAuthorLabel(liveAuthorNick, post.authorWithdrawn, t)
     : '';
   const postAvatarUrl = post?.authorWithdrawn ? '' : authorAvatarUrl;
   const authorInitial = (authorName || '?').slice(0, 1).toUpperCase();
@@ -439,7 +466,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
               openSafety({
                 roomId,
                 userId: post.authorUserId,
-                nickname: post.authorNickname,
+                nickname: liveAuthorNick,
                 kind: 'post',
                 postId: post.id,
               })
@@ -498,7 +525,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                 {showName && !isMine && (
                   <div className="rooms__comment-head">
                     <strong className="rooms__comment-name">
-                      {roomAuthorLabel(c.authorNickname, c.authorWithdrawn, t)}
+                      {roomAuthorLabel(
+                        memberNickByUserId[c.authorUserId] || c.authorNickname,
+                        c.authorWithdrawn,
+                        t,
+                      )}
                     </strong>
                   </div>
                 )}
