@@ -69,10 +69,6 @@
       "name": "Klasik",
       "desc": "Ikon flat (Flaticon)"
     },
-    "smileys": {
-      "name": "Smileys",
-      "desc": "Ikon animasi (Flaticon)"
-    },
     "cat": {
       "name": "Kucing",
       "desc": "Emoji kucing (Flaticon)"
@@ -261,7 +257,7 @@
     "title": "Ruang teman",
     "joinWithCode": "Gabung dengan kode",
     "create": "Buat ruang",
-    "empty": "Anda belum bergabung di ruang mana pun",
+    "empty": "Tempat untuk berbagi diary dengan teman",
     "emptyLead": "Buat ruang nyaman untuk menempel diary bersama teman.",
     "memberCount": "{{n}} anggota",
     "withdrawnMember": "Anggota yang keluar",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "Tinggalkan komentar!",
       "poke": "Ketuk foto profil untuk mengirim colekan!",
-      "share": "Ketuk ikon bagikan di atas untuk memposting diary!"
+      "share": "Ketuk ikon bagikan di atas untuk memposting diary!",
+      "create": "Coba buat ruang!"
     },
     "backToRoom": "← Ke ruang",
     "backToRoomAria": "Kembali ke ruang",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 meninggalkan komentar!",
     "newCommentToast": "Ada komentar baru!",
     "postNew": "N",
-    "postNewAria": "Diary baru"
+    "postNewAria": "Diary baru",
+    "emptyCta": "Buat ruang",
+    "afterSavePromptTitle": "Bagikan diary ini di PageBy?",
+    "afterSavePromptLead": "Kamu bisa berbagi diary dengan teman!",
+    "afterSavePromptOk": "Ke PageBy",
+    "afterSavePromptLater": "Nanti"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

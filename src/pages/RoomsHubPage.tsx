@@ -23,6 +23,10 @@ import {
 import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
 import { roomHasUnreadPosts } from "../utils/roomPostSeen";
 import { isNetworkError, resolveNetworkErrorTitle } from "../utils/networkError";
+import {
+  isRoomCreateCoachSeen,
+  markRoomCreateCoachSeen,
+} from "../utils/onboarding";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
@@ -103,8 +107,13 @@ function RoomsHubPage({
     kind: "leave" | "delete";
   } | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
+  const [showCreateCoach, setShowCreateCoach] = useState(
+    () => !isRoomCreateCoachSeen(),
+  );
 
   const shareReady = canShare(nickname);
+  const canShowCreateCoach =
+    showCreateCoach && shareReady && !loading && rooms.length === 0;
 
   const profileAvatar = () =>
     avatarUrl || letterAvatarDataUrl(nickname.trim() || "?");
@@ -218,8 +227,17 @@ function RoomsHubPage({
       setCoverUrl(null);
       setEditingRoomId(null);
       setEditCoverDirty(false);
+      if (showCreateCoach) {
+        markRoomCreateCoachSeen();
+        setShowCreateCoach(false);
+      }
     }
     setSheet(kind);
+  };
+
+  const dismissCreateCoach = () => {
+    markRoomCreateCoachSeen();
+    setShowCreateCoach(false);
   };
 
   const closeSheet = () => {
@@ -574,21 +592,42 @@ function RoomsHubPage({
         </div>
       ) : (
         <>
-          <div className="rooms__actions">
-            <button
-              type="button"
-              className="rooms__btn rooms__btn--scrap rooms__btn--tilt-left"
-              onClick={() => openSheet("join")}
-            >
-              {t("rooms.joinWithCode")}
-            </button>
-            <button
-              type="button"
-              className="rooms__btn primary rooms__btn--scrap rooms__btn--tilt-right"
-              onClick={() => openSheet("create")}
-            >
-              {t("rooms.create")}
-            </button>
+          <div className="rooms__hub-intro">
+            <div className="rooms__actions">
+              <button
+                type="button"
+                className="rooms__btn rooms__btn--scrap rooms__btn--tilt-left"
+                onClick={() => openSheet("join")}
+              >
+                {t("rooms.joinWithCode")}
+              </button>
+              <button
+                type="button"
+                className="rooms__btn primary rooms__btn--scrap rooms__btn--tilt-right"
+                onClick={() => openSheet("create")}
+              >
+                {t("rooms.create")}
+              </button>
+              {canShowCreateCoach && (
+                <div className="rooms__create-coach" role="status">
+                  <p>{t("rooms.coach.create")}</p>
+                  <button
+                    type="button"
+                    className="rooms__create-coach-dismiss"
+                    aria-label={t("common.close")}
+                    onClick={dismissCreateCoach}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {!loading && rooms.length === 0 && (
+              <div className="rooms__empty rooms__empty--scrap rooms__empty--hub-cta">
+                <p className="rooms__empty-title">{t("rooms.empty")}</p>
+              </div>
+            )}
           </div>
 
           {!sheet && error && <p className="rooms__error">{error}</p>}

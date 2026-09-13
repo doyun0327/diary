@@ -14,6 +14,7 @@ import {
 } from '../utils/moodPack';
 import { GENDER_EMOJI, preloadCharacterHairIcons, type CharacterProfile } from '../types/character';
 import AiLoadingWait from '../components/AiLoadingWait';
+import FortuneCookie from '../components/FortuneCookie';
 import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
@@ -226,6 +227,7 @@ function DiaryWritePage({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
+  const [fortuneVisible, setFortuneVisible] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [tipOpen, setTipOpen] = useState(false);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
@@ -751,6 +753,14 @@ function DiaryWritePage({
     };
   }, [aiLoading, aiLottiePool]);
 
+  // 그리기 단계 진입 후 로띠 → 포춘쿠키로 교체 (그림 끝나도 × 전까지 유지)
+  useEffect(() => {
+    if (!aiLoading || aiProgress === 'waiting') return;
+    if (fortuneVisible) return;
+    const timer = window.setTimeout(() => setFortuneVisible(true), 2800);
+    return () => window.clearTimeout(timer);
+  }, [aiLoading, aiProgress, fortuneVisible]);
+
   const saveAndLeave = () => {
     formRef.current?.requestSubmit();
   };
@@ -1125,6 +1135,7 @@ function DiaryWritePage({
     if (!(await reserveAiDrawQuota())) return;
 
     setAiProgress('waiting');
+    setFortuneVisible(false);
     setActiveAiLottie(pickRandomLottie(aiLottiePool));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
@@ -1540,10 +1551,15 @@ function DiaryWritePage({
                 lottieKey={aiLottieKey}
                 step={aiProgress}
                 sourceText={content}
-                durationHintSeconds={
-                  aiStyleRef.current === 'oilPastel' ? 30 : 20
-                }
+                hideStage={fortuneVisible}
               />
+            )}
+            {fortuneVisible && !purchaseClickShield && (
+              <div
+                className={`diary-write__fortune-layer${aiLoading ? ' is-loading' : ''}`}
+              >
+                <FortuneCookie onDismiss={() => setFortuneVisible(false)} />
+              </div>
             )}
             </div>
           </div>

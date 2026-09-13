@@ -14,6 +14,8 @@ interface MoodCalendarProps {
   onViewChange: (year: number, month: number) => void;
   onSelectDate?: (date: string) => void;
   selectedDate?: string;
+  /** 방금 저장한 날짜 — 짧은 하이라이트 */
+  highlightDate?: string | null;
   hideHeader?: boolean;
 }
 
@@ -53,6 +55,7 @@ function MoodCalendar({
   onViewChange,
   onSelectDate,
   selectedDate,
+  highlightDate,
   hideHeader = false,
 }: MoodCalendarProps) {
   const { t } = useTranslation();
@@ -168,6 +171,7 @@ function MoodCalendar({
           const showMood = Boolean(sticker) && !showDrawing;
           const isToday = dateStr === todayStr;
           const isSelected = Boolean(selectedDate) && dateStr === selectedDate;
+          const isJustSaved = Boolean(highlightDate) && dateStr === highlightDate;
           const moodLabel = sticker
             ? isMood(sticker)
               ? t(`mood.${sticker}`)
@@ -184,6 +188,7 @@ function MoodCalendar({
                 showMood ? 'has-mood' : '',
                 isToday ? 'today' : '',
                 isSelected ? 'selected' : '',
+                isJustSaved ? 'just-saved' : '',
               ].filter(Boolean).join(' ')}
               aria-pressed={isSelected || undefined}
               onClick={() => onSelectDate?.(dateStr)}

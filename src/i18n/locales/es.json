@@ -69,10 +69,6 @@
       "name": "Clásico",
       "desc": "Iconos planos (Flaticon)"
     },
-    "smileys": {
-      "name": "Caritas",
-      "desc": "Iconos animados (Flaticon)"
-    },
     "cat": {
       "name": "Gato",
       "desc": "Emojis de gato (Flaticon)"
@@ -261,7 +257,7 @@
     "title": "Salas de amigos",
     "joinWithCode": "Unirse con código",
     "create": "Crear sala",
-    "empty": "Aún no estás en ninguna sala",
+    "empty": "Un espacio para compartir diarios con amigos",
     "emptyLead": "Crea una sala acogedora para pegar diarios con amigos.",
     "memberCount": "{{n}} miembros",
     "withdrawnMember": "Miembro dado de baja",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "¡Deja un comentario!",
       "poke": "Toca una foto para avisar a un amigo!",
-      "share": "Toca el icono de compartir arriba para publicar un diario!"
+      "share": "Toca el icono de compartir arriba para publicar un diario!",
+      "create": "¡Prueba a crear una sala!"
     },
     "backToRoom": "← A la sala",
     "backToRoomAria": "Volver a la sala",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 ¡Dejó un comentario!",
     "newCommentToast": "¡Hay un comentario nuevo!",
     "postNew": "N",
-    "postNewAria": "Diario nuevo"
+    "postNewAria": "Diario nuevo",
+    "emptyCta": "Crear sala",
+    "afterSavePromptTitle": "¿Compartir este diario en PageBy?",
+    "afterSavePromptLead": "¡Puedes compartir diarios con amigos!",
+    "afterSavePromptOk": "Ir a PageBy",
+    "afterSavePromptLater": "Más tarde"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

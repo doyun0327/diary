@@ -69,10 +69,6 @@
       "name": "คลาสสิก",
       "desc": "ไอคอนแบบแบน (Flaticon)"
     },
-    "smileys": {
-      "name": "หน้ายิ้ม",
-      "desc": "ไอคอนเคลื่อนไหว (Flaticon)"
-    },
     "cat": {
       "name": "แมว",
       "desc": "อีโมจิแมว (Flaticon)"
@@ -261,7 +257,7 @@
     "title": "ห้องเพื่อน",
     "joinWithCode": "เข้าร่วมด้วยรหัส",
     "create": "สร้างห้อง",
-    "empty": "คุณยังไม่ได้เข้าร่วมห้องใด",
+    "empty": "พื้นที่สำหรับแชร์ไดอารี่กับเพื่อน",
     "emptyLead": "สร้างห้องอบอุ่นไว้แปะไดอารี่กับเพื่อนไหม?",
     "memberCount": "{{n}} สมาชิก",
     "withdrawnMember": "สมาชิกที่ออกจากระบบ",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "ลองคอมเมนต์ดูสิ!",
       "poke": "แตะรูปโปรไฟล์เพื่อส่งการแจ้งเตือน!",
-      "share": "แตะไอคอนแชร์ด้านบนเพื่อโพสต์ไดอารี่!"
+      "share": "แตะไอคอนแชร์ด้านบนเพื่อโพสต์ไดอารี่!",
+      "create": "ลองสร้างห้องดูสิ!"
     },
     "backToRoom": "← ไปห้อง",
     "backToRoomAria": "กลับไปห้อง",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 แสดงความคิดเห็นแล้ว!",
     "newCommentToast": "มีความคิดเห็นใหม่!",
     "postNew": "N",
-    "postNewAria": "ไดอารี่ใหม่"
+    "postNewAria": "ไดอารี่ใหม่",
+    "emptyCta": "สร้างห้อง",
+    "afterSavePromptTitle": "แชร์ไดอารี่นี้บน PageBy ไหม?",
+    "afterSavePromptLead": "แชร์ไดอารี่กับเพื่อนได้!",
+    "afterSavePromptOk": "ไปที่ PageBy",
+    "afterSavePromptLater": "ไว้ทีหลัง"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

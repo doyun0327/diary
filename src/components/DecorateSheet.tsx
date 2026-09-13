@@ -17,7 +17,7 @@ import CloseIcon from './CloseIcon';
 import './DecorateSheet.css';
 
 const EMOJI_PACK_ORDER: MoodPackId[] = [
-  'classic', 'weather', 'smileys', 'love', 'dog', 'cat', 'ghost', 'numbers', 'numbers2',
+  'classic', 'weather', 'love', 'dog', 'cat', 'ghost', 'numbers', 'numbers2',
 ];
 
 interface DecorateSheetProps {

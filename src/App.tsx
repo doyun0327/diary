@@ -63,6 +63,7 @@ import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/sy
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
+import { preloadAiStylePreviews } from "./utils/aiDrawStyles";
 import {
   applyAiPackCreditsFromServer,
   applyMonthlyUsageFromServer,
@@ -100,6 +101,24 @@ import "./App.css";
 export type Page = "home" | "write" | "detail" | "rooms" | "room" | "room-post";
 
 type SubscriptionModalReason = "write" | "search" | "export";
+
+const PAGEBY_AFTER_SAVE_PROMPT_KEY = "pageby-after-save-prompt-seen";
+
+function hasSeenPagebyAfterSavePrompt(): boolean {
+  try {
+    return localStorage.getItem(PAGEBY_AFTER_SAVE_PROMPT_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+function markPagebyAfterSavePromptSeen(): void {
+  try {
+    localStorage.setItem(PAGEBY_AFTER_SAVE_PROMPT_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
 
 function readResumeWrite(): { page: Page; editingId: string | null } {
   const draft = loadWriteDraft();
@@ -157,9 +176,25 @@ function App() {
   const [writeSaving, setWriteSaving] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [googleLoginForProOpen, setGoogleLoginForProOpen] = useState(false);
+  const [pagebyAfterSavePromptOpen, setPagebyAfterSavePromptOpen] =
+    useState(false);
+  const [calendarHighlightDate, setCalendarHighlightDate] = useState<
+    string | null
+  >(null);
+  const calendarHighlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [accessTick, setAccessTick] = useState(0);
   const [cloudSyncLoading, setCloudSyncLoading] = useState(false);
   const deployUpdating = useDeployMaintenance();
+
+  useEffect(() => {
+    return () => {
+      if (calendarHighlightTimerRef.current) {
+        clearTimeout(calendarHighlightTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (deployUpdating) requestDraftFlush();
@@ -169,6 +204,7 @@ function App() {
     const run = () => {
       preloadMoodPackIcons();
       preloadCharacterHairIcons();
+      preloadAiStylePreviews();
     };
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(run, { timeout: 2000 });
@@ -570,9 +606,27 @@ function App() {
   const persistNewEntry = useCallback(
     async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
       await addEntry(entry);
+      const savedDate = entry.date;
+      const [y, m] = savedDate.split("-").map(Number);
+      if (Number.isFinite(y) && Number.isFinite(m)) {
+        setCalYear(y);
+        setCalMonth(m - 1);
+      }
+      setSelectedDate(savedDate);
+      if (calendarHighlightTimerRef.current) {
+        clearTimeout(calendarHighlightTimerRef.current);
+      }
+      setCalendarHighlightDate(savedDate);
+      calendarHighlightTimerRef.current = setTimeout(() => {
+        setCalendarHighlightDate(null);
+        calendarHighlightTimerRef.current = null;
+      }, 2400);
       setPage("home");
       syncInBackground();
       showAppToast(t("write.savedToast"));
+      if (!hasSeenPagebyAfterSavePrompt()) {
+        setPagebyAfterSavePromptOpen(true);
+      }
     },
     [addEntry, showAppToast, syncInBackground, t],
   );
@@ -1020,6 +1074,7 @@ function App() {
               viewYear={calYear}
               viewMonth={calMonth}
               selectedDate={selectedDate}
+              highlightDate={calendarHighlightDate}
               onSelectDate={setSelectedDate}
               onViewChange={(year, month) => {
                 setCalYear(year);
@@ -1336,6 +1391,31 @@ function App() {
             onPrimary={() => {
               setGoogleLoginForProOpen(false);
               setAccountOpen(true);
+            }}
+            closeAriaLabel={t("common.close")}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {pagebyAfterSavePromptOpen &&
+        createPortal(
+          <AppModal
+            title={t("rooms.afterSavePromptTitle")}
+            lead={t("rooms.afterSavePromptLead")}
+            onDismiss={() => {
+              markPagebyAfterSavePromptSeen();
+              setPagebyAfterSavePromptOpen(false);
+            }}
+            showClose
+            primaryLabel={t("rooms.afterSavePromptOk")}
+            onPrimary={() => {
+              markPagebyAfterSavePromptSeen();
+              setPagebyAfterSavePromptOpen(false);
+              openRooms();
+            }}
+            secondaryLabel={t("rooms.afterSavePromptLater")}
+            onSecondary={() => {
+              markPagebyAfterSavePromptSeen();
+              setPagebyAfterSavePromptOpen(false);
             }}
             closeAriaLabel={t("common.close")}
           />,

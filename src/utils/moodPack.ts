@@ -10,11 +10,7 @@ export const MOOD_PACK_CHANGE_EVENT = 'mood-pack-change';
 /** 팩별 아이콘 보정 — 원본 GIF/PNG 기울어짐 */
 export const MOOD_ICON_TRANSFORMS: Partial<
   Record<MoodPackId, Partial<Record<Mood, string>>>
-> = {
-  smileys: {
-    happy: 'rotate(-45deg)',
-  },
-};
+> = {};
 
 /** Magnific · Flat Emoji pack (emoji-6) — 정적 PNG */
 const CLASSIC_ICONS: Record<Mood, string> = {
@@ -30,22 +26,6 @@ const CLASSIC_ICONS: Record<Mood, string> = {
   angry: '/moods/classic/angry.png',
   anxious: '/moods/classic/anxious.png',
   sick: '/moods/classic/sick.png',
-};
-
-/** Freepik smileys 애니 GIF */
-const SMILEYS_ICONS: Record<Mood, string> = {
-  happy: '/moods/happy.gif',
-  excited: '/moods/excited.gif',
-  love: '/moods/love.gif',
-  proud: '/moods/proud.gif',
-  calm: '/moods/calm.gif',
-  sleepy: '/moods/sleepy.gif',
-  soso: '/moods/soso.gif',
-  surprised: '/moods/surprised.gif',
-  sad: '/moods/sad.gif',
-  angry: '/moods/angry.gif',
-  anxious: '/moods/anxious.gif',
-  sick: '/moods/sick.gif',
 };
 
 /** MrHamster · Cat emojis pack — 정적 PNG */
@@ -176,15 +156,6 @@ export const MOOD_PACKS: {
     },
   },
   {
-    id: 'smileys',
-    preview: ['happy', 'love', 'sleepy', 'sad'],
-    icons: SMILEYS_ICONS,
-    attribution: {
-      author: 'Freepik',
-      href: 'https://www.flaticon.com/free-animated-icons/emoji',
-    },
-  },
-  {
     id: 'cat',
     preview: ['happy', 'love', 'sleepy', 'sad'],
     icons: CAT_ICONS,
@@ -261,6 +232,7 @@ export function isValidMoodPackId(id: unknown): id is MoodPackId {
 
 export function parseMoodPackId(id: unknown): MoodPackId | undefined {
   if (isValidMoodPackId(id)) return id;
+  if (id === 'smileys') return 'classic';
   if (id === 'weatherAnimated' || id === 'weatherStatic') return 'weather';
   return undefined;
 }

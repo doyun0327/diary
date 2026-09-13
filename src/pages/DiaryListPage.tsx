@@ -15,6 +15,7 @@ interface DiaryListPageProps {
   viewMonth: number;
   onViewChange: (year: number, month: number) => void;
   selectedDate?: string;
+  highlightDate?: string | null;
   onSelectDate?: (date: string) => void;
 }
 
@@ -25,6 +26,7 @@ function DiaryListPage({
   viewMonth,
   onViewChange,
   selectedDate,
+  highlightDate,
   onSelectDate,
 }: DiaryListPageProps) {
   const { t } = useTranslation();
@@ -68,6 +70,7 @@ function DiaryListPage({
         viewMonth={viewMonth}
         onViewChange={onViewChange}
         selectedDate={selectedDate}
+        highlightDate={highlightDate}
         onSelectDate={handleCalendarDate}
         hideHeader
       />

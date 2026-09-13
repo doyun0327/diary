@@ -37,7 +37,7 @@
     "footer": "천천히, 하루씩",
     "account": "계정",
     "accountHintEmpty": "프로필 · 계정",
-    "rooms": "친구 방",
+    "rooms": "PageBy",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
     "characterHint": "AI 그림 속 나",
@@ -70,10 +70,6 @@
     "classic": {
       "name": "Classic",
       "desc": "Flat 이모티콘 (Flaticon)"
-    },
-    "smileys": {
-      "name": "Smileys",
-      "desc": "애니 이모티콘 (Flaticon)"
     },
     "cat": {
       "name": "Cat",
@@ -130,7 +126,7 @@
       "termsHeading": "이용약관",
       "termsBody": "PageBy는 개인 일기 기록을 위한 앱입니다. 서비스 이용 시 관련 법령을 준수해 주세요. 계정·닉네임·일기 내용은 사용자의 책임 하에 관리되며, 타인의 권리를 침해하는 내용의 게시·공유는 금지됩니다. 서비스 내용은 예고 없이 변경될 수 있습니다.",
       "privacyHeading": "개인정보처리방침",
-      "privacyBody": "일기·그림·프로필 정보는 기기에 저장되거나, Google 계정 로그인·친구 방 기능을 쓸 때 앱 서버에 저장될 수 있습니다. 수집 목적은 일기 저장·공유·앱 기능 제공에 한정됩니다. 친구 방에서는 다른 사용자의 글·댓글을 신고하거나 사용자를 차단할 수 있습니다. 제3자에게 판매하지 않으며, 법령에 따른 요청이 있는 경우를 제외하고 외부에 제공하지 않습니다.",
+      "privacyBody": "일기·그림·프로필 정보는 기기에 저장되거나, Google 계정 로그인·PageBy 기능을 쓸 때 앱 서버에 저장될 수 있습니다. 수집 목적은 일기 저장·공유·앱 기능 제공에 한정됩니다. PageBy에서는 다른 사용자의 글·댓글을 신고하거나 사용자를 차단할 수 있습니다. 제3자에게 판매하지 않으며, 법령에 따른 요청이 있는 경우를 제외하고 외부에 제공하지 않습니다.",
       "refundHeading": "환불 정책",
       "refundBody": "PageBy의 유료 결제(구독, AI 그림 충전 팩, 츄르 등)는 Google Play 또는 App Store를 통해 이루어지며, 결제·환불은 각 스토어의 정책을 따릅니다. 구독은 언제든 해지할 수 있으며, 해지 후에도 이미 결제된 이용 기간이 끝날 때까지는 구독 혜택을 이용할 수 있습니다. AI 그림 충전 팩·츄르처럼 구매 후 계정에 지급되는 소모성 상품은 지급이 완료되면 원칙적으로 환불이 어렵습니다. 결제 오류, 상품 미지급, 앱 장애로 서비스를 이용하지 못한 경우에는 Google Play/App Store의 환불 요청을 이용해 주세요. 관련 법령에서 정한 청약철회·환불 권리는 해당 법령에 따릅니다."
     },
@@ -141,7 +137,6 @@
       "note": "무료 Flaticon 리소스는 출처 표기가 필요합니다. 위 링크가 그 표기입니다.",
       "usage": {
         "mood.classic": "기분 · Classic",
-        "mood.smileys": "기분 · Smileys",
         "mood.cat": "기분 · Cat",
         "mood.dog": "기분 · Dog",
         "mood.love": "기분 · Love",
@@ -208,7 +203,7 @@
     },
     "removePhoto": "삭제",
     "nameLabel": "이름",
-    "nameHint": "친구 방에서 보일 이름이에요",
+    "nameHint": "PageBy에서 보일 이름이에요",
     "nameHintLoggedIn": "로그아웃해도 이름은 이 기기에 남아요",
     "namePlaceholder": "이름을 입력해 주세요",
     "save": "저장",
@@ -323,11 +318,16 @@
     "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
-    "title": "친구 방",
+    "title": "PageBy",
     "joinWithCode": "코드로 입장",
     "create": "방 만들기",
-    "empty": "아직 참여한 방이 없어요",
+    "empty": "친구랑 일기를 공유하는 공간이에요",
     "emptyLead": "친구랑 일기 붙여 둘 방을 하나 만들어 볼까요?",
+    "emptyCta": "방 만들기",
+    "afterSavePromptTitle": "이 일기를 PageBy에 올려볼까요?",
+    "afterSavePromptLead": "친구랑 일기를 공유할 수 있어요!",
+    "afterSavePromptOk": "PageBy로 가기",
+    "afterSavePromptLater": "나중에",
     "memberCount": "멤버 {{n}}",
     "withdrawnMember": "탈퇴한 회원",
     "pokeWithdrawn": "탈퇴한 회원에게는 찌를 수 없어요",
@@ -394,7 +394,7 @@
     "sharePushBody": "일기를 공유했어요!",
     "commentPushBody": "{{name}}💛 댓글을 달았어요!",
     "newCommentToast": "새로운 댓글이 생겼어요!",
-    "sharedEmpty": "아직 공유된 일기가 없어요.\n일기를 열고 「공유 → 친구 방」을 눌러 보세요.",
+    "sharedEmpty": "아직 공유된 일기가 없어요.\n일기를 열고 「공유 → PageBy」를 눌러 보세요.",
     "sharePrompt": "일기를 공유해볼까요?",
     "emptyNoDiaries": "작성된 일기가 없습니다.",
     "shareDiary": "일기 공유",
@@ -410,7 +410,8 @@
     "coach": {
       "comment": "댓글을 남겨보세요!",
       "poke": "프사를 누르면 친구에게 알림이 가요!",
-      "share": "위 공유 아이콘을 눌러 일기를 올려보세요!"
+      "share": "위 공유 아이콘을 눌러 일기를 올려보세요!",
+      "create": "방을 만들어봐요!"
     },
     "backToRoom": "← 방으로",
     "backToRoomAria": "방으로",
@@ -425,8 +426,8 @@
       "createdLead": "친구에게 아래 초대코드를 알려 주세요.",
       "copyCode": "코드 복사하기",
       "share": "공유하기",
-      "shareTitle": "PageBy 친구 방 초대",
-      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}\n\n앱에서 친구방 > 코드로 입장 > 초대코드 입력하면 들어올 수 있어요!",
+      "shareTitle": "PageBy 초대",
+      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}\n\n앱에서 PageBy > 코드로 입장 > 초대코드 입력하면 들어올 수 있어요!",
       "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
@@ -462,7 +463,7 @@
     "err": {
       "needNickname": "이름과 프로필 사진을 먼저 정해 주세요",
       "needProfile": "이름을 설정하면 친구와 공유할 수 있어요",
-      "guestAuth": "친구 방 연결에 실패했어요. 잠시 후 다시 시도해 주세요",
+      "guestAuth": "PageBy 연결에 실패했어요. 잠시 후 다시 시도해 주세요",
       "list": "방 목록을 불러오지 못했어요",
       "nameRequired": "방 이름을 입력해 주세요",
       "create": "방을 만들지 못했어요",
@@ -612,7 +613,6 @@
           "desc": "포근하고 은은하게 스며드는 오일파스텔 화풍"
         }
       },
-      "durationHint": "약 {{n}}초 정도 걸려요",
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
       "exGood2": "좋은 예: 공원에서 강아지랑 뛰어놀았어요",
       "exBad": "아쉬운 예: 오늘 기분이 좋았어요",
@@ -652,7 +652,14 @@
       "usageNotDeductedTitle": "사용권 안내",
       "usageNotDeducted": "사용권이 차감되지 않았습니다.",
       "cdnFallbackTitle": "그림 불러오기",
-      "cdnFallbackNotice": "그림이 완성됐어요. 네트워크가 불안정해서 불러오는 데 시간이 걸렸어요."
+      "cdnFallbackNotice": "그림이 완성됐어요. 네트워크가 불안정해서 불러오는 데 시간이 걸렸어요.",
+      "fortune": {
+        "tap": "포춘쿠키를 눌러 보세요",
+        "tapAria": "포춘쿠키 열기",
+        "again": "다시 눌러 다른 운세",
+        "close": "운세 닫기",
+        "label": "오늘의 운세"
+      }
     },
     "reward": {
       "saveTitle": "광고 보고 일기 1편 저장",
@@ -737,12 +744,12 @@
     "sns": "SNS로 공유",
     "snsIcon": "SNS",
     "snsDesc": "인스타·카카오톡 등 원하는 앱 선택",
-    "rooms": "친구 방",
+    "rooms": "PageBy",
     "roomsIcon": "방",
     "roomsDesc": "참여 중인 방에 올리기",
     "roomsHint": "여러 방을 골라 한 번에 공유할 수 있어요",
     "roomsLoading": "방 목록 불러오는 중…",
-    "roomsEmpty": "참여 중인 방이 없어요. 메뉴 → 친구 방에서 방을 만들거나 입장해 주세요.",
+    "roomsEmpty": "참여 중인 방이 없어요. 메뉴 → PageBy에서 방을 만들거나 입장해 주세요.",
     "pagePrev": "이전",
     "pageNext": "다음",
     "pageStatus": "{{page}} / {{total}}",

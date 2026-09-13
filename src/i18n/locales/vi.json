@@ -69,10 +69,6 @@
       "name": "Cổ điển",
       "desc": "Biểu tượng phẳng (Flaticon)"
     },
-    "smileys": {
-      "name": "Mặt cười",
-      "desc": "Biểu tượng động (Flaticon)"
-    },
     "cat": {
       "name": "Mèo",
       "desc": "Emoji mèo (Flaticon)"
@@ -261,7 +257,7 @@
     "title": "Phòng bạn bè",
     "joinWithCode": "Tham gia bằng mã",
     "create": "Tạo phòng",
-    "empty": "Bạn chưa tham gia phòng nào",
+    "empty": "Không gian để chia sẻ nhật ký với bạn bè",
     "emptyLead": "Tạo một phòng ấm cúng để dán nhật ký cùng bạn bè nhé.",
     "memberCount": "{{n}} thành viên",
     "withdrawnMember": "Thành viên đã rút",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "Hãy để lại bình luận!",
       "poke": "Chạm ảnh đại diện để nhắc bạn bè!",
-      "share": "Chạm biểu tượng chia sẻ phía trên để đăng nhật ký!"
+      "share": "Chạm biểu tượng chia sẻ phía trên để đăng nhật ký!",
+      "create": "Hãy tạo một phòng nhé!"
     },
     "backToRoom": "← Về phòng",
     "backToRoomAria": "Về phòng",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 đã bình luận!",
     "newCommentToast": "Có bình luận mới!",
     "postNew": "N",
-    "postNewAria": "Nhật ký mới"
+    "postNewAria": "Nhật ký mới",
+    "emptyCta": "Tạo phòng",
+    "afterSavePromptTitle": "Đăng nhật ký này lên PageBy?",
+    "afterSavePromptLead": "Bạn có thể chia sẻ nhật ký với bạn bè!",
+    "afterSavePromptOk": "Đến PageBy",
+    "afterSavePromptLater": "Để sau"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

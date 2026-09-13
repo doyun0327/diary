@@ -69,10 +69,6 @@
       "name": "Classique",
       "desc": "Icônes plates (Flaticon)"
     },
-    "smileys": {
-      "name": "Smileys",
-      "desc": "Icônes animées (Flaticon)"
-    },
     "cat": {
       "name": "Chat",
       "desc": "Emojis chat (Flaticon)"
@@ -261,7 +257,7 @@
     "title": "Salons d'amis",
     "joinWithCode": "Rejoindre avec un code",
     "create": "Créer un salon",
-    "empty": "Vous n'êtes encore dans aucun salon",
+    "empty": "Un espace pour partager des journaux avec des amis",
     "emptyLead": "Créez un salon cosy pour coller des journaux entre amis.",
     "memberCount": "{{n}} membres",
     "withdrawnMember": "Membre désinscrit",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "Laissez un commentaire !",
       "poke": "Appuyez sur une photo pour envoyer un toc!",
-      "share": "Appuyez sur l'icone de partage en haut pour publier un journal!"
+      "share": "Appuyez sur l'icone de partage en haut pour publier un journal!",
+      "create": "Créez un salon !"
     },
     "backToRoom": "← Au salon",
     "backToRoomAria": "Retour au salon",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 a laissé un commentaire !",
     "newCommentToast": "Un nouveau commentaire est arrivé !",
     "postNew": "N",
-    "postNewAria": "Nouveau journal"
+    "postNewAria": "Nouveau journal",
+    "emptyCta": "Créer un salon",
+    "afterSavePromptTitle": "Partager ce journal sur PageBy ?",
+    "afterSavePromptLead": "Vous pouvez partager des journaux avec des amis !",
+    "afterSavePromptOk": "Aller à PageBy",
+    "afterSavePromptLater": "Plus tard"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

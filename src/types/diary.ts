@@ -1,7 +1,6 @@
 export type MoodPackId =
   | 'classic'
   | 'weather'
-  | 'smileys'
   | 'cat'
   | 'dog'
   | 'love'

@@ -69,10 +69,6 @@
       "name": "經典",
       "desc": "扁平圖標（Flaticon）"
     },
-    "smileys": {
-      "name": "笑臉",
-      "desc": "動態圖標（Flaticon）"
-    },
     "cat": {
       "name": "貓咪",
       "desc": "貓咪表情（Flaticon）"
@@ -261,7 +257,7 @@
     "title": "好友房",
     "joinWithCode": "用邀請碼加入",
     "create": "創建房間",
-    "empty": "還沒有加入任何房間",
+    "empty": "這裡是和朋友分享日記的空間",
     "emptyLead": "要不要建個房間，和朋友一起貼日記？",
     "memberCount": "{{n}} 人",
     "withdrawnMember": "已註銷會員",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "留言試試吧！",
       "poke": "點頭像就能提醒朋友寫日記!",
-      "share": "點上方分享圖示發布日記吧!"
+      "share": "點上方分享圖示發布日記吧!",
+      "create": "來建立一個房間吧！"
     },
     "backToRoom": "← 返回房間",
     "backToRoomAria": "返回房間",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 留言了！",
     "newCommentToast": "有新留言了！",
     "postNew": "N",
-    "postNewAria": "新日記"
+    "postNewAria": "新日記",
+    "emptyCta": "建立房間",
+    "afterSavePromptTitle": "要把這篇日記放到 PageBy 嗎？",
+    "afterSavePromptLead": "可以和朋友分享日記！",
+    "afterSavePromptOk": "前往 PageBy",
+    "afterSavePromptLater": "以後再說"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

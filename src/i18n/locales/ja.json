@@ -69,10 +69,6 @@
       "name": "クラシック",
       "desc": "フラットアイコン（Flaticon）"
     },
-    "smileys": {
-      "name": "スマイリー",
-      "desc": "アニメーションアイコン（Flaticon）"
-    },
     "cat": {
       "name": "ねこ",
       "desc": "ねこ絵文字（Flaticon）"
@@ -261,7 +257,7 @@
     "title": "フレンドルーム",
     "joinWithCode": "招待コードで参加",
     "create": "ルームを作成",
-    "empty": "まだどのルームにも参加していません",
+    "empty": "友達と日記を共有する場所です",
     "emptyLead": "友達と日記を貼るルームを作ってみませんか？",
     "memberCount": "{{n}} 人",
     "withdrawnMember": "退会した会員",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "コメントを残してみてね！",
       "poke": "プロフィールを押すと友だちに通知が届きます!",
-      "share": "上の共有アイコンから日記を投稿してみましょう!"
+      "share": "上の共有アイコンから日記を投稿してみましょう!",
+      "create": "ルームを作ってみよう！"
     },
     "backToRoom": "← ルームへ",
     "backToRoomAria": "ルームへ",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 コメントしました！",
     "newCommentToast": "新しいコメントが届きました！",
     "postNew": "N",
-    "postNewAria": "新しい日記"
+    "postNewAria": "新しい日記",
+    "emptyCta": "ルームを作成",
+    "afterSavePromptTitle": "この日記をPageByに載せてみますか？",
+    "afterSavePromptLead": "友達と日記を共有できます！",
+    "afterSavePromptOk": "PageByへ",
+    "afterSavePromptLater": "あとで"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

@@ -69,10 +69,6 @@
       "name": "经典",
       "desc": "扁平图标（Flaticon）"
     },
-    "smileys": {
-      "name": "笑脸",
-      "desc": "动态图标（Flaticon）"
-    },
     "cat": {
       "name": "猫咪",
       "desc": "猫咪表情（Flaticon）"
@@ -261,7 +257,7 @@
     "title": "好友房",
     "joinWithCode": "用邀请码加入",
     "create": "创建房间",
-    "empty": "还没有加入任何房间",
+    "empty": "这里是和朋友分享日记的空间",
     "emptyLead": "要不要建个房间，和朋友一起贴日记？",
     "memberCount": "{{n}} 人",
     "withdrawnMember": "已注销用户",
@@ -327,7 +323,8 @@
     "coach": {
       "comment": "留言试试吧！",
       "poke": "点头像就能提醒朋友写日记!",
-      "share": "点上方分享图标发布日记吧!"
+      "share": "点上方分享图标发布日记吧!",
+      "create": "来创建一个房间吧！"
     },
     "backToRoom": "← 返回房间",
     "backToRoomAria": "返回房间",
@@ -412,7 +409,12 @@
     "commentPushBody": "{{name}}💛 留言了！",
     "newCommentToast": "有新评论了！",
     "postNew": "N",
-    "postNewAria": "新日记"
+    "postNewAria": "新日记",
+    "emptyCta": "创建房间",
+    "afterSavePromptTitle": "要把这篇日记放到 PageBy 吗？",
+    "afterSavePromptLead": "可以和朋友分享日记！",
+    "afterSavePromptOk": "前往 PageBy",
+    "afterSavePromptLater": "以后再说"
   },
   "profileSetup": {
     "eyebrow": "PageBy",

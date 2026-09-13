@@ -198,6 +198,55 @@
   box-shadow: inset 0 0 0 2px var(--color-accent);
 }
 
+.mood-cal__day.just-saved {
+  z-index: 3;
+  overflow: visible;
+}
+
+.mood-cal__day.just-saved::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: 6;
+  border-radius: 15px;
+  border: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 230, 80, 0.5) 0%,
+    rgba(255, 220, 60, 0.28) 55%,
+    rgba(255, 210, 40, 0.1) 78%,
+    transparent 92%
+  );
+  box-shadow:
+    0 0 5px 1px rgba(255, 220, 70, 0.35),
+    inset 0 0 8px 2px rgba(255, 236, 120, 0.45);
+  pointer-events: none;
+  animation: mood-cal-just-saved-glow 2.2s ease-out forwards;
+}
+
+@keyframes mood-cal-just-saved-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(0.4px);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0.8px);
+  }
+  55% {
+    opacity: 0.88;
+    transform: scale(1);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: blur(1.5px);
+  }
+}
+
 .mood-cal__day.has-mood {
   color: unset;
   background: transparent;

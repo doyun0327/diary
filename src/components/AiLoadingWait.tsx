@@ -122,8 +122,8 @@ interface AiLoadingWaitProps {
   lottieKey: number;
   step: AiProgress;
   sourceText?: string;
-  /** 그리는 중 단계에만 보여줄 예상 초 (없으면 안내 없음) */
-  durationHintSeconds?: number | null;
+  /** true면 로띠 자리 비움 (포춘쿠키가 그 자리를 씀) */
+  hideStage?: boolean;
 }
 
 export default function AiLoadingWait({
@@ -131,13 +131,12 @@ export default function AiLoadingWait({
   lottieKey,
   step,
   sourceText = '',
-  durationHintSeconds = null,
+  hideStage = false,
 }: AiLoadingWaitProps) {
   const { t } = useTranslation();
   const activeIndex = AI_PROGRESS_STEPS.indexOf(step);
   const keywords = useMemo(() => keywordsFromDiary(sourceText), [sourceText]);
   const [floaters, setFloaters] = useState<Floater[]>([]);
-  const [hintVisible, setHintVisible] = useState(false);
   const [resumeKey, setResumeKey] = useState(0);
   const cursorRef = useRef(0);
   const idRef = useRef(MAX_FLOATING);
@@ -167,20 +166,6 @@ export default function AiLoadingWait({
       window.removeEventListener('pageshow', remountOnShow);
     };
   }, []);
-
-  useEffect(() => {
-    const show =
-      step === 'drawing' &&
-      typeof durationHintSeconds === 'number' &&
-      durationHintSeconds > 0;
-    if (!show) {
-      setHintVisible(false);
-      return;
-    }
-    setHintVisible(true);
-    const timer = window.setTimeout(() => setHintVisible(false), 5000);
-    return () => window.clearTimeout(timer);
-  }, [step, durationHintSeconds]);
 
   useEffect(() => {
     const next: Floater[] = [];
@@ -218,7 +203,7 @@ export default function AiLoadingWait({
 
   return (
     <div
-      className="ai-loading-wait"
+      className={`ai-loading-wait${hideStage ? ' has-fortune' : ''}`}
       role="status"
       aria-live="polite"
       aria-busy="true"
@@ -251,21 +236,21 @@ export default function AiLoadingWait({
         ))}
       </div>
       <div className="ai-loading-wait__panel">
-        <div className="ai-loading-wait__stage">
-          {animationData ? (
-            <AiLoadingLottie
-              key={`${lottieKey}-${resumeKey}`}
-              animationData={animationData}
-            />
-          ) : (
-            <div className="ai-loading-wait__lottie" />
-          )}
-        </div>
-        {hintVisible && durationHintSeconds != null && durationHintSeconds > 0 ? (
-          <div className="ai-loading-wait__toast" role="status">
-            {t('write.ai.durationHint', { n: durationHintSeconds })}
+        {!hideStage ? (
+          <div className="ai-loading-wait__stage">
+            {animationData ? (
+              <AiLoadingLottie
+                key={`${lottieKey}-${resumeKey}`}
+                animationData={animationData}
+              />
+            ) : (
+              <div className="ai-loading-wait__lottie" />
+            )}
           </div>
-        ) : null}
+        ) : (
+          /* 포춘쿠키가 올라올 자리 예약 (같은 위치) */
+          <div className="ai-loading-wait__stage ai-loading-wait__stage--slot" />
+        )}
         <div className="ai-loading-wait__track" aria-hidden>
           {AI_PROGRESS_STEPS.map((id, index) => (
             <Fragment key={id}>

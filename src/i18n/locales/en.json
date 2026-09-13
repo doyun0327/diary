@@ -37,7 +37,7 @@
     "footer": "Slowly, day by day",
     "account": "Account",
     "accountHintEmpty": "Photo · account",
-    "rooms": "Friend rooms",
+    "rooms": "PageBy",
     "roomsHint": "My rooms",
     "character": "Character",
     "characterHint": "Me in AI drawings",
@@ -70,10 +70,6 @@
     "classic": {
       "name": "Classic",
       "desc": "Flat icons (Flaticon)"
-    },
-    "smileys": {
-      "name": "Smileys",
-      "desc": "Animated icons (Flaticon)"
     },
     "cat": {
       "name": "Cat",
@@ -130,7 +126,7 @@
       "termsHeading": "Terms of Service",
       "termsBody": "PageBy is a personal diary app. Please follow applicable laws while using the service. You are responsible for your account, nickname, and diary content. Posting or sharing content that infringes others' rights is not allowed. Features may change without notice.",
       "privacyHeading": "Privacy Policy",
-      "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use friend rooms. We use this data only to provide diary storage, sharing, and app features. In friend rooms you can report posts/comments or block users. We do not sell personal data, and we do not share it except when required by law.",
+      "privacyBody": "Diary entries, drawings, and profile data may be stored on your device, and may sync to the server when you use PageBy. We use this data only to provide diary storage, sharing, and app features. In PageBy you can report posts/comments or block users. We do not sell personal data, and we do not share it except when required by law.",
       "refundHeading": "Refund Policy",
       "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
@@ -141,7 +137,6 @@
       "note": "Free Flaticon resources require attribution. The links above are that credit.",
       "usage": {
         "mood.classic": "Mood · Classic",
-        "mood.smileys": "Mood · Smileys",
         "mood.cat": "Mood · Cat",
         "mood.dog": "Mood · Dog",
         "mood.love": "Mood · Love",
@@ -208,7 +203,7 @@
     },
     "removePhoto": "Remove",
     "nameLabel": "Name",
-    "nameHint": "Name shown in friend rooms",
+    "nameHint": "Name shown in PageBy",
     "nameHintLoggedIn": "Your name stays on this device after sign-out",
     "namePlaceholder": "Enter your name",
     "save": "Save",
@@ -323,11 +318,16 @@
     "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
-    "title": "Friend rooms",
+    "title": "PageBy",
     "joinWithCode": "Join with code",
     "create": "Create room",
-    "empty": "You're not in any rooms yet",
+    "empty": "A space to share diaries with friends",
     "emptyLead": "Make a cozy room to stick diaries with friends.",
+    "emptyCta": "Create a room",
+    "afterSavePromptTitle": "Share this diary on PageBy?",
+    "afterSavePromptLead": "You can share diaries with friends!",
+    "afterSavePromptOk": "Go to PageBy",
+    "afterSavePromptLater": "Later",
     "memberCount": "{{n}} members",
     "withdrawnMember": "Withdrawn member",
     "pokeWithdrawn": "You cannot poke a withdrawn member",
@@ -394,7 +394,7 @@
     "sharePushBody": "Shared a diary!",
     "commentPushBody": "{{name}}💛 left a comment!",
     "newCommentToast": "A new comment arrived!",
-    "sharedEmpty": "No shared diaries yet.\nOpen a diary and tap Share → Friend rooms.",
+    "sharedEmpty": "No shared diaries yet.\nOpen a diary and tap Share → PageBy.",
     "sharePrompt": "Want to share a diary?",
     "emptyNoDiaries": "No diaries yet.",
     "shareDiary": "Share diary",
@@ -410,7 +410,8 @@
     "coach": {
       "comment": "Leave a comment!",
       "poke": "Tap a profile to send a nudge!",
-      "share": "Tap the share icon above to post a diary!"
+      "share": "Tap the share icon above to post a diary!",
+      "create": "Try creating a room!"
     },
     "backToRoom": "← To room",
     "backToRoomAria": "Back to room",
@@ -426,7 +427,7 @@
       "copyCode": "Copy code",
       "share": "Share",
       "shareTitle": "PageBy room invite",
-      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}\n\nIn the app: Friend rooms > Join with code > enter the invite code",
+      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}\n\nIn the app: PageBy > Join with code > enter the invite code",
       "enterRoom": "Enter room",
       "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
     },
@@ -462,7 +463,7 @@
     "err": {
       "needNickname": "Set your name and profile photo first",
       "needProfile": "Set a name to share with friends",
-      "guestAuth": "Couldn't connect to friend rooms. Try again shortly",
+      "guestAuth": "Couldn't connect to PageBy. Try again shortly",
       "list": "Couldn't load rooms",
       "nameRequired": "Please enter a room name",
       "create": "Couldn't create room",
@@ -612,7 +613,6 @@
           "desc": "Soft oil-pastel look · about 30 sec when not queued"
         }
       },
-      "durationHint": "This usually takes about {{n}} seconds",
       "exGood1": "Good: We had a pizza party today",
       "exGood2": "Good: I played with a dog in the park",
       "exBad": "Weak: I felt good today",
@@ -652,7 +652,14 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Drawing ready",
-      "cdnFallbackNotice": "Your drawing is ready. It took a bit longer to load because the network was unstable."
+      "cdnFallbackNotice": "Your drawing is ready. It took a bit longer to load because the network was unstable.",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
+      }
     },
     "reward": {
       "saveTitle": "Watch an ad to save 1 diary",
@@ -736,12 +743,12 @@
     "sns": "Share to SNS",
     "snsIcon": "SNS",
     "snsDesc": "Pick Instagram, KakaoTalk, and more",
-    "rooms": "Friend rooms",
+    "rooms": "PageBy",
     "roomsIcon": "Room",
     "roomsDesc": "Post to rooms you're in",
     "roomsHint": "Pick several rooms to share at once",
     "roomsLoading": "Loading rooms…",
-    "roomsEmpty": "No rooms yet. Create or join under Menu → Friend rooms.",
+    "roomsEmpty": "No rooms yet. Create or join under Menu → PageBy.",
     "pagePrev": "Prev",
     "pageNext": "Next",
     "pageStatus": "{{page}} / {{total}}",
