@@ -1525,7 +1525,6 @@ function DiaryWritePage({
               className="diary-write__canvas-fold"
               onClick={() => {
                 setCanvasCollapsed((open) => !open);
-                if (!canvasCollapsed) setTipOpen(false);
               }}
               aria-expanded={!canvasCollapsed}
               aria-label={canvasCollapsed ? t('write.expandCanvas') : t('write.collapseCanvas')}

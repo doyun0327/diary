@@ -23,6 +23,11 @@
   position: relative;
   z-index: 1;
   width: min(360px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 18px 22px 22px;
   border-radius: 22px;
   background: var(--sheet-bg, var(--color-surface));
