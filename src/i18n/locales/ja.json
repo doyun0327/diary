@@ -487,8 +487,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "描き始めますか？",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "描く"
+    "drawConfirmLead": "残り {{n}} 回\n描き終わると消化されます。",
+    "drawConfirmOk": "描く",
+    "deductAfterDone": "描き終わると回数が減ります。",
+    "deductAfterDoneShort": "完成後に消化"
   },
   "write": {
     "title": {

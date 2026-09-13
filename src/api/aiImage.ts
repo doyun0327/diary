@@ -1,6 +1,5 @@
-import type { CharacterProfile } from '../types/character';
-import { describeCharacter } from '../types/character';
 import type { AiDrawStyleId } from '../utils/aiDrawStyles';
+import { normalizeAiDrawStyleId, stylePromptFor } from '../utils/aiDrawStyles';
 import { apiUrl, isRemoteApi } from './config';
 
 /**
@@ -299,6 +298,7 @@ async function pollDrawJob(
 
 /**
  * 백엔드에 AI 그림 생성 요청 (비동기 큐).
+ * 첨부 사진(referenceImage)만 사용 — 캐릭터 외형 텍스트는 보내지 않음.
  *
  * POST /api/ai/draw → 202 { jobId, status: queued }
  * GET  /api/ai/draw/{jobId} → queued|running|done|failed
@@ -307,37 +307,38 @@ async function pollDrawJob(
  */
 export async function generateDiaryImage(input: {
   title?: string;
-  content: string;
-  character?: CharacterProfile;
-  /** 영어동화책(기본) | 오일파스텔 */
+  content?: string;
+  /** webtoonHero | oilPastel | jpRetroFilm — 전부 사진 + GPT Image 2 */
   style?: AiDrawStyleId;
+  /** 필수 — data:image/...;base64,... */
+  referenceImage: string;
   /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
   accessToken?: string | null;
   onProgress?: (step: AiProgress) => void;
 }): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
-  const diaryLine = extractSceneLine(input.content) || title;
+  const diaryLine = extractSceneLine(input.content ?? '') || title;
+  const referenceImage = input.referenceImage?.trim() || '';
 
-  if (!diaryLine) {
-    throw new Error('그림을 만들려면 일기 내용을 먼저 적어 주세요');
+  if (!referenceImage.startsWith('data:image/')) {
+    throw new Error('그림을 만들려면 사진을 첨부해 주세요');
   }
 
-  const styleId = input.style ?? 'storybook';
-
-  const character = input.character
-    ? describeCharacter(input.character, styleId)
-    : undefined;
+  const styleId = normalizeAiDrawStyleId(input.style);
+  const stylePrompt = stylePromptFor(styleId);
 
   const payload: Record<string, unknown> = {
-    diaryLine,
+    diaryLine: diaryLine || undefined,
     title: title || undefined,
-    character,
     sceneMode: 'full' as const,
     style: styleId,
+    stylePrompt,
+    referenceImage,
+    referenceImageBase64: referenceImage,
   };
 
   console.info('[AI] ===== POST /api/ai/draw =====');
-  console.info('[AI] body:', payload);
+  console.info('[AI] body keys:', Object.keys(payload), 'hasRef=true style=', styleId);
 
   input.onProgress?.('waiting');
 

@@ -186,6 +186,7 @@ function MoodCalendar({
                 'mood-cal__day',
                 showDrawing ? 'has-drawing' : '',
                 showMood ? 'has-mood' : '',
+                !showDrawing && !showMood ? 'is-empty' : '',
                 isToday ? 'today' : '',
                 isSelected ? 'selected' : '',
                 isJustSaved ? 'just-saved' : '',
@@ -194,18 +195,19 @@ function MoodCalendar({
               onClick={() => onSelectDate?.(dateStr)}
               aria-label={`${day}${moodLabel ? ` ${moodLabel}` : ''}`}
             >
-              {showDrawing && imageUrl ? (
-                <img
-                  className="mood-cal__thumb"
-                  src={imageUrl}
-                  alt=""
-                  draggable={false}
-                />
-              ) : showMood && sticker ? (
-                <MoodIcon mood={sticker} packId={mark?.moodPack} />
-              ) : (
-                day
-              )}
+              <span className="mood-cal__day-num">{day}</span>
+              <span className="mood-cal__media" aria-hidden>
+                {showDrawing && imageUrl ? (
+                  <img
+                    className="mood-cal__thumb"
+                    src={imageUrl}
+                    alt=""
+                    draggable={false}
+                  />
+                ) : showMood && sticker ? (
+                  <MoodIcon mood={sticker} packId={mark?.moodPack} />
+                ) : null}
+              </span>
             </button>
           );
         })}

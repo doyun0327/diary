@@ -487,8 +487,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "Bắt đầu vẽ?",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "Vẽ"
+    "drawConfirmLead": "Còn {{n}}\nChỉ trừ khi vẽ xong.",
+    "drawConfirmOk": "Vẽ",
+    "deductAfterDone": "Chỉ trừ lượt khi vẽ xong.",
+    "deductAfterDoneShort": "Trừ khi xong"
   },
   "write": {
     "title": {

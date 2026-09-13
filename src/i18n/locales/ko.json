@@ -551,8 +551,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "그림을 그릴까요?",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "그리기"
+    "drawConfirmLead": "남은 횟수 {{n}}회\n그림이 다 그려지면 차감돼요.",
+    "drawConfirmOk": "그리기",
+    "deductAfterDone": "그림이 다 그려지면 횟수가 차감돼요.",
+    "deductAfterDoneShort": "완성 후 차감"
   },
   "write": {
     "title": {
@@ -596,21 +598,34 @@
       "puzzleAria": "그림 맞추기 퍼즐",
       "puzzleTile": "퍼즐 조각 {{n}}",
       "tip": "팁",
-      "tipBody": "설정한 캐릭터가 그림 속 주인공이 되고, AI는 일기 전체 내용을 바탕으로 그려요.",
-      "tipVisible": "눈에 보이는 행동·장소",
-      "tipAsk": "를 적어 주세요.",
+      "tipBody": "사진을 올리면 AI가 스케치로 바꿔 그림판에 올려 줘요. 그다음 손으로 더 그려 보세요.",
+      "tipVisible": "사진 속 장면",
+      "tipAsk": "이 보이도록 찍어 주세요.",
       "styleTitle": "어떤 스타일로 그릴까요?",
-      "styleLead": "마음에 드는 그림체를 골라 주세요.",
+      "styleLead": "사진을 첨부한 뒤 스타일을 고르고 확인을 눌러 주세요.",
+      "styleConfirm": "확인",
+      "styleSoon": "(준비 중)",
+      "styleDisabled": "아직 쓸 수 없는 스타일이에요. 다른 스타일을 골라 주세요.",
       "stylePreview": "미리보기",
       "stylePreviewHide": "미리보기 접기",
+      "photoLabel": "사진 첨부 (필수)",
+      "photoHint": "올린 사진을 초등학생 낙서처럼 스케치해요.",
+      "photoAdd": "사진 고르기",
+      "photoChange": "사진 변경",
+      "photoRemove": "사진 빼기",
+      "photoError": "사진을 불러오지 못했어요. 다른 이미지를 골라 주세요.",
       "style": {
-        "storybook": {
-          "name": "영어동화책 st",
-          "desc": "익살스럽고 자유로운 동화책 화풍 "
+        "webtoonHero": {
+          "name": "웹툰주인공 st",
+          "desc": "손그림 느낌의 웹툰 주인공처럼 그려줘요"
         },
         "oilPastel": {
           "name": "오일파스텔 st",
           "desc": "포근하고 은은하게 스며드는 오일파스텔 화풍"
+        },
+        "jpRetroFilm": {
+          "name": "일본 레트로 영화풍 st",
+          "desc": "감성 가득한 레트로 일본 애니 화풍"
         }
       },
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
@@ -678,6 +693,7 @@
       "aiFailed": "그림 생성에 실패했습니다",
       "aiRetry": "다시 시도해 주세요",
       "aiNeedContent": "그림을 만들려면 일기 내용을 먼저 적어 주세요",
+      "aiNeedPhoto": "사진을 먼저 첨부해 주세요",
       "aiHttp": "그림 생성 실패: HTTP {{status}}",
       "aiNoImage": "백엔드 응답에 이미지가 없습니다",
       "aiUrl": "이미지 URL을 불러오지 못했습니다",
@@ -697,7 +713,7 @@
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",
-      "ai": "일기를 쓰고 AI로 그림을 그려보세요"
+      "ai": "이미지를 첨부하면 그림으로 그려줘요!"
     }
   },
   "detail": {

@@ -551,8 +551,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "Start drawing?",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "Draw"
+    "drawConfirmLead": "{{n}} left\nDeducted when the drawing finishes.",
+    "drawConfirmOk": "Draw",
+    "deductAfterDone": "Credits are used only after the drawing finishes.",
+    "deductAfterDoneShort": "After done"
   },
   "write": {
     "title": {
@@ -596,21 +598,34 @@
       "puzzleAria": "Picture slide puzzle",
       "puzzleTile": "Puzzle piece {{n}}",
       "tip": "Tip",
-      "tipBody": "Your character is the lead; AI draws from the full diary text.",
-      "tipVisible": "Visible actions & places",
-      "tipAsk": " — please write them.",
+      "tipBody": "Upload a photo and AI sketches it onto the canvas. Then keep drawing by hand.",
+      "tipVisible": "The scene in the photo",
+      "tipAsk": " should be clear.",
       "styleTitle": "Which style?",
-      "styleLead": "Pick a look for your diary drawing.",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
       "stylePreview": "Preview",
       "stylePreviewHide": "Hide preview",
+      "photoLabel": "Attach photo (required)",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
       "style": {
-        "storybook": {
-          "name": "Storybook",
-          "desc": "Same fairy-tale look as now"
+        "webtoonHero": {
+          "name": "Webtoon hero",
+          "desc": "Casual hand-drawn webtoon protagonist vibe"
         },
         "oilPastel": {
           "name": "Oil pastel",
-          "desc": "Soft oil-pastel look · about 30 sec when not queued"
+          "desc": "Soft oil-pastel look from your photo"
+        },
+        "jpRetroFilm": {
+          "name": "JP retro film",
+          "desc": "Dreamy retro Japanese anime look"
         }
       },
       "exGood1": "Good: We had a pizza party today",
@@ -678,6 +693,7 @@
       "aiFailed": "Failed to generate drawing",
       "aiRetry": "Please try again",
       "aiNeedContent": "Write diary content before generating",
+      "aiNeedPhoto": "Attach a photo first",
       "aiHttp": "Drawing failed: HTTP {{status}}",
       "aiNoImage": "No image in backend response",
       "aiUrl": "Couldn't load image URL",
@@ -696,7 +712,7 @@
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
-      "ai": "Write a diary, then let AI draw it"
+      "ai": "Attach an image and it’ll draw it for you!"
     }
   },
   "detail": {

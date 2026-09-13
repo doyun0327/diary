@@ -1,12 +1,8 @@
 ==========================================================
-백엔드 AI 그림 — SD 3.5 Large 단일 경로
+백엔드 AI 그림 — 스타일 id + (선택) 참조 사진
 (프론트는 POST /api/ai/draw 1번만 호출)
-모델: stabilityai/stable-diffusion-3.5-large
-작성일: 2026-08-05
+작성일: 2026-09-13 (kidSketch / referenceImage 추가)
 ==========================================================
-
-※ Gemini / Flux / provider 분기 없음.
-※ 이미지는 무조건 Stable Diffusion 3.5 Large.
 
 
 ■ 흐름
@@ -14,95 +10,69 @@
 
   프론트
     └─ POST /api/ai/draw
-         { diaryLine, title?, character? }
+         {
+           diaryLine?, title?, character?,
+           style: "kidSketch" | "oilPastel",
+           stylePrompt?,          // kidSketch 시 프론트가 상세 프롬프트 전달
+           referenceImage?        // data:image/jpeg;base64,... 첨부 사진
+         }
 
   백엔드
-    ① 크레용 스타일 템플릿 + diaryLine (+ character) → prompt 조립
-    ② stabilityai/stable-diffusion-3.5-large 호출
-    ③ { imageBase64 } 반환  (scene/prompt는 선택)
+    ① style / stylePrompt 로 화풍 템플릿 선택
+    ② referenceImage 가 있으면 img2img / IP-Adapter / 비전 기반 장면 재현
+       (없으면 diaryLine + character 텍스트만으로 생성 — 기존 경로)
+    ③ { imageBase64 } 또는 job 큐 응답
 
 
-■ 요청
+■ 요청 예 (사진 첨부 + 일러스트)
 ----------------------------------------------------------
 
 {
-  "diaryLine": "오랜만에 수영장을 가서 수영을 했다. 힘들었지만 뿌듯했다.",
-  "title": "수영",
-  "character": "a young boy with black hair"
+  "diaryLine": "수영장에서 놀았다",
+  "style": "kidSketch",
+  "stylePrompt": "Redraw the attached photo as if an elementary school child ...",
+  "referenceImage": "data:image/jpeg;base64,...."
 }
 
+※ referenceImage 가 있으면 character 필드는 생략될 수 있음.
+※ diaryLine 과 referenceImage 중 최소 하나는 있어야 함.
 
-■ 프롬프트 조립
+
+■ kidSketch 프롬프트 요지 (stylePrompt 우선, 없으면 서버 기본값)
 ----------------------------------------------------------
 
-크레용 스타일 prefix:
-Children's crayon diary art style, wax crayon texture, handmade drawing on paper,
-soft pastel colors, warm cozy atmosphere, imperfect childlike strokes,
-cute and emotional storybook illustration, simple and heartwarming.
-
-공통 suffix:
-Scene: {diaryLine 또는 이를 바탕으로 만든 영문 장면}
-Character look (brief): {character}   ← 있을 때만
-exactly one child, two arms, two legs, no extra limbs, no text, no watermark, no photorealism
-
-negative_prompt 예:
-text, watermark, photorealistic, photo, 3d render, extra limbs, deformed hands,
-ugly, nsfw, multiple people
+- 첨부 사진을 초등학생이 따라 그린 듯한 그림
+- 네임펜으로 삐뚤빼뚤·불안정한 선, 겹침·지저분함 OK
+- 머리카락은 굵은 선으로 깔끔하게
+- 얼굴은 동그랗고 단순, 밝은 표정, 눈은 작은 점 두개
+- 코·입은 최소 선, 3등신, 큰 머리·작은 몸, 막대 팔다리
+- 색칠은 거의 없음 — 특징만 크레파스/색연필로 대충
+- 흰 종이 손그림 낙서 / 디지털·웹툰·전문 일러스트 금지
+- 의도적으로 완성도 낮게, 선 두껍게, 팔다리 그림체 통일
 
 
-■ 이미지 호출
+■ oilPastel
 ----------------------------------------------------------
 
-모델 ID 고정:
-  stabilityai/stable-diffusion-3.5-large
-
-호출처 예 (팀 인프라에 맞게 하나만):
-  - Hugging Face Inference API
-  - 자체 GPU 서버에 올린 SD3.5 Large
-  - 호스팅 SD API
-
-설정 예:
-  ai:
-    sd:
-      model: stabilityai/stable-diffusion-3.5-large
-      api-url: ${SD_API_URL}
-      api-key: ${SD_API_KEY}
-      width: 640
-      height: 992
-
-Gemini / Flux 설정·코드는 넣지 말 것.
+기존 오일파스텔 템플릿 유지.
+(영어동화책 storybook 스타일은 제거됨 — 구 클라이언트가 보내면 kidSketch 로 폴백 권장)
 
 
-■ 응답 (최소)
+■ 응답
 ----------------------------------------------------------
 
-{ "imageBase64": "data:image/png;base64,...." }
-
-선택:
-{ "scene": "...", "prompt": "조립한 전체 프롬프트" }
-
-provider 필드 불필요.
+동기: { "imageBase64": "data:image/png;base64,...." }
+비동기: 202 { "jobId", "status": "queued" } → GET /api/ai/draw/{jobId}
 
 
-■ 의사코드
+■ curl (로컬 테스트)
 ----------------------------------------------------------
 
-draw(req):
-  if blank(req.diaryLine): 400
-
-  prompt = CRAYON_STYLE_PREFIX
-         + "\nScene: " + req.diaryLine   // 또는 간단 영문화
-         + (character ? "\nCharacter look (brief): " + character : "")
-         + "\nexactly one child, ..."
-
-  png = callSd35Large(prompt, negative)
-  return { imageBase64: "data:image/png;base64," + png }
-
-
-■ curl
-----------------------------------------------------------
-
+# 텍스트만 + kidSketch
 curl -X POST http://localhost:8080/api/ai/draw ^
   -H "Content-Type: application/json" ^
-  -d "{\"diaryLine\":\"오랜만에 수영장을 가서 수영을 했다.\",\"character\":\"a young boy with black hair\"}"
+  -H "Authorization: Bearer YOUR_JWT" ^
+  -d "{\"diaryLine\":\"공원에서 강아지랑 놀았다\",\"style\":\"kidSketch\"}"
+
+# 사진 첨부는 body에 referenceImage: "data:image/jpeg;base64,..." 포함
 ==========================================================

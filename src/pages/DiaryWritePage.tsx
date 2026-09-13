@@ -12,7 +12,6 @@ import {
   preloadMoodPackIcons,
   useMoodPackId,
 } from '../utils/moodPack';
-import { GENDER_EMOJI, preloadCharacterHairIcons, type CharacterProfile } from '../types/character';
 import AiLoadingWait from '../components/AiLoadingWait';
 import FortuneCookie from '../components/FortuneCookie';
 import CalendarPopup from '../components/CalendarPopup';
@@ -22,7 +21,7 @@ import MoodIcon from '../components/MoodIcon';
 import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
-import { AI_DRAW_STYLES, type AiDrawStyleId } from '../utils/aiDrawStyles';
+import { AI_DRAW_STYLES, fileToAiReferenceDataUrl, isAiDrawStyleEnabled, type AiDrawStyleId } from '../utils/aiDrawStyles';
 import { diaryEditFontStack, defaultFontIdForLanguage, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
@@ -45,10 +44,7 @@ import {
 } from '../utils/diaryAccess';
 import {
   isAiCoachSeen,
-  isCharacterCoachSeen,
-  isCharacterSetupDone,
   markAiCoachSeen,
-  markCharacterCoachSeen,
 } from '../utils/onboarding';
 import {
   clearWriteDraft,
@@ -148,7 +144,6 @@ function syncContentTextareaHeight(
   el.style.height = `${contentHeight + extra}px`;
 }
 interface DiaryWritePageProps {
-  character: CharacterProfile;
   /** 있으면 수정 모드 */
   initialEntry?: DiaryEntry;
   /** 새 글일 때 기본 날짜 (메인 달력 선택일) */
@@ -159,7 +154,6 @@ interface DiaryWritePageProps {
     },
   ) => void | Promise<void>;
   onCancel: () => void;
-  onOpenCharacter: () => void;
   /** Flutter AppBar 저장 버튼 활성 상태 */
   onNativeSaveStateChange?: (enabled: boolean, saving?: boolean) => void;
   writeQuota?: { used: number; limit: number };
@@ -168,12 +162,10 @@ interface DiaryWritePageProps {
 }
 
 function DiaryWritePage({
-  character,
   initialEntry,
   initialDate,
   onSave,
   onCancel,
-  onOpenCharacter,
   onNativeSaveStateChange,
   writeQuota: _writeQuota,
   onAppToast,
@@ -229,7 +221,6 @@ function DiaryWritePage({
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
   const [fortuneVisible, setFortuneVisible] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [tipOpen, setTipOpen] = useState(false);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
   const [aiLottieKey, setAiLottieKey] = useState(0);
@@ -243,6 +234,13 @@ function DiaryWritePage({
   const [aiStylePreviewId, setAiStylePreviewId] = useState<AiDrawStyleId | null>(
     null,
   );
+  /** 모달에서 고른 스타일 (확인 전까지 대기) */
+  const [aiStyleSelectedId, setAiStyleSelectedId] =
+    useState<AiDrawStyleId>('webtoonHero');
+  /** AI 그림용 참조 사진 (data URL) */
+  const [aiReferenceImage, setAiReferenceImage] = useState<string | null>(null);
+  const [aiPhotoError, setAiPhotoError] = useState<string | null>(null);
+  const aiPhotoInputRef = useRef<HTMLInputElement>(null);
   const [aiLoginOpen, setAiLoginOpen] = useState(false);
   const [aiLoginBusy, setAiLoginBusy] = useState(false);
   const [aiLoginError, setAiLoginError] = useState<string | null>(null);
@@ -251,7 +249,8 @@ function DiaryWritePage({
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
-  const aiStyleRef = useRef<AiDrawStyleId>('storybook');
+  const aiStyleRef = useRef<AiDrawStyleId>('webtoonHero');
+  const aiReferenceImageRef = useRef<string | null>(null);
   const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free' | 'ai-pack'>(
     'none',
   );
@@ -324,9 +323,8 @@ function DiaryWritePage({
     hadImage:
       Boolean(initialEntry?.imageUrl) || Boolean(resumeDraft?.hasDrawing),
   });
-  const [coach, setCoach] = useState<'character' | 'ai' | null>(() => {
+  const [coach, setCoach] = useState<'ai' | null>(() => {
     if (isEdit) return null;
-    if (!isCharacterCoachSeen() && !isCharacterSetupDone()) return 'character';
     if (!isAiCoachSeen()) return 'ai';
     return null;
   });
@@ -387,10 +385,6 @@ function DiaryWritePage({
   }, [writePackId]);
 
   useEffect(() => {
-    preloadCharacterHairIcons();
-  }, []);
-
-  useEffect(() => {
     const onNativeSave = () => {
       if (savingRef.current || aiLoading) return;
       formRef.current?.requestSubmit();
@@ -430,21 +424,12 @@ function DiaryWritePage({
       setCoach(null);
       return;
     }
-    if (!isCharacterCoachSeen() && !isCharacterSetupDone()) {
-      setCoach('character');
-      return;
-    }
     if (!isAiCoachSeen()) {
       setCoach('ai');
       return;
     }
     setCoach(null);
-  }, [isEdit, character]);
-
-  const dismissCharacterCoach = () => {
-    markCharacterCoachSeen();
-    setCoach((prev) => (prev === 'character' ? (isAiCoachSeen() ? null : 'ai') : prev));
-  };
+  }, [isEdit]);
 
   const dismissAiCoach = () => {
     markAiCoachSeen();
@@ -753,7 +738,7 @@ function DiaryWritePage({
     };
   }, [aiLoading, aiLottiePool]);
 
-  // 그리기 단계 진입 후 로띠 → 포춘쿠키로 교체 (그림 끝나도 × 전까지 유지)
+  // 그리기 단계 진입 후 로띠 → 포춘쿠키로 교체 (완료·이미지 선택 시 자동 숨김)
   useEffect(() => {
     if (!aiLoading || aiProgress === 'waiting') return;
     if (fortuneVisible) return;
@@ -980,11 +965,14 @@ function DiaryWritePage({
 
   const handleAiDraw = () => {
     clearPurchaseShield();
-    if (!content.trim()) {
-      setAiError(t('write.err.aiNeedContent'));
+    // 웹: 로그인 없이 바로 스타일 선택 (로컬 테스트용)
+    if (!isFlutterApp()) {
+      setAiPhotoError(null);
+      setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
+      setAiStyleOpen(true);
       return;
     }
-    // 미연동: 로그인하면 무료 3편 — Google 로그인 유도
+    // 앱: 미연동이면 Google 로그인 유도
     if (!isGoogleSignedIn()) {
       setAiLoginError(null);
       setAiLoginOpen(true);
@@ -992,6 +980,8 @@ function DiaryWritePage({
     }
     void (async () => {
       await claimWelcomeAiCredits();
+      setAiPhotoError(null);
+      setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
       setAiStyleOpen(true);
     })();
   };
@@ -1000,6 +990,7 @@ function DiaryWritePage({
     setAiLoginOpen(false);
     setAiLoginBusy(false);
     setAiLoginError(null);
+    setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
     setAiStyleOpen(true);
   }, []);
 
@@ -1008,6 +999,7 @@ function DiaryWritePage({
     setAiLoginOpen(false);
     setAiLoginBusy(false);
     setAiLoginError(null);
+    setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
     setAiStyleOpen(true);
   }, []);
 
@@ -1084,6 +1076,14 @@ function DiaryWritePage({
   }, [aiLoginOpen, handleAiGoogleIdToken, t]);
 
   const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
+    if (!aiReferenceImageRef.current?.startsWith('data:image/')) {
+      setAiPhotoError(t('write.err.aiNeedPhoto'));
+      return;
+    }
+    if (!isAiDrawStyleEnabled(styleId)) {
+      setAiPhotoError(t('write.ai.styleDisabled'));
+      return;
+    }
     aiStyleRef.current = styleId;
     setAiStyleOpen(false);
 
@@ -1110,6 +1110,18 @@ function DiaryWritePage({
       return;
     }
     void runAiDraw();
+  };
+
+  const handleAiPhotoPick = async (file: File | undefined) => {
+    if (!file) return;
+    setAiPhotoError(null);
+    try {
+      const dataUrl = await fileToAiReferenceDataUrl(file);
+      setAiReferenceImage(dataUrl);
+      aiReferenceImageRef.current = dataUrl;
+    } catch {
+      setAiPhotoError(t('write.ai.photoError'));
+    }
   };
 
   const capturePreviousSnapshot = async (): Promise<{
@@ -1145,11 +1157,15 @@ function DiaryWritePage({
         await capturePreviousSnapshot();
       previousCanvasStateRef.current = previousState;
 
+      const ref = aiReferenceImageRef.current;
+      if (!ref?.startsWith('data:image/')) {
+        throw new Error(t('write.err.aiNeedPhoto'));
+      }
       const { imageUrl, notice, imageSource } = await generateDiaryImage({
         title,
         content,
-        character,
         style: aiStyleRef.current,
+        referenceImage: ref,
         accessToken: getAccessToken(),
         onProgress: setAiProgress,
       });
@@ -1188,6 +1204,7 @@ function DiaryWritePage({
       showAiRetryToast();
     } finally {
       setAiLoading(false);
+      setFortuneVisible(false);
     }
   };
 
@@ -1198,6 +1215,7 @@ function DiaryWritePage({
   };
 
   const toggleAiPick = (index: number) => {
+    setFortuneVisible(false);
     setAiPickSelected((prev) => {
       const next = new Set(prev);
       if (next.has(index)) next.delete(index);
@@ -1569,61 +1587,30 @@ function DiaryWritePage({
           <div className="diary-write__section-head">
             <div className="diary-write__ai-block">
               <div className="diary-write__ai-actions">
-                <button
-                  type="button"
-                  className="diary-write__tip-btn"
-                  onClick={() => setTipOpen((open) => !open)}
-                  aria-expanded={tipOpen}
-                >
-                  {t('write.ai.tip')}
-                </button>
                 <div className="diary-write__ai-draw">
-                  <div className="diary-write__coach-anchor">
-                    <button
-                      type="button"
-                      className="diary-write__ai-char"
-                      onClick={() => {
-                        dismissCharacterCoach();
-                        onOpenCharacter();
-                      }}
-                      aria-label={t('write.ai.characterAria')}
-                      title={t('write.ai.characterTitle')}
-                    >
-                      <span className="diary-write__ai-char-emoji" aria-hidden>
-                        {GENDER_EMOJI[character.gender]}
-                      </span>
-                    </button>
-                  </div>
                   <div className="diary-write__coach-anchor diary-write__coach-anchor--ai">
                     <button
                       type="button"
                       className="diary-write__ai-link"
                       onClick={handleAiDraw}
-                      disabled={aiLoading || !content.trim()}
+                      disabled={aiLoading}
                     >
                       {aiLabel}
                     </button>
                     {isFlutterApp() && (
-                      <span className="diary-write__ai-remaining">
-                        {aiLeft}
+                      <span
+                        className="diary-write__ai-remaining"
+                        title={t('quota.deductAfterDone')}
+                      >
+                        <span className="diary-write__ai-remaining-n">{aiLeft}</span>
+                        <span className="diary-write__ai-remaining-hint">
+                          {t('quota.deductAfterDoneShort')}
+                        </span>
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              {coach === 'character' && (
-                <div className="diary-write__coach" role="status">
-                  <p>{t('write.coach.character')}</p>
-                  <button
-                    type="button"
-                    className="diary-write__coach-dismiss"
-                    aria-label={t('common.close')}
-                    onClick={dismissCharacterCoach}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
               {coach === 'ai' && (
                 <div className="diary-write__coach diary-write__coach--ai" role="status">
                   <p>{t('write.coach.ai')}</p>
@@ -1639,22 +1626,6 @@ function DiaryWritePage({
               )}
             </div>
           </div>
-
-          {tipOpen && (
-            <div className="diary-write__tip">
-              <p className="diary-write__ai-note">
-                {t('write.ai.tipBody')}
-              </p>
-              <p>
-                <strong>{t('write.ai.tipVisible')}</strong>{t('write.ai.tipAsk')}
-              </p>
-              <ul>
-                <li>{t('write.ai.exGood1')}</li>
-                <li>{t('write.ai.exGood2')}</li>
-                <li>{t('write.ai.exBad')}</li>
-              </ul>
-            </div>
-          )}
 
           <textarea
             ref={contentRef}
@@ -1700,28 +1671,113 @@ function DiaryWritePage({
               }}
               showClose
               closeAriaLabel={t('common.close')}
+              primaryLabel={t('write.ai.styleConfirm')}
+              onPrimary={() => {
+                if (!aiReferenceImage) {
+                  setAiPhotoError(t('write.err.aiNeedPhoto'));
+                  return;
+                }
+                if (!isAiDrawStyleEnabled(aiStyleSelectedId)) {
+                  setAiPhotoError(t('write.ai.styleDisabled'));
+                  return;
+                }
+                setAiStylePreviewId(null);
+                proceedAfterStylePick(aiStyleSelectedId);
+              }}
             >
               <p className="diary-write__ai-style-lead">{t('write.ai.styleLead')}</p>
+              {isFlutterApp() ? (
+                <p className="diary-write__ai-quota-note">
+                  {t('quota.drawConfirmLead', {
+                    n: aiLeft,
+                    limit: aiQuota.limit,
+                  })}
+                </p>
+              ) : null}
+
+              <div className="diary-write__ai-photo">
+                <p className="diary-write__ai-photo-label">{t('write.ai.photoLabel')}</p>
+                <input
+                  ref={aiPhotoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="diary-write__ai-photo-input"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = '';
+                    void handleAiPhotoPick(file);
+                  }}
+                />
+                {aiReferenceImage ? (
+                  <div className="diary-write__ai-photo-preview-wrap">
+                    <img
+                      src={aiReferenceImage}
+                      alt=""
+                      className="diary-write__ai-photo-preview"
+                    />
+                    <div className="diary-write__ai-photo-actions">
+                      <button
+                        type="button"
+                        className="diary-write__ai-photo-btn"
+                        onClick={() => aiPhotoInputRef.current?.click()}
+                      >
+                        {t('write.ai.photoChange')}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="diary-write__ai-photo-add"
+                    onClick={() => aiPhotoInputRef.current?.click()}
+                  >
+                    {t('write.ai.photoAdd')}
+                  </button>
+                )}
+                {aiPhotoError ? (
+                  <p className="diary-write__ai-error" role="alert">
+                    {aiPhotoError}
+                  </p>
+                ) : null}
+              </div>
+
               <div className="diary-write__ai-styles" role="list">
                 {AI_DRAW_STYLES.map((style) => {
                   const previewOpen = aiStylePreviewId === style.id;
+                  const selected = aiStyleSelectedId === style.id;
+                  const enabled = style.enabled !== false;
                   return (
                     <div
                       key={style.id}
-                      className={`diary-write__ai-style-item${previewOpen ? ' is-preview-open' : ''}`}
+                      className={[
+                        'diary-write__ai-style-item',
+                        previewOpen ? 'is-preview-open' : '',
+                        selected ? 'is-selected' : '',
+                        !enabled ? 'is-disabled' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
                       role="listitem"
                     >
                       <div className="diary-write__ai-style-row">
                         <button
                           type="button"
                           className="diary-write__ai-style-btn"
+                          aria-pressed={selected}
+                          disabled={!enabled}
                           onClick={() => {
-                            setAiStylePreviewId(null);
-                            proceedAfterStylePick(style.id);
+                            if (!enabled) return;
+                            setAiStyleSelectedId(style.id);
                           }}
                         >
                           <span className="diary-write__ai-style-name">
                             {t(`write.ai.style.${style.id}.name`)}
+                            {!enabled ? (
+                              <span className="diary-write__ai-style-soon">
+                                {' '}
+                                {t('write.ai.styleSoon')}
+                              </span>
+                            ) : null}
                           </span>
                           <span className="diary-write__ai-style-desc">
                             {t(`write.ai.style.${style.id}.desc`)}
@@ -1784,7 +1840,10 @@ function DiaryWritePage({
           {aiConfirmOpen && (
             <AppModal
               title={t('quota.drawConfirmTitle')}
-              lead={String(aiLeft)}
+              lead={t('quota.drawConfirmLead', {
+                n: aiLeft,
+                limit: aiQuota.limit,
+              })}
               onDismiss={() => setAiConfirmOpen(false)}
               showClose
               closeAriaLabel={t('common.close')}

@@ -1086,12 +1086,10 @@ function App() {
         {page === "write" && (
           <DiaryWritePage
             key={editingId ?? `new-${selectedDate}`}
-            character={character}
             initialEntry={editingEntry}
             initialDate={editingEntry ? undefined : selectedDate}
             onSave={handleSave}
             onCancel={handleWriteCancel}
-            onOpenCharacter={() => setCharacterOpen(true)}
             onNativeSaveStateChange={(enabled, saving) => {
               setWriteSaveEnabled(enabled);
               setWriteSaving(Boolean(saving));

@@ -260,7 +260,7 @@ const OUTFIT_EN_OIL_PASTEL: Record<CharacterProfile['outfit'], string> = {
 function describeOutfit(
   outfit: CharacterProfile['outfit'],
   gender: CharacterProfile['gender'],
-  style?: 'storybook' | 'oilPastel',
+  style?: 'webtoonHero' | 'oilPastel' | 'jpRetroFilm' | 'kidSketch' | 'storybook',
 ): string {
   const who = genderPossessive(gender);
   const base = (style === 'oilPastel' ? OUTFIT_EN_OIL_PASTEL : OUTFIT_EN)[outfit];
@@ -522,7 +522,7 @@ function describePet(pet: CharacterPet): string {
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */
 export function describeCharacter(
   profile: CharacterProfile,
-  style?: 'storybook' | 'oilPastel',
+  style?: 'webtoonHero' | 'oilPastel' | 'jpRetroFilm' | 'kidSketch' | 'storybook',
 ): string {
   const accessories =
     style === 'oilPastel' ? ACCESSORY_EN_OIL_PASTEL : ACCESSORY_EN;

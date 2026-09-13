@@ -488,8 +488,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "Zeichnen?",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "Zeichnen"
+    "drawConfirmLead": "{{n}} übrig\nWird abgezogen, wenn die Zeichnung fertig ist.",
+    "drawConfirmOk": "Zeichnen",
+    "deductAfterDone": "Abzug erst, wenn die Zeichnung fertig ist.",
+    "deductAfterDoneShort": "Nach Fertig"
   },
   "write": {
     "title": {

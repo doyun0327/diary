@@ -487,8 +487,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "开始画画？",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "画"
+    "drawConfirmLead": "剩余 {{n}} 次\n画完后才会扣次。",
+    "drawConfirmOk": "画",
+    "deductAfterDone": "画完成功后才会扣次。",
+    "deductAfterDoneShort": "完成后扣次"
   },
   "write": {
     "title": {

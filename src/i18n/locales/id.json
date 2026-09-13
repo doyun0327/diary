@@ -487,8 +487,10 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "Mulai menggambar?",
-    "drawConfirmLead": "{{n}}/{{limit}}",
-    "drawConfirmOk": "Gambar"
+    "drawConfirmLead": "Sisa {{n}}\nDipotong setelah gambar selesai.",
+    "drawConfirmOk": "Gambar",
+    "deductAfterDone": "Kuota dipotong setelah gambar selesai.",
+    "deductAfterDoneShort": "Setelah selesai"
   },
   "write": {
     "title": {
