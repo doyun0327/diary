@@ -229,51 +229,62 @@
   overflow: visible;
 }
 
+/* 그림 칸 테두리를 샤라락 한 바퀴 */
+@property --mood-cal-sparkle-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .mood-cal__day.just-saved::after {
   content: '';
   position: absolute;
-  /* 그림 칸만 하이라이트 — 날짜와 합쳐지지 않게 */
   top: calc(0.72rem * 1.15 + 5px);
   right: 2px;
   bottom: 3px;
   left: 2px;
   z-index: 6;
   border-radius: 8px;
-  border: none;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 230, 80, 0.5) 0%,
-    rgba(255, 220, 60, 0.28) 55%,
-    rgba(255, 210, 40, 0.1) 78%,
-    transparent 92%
-  );
-  box-shadow:
-    0 0 5px 1px rgba(255, 220, 70, 0.35),
-    inset 0 0 8px 2px rgba(255, 236, 120, 0.45);
+  padding: 2px;
+  box-sizing: border-box;
   pointer-events: none;
-  animation: mood-cal-just-saved-glow 2.2s ease-out forwards;
+  background: conic-gradient(
+    from var(--mood-cal-sparkle-angle),
+    transparent 0deg,
+    transparent 250deg,
+    rgba(255, 236, 140, 0.25) 285deg,
+    rgba(255, 248, 200, 0.95) 310deg,
+    #fff8c8 325deg,
+    #ffd84a 338deg,
+    rgba(255, 220, 80, 0.55) 350deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 3px rgba(255, 220, 90, 0.75));
+  animation: mood-cal-just-saved-orbit 1.45s linear forwards;
 }
 
-@keyframes mood-cal-just-saved-glow {
+@keyframes mood-cal-just-saved-orbit {
   0% {
+    --mood-cal-sparkle-angle: 0deg;
     opacity: 0;
-    transform: scale(0.96);
-    filter: blur(0.4px);
   }
-  18% {
+  8% {
     opacity: 1;
-    transform: scale(1);
-    filter: blur(0.8px);
   }
-  55% {
-    opacity: 0.88;
-    transform: scale(1);
-    filter: blur(1px);
+  82% {
+    opacity: 1;
   }
   100% {
+    --mood-cal-sparkle-angle: 360deg;
     opacity: 0;
-    transform: scale(1.02);
-    filter: blur(1.5px);
   }
 }
 
@@ -361,4 +372,5 @@
   bottom: 2px;
   left: 1px;
   border-radius: 7px;
+  padding: 2px;
 }

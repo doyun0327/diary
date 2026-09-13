@@ -23,6 +23,7 @@ import {
   setPendingNyangPurchase,
   type PendingNyangPurchase,
 } from '../utils/pendingNyangPurchase';
+import { fetchTipStorePrices } from '../utils/tipPurchase';
 import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn } from '../lib/googleAuth';
 import CloseIcon from './CloseIcon';
@@ -74,6 +75,8 @@ function NyangTicketSheet({
   const [history, setHistory] = useState<PurchaseRecordDto[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [storePrices, setStorePrices] = useState<Record<string, string>>({});
+  const [pricesLoading, setPricesLoading] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -95,6 +98,33 @@ function NyangTicketSheet({
     if (!isFlutterApp()) return;
     requestSubscriptionRestore();
   }, []);
+
+  // 스토어 현지 가격 (국가·통화별 priceString)
+  useEffect(() => {
+    if (!isFlutterApp()) return;
+    let cancelled = false;
+    setPricesLoading(true);
+    void fetchTipStorePrices()
+      .then((prices) => {
+        if (!cancelled) setStorePrices(prices);
+      })
+      .finally(() => {
+        if (!cancelled) setPricesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const priceFor = (productId: string) => {
+    const exact = storePrices[productId]?.trim();
+    if (exact) return exact;
+    for (const [id, price] of Object.entries(storePrices)) {
+      if (id.startsWith(`${productId}:`) && price.trim()) return price.trim();
+    }
+    if (pricesLoading) return '…';
+    return null;
+  };
 
   const loadHistory = useCallback(async () => {
     const token = getAccessToken();
@@ -390,7 +420,16 @@ function NyangTicketSheet({
                   ? t('nyangTicket.signingIn')
                   : busy === 'sub'
                     ? t('common.processing')
-                    : t('nyangTicket.subscribeCta')}
+                    : (
+                      <span className="nyang-ticket__cta-with-price">
+                        <span>{t('nyangTicket.subscribeCta')}</span>
+                        {priceFor(SUB_PRODUCT_ID) ? (
+                          <span className="nyang-ticket__price">
+                            {priceFor(SUB_PRODUCT_ID)}
+                          </span>
+                        ) : null}
+                      </span>
+                    )}
               </button>
             )}
           </section>
@@ -404,27 +443,30 @@ function NyangTicketSheet({
               </span>
             </div>
             <ul className="nyang-ticket__packs">
-              {AI_PACK_PRODUCTS.map((pack) => (
-                <li key={pack.id}>
-                  <button
-                    type="button"
-                    className="nyang-ticket__pack-btn"
-                    disabled={busy != null}
-                    onClick={() => void handleBuyPack(pack.id)}
-                  >
-                    <span className="nyang-ticket__pack-name">
-                      {t('nyangTicket.packLabel', { n: pack.credits })}
-                    </span>
-                    <span className="nyang-ticket__pack-cta">
-                      {busy === 'google'
-                        ? t('nyangTicket.signingIn')
-                        : busy === pack.id
-                          ? t('common.processing')
-                          : t('nyangTicket.buy')}
-                    </span>
-                  </button>
-                </li>
-              ))}
+              {AI_PACK_PRODUCTS.map((pack) => {
+                const price = priceFor(pack.id);
+                return (
+                  <li key={pack.id}>
+                    <button
+                      type="button"
+                      className="nyang-ticket__pack-btn"
+                      disabled={busy != null}
+                      onClick={() => void handleBuyPack(pack.id)}
+                    >
+                      <span className="nyang-ticket__pack-name">
+                        {t('nyangTicket.packLabel', { n: pack.credits })}
+                      </span>
+                      <span className="nyang-ticket__pack-cta">
+                        {busy === 'google'
+                          ? t('nyangTicket.signingIn')
+                          : busy === pack.id
+                            ? t('common.processing')
+                            : (price ?? t('nyangTicket.buy'))}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

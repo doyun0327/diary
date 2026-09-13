@@ -86,6 +86,26 @@
   margin-top: 0;
 }
 
+.nyang-ticket__cta-with-price {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.25;
+}
+
+.nyang-ticket__price {
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.nyang-ticket__pack-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
 .nyang-ticket__sub-status {
   width: 100%;
   display: flex;
@@ -143,12 +163,6 @@
 
 .nyang-ticket__pack-btn:not(:disabled):active {
   transform: scale(0.98);
-}
-
-.nyang-ticket__pack-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text);
 }
 
 .nyang-ticket__pack-cta {

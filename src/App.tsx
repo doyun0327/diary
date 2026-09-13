@@ -620,7 +620,7 @@ function App() {
       calendarHighlightTimerRef.current = setTimeout(() => {
         setCalendarHighlightDate(null);
         calendarHighlightTimerRef.current = null;
-      }, 2400);
+      }, 1600);
       setPage("home");
       syncInBackground();
       showAppToast(t("write.savedToast"));
@@ -933,10 +933,18 @@ function App() {
       const visible =
         !needsProfileSetup && !hideNativeChrome;
 
+      // 무료 하단 배너: 홈·쓰기·PageBy·상세 등 (잠금·프로필 설정만 제외)
+      const showBanner =
+        !needsProfileSetup &&
+        !lockSetupOpen &&
+        !lockDisableOpen &&
+        !screenLock.locked;
+
       // 채널만 있으면 전송 (isFlutterApp 게이트 제거 — 플래그 미설정 시에도 숨김 반영)
       postDiaryNative({
         type: "headerState",
         visible,
+        showBanner,
         showCalendar: page === "home",
         showBack: isWrite,
         showSave: isWrite,
@@ -947,11 +955,7 @@ function App() {
         label:
           page === "home"
             ? formatYearMonth(calYear, calMonth)
-            : isWrite
-              ? editingId
-                ? t("write.title.edit")
-                : t("write.title.new")
-              : "",
+            : "",
         saveLabel: writeSaving
           ? editingId
             ? t("write.savingEdit")
