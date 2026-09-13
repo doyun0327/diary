@@ -21,7 +21,7 @@ import MoodIcon from '../components/MoodIcon';
 import { generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
 import { formatDate, today } from '../utils/date';
-import { AI_DRAW_STYLES, fileToAiReferenceDataUrl, isAiDrawStyleEnabled, type AiDrawStyleId } from '../utils/aiDrawStyles';
+import { AI_DRAW_STYLES, aiStylePreviewSrc, fileToAiReferenceDataUrl, isAiDrawStyleEnabled, subscribeAiStylePreviewsReady, type AiDrawStyleId } from '../utils/aiDrawStyles';
 import { diaryEditFontStack, defaultFontIdForLanguage, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
@@ -43,8 +43,8 @@ import {
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
-  isAiCoachSeen,
-  markAiCoachSeen,
+  shouldShowAiDeductCoach,
+  markAiDeductCoachShown,
 } from '../utils/onboarding';
 import {
   clearWriteDraft,
@@ -130,7 +130,7 @@ function scrollWritingFieldIntoView(el: HTMLElement | null) {
   });
 }
 
-/** 본문 높이 = 글 줄 수 (+ 입력 중일 때만 빈 줄 1줄) */
+/** 본문 높이 = 글 줄 수 (+ 입력 중일 때만 빈 줄 1줄), 최소 3줄 */
 function syncContentTextareaHeight(
   el: HTMLTextAreaElement | null,
   options?: { extraBlankLine?: boolean },
@@ -141,7 +141,8 @@ function syncContentTextareaHeight(
   el.style.removeProperty('height');
   const contentHeight = el.scrollHeight;
   const extra = options?.extraBlankLine ? lh : 0;
-  el.style.height = `${contentHeight + extra}px`;
+  const minHeight = lh * 3;
+  el.style.height = `${Math.max(contentHeight + extra, minHeight)}px`;
 }
 interface DiaryWritePageProps {
   /** 있으면 수정 모드 */
@@ -228,7 +229,6 @@ function DiaryWritePage({
   const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
-  const [aiConfirmOpen, setAiConfirmOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
   /** 미리보기 펼친 스타일 — null 이면 접힘 */
   const [aiStylePreviewId, setAiStylePreviewId] = useState<AiDrawStyleId | null>(
@@ -259,6 +259,7 @@ function DiaryWritePage({
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
   const [accessTick, setAccessTick] = useState(0);
+  const [, setAiPreviewTick] = useState(0);
   const [purchaseClickShield, setPurchaseClickShield] = useState(false);
   const proPurchaseGuardUntilRef = useRef(0);
   const purchaseShieldTimerRef = useRef<number | null>(null);
@@ -325,7 +326,7 @@ function DiaryWritePage({
   });
   const [coach, setCoach] = useState<'ai' | null>(() => {
     if (isEdit) return null;
-    if (!isAiCoachSeen()) return 'ai';
+    if (shouldShowAiDeductCoach()) return 'ai';
     return null;
   });
   const canvasRef = useRef<DrawingCanvasHandle>(null);
@@ -345,6 +346,8 @@ function DiaryWritePage({
     savingRef.current = saving;
     onNativeSaveStateChange?.(!aiLoading && !saving, saving);
   }, [aiLoading, saving, onNativeSaveStateChange]);
+
+  useEffect(() => subscribeAiStylePreviewsReady(() => setAiPreviewTick((n) => n + 1)), []);
 
   useEffect(() => {
     drawingClearedRef.current = false;
@@ -424,7 +427,7 @@ function DiaryWritePage({
       setCoach(null);
       return;
     }
-    if (!isAiCoachSeen()) {
+    if (shouldShowAiDeductCoach()) {
       setCoach('ai');
       return;
     }
@@ -432,9 +435,56 @@ function DiaryWritePage({
   }, [isEdit]);
 
   const dismissAiCoach = () => {
-    markAiCoachSeen();
-    setCoach((prev) => (prev === 'ai' ? null : prev));
+    setCoach((prev) => {
+      if (prev === 'ai') markAiDeductCoachShown();
+      return prev === 'ai' ? null : prev;
+    });
   };
+
+  // 처음 몇 번만 짧게 흘려가게 안내
+  useEffect(() => {
+    if (coach !== 'ai') return;
+    const timer = window.setTimeout(() => {
+      dismissAiCoach();
+    }, 4500);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 표시될 때만 타이머
+  }, [coach]);
+
+  // 스타일 미리보기 펼치면 모달을 맨 아래로 — 확인 버튼이 전부 보이게
+  useEffect(() => {
+    if (!aiStyleOpen || !aiStylePreviewId) return;
+    let cancelled = false;
+    const timers: number[] = [];
+
+    const scrollPanelToBottom = () => {
+      if (cancelled) return;
+      const panel = document.querySelector(
+        '.app-modal__panel--ai-style',
+      ) as HTMLElement | null;
+      if (!panel) return;
+      panel.scrollTop = panel.scrollHeight;
+    };
+
+    const schedule = (ms: number) => {
+      timers.push(window.setTimeout(scrollPanelToBottom, ms));
+    };
+
+    // 레이아웃·미리보기 이미지 반영 타이밍에 맞춰 여러 번
+    const raf = window.requestAnimationFrame(() => {
+      scrollPanelToBottom();
+      schedule(0);
+      schedule(50);
+      schedule(150);
+      schedule(300);
+    });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(raf);
+      timers.forEach((id) => window.clearTimeout(id));
+    };
+  }, [aiStyleOpen, aiStylePreviewId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -703,7 +753,6 @@ function DiaryWritePage({
       setRewardPromptOpen(false);
       setAiDailyLimitOpen(false);
       setAdIncompleteOpen(false);
-      setAiConfirmOpen(false);
       // 월한도 추가구매 모달은 유지 (실드가 모달 클릭을 막지 않도록 AppModal z-index > shield)
       setAiError(null);
       contentRef.current?.blur();
@@ -1602,9 +1651,6 @@ function DiaryWritePage({
                         title={t('quota.deductAfterDone')}
                       >
                         <span className="diary-write__ai-remaining-n">{aiLeft}</span>
-                        <span className="diary-write__ai-remaining-hint">
-                          {t('quota.deductAfterDoneShort')}
-                        </span>
                       </span>
                     )}
                   </div>
@@ -1664,6 +1710,7 @@ function DiaryWritePage({
           {aiStyleOpen && (
             <AppModal
               title={t('write.ai.styleTitle')}
+              panelClassName="app-modal__panel--ai-style"
               onDismiss={() => {
                 setAiStyleOpen(false);
                 setAiStylePreviewId(null);
@@ -1685,14 +1732,6 @@ function DiaryWritePage({
               }}
             >
               <p className="diary-write__ai-style-lead">{t('write.ai.styleLead')}</p>
-              {isFlutterApp() ? (
-                <p className="diary-write__ai-quota-note">
-                  {t('quota.drawConfirmLead', {
-                    n: aiLeft,
-                    limit: aiQuota.limit,
-                  })}
-                </p>
-              ) : null}
 
               <div className="diary-write__ai-photo">
                 <p className="diary-write__ai-photo-label">{t('write.ai.photoLabel')}</p>
@@ -1818,16 +1857,20 @@ function DiaryWritePage({
                           className="diary-write__ai-style-preview-grid"
                           aria-label={t('write.ai.stylePreview')}
                         >
-                          {style.previewSrcs.map((src) => (
-                            <img
-                              key={src}
-                              src={src}
-                              alt=""
-                              className="diary-write__ai-style-preview-img"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ))}
+                          {style.previewSrcs.map((src) => {
+                            const resolved = aiStylePreviewSrc(src);
+                            // blob만 사용 — path fallback 시 네트워크 재요청 방지
+                            if (!resolved.startsWith('blob:')) return null;
+                            return (
+                              <img
+                                key={src}
+                                src={resolved}
+                                alt=""
+                                className="diary-write__ai-style-preview-img"
+                                decoding="async"
+                              />
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -1835,23 +1878,6 @@ function DiaryWritePage({
                 })}
               </div>
             </AppModal>
-          )}
-          {aiConfirmOpen && (
-            <AppModal
-              title={t('quota.drawConfirmTitle')}
-              lead={t('quota.drawConfirmLead', {
-                n: aiLeft,
-                limit: aiQuota.limit,
-              })}
-              onDismiss={() => setAiConfirmOpen(false)}
-              showClose
-              closeAriaLabel={t('common.close')}
-              primaryLabel={t('quota.drawConfirmOk')}
-              onPrimary={() => {
-                setAiConfirmOpen(false);
-                void runAiDraw();
-              }}
-            />
           )}
           {usageNoticeOpen && (
             <AppModal

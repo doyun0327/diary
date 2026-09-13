@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "圖片已載入",
-      "cdnFallbackNotice": "圖畫已完成。網路不穩定，載入多花了一點時間。"
+      "cdnFallbackNotice": "圖畫已完成。網路不穩定，載入多花了一點時間。",
+      "photoLabel": "*新增照片",
+      "style": {
+        "webtoonHero": {
+          "name": "網漫主角st",
+          "desc": "轉換成彷彿剛從漫畫裡走出來的主角視覺。"
+        },
+        "oilPastel": {
+          "name": "油畫棒st",
+          "desc": "幫可愛角色加上溫暖手繪質感。"
+        },
+        "jpRetroFilm": {
+          "name": "日系復古電影風st",
+          "desc": "用朦朧膠片色調與90年代動畫感，復古地呈現。"
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "AI 畫",

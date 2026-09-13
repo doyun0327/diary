@@ -1,6 +1,8 @@
 const CHARACTER_DONE_KEY = 'picture-diary-onboarding-character-done';
 const CHARACTER_COACH_KEY = 'picture-diary-onboarding-character-coach';
 const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
+/** 완성 후 차감 안내 노출 횟수 (최대 3) */
+const AI_DEDUCT_COACH_COUNT_KEY = 'picture-diary-onboarding-ai-deduct-coach-count';
 const WRITE_FAB_COACH_KEY = 'picture-diary-onboarding-write-fab-coach';
 const ROOM_COMMENT_COACH_KEY = 'picture-diary-onboarding-room-comment-coach';
 const ROOM_POKE_COACH_KEY = 'picture-diary-onboarding-room-poke-coach';
@@ -107,6 +109,29 @@ export function isAiCoachSeen(): boolean {
 
 export function markAiCoachSeen() {
   writeFlag(AI_COACH_KEY);
+}
+
+/** 완성 후 차감 — 처음 3번만 흘려가게 */
+export function shouldShowAiDeductCoach(): boolean {
+  return getAiDeductCoachShowCount() < 3;
+}
+
+export function getAiDeductCoachShowCount(): number {
+  try {
+    const n = Number(localStorage.getItem(AI_DEDUCT_COACH_COUNT_KEY) ?? '0');
+    return Number.isFinite(n) && n > 0 ? Math.min(3, Math.floor(n)) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function markAiDeductCoachShown() {
+  try {
+    const next = Math.min(3, getAiDeductCoachShowCount() + 1);
+    localStorage.setItem(AI_DEDUCT_COACH_COUNT_KEY, String(next));
+  } catch {
+    // ignore
+  }
 }
 
 export function isWriteFabCoachSeen(): boolean {

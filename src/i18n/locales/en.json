@@ -37,7 +37,7 @@
     "footer": "Slowly, day by day",
     "account": "Account",
     "accountHintEmpty": "Photo · account",
-    "rooms": "PageBy",
+    "rooms": "page",
     "roomsHint": "My rooms",
     "character": "Character",
     "characterHint": "Me in AI drawings",
@@ -576,7 +576,7 @@
     "collapseCanvas": "Hide drawing",
     "expandCanvas": "Show drawing",
     "ai": {
-      "button": "✨ AI drawing",
+      "button": "Generate drawing",
       "sceneStep": "Writing prompt…",
       "drawStep": "Drawing…",
       "statusWaiting": "Waiting…",
@@ -608,7 +608,7 @@
       "styleDisabled": "That style isn’t available yet. Pick another style.",
       "stylePreview": "Preview",
       "stylePreviewHide": "Hide preview",
-      "photoLabel": "Attach photo (required)",
+      "photoLabel": "*Attach photo",
       "photoHint": "AI sketches your photo like an elementary-school doodle.",
       "photoAdd": "Choose photo",
       "photoChange": "Change photo",
@@ -616,16 +616,16 @@
       "photoError": "Couldn’t load that photo. Try another image.",
       "style": {
         "webtoonHero": {
-          "name": "Webtoon hero",
-          "desc": "Casual hand-drawn webtoon protagonist vibe"
+          "name": "Webtoonherost",
+          "desc": "Turns you into a protagonist who just stepped out of a comic."
         },
         "oilPastel": {
-          "name": "Oil pastel",
-          "desc": "Soft oil-pastel look from your photo"
+          "name": "Oilpastelst",
+          "desc": "Adds a cozy hand-drawn texture to a cute character."
         },
         "jpRetroFilm": {
-          "name": "JP retro film",
-          "desc": "Dreamy retro Japanese anime look"
+          "name": "JPretrofilmst",
+          "desc": "Dreamy film tones and 90s anime vibes for a retro look."
         }
       },
       "exGood1": "Good: We had a pizza party today",
@@ -712,7 +712,7 @@
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
-      "ai": "Attach an image and it’ll draw it for you!"
+      "ai": "Credits are used after the drawing finishes"
     }
   },
   "detail": {

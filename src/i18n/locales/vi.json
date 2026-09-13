@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Đã tải ảnh",
-      "cdnFallbackNotice": "Bức vẽ đã xong. Mạng không ổn định nên tải hơi lâu."
+      "cdnFallbackNotice": "Bức vẽ đã xong. Mạng không ổn định nên tải hơi lâu.",
+      "photoLabel": "*Đính kèm ảnh",
+      "style": {
+        "webtoonHero": {
+          "name": "Nhânvậtwebtoonst",
+          "desc": "Biến bạn thành nhân vật chính như vừa bước ra từ truyện tranh."
+        },
+        "oilPastel": {
+          "name": "Pasteldầust",
+          "desc": "Phủ chất liệu vẽ tay ấm áp lên nhân vật dễ thương."
+        },
+        "jpRetroFilm": {
+          "name": "PhimretroNhst",
+          "desc": "Tone phim mơ màng và vibe anime thập niên 90 mang cảm giác retro."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "Tranh AI",

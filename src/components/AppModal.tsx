@@ -18,6 +18,8 @@ type AppModalProps = {
   onSecondary?: () => void;
   ariaLabelledBy?: string;
   closeAriaLabel?: string;
+  /** panel 추가 클래스 */
+  panelClassName?: string;
 };
 
 /** 앱 공통 중앙 모달 (방 생성·공유 결과 등) */
@@ -34,6 +36,7 @@ export default function AppModal({
   onSecondary,
   ariaLabelledBy = 'app-modal-title',
   closeAriaLabel = 'close',
+  panelClassName,
 }: AppModalProps) {
   const canClose = Boolean(onDismiss);
   const showX = showClose ?? canClose;
@@ -47,7 +50,7 @@ export default function AppModal({
         onClick={onDismiss}
         disabled={!canClose}
       />
-      <div className="app-modal__panel">
+      <div className={['app-modal__panel', panelClassName].filter(Boolean).join(' ')}>
         {showX && onDismiss ? (
           <button
             type="button"

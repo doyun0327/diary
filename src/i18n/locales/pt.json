@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Imagem carregada",
-      "cdnFallbackNotice": "Seu desenho está pronto. Demorou um pouco mais para carregar por causa da rede instável."
+      "cdnFallbackNotice": "Seu desenho está pronto. Demorou um pouco mais para carregar por causa da rede instável.",
+      "photoLabel": "*Anexar foto",
+      "style": {
+        "webtoonHero": {
+          "name": "Heróidewebtoonst",
+          "desc": "Transforma você num protagonista que acabou de sair de um quadrinho."
+        },
+        "oilPastel": {
+          "name": "Pasteldeóleost",
+          "desc": "Coloca uma textura aconchegante de desenho à mão num personagem fofo."
+        },
+        "jpRetroFilm": {
+          "name": "FilmeretroJPst",
+          "desc": "Tons de filme suaves e vibe anime dos anos 90 para um visual retrô."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "Desenho da IA",

@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Gambar dimuat",
-      "cdnFallbackNotice": "Gambarmu sudah siap. Memuat agak lama karena jaringan tidak stabil."
+      "cdnFallbackNotice": "Gambarmu sudah siap. Memuat agak lama karena jaringan tidak stabil.",
+      "photoLabel": "*Lampirkan foto",
+      "style": {
+        "webtoonHero": {
+          "name": "Pahlawanwebtoonst",
+          "desc": "Mengubahmu jadi protagonis yang baru keluar dari komik."
+        },
+        "oilPastel": {
+          "name": "Pastelminyakst",
+          "desc": "Memberi tekstur gambar tangan yang hangat pada karakter lucu."
+        },
+        "jpRetroFilm": {
+          "name": "FilmretroJPst",
+          "desc": "Warna film sayu dan vibe anime 90-an untuk look retro."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "Gambar AI",

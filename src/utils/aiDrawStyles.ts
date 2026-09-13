@@ -34,63 +34,143 @@ export const AI_DRAW_STYLES: {
     id: 'webtoonHero',
     enabled: true,
     previewSrcs: [
-      '/preview/storybook.jpg',
-      '/preview/storybook2.jpg',
-      '/preview/storybook3.jpg',
+      '/preview/웹툰1.jpg',
+      '/preview/웹툰2.jpg',
+      '/preview/웹툰3.jpg',
     ],
   },
   {
     id: 'oilPastel',
     enabled: true,
     previewSrcs: [
-      '/preview/oilpastel.jpg',
-      '/preview/oilpastel2.jpg',
-      '/preview/oilpastel3.jpg',
+      '/preview/오일1.jpg',
+      '/preview/오일2.jpg',
+      '/preview/오일3.jpg',
     ],
   },
   {
     id: 'jpRetroFilm',
     enabled: true,
-    // 샘플 교체 전까지 오일 미리보기 재사용
     previewSrcs: [
-      '/preview/oilpastel.jpg',
-      '/preview/oilpastel2.jpg',
-      '/preview/oilpastel3.jpg',
+      '/preview/일본1.jpg',
+      '/preview/일본2.jpg',
+      '/preview/일본3.jpg',
     ],
   },
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v4';
-const preloadedAiStyleSrcs = new Set<string>();
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v5';
+/** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
+const previewBlobUrlBySrc = new Map<string, string>();
+const previewReadyListeners = new Set<() => void>();
+let previewWarmPromise: Promise<void> | null = null;
 
-export function preloadAiStylePreviews() {
-  const urls = AI_DRAW_STYLES.flatMap((style) => style.previewSrcs);
-  for (const src of urls) {
-    if (!src || preloadedAiStyleSrcs.has(src)) continue;
-    preloadedAiStyleSrcs.add(src);
-    const img = new Image();
-    img.decoding = 'async';
-    img.src = src;
-    void img.decode?.().catch(() => undefined);
+function previewRequestUrl(path: string): string {
+  try {
+    return new URL(path, typeof location !== 'undefined' ? location.origin : 'https://local').href;
+  } catch {
+    return path;
   }
+}
 
-  if (typeof caches === 'undefined') return;
-  void caches
-    .open(AI_STYLE_PREVIEW_CACHE)
-    .then(async (cache) => {
+function notifyAiStylePreviewsReady() {
+  previewReadyListeners.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+/** 스타일 미리보기 src — 캐시 blob만 반환 (없으면 빈 문자열 → 네트워크 금지) */
+export function aiStylePreviewSrc(path: string): string {
+  return previewBlobUrlBySrc.get(path) ?? '';
+}
+
+export function subscribeAiStylePreviewsReady(listener: () => void): () => void {
+  previewReadyListeners.add(listener);
+  if (previewBlobUrlBySrc.size > 0) {
+    try {
+      listener();
+    } catch {
+      /* ignore */
+    }
+  }
+  return () => {
+    previewReadyListeners.delete(listener);
+  };
+}
+
+async function putPreviewBlob(path: string, res: Response) {
+  try {
+    const blob = await res.blob();
+    if (!blob.size) return;
+    const prev = previewBlobUrlBySrc.get(path);
+    if (prev) URL.revokeObjectURL(prev);
+    previewBlobUrlBySrc.set(path, URL.createObjectURL(blob));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * 앱 최초(캐시 비어 있을 때)만 네트워크로 받아 Cache Storage에 저장.
+ * 이후에는 캐시 → blob URL만 사용 (미리보기 img 재요청 없음).
+ */
+export function preloadAiStylePreviews() {
+  if (previewWarmPromise) return previewWarmPromise;
+
+  previewWarmPromise = (async () => {
+    const paths = AI_DRAW_STYLES.flatMap((style) => style.previewSrcs).filter(Boolean);
+    if (paths.length === 0) return;
+
+    if (typeof caches === 'undefined') {
+      for (const src of paths) {
+        if (previewBlobUrlBySrc.has(src)) continue;
+        try {
+          const res = await fetch(previewRequestUrl(src));
+          if (res.ok) await putPreviewBlob(src, res);
+        } catch {
+          /* ignore */
+        }
+      }
+      notifyAiStylePreviewsReady();
+      return;
+    }
+
+    try {
+      const cache = await caches.open(AI_STYLE_PREVIEW_CACHE);
       await Promise.all(
-        urls.map(async (url) => {
-          try {
-            const hit = await cache.match(url);
-            if (hit) return;
-            await cache.add(url);
-          } catch {
-            /* ignore */
+        paths.map(async (path) => {
+          const reqUrl = previewRequestUrl(path);
+          let res =
+            (await cache.match(reqUrl)) ||
+            (await cache.match(path)) ||
+            (await cache.match(encodeURI(path)));
+
+          if (!res) {
+            try {
+              const fetched = await fetch(reqUrl);
+              if (!fetched.ok) return;
+              await cache.put(reqUrl, fetched.clone());
+              res = fetched;
+            } catch {
+              return;
+            }
           }
+
+          await putPreviewBlob(path, res);
         }),
       );
-    })
-    .catch(() => undefined);
+    } catch {
+      /* ignore */
+    }
+
+    notifyAiStylePreviewsReady();
+  })();
+
+  return previewWarmPromise;
 }
 
 export function isAiDrawStyleEnabled(styleId: AiDrawStyleId): boolean {

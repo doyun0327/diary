@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "โหลดรูปแล้ว",
-      "cdnFallbackNotice": "รูปวาดพร้อมแล้ว การโหลดใช้เวลานานขึ้นเพราะเน็ตไม่เสถียร"
+      "cdnFallbackNotice": "รูปวาดพร้อมแล้ว การโหลดใช้เวลานานขึ้นเพราะเน็ตไม่เสถียร",
+      "photoLabel": "*แนบรูป",
+      "style": {
+        "webtoonHero": {
+          "name": "ตัวเอกเว็บตูนst",
+          "desc": "แปลงเป็นตัวเอกที่เพิ่งโผล่มาจากโลกการ์ตูน"
+        },
+        "oilPastel": {
+          "name": "ออยล์พาสเทลst",
+          "desc": "ใส่เนื้อสัมผัสมือวาดอบอุ่นให้ตัวละครน่ารัก"
+        },
+        "jpRetroFilm": {
+          "name": "ฟิล์มเรโทรญี่ปุ่นst",
+          "desc": "โทนฟิล์มละมุนและกลิ่นอายอนิเมะยุค 90 ให้ฟีลเรโทร"
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "ภาพวาด AI",

@@ -565,7 +565,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Bild geladen",
-      "cdnFallbackNotice": "Deine Zeichnung ist fertig. Wegen einer instabilen Verbindung hat das Laden etwas länger gedauert."
+      "cdnFallbackNotice": "Deine Zeichnung ist fertig. Wegen einer instabilen Verbindung hat das Laden etwas länger gedauert.",
+      "photoLabel": "*Foto anhängen",
+      "style": {
+        "webtoonHero": {
+          "name": "Webtoonheldst",
+          "desc": "Verwandelt dich in einen Protagonisten, der gerade aus einem Comic gestiegen ist."
+        },
+        "oilPastel": {
+          "name": "Ölpastellst",
+          "desc": "Verleiht einem süßen Charakter eine kuschelige Handzeichentextur."
+        },
+        "jpRetroFilm": {
+          "name": "JPretrofilmst",
+          "desc": "Verträumte Filmfarben und 90er-Anime-Feeling für einen Retro-Look."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "KI-Zeichnung",

@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Image chargée",
-      "cdnFallbackNotice": "Ton dessin est prêt. Le chargement a pris un peu plus de temps à cause d'une connexion instable."
+      "cdnFallbackNotice": "Ton dessin est prêt. Le chargement a pris un peu plus de temps à cause d'une connexion instable.",
+      "photoLabel": "*Joindre une photo",
+      "style": {
+        "webtoonHero": {
+          "name": "Héroswebtoonst",
+          "desc": "Te transforme en héros tout juste sorti d’une BD."
+        },
+        "oilPastel": {
+          "name": "Pastelàl’huilest",
+          "desc": "Ajoute une texture dessin à la main cocooning à un personnage mignon."
+        },
+        "jpRetroFilm": {
+          "name": "CinémarétroJPst",
+          "desc": "Teintes de film rêveuses et vibe anime 90s pour un rendu rétro."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "Dessin IA",

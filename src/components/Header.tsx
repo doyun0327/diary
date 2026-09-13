@@ -390,6 +390,15 @@ function Header({
                 onClick={() => closeAnd(onOpenAccount)}
               />
             )}
+            {onOpenRooms && (
+              <MenuItem
+                icon={<IconUsers />}
+                label={t('header.rooms')}
+                hint={t('header.roomsHint')}
+                tone="lavender"
+                onClick={() => closeAnd(onOpenRooms)}
+              />
+            )}
             {onOpenLanguage && (
               <MenuItem
                 icon={<IconGlobe />}
@@ -417,14 +426,6 @@ function Header({
               />
             )}
             */}
-            {onOpenRooms && (
-              <MenuItem
-                icon={<IconUsers />}
-                label={t('header.rooms')}
-                tone="lavender"
-                onClick={() => closeAnd(onOpenRooms)}
-              />
-            )}
             {onOpenDecorate && (
               <MenuItem
                 icon={<IconPalette />}

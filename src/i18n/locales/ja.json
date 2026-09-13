@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "読み込み完了",
-      "cdnFallbackNotice": "絵ができました。ネットワークが不安定で、読み込みに少し時間がかかりました。"
+      "cdnFallbackNotice": "絵ができました。ネットワークが不安定で、読み込みに少し時間がかかりました。",
+      "photoLabel": "*写真添付",
+      "style": {
+        "webtoonHero": {
+          "name": "ウェブトゥーン主人公st",
+          "desc": "漫画から飛び出したような主人公ビジュアルに変換します。"
+        },
+        "oilPastel": {
+          "name": "オイルパステルst",
+          "desc": "かわいいキャラにほっこり手描き質感をのせます。"
+        },
+        "jpRetroFilm": {
+          "name": "日本レトロ映画風st",
+          "desc": "淡いフィルムの色合いと90年代アニメソウルでレトロに演出します。"
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "AIの絵",

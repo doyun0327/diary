@@ -564,7 +564,22 @@
       "usageNotDeductedTitle": "Usage credit",
       "usageNotDeducted": "Your usage credit was not deducted.",
       "cdnFallbackTitle": "Imagen cargada",
-      "cdnFallbackNotice": "Tu dibujo está listo. Tardó un poco más en cargar por una red inestable."
+      "cdnFallbackNotice": "Tu dibujo está listo. Tardó un poco más en cargar por una red inestable.",
+      "photoLabel": "*Adjuntar foto",
+      "style": {
+        "webtoonHero": {
+          "name": "Héroedewebtoonst",
+          "desc": "Te convierte en un protagonista que acaba de salir de un cómic."
+        },
+        "oilPastel": {
+          "name": "Pasteldeóleost",
+          "desc": "Añade una textura de dibujo a mano cálida a un personaje cute."
+        },
+        "jpRetroFilm": {
+          "name": "Cinejaponesretrost",
+          "desc": "Tonos de película soñados y vibe anime de los 90 para un look retro."
+        }
+      }
     },
     "confirm": {
       "replaceTitle": "Dibujo IA",

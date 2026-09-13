@@ -37,7 +37,7 @@
     "footer": "천천히, 하루씩",
     "account": "계정",
     "accountHintEmpty": "프로필 · 계정",
-    "rooms": "PageBy",
+    "rooms": "page",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
     "characterHint": "AI 그림 속 나",
@@ -576,7 +576,7 @@
     "collapseCanvas": "그림 접기",
     "expandCanvas": "그림 펼치기",
     "ai": {
-      "button": "✨ AI 그림",
+      "button": "그림생성 📸",
       "sceneStep": "프롬프트 만드는 중…",
       "drawStep": "그리는 중…",
       "statusWaiting": "대기 중…",
@@ -608,7 +608,7 @@
       "styleDisabled": "아직 쓸 수 없는 스타일이에요. 다른 스타일을 골라 주세요.",
       "stylePreview": "미리보기",
       "stylePreviewHide": "미리보기 접기",
-      "photoLabel": "사진 첨부 (필수)",
+      "photoLabel": "*사진첨부",
       "photoHint": "올린 사진을 초등학생 낙서처럼 스케치해요.",
       "photoAdd": "사진 고르기",
       "photoChange": "사진 변경",
@@ -616,16 +616,16 @@
       "photoError": "사진을 불러오지 못했어요. 다른 이미지를 골라 주세요.",
       "style": {
         "webtoonHero": {
-          "name": "웹툰주인공 st",
-          "desc": "손그림 느낌의 웹툰 주인공처럼 그려줘요"
+          "name": "웹툰주인공st",
+          "desc": "만화 속에서 갓 튀어나온 듯한 주인공 비주얼로 변환해요."
         },
         "oilPastel": {
-          "name": "오일파스텔 st",
-          "desc": "포근하고 은은하게 스며드는 오일파스텔 화풍"
+          "name": "오일파스텔st",
+          "desc": "귀여운 캐릭터에 포근한 손그림 질감을 입혀줘요."
         },
         "jpRetroFilm": {
-          "name": "일본 레트로 영화풍 st",
-          "desc": "감성 가득한 레트로 일본 애니 화풍"
+          "name": "일본 레트로 영화풍st",
+          "desc": "아련한 필름 빛깔과 90년대 애니 감성으로 레트로하게 연출해요."
         }
       },
       "exGood1": "좋은 예: 오늘은 피자 파티를 했어요",
@@ -713,7 +713,7 @@
     },
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",
-      "ai": "이미지를 첨부하면 그림으로 그려줘요!"
+      "ai": "그림이 완성되면 횟수가 차감돼요"
     }
   },
   "detail": {
