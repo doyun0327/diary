@@ -85,7 +85,7 @@ import {
   readStoredGender,
 } from '../hooks/useClientProfile';
 import { profileLookForAi } from '../utils/profileDemographics';
-import { requestNativeGoogleSignIn, mountGoogleSignInButton } from '../lib/googleAuth';
+import { mountGoogleSignInButton } from '../lib/googleAuth';
 import {
   consumeAiPackCreditsRemote,
   consumeMonthlyUsage,
@@ -1243,32 +1243,6 @@ function DiaryWritePage({
     aiStyleRef.current = styleId;
     setAiStyleOpen(false);
     beginAiDrawAfterSetup();
-  };
-
-  const handleAiGoogleLogin = () => {
-    if (aiLoginBusy) return;
-    if (!isFlutterApp()) return;
-    setAiLoginError(null);
-    setAiLoginBusy(true);
-    const signInPromise = requestNativeGoogleSignIn();
-    void (async () => {
-      try {
-        const idToken = await signInPromise;
-        await signInWithGoogleIdToken(idToken);
-        if (!isGoogleSignedIn()) {
-          setAiLoginError(t('write.ai.loginFailed'));
-          return;
-        }
-        await finishAiLoginAndDraw();
-      } catch (err) {
-        const reason = err instanceof Error ? err.message : '';
-        if (reason !== 'cancelled') {
-          setAiLoginError(t('write.ai.loginFailed'));
-        }
-      } finally {
-        setAiLoginBusy(false);
-      }
-    })();
   };
 
   const handleAiGoogleIdToken = useCallback(
