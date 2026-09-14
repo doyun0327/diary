@@ -388,7 +388,9 @@ export async function generateDiaryImage(input: {
 
   if (!response.ok && response.status !== 202) {
     let message = `그림 생성 실패: HTTP ${response.status}`;
-    if (response.status === 429) {
+    if (response.status === 413) {
+      message = 'photo-too-large';
+    } else if (response.status === 429) {
       message = '그림 요청이 많아요. 잠시 후 다시 시도해 주세요';
     } else if (response.status === 501) {
       message =

@@ -135,6 +135,12 @@
   color: var(--color-text);
 }
 
+.nyang-ticket__sub-status-renew {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 .nyang-ticket__sub-status-left {
   font-size: 0.82rem;
   font-weight: 600;

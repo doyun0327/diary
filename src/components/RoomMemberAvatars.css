@@ -39,7 +39,7 @@
   justify-content: center;
   overflow: hidden;
   padding: 0;
-  background: var(--color-bg-muted);
+  background: var(--color-accent-soft);
   color: var(--color-accent-text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;

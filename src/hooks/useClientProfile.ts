@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createId } from '../utils/id';
+import { AVATAR_CHANGED_EVENT } from '../utils/letterAvatar';
 import {
   isProfileAgeGroup,
   isProfileGender,
@@ -127,6 +128,19 @@ export function useClientProfile() {
     } catch {
       // ignore
     }
+  }, []);
+
+  useEffect(() => {
+    const onAvatarChanged = (event: Event) => {
+      const next = (event as CustomEvent<string>).detail;
+      if (typeof next === 'string' && next) {
+        setAvatarUrlState(next);
+      }
+    };
+    window.addEventListener(AVATAR_CHANGED_EVENT, onAvatarChanged);
+    return () => {
+      window.removeEventListener(AVATAR_CHANGED_EVENT, onAvatarChanged);
+    };
   }, []);
 
   return {

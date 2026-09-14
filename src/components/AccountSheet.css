@@ -371,7 +371,7 @@
   border: 2px dashed var(--color-border);
   border-radius: 50%;
   overflow: hidden;
-  background: var(--color-bg-muted);
+  background: var(--color-accent-soft);
   cursor: pointer;
   box-shadow: var(--shadow-card);
 }
@@ -392,7 +392,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--color-bg-muted);
+  background: var(--color-accent-soft);
 }
 
 .account-sheet__photo-menu {

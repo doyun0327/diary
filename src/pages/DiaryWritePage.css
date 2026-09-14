@@ -317,7 +317,7 @@
 .diary-write__ai-quota-scrim {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 80;
   margin: 0;
   padding: 0;
   border: 0;
@@ -342,37 +342,48 @@
   top: auto;
 }
 
-/* 횟수 상세 말풍선 — 테마색 */
+/* 횟수 상세 말풍선 — 가장 긴 줄 너비에 맞춤 */
 .diary-write__ai-quota-pop {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  top: auto;
-  transform: translateX(-50%);
-  z-index: 41;
-  min-width: 7.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 81;
   width: max-content;
-  max-width: min(220px, calc(100vw - 48px));
-  padding: 10px 12px;
-  border-radius: 16px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 10px;
+  border-radius: 14px;
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border-soft);
   box-shadow: var(--shadow-float);
   white-space: nowrap;
-  animation: diary-ai-quota-in 0.28s var(--ease-out, ease);
   pointer-events: auto;
+  visibility: hidden;
+  --quota-arrow-left: 50%;
+}
+
+.diary-write__ai-quota-pop.is-placed {
+  visibility: visible;
+  animation: diary-ai-quota-in 0.28s var(--ease-out, ease);
 }
 
 .diary-write__ai-quota-pop::after {
   content: '';
   position: absolute;
-  left: 50%;
+  left: var(--quota-arrow-left);
   top: 100%;
   transform: translateX(-50%);
   border: 7px solid transparent;
   border-top-color: var(--color-surface);
   filter: drop-shadow(0 1px 0 var(--color-border-soft));
+}
+
+.diary-write__ai-quota-pop.is-below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--color-surface);
+  filter: drop-shadow(0 -1px 0 var(--color-border-soft));
 }
 
 .diary-write__ai-quota-list {
@@ -401,11 +412,11 @@
 @keyframes diary-ai-quota-in {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(6px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
 }
 

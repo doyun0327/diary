@@ -293,6 +293,7 @@
     "subscribeLead": "매달 {{n}}장의 그림을 생성할 수 있어요!",
     "subscribeCta": "PRO 구독하기",
     "subscribed": "구독 중",
+    "nextRenewal": "다음 갱신 {{date}}",
     "subscribeDone": "구독이 시작됐어요!",
     "restoreStarted": "구매 복원을 요청했어요.",
     "restoreHint": "기기를 바꾸거나 앱을 다시 설치했을 때, 이미 산 구독을 다시 불러와요.",
@@ -647,7 +648,7 @@
       "sourceDiary": "일기로 그리기",
       "sourceDiaryDesc": "쓴 일기를 바탕으로 그림을 그려요!",
       "sourcePhoto": "사진으로 그리기",
-      "sourcePhotoDesc": "내 사진을 그림으로 바꿔 줘요",
+      "sourcePhotoDesc": "내 사진을 그림으로 바꿔 줘요!",
       "styleTitle": "어떤 스타일로 그릴까요?",
       "styleLead": "사진을 첨부한 뒤 스타일을 고르고 확인을 눌러 주세요.",
       "styleConfirm": "확인",
@@ -661,6 +662,7 @@
       "photoChange": "사진 변경",
       "photoRemove": "사진 빼기",
       "photoError": "사진을 불러오지 못했어요. 다른 이미지를 골라 주세요.",
+      "photoTooLarge": "이미지가 너무 큽니다. 더 작은 사진으로 골라 주세요.",
       "style": {
         "webtoonHero": {
           "name": "웹툰주인공st",

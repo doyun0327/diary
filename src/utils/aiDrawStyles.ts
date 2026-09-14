@@ -209,13 +209,44 @@ export function isPhotoAiDrawStyle(styleId: AiDrawStyleId): styleId is AiPhotoDr
   return styleId === 'webtoonHero' || styleId === 'oilPastel' || styleId === 'jpRetroFilm';
 }
 
-/** GPT Image 2 reference: width×height 면적 */
+/** GPT Image 2 출력(생성물) 규격 — 면적·비율 */
 export const GPT_IMAGE2_MIN_AREA = 655_360;
 export const GPT_IMAGE2_MAX_AREA = 8_294_400;
 /** 긴 변 : 짧은 변 최대 비율 */
 export const GPT_IMAGE2_MAX_ASPECT = 3;
 /** 한 변 최대 (미만) — 규격은 3840 미만, 16 배수로 3824 */
 export const GPT_IMAGE2_MAX_EDGE = 3824;
+
+/**
+ * AI 참조(첨부) 사진 규격 — 출력 최대치와 다름.
+ * 고해상도 폰 사진을 출력 envelope(최대 ~8.2MP)로 맞추면 Runware 400이 났음.
+ */
+export const AI_REF_MAX_LONG_SIDE = 1536;
+/** 원본 파일 상한 — 이보다 크면 첨부 단계에서 거절 */
+export const AI_REF_MAX_FILE_BYTES = 40 * 1024 * 1024;
+/** 리사이즈 후 data URL 상한 (~500KB JPEG). 넘으면 품질 낮추다 실패 */
+export const AI_REF_MAX_DATA_URL_CHARS = 700_000;
+
+export const AI_PHOTO_TOO_LARGE_CODE = 'photo-too-large';
+
+export function isAiPhotoTooLargeError(err: unknown): boolean {
+  return err instanceof Error && err.message === AI_PHOTO_TOO_LARGE_CODE;
+}
+
+export function isAiPhotoTooLargeMessage(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes(AI_PHOTO_TOO_LARGE_CODE) ||
+    m.includes('too large') ||
+    m.includes('payload too large') ||
+    m.includes('entity too large') ||
+    m.includes('request entity') ||
+    m.includes('image is too big') ||
+    /\b413\b/.test(m) ||
+    /이미지\s*가?\s*너무\s*큽/.test(message) ||
+    /용량이\s*너무/.test(message)
+  );
+}
 
 function snapMultipleOf16(n: number): number {
   return Math.max(16, Math.round(n / 16) * 16);
@@ -319,7 +350,7 @@ export function fitGptImage2Size(
   return { outW, outH, sx, sy, sw, sh };
 }
 
-/** AI 참조용 사진 → JPEG data URL (GPT Image 2 규격에 맞춤) */
+/** AI 참조용 사진 → JPEG data URL (긴 변 ≤1536, ~500KB) */
 export function fileToAiReferenceDataUrl(
   file: File,
   quality = 0.85,
@@ -334,6 +365,10 @@ export function fileToAiReferenceDataUrl(
       reject(new Error('image-only'));
       return;
     }
+    if (file.size > AI_REF_MAX_FILE_BYTES) {
+      reject(new Error(AI_PHOTO_TOO_LARGE_CODE));
+      return;
+    }
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('read-failed'));
     reader.onload = () => {
@@ -346,7 +381,10 @@ export function fileToAiReferenceDataUrl(
           reject(new Error('load-failed'));
           return;
         }
-        const { outW, outH, sx, sy, sw, sh } = fitGptImage2Size(srcW, srcH);
+        const long = Math.max(srcW, srcH);
+        const scale = long > AI_REF_MAX_LONG_SIDE ? AI_REF_MAX_LONG_SIDE / long : 1;
+        const outW = Math.max(1, Math.round(srcW * scale));
+        const outH = Math.max(1, Math.round(srcH * scale));
         const canvas = document.createElement('canvas');
         canvas.width = outW;
         canvas.height = outH;
@@ -355,8 +393,20 @@ export function fileToAiReferenceDataUrl(
           reject(new Error('canvas-failed'));
           return;
         }
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, outW, outH);
+        ctx.drawImage(img, 0, 0, outW, outH);
+        let q = quality;
+        let dataUrl = canvas.toDataURL('image/jpeg', q);
+        while (dataUrl.length > AI_REF_MAX_DATA_URL_CHARS && q > 0.45) {
+          q = Math.max(0.45, q - 0.1);
+          dataUrl = canvas.toDataURL('image/jpeg', q);
+        }
+        if (dataUrl.length > AI_REF_MAX_DATA_URL_CHARS) {
+          reject(new Error(AI_PHOTO_TOO_LARGE_CODE));
+          return;
+        }
+        resolve(dataUrl);
       };
       img.onerror = () => reject(new Error('load-failed'));
       img.src = src;

@@ -9,6 +9,7 @@ import { AI_PACK_PRODUCTS, type AiPackProductId } from '../utils/aiPackProducts'
 import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
   getDiaryAccessState,
+  getProBillingPeriodEndMs,
   getPurchasedAiPackCredits,
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
@@ -170,6 +171,10 @@ function NyangTicketSheet({
   const packLeft = getPurchasedAiPackCredits();
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
+  const nextRenewalMs = isPro ? getProBillingPeriodEndMs() : null;
+  const nextRenewalLabel = nextRenewalMs
+    ? formatPurchaseDate(nextRenewalMs, i18n.language)
+    : null;
 
   const recordSubscriptionPurchase = async (productId?: string | null) => {
     const token = getAccessToken();
@@ -449,6 +454,11 @@ function NyangTicketSheet({
                 <span className="nyang-ticket__sub-status-title">
                   {t('nyangTicket.subscribed')}
                 </span>
+                {nextRenewalLabel ? (
+                  <span className="nyang-ticket__sub-status-renew">
+                    {t('nyangTicket.nextRenewal', { date: nextRenewalLabel })}
+                  </span>
+                ) : null}
                 <span className="nyang-ticket__sub-status-left">
                   {t('nyangTicket.packsRemaining', { n: subLeft })}
                 </span>

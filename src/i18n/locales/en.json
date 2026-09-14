@@ -293,6 +293,7 @@
     "subscribeLead": "Create up to {{n}} drawings every month!",
     "subscribeCta": "Subscribe to PRO",
     "subscribed": "Subscribed",
+    "nextRenewal": "Next renewal {{date}}",
     "subscribeDone": "Subscription started!",
     "restoreStarted": "Restore requested.",
     "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
@@ -661,6 +662,7 @@
       "photoChange": "Change photo",
       "photoRemove": "Remove photo",
       "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
       "style": {
         "webtoonHero": {
           "name": "Webtoonherost",

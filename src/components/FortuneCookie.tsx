@@ -47,7 +47,7 @@ export default function FortuneCookie({
     let intervalId = 0;
     const startId = window.setTimeout(() => {
       // 글자 하나씩 — 길게 읽을 수 있게 여유 있게
-      const ms = chars.length > 80 ? 130 : 155;
+      const ms = chars.length > 80 ? 165 : 195;
       intervalId = window.setInterval(() => {
         i += 1;
         setTyped(chars.slice(0, i).join(''));

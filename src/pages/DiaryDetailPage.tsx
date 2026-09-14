@@ -34,6 +34,7 @@ interface DiaryDetailPageProps {
   onEdit: () => void;
   onDelete: (id: string) => void;
   onOpenRooms: () => void;
+  onOpenRoom: (roomId: string) => void;
 }
 
 type ShareStep = 'menu' | 'rooms';
@@ -49,6 +50,7 @@ function DiaryDetailPage({
   onEdit,
   onDelete,
   onOpenRooms,
+  onOpenRoom,
 }: DiaryDetailPageProps) {
   const { t } = useTranslation();
   const { ensureGuestSession } = useAuthSession();
@@ -288,6 +290,7 @@ function DiaryDetailPage({
     };
 
     const okNames: string[] = [];
+    const okRoomIds: string[] = [];
     const failNames: string[] = [];
 
     try {
@@ -300,6 +303,7 @@ function DiaryDetailPage({
         const room = targets[i];
         if (result.status === 'fulfilled') {
           okNames.push(room.name);
+          okRoomIds.push(room.id);
           sharedOk = true;
           invalidateRoomFeed(room.id);
         } else {
@@ -312,13 +316,12 @@ function DiaryDetailPage({
 
       closeShare({ force: true });
 
-      if (okNames.length > 0 && failNames.length === 0) {
+      if (okRoomIds.length === 1 && failNames.length === 0) {
+        onOpenRoom(okRoomIds[0]);
+      } else if (okNames.length > 0 && failNames.length === 0) {
         setFeedback({
           kind: 'gotoRooms',
-          title:
-            okNames.length === 1
-              ? t('share.ok.oneRoom', { name: okNames[0] })
-              : t('share.ok.manyRooms', { n: okNames.length }),
+          title: t('share.ok.manyRooms', { n: okNames.length }),
         });
       } else if (okNames.length > 0) {
         setFeedback({

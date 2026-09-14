@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import type { FormEvent } from 'react';
+import type { CSSProperties, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry, DiarySticker, DiaryCanvasState } from '../types/diary';
 import { isMood, isNumberSticker, MOODS, NUMBER_STICKERS } from '../types/diary';
@@ -27,6 +27,8 @@ import {
   aiStylePreviewSrc,
   fileToAiReferenceDataUrl,
   isAiDrawStyleEnabled,
+  isAiPhotoTooLargeError,
+  isAiPhotoTooLargeMessage,
   preloadAiStylePreviews,
   subscribeAiStylePreviewsReady,
   TEXT_OIL_STYLE_ID,
@@ -282,6 +284,14 @@ function DiaryWritePage({
   const [aiLoginBusy, setAiLoginBusy] = useState(false);
   const [aiLoginError, setAiLoginError] = useState<string | null>(null);
   const [aiQuotaDetailOpen, setAiQuotaDetailOpen] = useState(false);
+  const aiRemainingBtnRef = useRef<HTMLButtonElement>(null);
+  const aiQuotaPopRef = useRef<HTMLDivElement>(null);
+  const [aiQuotaPopPos, setAiQuotaPopPos] = useState<{
+    top: number;
+    left: number;
+    arrowLeft: number;
+    place: 'above' | 'below';
+  } | null>(null);
   const googleBtnHostRef = useRef<HTMLDivElement>(null);
   const { signInWithGoogleIdToken } = useAuthSession();
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
@@ -914,6 +924,44 @@ function DiaryWritePage({
     return lines;
   })();
 
+  useLayoutEffect(() => {
+    if (!aiQuotaDetailOpen) {
+      setAiQuotaPopPos(null);
+      return;
+    }
+    const place = () => {
+      const btn = aiRemainingBtnRef.current;
+      const pop = aiQuotaPopRef.current;
+      if (!btn || !pop) return;
+      const pad = 16;
+      const gap = 10;
+      const br = btn.getBoundingClientRect();
+      const pr = pop.getBoundingClientRect();
+      let left = br.right - pr.width;
+      left = Math.max(pad, Math.min(left, window.innerWidth - pad - pr.width));
+      let top = br.top - gap - pr.height;
+      let place: 'above' | 'below' = 'above';
+      if (top < pad) {
+        top = Math.min(br.bottom + gap, window.innerHeight - pad - pr.height);
+        place = 'below';
+      }
+      const arrowLeft = Math.max(
+        14,
+        Math.min(pr.width - 14, br.left + br.width / 2 - left),
+      );
+      setAiQuotaPopPos({ top, left, arrowLeft, place });
+    };
+    place();
+    const raf = window.requestAnimationFrame(place);
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [aiQuotaDetailOpen, aiQuotaBreakdown.length, aiLeft]);
+
   const promptAiDrawBlocked = () => {
     if (getAiPackCredits() > 0) {
       void runAiDraw();
@@ -1298,8 +1346,14 @@ function DiaryWritePage({
       const dataUrl = await fileToAiReferenceDataUrl(file);
       setAiReferenceImage(dataUrl);
       aiReferenceImageRef.current = dataUrl;
-    } catch {
-      setAiPhotoError(t('write.ai.photoError'));
+    } catch (err) {
+      setAiReferenceImage(null);
+      aiReferenceImageRef.current = null;
+      setAiPhotoError(
+        isAiPhotoTooLargeError(err)
+          ? t('write.ai.photoTooLarge')
+          : t('write.ai.photoError'),
+      );
     }
   };
 
@@ -1390,9 +1444,15 @@ function DiaryWritePage({
         setUsageNotice(notice);
         setUsageNoticeOpen(true);
       }
-    } catch {
+    } catch (err) {
       aiQuotaKindRef.current = 'none';
-      showAiRetryToast();
+      const msg = err instanceof Error ? err.message : '';
+      if (isAiPhotoTooLargeError(err) || isAiPhotoTooLargeMessage(msg)) {
+        setAiPhotoError(t('write.ai.photoTooLarge'));
+        onAppToast?.(t('write.ai.photoTooLarge'));
+      } else {
+        showAiRetryToast();
+      }
     } finally {
       setAiLoading(false);
       setFortuneVisible(false);
@@ -1818,6 +1878,7 @@ function DiaryWritePage({
                   {isFlutterApp() && (
                     <span className="diary-write__ai-remaining-wrap">
                       <button
+                        ref={aiRemainingBtnRef}
                         type="button"
                         className={`diary-write__ai-remaining${aiQuotaDetailOpen ? ' is-open' : ''}`}
                         title={t('quota.deductAfterDone')}
@@ -1830,35 +1891,6 @@ function DiaryWritePage({
                       >
                         <span className="diary-write__ai-remaining-n">{aiLeft}</span>
                       </button>
-                      {aiQuotaDetailOpen && (
-                        <>
-                          <button
-                            type="button"
-                            className="diary-write__ai-quota-scrim"
-                            aria-label={t('common.close')}
-                            onClick={() => setAiQuotaDetailOpen(false)}
-                          />
-                          <div
-                            className="diary-write__ai-quota-pop"
-                            role="dialog"
-                            aria-label={t('quota.breakdownTitle')}
-                          >
-                            {aiQuotaBreakdown.length > 0 ? (
-                              <ul className="diary-write__ai-quota-list">
-                                {aiQuotaBreakdown.map((line) => (
-                                  <li key={line.key}>
-                                    {t(line.labelKey, { n: line.n })}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="diary-write__ai-quota-empty">
-                                {t('quota.breakdownEmpty')}
-                              </p>
-                            )}
-                          </div>
-                        </>
-                      )}
                     </span>
                   )}
                 </div>
@@ -1881,6 +1913,45 @@ function DiaryWritePage({
       </div>
       {createPortal(
         <>
+          {aiQuotaDetailOpen && (
+            <>
+              <button
+                type="button"
+                className="diary-write__ai-quota-scrim"
+                aria-label={t('common.close')}
+                onClick={() => setAiQuotaDetailOpen(false)}
+              />
+              <div
+                ref={aiQuotaPopRef}
+                className={`diary-write__ai-quota-pop${aiQuotaPopPos ? ' is-placed' : ''}${aiQuotaPopPos?.place === 'below' ? ' is-below' : ''}`}
+                role="dialog"
+                aria-label={t('quota.breakdownTitle')}
+                style={
+                  aiQuotaPopPos
+                    ? ({
+                        top: aiQuotaPopPos.top,
+                        left: aiQuotaPopPos.left,
+                        ['--quota-arrow-left' as string]: `${aiQuotaPopPos.arrowLeft}px`,
+                      } as CSSProperties)
+                    : undefined
+                }
+              >
+                {aiQuotaBreakdown.length > 0 ? (
+                  <ul className="diary-write__ai-quota-list">
+                    {aiQuotaBreakdown.map((line) => (
+                      <li key={line.key}>
+                        {t(line.labelKey, { n: line.n })}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="diary-write__ai-quota-empty">
+                    {t('quota.breakdownEmpty')}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
           {purchaseClickShield && (
             <div
               className="diary-write__purchase-shield"

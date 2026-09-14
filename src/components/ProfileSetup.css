@@ -63,7 +63,7 @@
   border: none;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--color-surface);
+  background: var(--color-accent-soft);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 35%, transparent);
   cursor: pointer;
 }
@@ -94,7 +94,8 @@
   height: 100%;
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--color-text-muted);
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
 }
 
 .profile-setup__photo-btn {

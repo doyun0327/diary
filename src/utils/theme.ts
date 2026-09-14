@@ -1,3 +1,5 @@
+import { refreshStoredLetterAvatar } from './letterAvatar';
+
 export type ThemeId = 'paper' | 'matcha' | 'sky' | 'blossom' | 'pink' | 'ink' | 'lemon';
 
 export const THEME_STORAGE_KEY = 'picture-diary-theme';
@@ -66,6 +68,15 @@ export function applyTheme(id: ThemeId) {
   }
 
   syncThemeToNative(id);
+
+  // 테마 변수가 DOM에 적용된 뒤 이니셜 아바타 색 갱신
+  if (typeof window !== 'undefined') {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        refreshStoredLetterAvatar();
+      });
+    });
+  }
 }
 
 export function applyStoredTheme() {

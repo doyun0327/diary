@@ -1185,6 +1185,12 @@ function App() {
               setActivePostId(null);
               setPage("rooms");
             }}
+            onOpenRoom={(roomId) => {
+              void prefetchRoomFeed(roomId, { force: true });
+              setActiveRoomId(roomId);
+              setActivePostId(null);
+              setPage("room");
+            }}
           />
         )}
         {page === "rooms" && (
