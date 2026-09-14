@@ -230,10 +230,6 @@ function DiaryWritePage({
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
-  /** 미리보기 펼친 스타일 — null 이면 접힘 */
-  const [aiStylePreviewId, setAiStylePreviewId] = useState<AiDrawStyleId | null>(
-    null,
-  );
   /** 모달에서 고른 스타일 (확인 전까지 대기) */
   const [aiStyleSelectedId, setAiStyleSelectedId] =
     useState<AiDrawStyleId>('webtoonHero');
@@ -441,50 +437,15 @@ function DiaryWritePage({
     });
   };
 
-  // 처음 몇 번만 짧게 흘려가게 안내
+  // 그림생성 옆 말풍선 — 약 5초
   useEffect(() => {
     if (coach !== 'ai') return;
     const timer = window.setTimeout(() => {
       dismissAiCoach();
-    }, 4500);
+    }, 5000);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 표시될 때만 타이머
   }, [coach]);
-
-  // 스타일 미리보기 펼치면 모달을 맨 아래로 — 확인 버튼이 전부 보이게
-  useEffect(() => {
-    if (!aiStyleOpen || !aiStylePreviewId) return;
-    let cancelled = false;
-    const timers: number[] = [];
-
-    const scrollPanelToBottom = () => {
-      if (cancelled) return;
-      const panel = document.querySelector(
-        '.app-modal__panel--ai-style',
-      ) as HTMLElement | null;
-      if (!panel) return;
-      panel.scrollTop = panel.scrollHeight;
-    };
-
-    const schedule = (ms: number) => {
-      timers.push(window.setTimeout(scrollPanelToBottom, ms));
-    };
-
-    // 레이아웃·미리보기 이미지 반영 타이밍에 맞춰 여러 번
-    const raf = window.requestAnimationFrame(() => {
-      scrollPanelToBottom();
-      schedule(0);
-      schedule(50);
-      schedule(150);
-      schedule(300);
-    });
-
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(raf);
-      timers.forEach((id) => window.clearTimeout(id));
-    };
-  }, [aiStyleOpen, aiStylePreviewId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1653,22 +1614,22 @@ function DiaryWritePage({
                         <span className="diary-write__ai-remaining-n">{aiLeft}</span>
                       </span>
                     )}
+                    {coach === 'ai' && (
+                      <div className="diary-write__coach diary-write__coach--ai" role="status">
+                        <p>{t('write.coach.ai')}</p>
+                        <button
+                          type="button"
+                          className="diary-write__coach-dismiss"
+                          aria-label={t('common.close')}
+                          onClick={dismissAiCoach}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              {coach === 'ai' && (
-                <div className="diary-write__coach diary-write__coach--ai" role="status">
-                  <p>{t('write.coach.ai')}</p>
-                  <button
-                    type="button"
-                    className="diary-write__coach-dismiss"
-                    aria-label={t('common.close')}
-                    onClick={dismissAiCoach}
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
@@ -1713,7 +1674,6 @@ function DiaryWritePage({
               panelClassName="app-modal__panel--ai-style"
               onDismiss={() => {
                 setAiStyleOpen(false);
-                setAiStylePreviewId(null);
               }}
               showClose
               closeAriaLabel={t('common.close')}
@@ -1727,12 +1687,9 @@ function DiaryWritePage({
                   setAiPhotoError(t('write.ai.styleDisabled'));
                   return;
                 }
-                setAiStylePreviewId(null);
                 proceedAfterStylePick(aiStyleSelectedId);
               }}
             >
-              <p className="diary-write__ai-style-lead">{t('write.ai.styleLead')}</p>
-
               <div className="diary-write__ai-photo">
                 <p className="diary-write__ai-photo-label">{t('write.ai.photoLabel')}</p>
                 <input
@@ -1781,99 +1738,52 @@ function DiaryWritePage({
 
               <div className="diary-write__ai-styles" role="list">
                 {AI_DRAW_STYLES.map((style) => {
-                  const previewOpen = aiStylePreviewId === style.id;
                   const selected = aiStyleSelectedId === style.id;
                   const enabled = style.enabled !== false;
+                  const coverSrc = style.previewSrcs[0]
+                    ? aiStylePreviewSrc(style.previewSrcs[0])
+                    : '';
+                  const coverReady = coverSrc.startsWith('blob:');
                   return (
-                    <div
+                    <button
                       key={style.id}
+                      type="button"
+                      role="listitem"
                       className={[
                         'diary-write__ai-style-item',
-                        previewOpen ? 'is-preview-open' : '',
                         selected ? 'is-selected' : '',
                         !enabled ? 'is-disabled' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')}
-                      role="listitem"
+                      aria-pressed={selected}
+                      aria-label={t(`write.ai.style.${style.id}.name`)}
+                      disabled={!enabled}
+                      onClick={() => {
+                        if (!enabled) return;
+                        setAiStyleSelectedId(style.id);
+                      }}
                     >
-                      <div className="diary-write__ai-style-row">
-                        <button
-                          type="button"
-                          className="diary-write__ai-style-btn"
-                          aria-pressed={selected}
-                          disabled={!enabled}
-                          onClick={() => {
-                            if (!enabled) return;
-                            setAiStyleSelectedId(style.id);
-                          }}
-                        >
-                          <span className="diary-write__ai-style-name">
-                            {t(`write.ai.style.${style.id}.name`)}
-                            {!enabled ? (
-                              <span className="diary-write__ai-style-soon">
-                                {' '}
-                                {t('write.ai.styleSoon')}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span className="diary-write__ai-style-desc">
-                            {t(`write.ai.style.${style.id}.desc`)}
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          className="diary-write__ai-style-preview-toggle"
-                          aria-expanded={previewOpen}
-                          aria-label={
-                            previewOpen
-                              ? t('write.ai.stylePreviewHide')
-                              : t('write.ai.stylePreview')
-                          }
-                          onClick={() =>
-                            setAiStylePreviewId(previewOpen ? null : style.id)
-                          }
-                        >
-                          <svg
-                            className="diary-write__ai-style-chevron"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            aria-hidden
-                          >
-                            <path
-                              d="M6 9l6 6 6-6"
-                              stroke="currentColor"
-                              strokeWidth="2.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      {previewOpen && (
-                        <div
-                          className="diary-write__ai-style-preview-grid"
-                          aria-label={t('write.ai.stylePreview')}
-                        >
-                          {style.previewSrcs.map((src) => {
-                            const resolved = aiStylePreviewSrc(src);
-                            // blob만 사용 — path fallback 시 네트워크 재요청 방지
-                            if (!resolved.startsWith('blob:')) return null;
-                            return (
-                              <img
-                                key={src}
-                                src={resolved}
-                                alt=""
-                                className="diary-write__ai-style-preview-img"
-                                decoding="async"
-                              />
-                            );
-                          })}
-                        </div>
+                      {coverReady ? (
+                        <img
+                          src={coverSrc}
+                          alt=""
+                          className="diary-write__ai-style-cover"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span className="diary-write__ai-style-cover diary-write__ai-style-cover--empty" />
                       )}
-                    </div>
+                      <span className="diary-write__ai-style-name">
+                        {t(`write.ai.style.${style.id}.name`)}
+                        {!enabled ? (
+                          <span className="diary-write__ai-style-soon">
+                            {' '}
+                            {t('write.ai.styleSoon')}
+                          </span>
+                        ) : null}
+                      </span>
+                    </button>
                   );
                 })}
               </div>

@@ -37,7 +37,7 @@
     "footer": "慢慢地，一天一天",
     "account": "账号",
     "accountHintEmpty": "头像 · 账号",
-    "rooms": "好友房",
+    "rooms": "PageBy",
     "roomsHint": "我的房间",
     "character": "角色",
     "characterHint": "AI 画里的我",
@@ -340,7 +340,7 @@
       "copyCode": "复制邀请码",
       "share": "分享",
       "shareTitle": "PageBy 好友房邀请",
-      "shareText": "要不要一起画图日记？ 🖍️\n我们每天画一张吧！\n\n邀请码：{{code}}\n\n在应用中：好友房 > 用邀请码加入 > 输入邀请码即可进入",
+      "shareText": "要不要一起画图日记？ 🖍️\n我们每天画一张吧！\n\n邀请码：{{code}}\n\n点开链接即可进入。未安装应用会跳转到安装页面。",
       "enterRoom": "进入房间",
       "created": "房间已创建！\n\n邀请码：{{code}}\n\n把这个码分享给朋友吧。"
     },

@@ -37,7 +37,7 @@
     "footer": "Langsam, Tag für Tag",
     "account": "Konto",
     "accountHintEmpty": "Foto · Konto",
-    "rooms": "Freundesräume",
+    "rooms": "PageBy",
     "roomsHint": "Meine Räume",
     "character": "Charakter",
     "characterHint": "Ich in KI-Zeichnungen",
@@ -341,7 +341,7 @@
       "copyCode": "Code kopieren",
       "share": "Teilen",
       "shareTitle": "PageBy-Raumeinladung",
-      "shareText": "Lust auf ein Bildertagebuch? 🖍️\nLass uns jeden Tag zusammen malen!\n\nEinladungscode: {{code}}\n\nIn der App: Freundesräume > Mit Code beitreten > Einladungscode eingeben",
+      "shareText": "Lust auf ein Bildertagebuch? 🖍️\nLass uns jeden Tag zusammen malen!\n\nEinladungscode: {{code}}\n\nTipp auf den Link zum Beitreten. Ohne App geht’s zum Store.",
       "enterRoom": "Raum betreten",
       "created": "Raum erstellt!\n\nEinladungscode: {{code}}\n\nTeile diesen Code mit Freunden."
     },

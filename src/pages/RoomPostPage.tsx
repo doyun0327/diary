@@ -14,6 +14,10 @@ import {
   isUserBlocked,
   subscribeBlockedUsers,
 } from '../utils/blockedUsers';
+import {
+  isReportedPostHidden,
+  subscribeHiddenReportedPosts,
+} from '../utils/hiddenReportedPosts';
 import { useClientProfile } from '../hooks/useClientProfile';
 import './RoomsPages.css';
 
@@ -101,6 +105,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const syncKeyboardScrollRef = useRef<() => void>(() => {});
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+  useEffect(
+    () => subscribeHiddenReportedPosts(() => setBlockTick((n) => n + 1)),
+    [],
+  );
 
   useEffect(() => {
     const vv = window.visualViewport;
@@ -302,8 +310,12 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   useEffect(() => {
     if (post && isUserBlocked(post.authorUserId) && post.authorUserId !== userId) {
       onBack();
+      return;
     }
-  }, [post, userId, onBack, blockTick]);
+    if (isReportedPostHidden(postId)) {
+      onBack();
+    }
+  }, [post, userId, onBack, blockTick, postId]);
 
   const handleComment = async () => {
     const body = text.trim();
@@ -607,6 +619,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           onBlocked={() => {
             setBlockTick((n) => n + 1);
             if (post && safetyTarget.userId === post.authorUserId) onBack();
+          }}
+          onReportedPostHidden={() => {
+            setBlockTick((n) => n + 1);
+            onBack();
           }}
           onDone={setToast}
         />

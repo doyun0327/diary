@@ -394,7 +394,6 @@ function Header({
               <MenuItem
                 icon={<IconUsers />}
                 label={t('header.rooms')}
-                hint={t('header.roomsHint')}
                 tone="lavender"
                 onClick={() => closeAnd(onOpenRooms)}
               />

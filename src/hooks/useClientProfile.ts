@@ -5,6 +5,14 @@ const CLIENT_ID_KEY = 'picture-diary-client-id';
 const NICKNAME_KEY = 'picture-diary-nickname';
 const AVATAR_KEY = 'picture-diary-avatar';
 
+export function readStoredClientId(): string {
+  return loadClientId();
+}
+
+export function readStoredNickname(): string {
+  return loadNickname();
+}
+
 function loadClientId(): string {
   try {
     const existing = localStorage.getItem(CLIENT_ID_KEY);

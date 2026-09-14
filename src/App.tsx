@@ -65,6 +65,13 @@ import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
 import { preloadAiStylePreviews } from "./utils/aiDrawStyles";
 import {
+  captureInviteFromLocation,
+  isValidInviteCode,
+  normalizeInviteCode,
+  takePendingRoomInvite,
+  tryOpenAppOrStore,
+} from "./utils/roomInvite";
+import {
   applyAiPackCreditsFromServer,
   applyMonthlyUsageFromServer,
   canUseProAiQuota,
@@ -170,6 +177,10 @@ function App() {
   } | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
+  /** 초대 링크로 받은 코드 — RoomsHub에서 자동 입장 후 소거 */
+  const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(
+    null,
+  );
   const [subscriptionModal, setSubscriptionModal] =
     useState<SubscriptionModalReason | null>(null);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
@@ -603,24 +614,27 @@ function App() {
     googleReauthToastShownRef.current = false;
   }, [session?.provider, session?.userId]);
 
+  const pulseCalendarHighlight = useCallback((savedDate: string) => {
+    const [y, m] = savedDate.split("-").map(Number);
+    if (Number.isFinite(y) && Number.isFinite(m)) {
+      setCalYear(y);
+      setCalMonth(m - 1);
+    }
+    setSelectedDate(savedDate);
+    if (calendarHighlightTimerRef.current) {
+      clearTimeout(calendarHighlightTimerRef.current);
+    }
+    setCalendarHighlightDate(savedDate);
+    calendarHighlightTimerRef.current = setTimeout(() => {
+      setCalendarHighlightDate(null);
+      calendarHighlightTimerRef.current = null;
+    }, 1600);
+  }, []);
+
   const persistNewEntry = useCallback(
     async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
       await addEntry(entry);
-      const savedDate = entry.date;
-      const [y, m] = savedDate.split("-").map(Number);
-      if (Number.isFinite(y) && Number.isFinite(m)) {
-        setCalYear(y);
-        setCalMonth(m - 1);
-      }
-      setSelectedDate(savedDate);
-      if (calendarHighlightTimerRef.current) {
-        clearTimeout(calendarHighlightTimerRef.current);
-      }
-      setCalendarHighlightDate(savedDate);
-      calendarHighlightTimerRef.current = setTimeout(() => {
-        setCalendarHighlightDate(null);
-        calendarHighlightTimerRef.current = null;
-      }, 1600);
+      pulseCalendarHighlight(entry.date);
       setPage("home");
       syncInBackground();
       showAppToast(t("write.savedToast"));
@@ -628,7 +642,7 @@ function App() {
         setPagebyAfterSavePromptOpen(true);
       }
     },
-    [addEntry, showAppToast, syncInBackground, t],
+    [addEntry, pulseCalendarHighlight, showAppToast, syncInBackground, t],
   );
 
   const persistDiarySave = useCallback(
@@ -640,9 +654,10 @@ function App() {
     ) => {
       if (editId) {
         await updateEntry(editId, entry);
-        setSelectedId(editId);
+        setSelectedId(null);
         setEditingId(null);
-        setPage("detail");
+        pulseCalendarHighlight(entry.date);
+        setPage("home");
         void syncSharedDiaryAfterEdit(editId, entry);
         syncInBackground();
         showAppToast(t("write.updatedToast"));
@@ -650,7 +665,14 @@ function App() {
       }
       await persistNewEntry(entry);
     },
-    [persistNewEntry, showAppToast, syncInBackground, t, updateEntry],
+    [
+      persistNewEntry,
+      pulseCalendarHighlight,
+      showAppToast,
+      syncInBackground,
+      t,
+      updateEntry,
+    ],
   );
 
   const handleSave: Parameters<typeof DiaryWritePage>[0]["onSave"] = (
@@ -885,6 +907,44 @@ function App() {
     setActivePostId(null);
     setPage("rooms");
   };
+
+  // 초대 딥링크: URL·Flutter 주입 → (브라우저면 앱/스토어 시도) → 친구방 자동 입장
+  useEffect(() => {
+    const applyInvite = (raw: string | null | undefined) => {
+      const code = normalizeInviteCode(raw);
+      if (!isValidInviteCode(code)) return false;
+      setPendingInviteCode(code);
+      return true;
+    };
+
+    const fromBoot = captureInviteFromLocation();
+    if (fromBoot) {
+      if (!isFlutterApp()) {
+        tryOpenAppOrStore(fromBoot);
+      }
+      applyInvite(fromBoot);
+    }
+
+    const onInviteEvent = () => {
+      const code = captureInviteFromLocation();
+      if (applyInvite(code)) {
+        void prefetchRoomsList();
+        setActiveRoomId(null);
+        setActivePostId(null);
+        setPage("rooms");
+      }
+    };
+    window.addEventListener("diary-invite-open", onInviteEvent);
+    return () => window.removeEventListener("diary-invite-open", onInviteEvent);
+  }, []);
+
+  // 프로필 설정이 끝난 뒤에야 방 허브로 이동
+  useEffect(() => {
+    if (needsProfileSetup || !pendingInviteCode) return;
+    if (page === "rooms" || page === "room" || page === "room-post") return;
+    openRooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 초대 대기 중 1회
+  }, [needsProfileSetup, pendingInviteCode]);
 
   // 화면 잠금 메뉴 임시 비활성
   // const handleToggleScreenLock = () => {
@@ -1127,6 +1187,11 @@ function App() {
             ensureGuestSession={ensureGuestSession}
             onOpenAccount={() => setAccountOpen(true)}
             onBack={() => setPage("home")}
+            pendingInviteCode={pendingInviteCode}
+            onPendingInviteConsumed={() => {
+              takePendingRoomInvite();
+              setPendingInviteCode(null);
+            }}
             onOpenRoom={(roomId) => {
               void prefetchRoomFeed(roomId, { force: true });
               setActiveRoomId(roomId);

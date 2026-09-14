@@ -37,7 +37,7 @@
     "footer": "Despacio, día a día",
     "account": "Cuenta",
     "accountHintEmpty": "Foto · cuenta",
-    "rooms": "Salas de amigos",
+    "rooms": "PageBy",
     "roomsHint": "Mis salas",
     "character": "Personaje",
     "characterHint": "Yo en dibujos IA",
@@ -340,7 +340,7 @@
       "copyCode": "Copiar código",
       "share": "Compartir",
       "shareTitle": "Invitación a sala PageBy",
-      "shareText": "¿Quieres probar un diario ilustrado? 🖍️\n¡Dibujemos uno juntos cada día!\n\nCódigo: {{code}}\n\nEn la app: Salas de amigos > Unirse con código > introduce el código de invitación",
+      "shareText": "¿Quieres probar un diario ilustrado? 🖍️\n¡Dibujemos uno juntos cada día!\n\nCódigo: {{code}}\n\nToca el enlace para entrar. Si no tienes la app, irás a la tienda.",
       "enterRoom": "Entrar a la sala",
       "created": "¡Sala creada!\n\nCódigo de invitación: {{code}}\n\nComparte este código con amigos."
     },

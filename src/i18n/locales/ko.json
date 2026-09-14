@@ -37,7 +37,7 @@
     "footer": "천천히, 하루씩",
     "account": "계정",
     "accountHintEmpty": "프로필 · 계정",
-    "rooms": "page",
+    "rooms": "PageBy",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
     "characterHint": "AI 그림 속 나",
@@ -427,7 +427,7 @@
       "copyCode": "코드 복사하기",
       "share": "공유하기",
       "shareTitle": "PageBy 초대",
-      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}\n\n앱에서 PageBy > 코드로 입장 > 초대코드 입력하면 들어올 수 있어요!",
+      "shareText": "너도 그림일기 써볼래? 🖍️\n우리 같이 매일 하나씩 그려보자!\n\n초대코드: {{code}}\n\n링크를 누르면 바로 들어올 수 있어요. 앱이 없으면 설치 화면으로 이동해요!",
       "enterRoom": "방으로 들어가기",
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
@@ -456,7 +456,7 @@
       "blockLead": "{{name}}의 글과 댓글이 더 이상 보이지 않아요.",
       "blockConfirm": "차단하기",
       "blockedToast": "{{name}}님을 차단했어요",
-      "reportedToast": "신고를 접수했어요. 검토할게요.",
+      "reportedToast": "신고를 접수했어요. 해당 글은 더 이상 보이지 않아요.",
       "feedEmptyBlocked": "차단한 사람의 글만 있어서 지금은 비어 있어요.",
       "you": "나"
     },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AppModal from './AppModal';
 import { blockUser } from '../utils/blockedUsers';
+import { hideReportedPost } from '../utils/hiddenReportedPosts';
 import {
   REPORT_REASON_IDS,
   submitUgcReport,
@@ -23,12 +24,20 @@ type RoomSafetyModalProps = {
   onClose: () => void;
   /** 차단 직후 (목록 새로고침·뒤로가기 등) */
   onBlocked?: (userId: string) => void;
+  /** 게시글 신고 후 숨김 처리됨 */
+  onReportedPostHidden?: (postId: string) => void;
   onDone?: (message: string) => void;
 };
 
 type Step = 'menu' | 'report' | 'blockConfirm';
 
-function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModalProps) {
+function RoomSafetyModal({
+  target,
+  onClose,
+  onBlocked,
+  onReportedPostHidden,
+  onDone,
+}: RoomSafetyModalProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>('menu');
   const [reason, setReason] = useState<ReportReasonId>('spam');
@@ -60,12 +69,16 @@ function RoomSafetyModal({ target, onClose, onBlocked, onDone }: RoomSafetyModal
         postId: target.postId,
         commentId: target.commentId,
       });
-      finish(t('rooms.safety.reportedToast'));
     } catch {
-      finish(t('rooms.safety.reportedToast'));
-    } finally {
-      setBusy(false);
+      // 서버 실패해도 로컬 큐·숨김은 진행
     }
+    const postId = target.postId?.trim();
+    if (target.kind === 'post' && postId) {
+      hideReportedPost(postId);
+      onReportedPostHidden?.(postId);
+    }
+    finish(t('rooms.safety.reportedToast'));
+    setBusy(false);
   };
 
   if (step === 'report') {

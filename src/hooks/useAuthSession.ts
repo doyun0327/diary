@@ -6,6 +6,10 @@ import {
   logoutRemote,
   deleteAccountRemote,
 } from '../api/authApi';
+import {
+  readStoredClientId,
+  readStoredNickname,
+} from './useClientProfile';
 
 export type AuthProvider = 'google' | 'apple' | 'guest';
 
@@ -223,12 +227,49 @@ export function useAuthSession() {
   const signInWithGoogleIdToken = useCallback(async (idToken: string) => {
     const current = loadSession();
     const currentToken = loadToken();
-    // 게스트 세션이면 Authorization 으로 보내 같은 users.id 승격
-    const guestToken =
-      current?.provider === 'guest' && isAccessTokenUsable(currentToken)
-        ? currentToken
-        : null;
     const prevSynced = current?.lastSyncedAt ?? null;
+
+    /**
+     * 게스트 → Google 은 같은 users.id 로 승격.
+     * 토큰이 만료됐어도 같은 clientId 로 게스트 JWT를 다시 받아
+     * Authorization 에 실어 무조건 승격 시도.
+     */
+    let guestToken: string | null = null;
+    const alreadyGoogle =
+      current?.provider === 'google' && isAccessTokenUsable(currentToken);
+
+    if (!alreadyGoogle) {
+      if (
+        current?.provider === 'guest' &&
+        isAccessTokenUsable(currentToken) &&
+        currentToken
+      ) {
+        guestToken = currentToken;
+      } else {
+        const clientId = readStoredClientId().trim();
+        const nick = readStoredNickname().trim() || 'User';
+        if (clientId) {
+          try {
+            const guestAuth = await loginAsGuest(clientId, nick);
+            // provider 가 이미 google 로 복구된 경우(기기 연동)엔 승격 헤더 불필요
+            if (
+              providerFromAuthUser(guestAuth.user.provider) === 'guest' &&
+              guestAuth.accessToken
+            ) {
+              guestToken = guestAuth.accessToken;
+            }
+          } catch {
+            // 재발급 실패 시 만료된 게스트 토큰이라도 보내 서버 승격 시도
+            if (current?.provider === 'guest' && currentToken) {
+              guestToken = currentToken;
+            }
+          }
+        } else if (current?.provider === 'guest' && currentToken) {
+          guestToken = currentToken;
+        }
+      }
+    }
+
     const auth = await loginWithGoogleIdToken(idToken, guestToken);
     const next = sessionFromAuth('google', auth, prevSynced);
     saveToken(auth.accessToken);

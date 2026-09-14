@@ -37,7 +37,7 @@
     "footer": "Slowly, day by day",
     "account": "Account",
     "accountHintEmpty": "Photo · account",
-    "rooms": "page",
+    "rooms": "PageBy",
     "roomsHint": "My rooms",
     "character": "Character",
     "characterHint": "Me in AI drawings",
@@ -427,7 +427,7 @@
       "copyCode": "Copy code",
       "share": "Share",
       "shareTitle": "PageBy room invite",
-      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}\n\nIn the app: PageBy > Join with code > enter the invite code",
+      "shareText": "Want to try a picture diary too? 🖍️\nLet's draw one together every day!\n\nInvite code: {{code}}\n\nTap the link to join right away. If the app isn't installed, you'll go to the store.",
       "enterRoom": "Enter room",
       "created": "Room created!\n\nInvite code: {{code}}\n\nShare this code with friends."
     },
@@ -456,7 +456,7 @@
       "blockLead": "Posts and comments from {{name}} won't appear for you.",
       "blockConfirm": "Block",
       "blockedToast": "Blocked {{name}}",
-      "reportedToast": "Report received. We'll review it.",
+      "reportedToast": "Report received. That post is now hidden for you.",
       "feedEmptyBlocked": "Nothing to show — only posts from blocked people.",
       "you": "You"
     },

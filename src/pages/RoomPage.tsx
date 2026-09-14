@@ -28,6 +28,10 @@ import {
   filterBlockedAuthorId,
   subscribeBlockedUsers,
 } from '../utils/blockedUsers';
+import {
+  filterHiddenReportedPosts,
+  subscribeHiddenReportedPosts,
+} from '../utils/hiddenReportedPosts';
 import './RoomsPages.css';
 
 export const ROOM_POSTS_PAGE_SIZE = 10;
@@ -71,6 +75,10 @@ function RoomPage({
   const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
+  useEffect(
+    () => subscribeHiddenReportedPosts(() => setBlockTick((n) => n + 1)),
+    [],
+  );
 
   useEffect(() => {
     if (!toast) return;
@@ -80,7 +88,7 @@ function RoomPage({
 
   const visibleFeedPosts = useMemo(() => {
     void blockTick;
-    return filterBlockedAuthorId(posts);
+    return filterHiddenReportedPosts(filterBlockedAuthorId(posts));
   }, [posts, blockTick]);
 
   const postsPageCount = Math.max(1, totalPages);

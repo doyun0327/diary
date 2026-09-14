@@ -37,7 +37,7 @@
     "footer": "Thong thả, từng ngày một",
     "account": "Tài khoản",
     "accountHintEmpty": "Ảnh · tài khoản",
-    "rooms": "Phòng bạn bè",
+    "rooms": "PageBy",
     "roomsHint": "Phòng của tôi",
     "character": "Nhân vật",
     "characterHint": "Tôi trong tranh AI",
@@ -340,7 +340,7 @@
       "copyCode": "Sao chép mã",
       "share": "Chia sẻ",
       "shareTitle": "Lời mời phòng PageBy",
-      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}\n\nTrong app: Phòng bạn bè > Tham gia bằng mã > nhập mã mời",
+      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}\n\nNhấn link để vào ngay. Nếu chưa cài app sẽ chuyển đến cửa hàng.",
       "enterRoom": "Vào phòng",
       "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
     },

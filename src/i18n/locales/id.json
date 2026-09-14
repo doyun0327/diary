@@ -37,7 +37,7 @@
     "footer": "Pelan-pelan, hari demi hari",
     "account": "Akun",
     "accountHintEmpty": "Foto · akun",
-    "rooms": "Ruang teman",
+    "rooms": "PageBy",
     "roomsHint": "Ruang saya",
     "character": "Karakter",
     "characterHint": "Saya di gambar AI",
@@ -340,7 +340,7 @@
       "copyCode": "Salin kode",
       "share": "Bagikan",
       "shareTitle": "Undangan ruang PageBy",
-      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}\n\nDi aplikasi: Ruang teman > Gabung dengan kode > masukkan kode undangan",
+      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}\n\nKetuk tautan untuk masuk. Jika belum instal, akan ke toko aplikasi.",
       "enterRoom": "Masuk ruang",
       "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
     },

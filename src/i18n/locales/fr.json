@@ -37,7 +37,7 @@
     "footer": "Doucement, jour après jour",
     "account": "Compte",
     "accountHintEmpty": "Photo · compte",
-    "rooms": "Salons d'amis",
+    "rooms": "PageBy",
     "roomsHint": "Mes salons",
     "character": "Personnage",
     "characterHint": "Moi dans les dessins IA",
@@ -340,7 +340,7 @@
       "copyCode": "Copier le code",
       "share": "Partager",
       "shareTitle": "Invitation salon PageBy",
-      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}\n\nDans l’app : Salons d’amis > Rejoindre avec un code > saisissez le code d’invitation",
+      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}\n\nOuvre le lien pour rejoindre tout de suite. Sans l’app, tu iras sur le store.",
       "enterRoom": "Entrer dans le salon",
       "created": "Salon créé !\n\nCode d'invitation : {{code}}\n\nPartagez ce code avec vos amis."
     },

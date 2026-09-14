@@ -34,6 +34,7 @@ export const AI_DRAW_STYLES: {
     id: 'webtoonHero',
     enabled: true,
     previewSrcs: [
+      '/preview/웹툰4.jpg',
       '/preview/웹툰1.jpg',
       '/preview/웹툰2.jpg',
       '/preview/웹툰3.jpg',
@@ -52,14 +53,14 @@ export const AI_DRAW_STYLES: {
     id: 'jpRetroFilm',
     enabled: true,
     previewSrcs: [
+      '/preview/일본3.jpg',
       '/preview/일본1.jpg',
       '/preview/일본2.jpg',
-      '/preview/일본3.jpg',
     ],
   },
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v5';
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v7';
 /** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
 const previewBlobUrlBySrc = new Map<string, string>();
 const previewReadyListeners = new Set<() => void>();
@@ -122,7 +123,10 @@ export function preloadAiStylePreviews() {
   if (previewWarmPromise) return previewWarmPromise;
 
   previewWarmPromise = (async () => {
-    const paths = AI_DRAW_STYLES.flatMap((style) => style.previewSrcs).filter(Boolean);
+    // UI는 스타일당 대표 1장만 쓰므로 커버만 프리로드
+    const paths = AI_DRAW_STYLES.map((style) => style.previewSrcs[0]).filter(
+      Boolean,
+    ) as string[];
     if (paths.length === 0) return;
 
     if (typeof caches === 'undefined') {

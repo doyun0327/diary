@@ -27,6 +27,11 @@ import {
   isRoomCreateCoachSeen,
   markRoomCreateCoachSeen,
 } from "../utils/onboarding";
+import {
+  buildRoomInviteUrl,
+  isValidInviteCode,
+  normalizeInviteCode,
+} from "../utils/roomInvite";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
@@ -41,6 +46,9 @@ interface RoomsHubPageProps {
   onOpenAccount: () => void;
   onOpenRoom: (roomId: string) => void;
   onBack: () => void;
+  /** 딥링크로 받은 초대코드 — 있으면 자동 입장 */
+  pendingInviteCode?: string | null;
+  onPendingInviteConsumed?: () => void;
 }
 
 type SheetKind = "create" | "join" | "edit" | null;
@@ -80,6 +88,8 @@ function RoomsHubPage({
   onOpenAccount,
   onOpenRoom,
   onBack,
+  pendingInviteCode = null,
+  onPendingInviteConsumed,
 }: RoomsHubPageProps) {
   const { t } = useTranslation();
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
@@ -441,21 +451,19 @@ function RoomsHubPage({
 
   const shareInviteCode = async (code: string) => {
     const text = t("rooms.alert.shareText", { code });
-    const installUrl =
-      (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
-      window.location.origin;
+    const inviteUrl = buildRoomInviteUrl(code);
 
     const nativeOk = await shareViaNative({
       title: t("rooms.alert.shareTitle"),
       text,
-      url: installUrl,
+      url: inviteUrl,
     });
     if (nativeOk) return;
 
     try {
       await copyText(text);
     } catch {
-      // ?��립보?�� ?��?��?��?�� 공유?�� 진행
+      // ignore
     }
 
     try {
@@ -463,7 +471,7 @@ function RoomsHubPage({
         await navigator.share({
           title: t("rooms.alert.shareTitle"),
           text,
-          url: installUrl,
+          url: inviteUrl,
         });
         return;
       }
@@ -472,7 +480,7 @@ function RoomsHubPage({
     }
 
     try {
-      await copyText(`${text}\n\n${installUrl}`);
+      await copyText(`${text}\n\n${inviteUrl}`);
     } catch {
       setError(t("rooms.err.copy"));
     }
@@ -489,9 +497,8 @@ function RoomsHubPage({
 
   const handleJoin = async () => {
     if (!shareReady || busy) return;
-    const code = inviteCode.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 8);
-    const valid = code.length === 8 || /^\d{6}$/.test(code);
-    if (!valid) {
+    const code = normalizeInviteCode(inviteCode);
+    if (!isValidInviteCode(code)) {
       setError(t("rooms.err.codeRequired"));
       return;
     }
@@ -511,6 +518,41 @@ function RoomsHubPage({
       setBusy(false);
     }
   };
+
+  // 초대 링크로 들어온 경우 자동 입장
+  useEffect(() => {
+    const code = normalizeInviteCode(pendingInviteCode ?? "");
+    if (!isValidInviteCode(code) || !shareReady) return;
+    let cancelled = false;
+    setInviteCode(code);
+    setSheet("join");
+    setBusy(true);
+    setError(null);
+    void (async () => {
+      try {
+        await ensureAuth();
+        if (cancelled) return;
+        const room = await roomsApi.joinRoom(code, nickname.trim(), profileAvatar());
+        if (cancelled) return;
+        setInviteCode("");
+        setSheet(null);
+        onPendingInviteConsumed?.();
+        invalidateRoomsList();
+        await refresh(0);
+        onOpenRoom(room.id);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : t("rooms.err.join"));
+        onPendingInviteConsumed?.();
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 초대코드 1회
+  }, [pendingInviteCode, shareReady]);
 
   const handleRoomAction = async () => {
     if (!roomAction || actionBusy) return;
