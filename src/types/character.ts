@@ -1,23 +1,3 @@
-export type PetKind = 'dog' | 'cat';
-export type PetColor =
-  | 'white'
-  | 'black'
-  | 'brown'
-  | 'cream'
-  | 'gray'
-  | 'orange'
-  | 'spotted';
-
-export interface CharacterPet {
-  id: string;
-  kind: PetKind;
-  color: PetColor;
-  /** 이름·품종 등 자유 입력 (선택) */
-  note: string;
-  /** false면 설정은 유지하고 AI 그림에만 제외 */
-  enabled: boolean;
-}
-
 export interface CharacterProfile {
   gender: 'girl' | 'boy' | 'woman' | 'man';
   hairStyle:
@@ -36,18 +16,13 @@ export interface CharacterProfile {
     | 'swimsuit'
     | 'ski-suit';
   accessory: 'none' | 'glasses' | 'hat' | 'ribbon';
-  /** 반려동물 (최대 MAX_PETS) */
-  pets: CharacterPet[];
 }
-
-export const MAX_PETS = 3;
 
 export const DEFAULT_CHARACTER: CharacterProfile = {
   gender: 'girl',
   hairStyle: 'woman-bob',
   outfit: 'short-sleeve',
   accessory: 'none',
-  pets: [],
 };
 
 export const GENDER_OPTIONS: { value: CharacterProfile['gender']; label: string }[] = [
@@ -165,33 +140,6 @@ export const ACCESSORY_OPTIONS: {
   { value: 'ribbon', label: '리본', emoji: '🎀' },
 ];
 
-export const PET_KIND_OPTIONS: {
-  value: PetKind;
-  label: string;
-  emoji: string;
-}[] = [
-  { value: 'dog', label: '강아지', emoji: '🐶' },
-  { value: 'cat', label: '고양이', emoji: '🐱' },
-];
-
-export const PET_COLOR_OPTIONS: {
-  value: PetColor;
-  label: string;
-  swatch: string;
-}[] = [
-  { value: 'white', label: '흰색', swatch: '#f5f5f5' },
-  { value: 'black', label: '검정', swatch: '#2a2a2a' },
-  { value: 'brown', label: '갈색', swatch: '#8b5a2b' },
-  { value: 'cream', label: '크림', swatch: '#f0d9a8' },
-  { value: 'gray', label: '회색', swatch: '#9a9a9a' },
-  { value: 'orange', label: '주황', swatch: '#e89a3c' },
-  {
-    value: 'spotted',
-    label: '얼룩',
-    swatch: 'linear-gradient(135deg, #2a2a2a 45%, #f5f5f5 45%)',
-  },
-];
-
 const GENDER_EN: Record<CharacterProfile['gender'], string> = {
   girl: 'a young girl',
   boy: 'a young boy',
@@ -281,46 +229,6 @@ const ACCESSORY_EN_OIL_PASTEL: Record<CharacterProfile['accessory'], string | nu
   ribbon: 'with a cute modern hair ribbon or clip',
 };
 
-const PET_COLOR_EN: Record<PetColor, string> = {
-  white: 'white',
-  black: 'black',
-  brown: 'brown',
-  cream: 'cream-colored',
-  gray: 'gray',
-  orange: 'orange',
-  spotted: 'spotted / bicolor',
-};
-
-/** 메모에 자주 쓰는 품종 → 영어 (종류 혼동 완화) */
-const PET_BREED_HINTS: { re: RegExp; en: string }[] = [
-  { re: /브리티시\s*숏\s*헤어|british\s*shorthair/i, en: 'British Shorthair' },
-  { re: /코리안\s*숏\s*헤어|korean\s*shorthair/i, en: 'Korean Shorthair' },
-  { re: /스코티시\s*폴드|scottish\s*fold/i, en: 'Scottish Fold' },
-  { re: /러시안\s*블루|russian\s*blue/i, en: 'Russian Blue' },
-  { re: /페르시안|persian/i, en: 'Persian' },
-  { re: /샴|siamese/i, en: 'Siamese' },
-  { re: /랙돌|ragdoll/i, en: 'Ragdoll' },
-  { re: /먼치킨|munchkin/i, en: 'Munchkin' },
-  { re: /노르웨이\s*숲|norwegian\s*forest/i, en: 'Norwegian Forest' },
-  { re: /메인\s*쿤|maine\s*coon/i, en: 'Maine Coon' },
-  { re: /포메라니안|pomeranian/i, en: 'Pomeranian' },
-  { re: /말티즈|maltese/i, en: 'Maltese' },
-  { re: /푸들|poodle/i, en: 'Poodle' },
-  { re: /비숑|bichon/i, en: 'Bichon Frise' },
-  { re: /시바|shiba/i, en: 'Shiba Inu' },
-  { re: /코기|corgi/i, en: 'Corgi' },
-  { re: /리트리버|retriever/i, en: 'Retriever' },
-  { re: /치와와|chihuahua/i, en: 'Chihuahua' },
-];
-
-function petBreedHint(note: string): string | null {
-  if (!note) return null;
-  for (const { re, en } of PET_BREED_HINTS) {
-    if (re.test(note)) return en;
-  }
-  return null;
-}
-
 const HAIR_STYLE_FALLBACK: Record<string, CharacterProfile['hairStyle']> = {
   'man-short': 'man-short',
   'man-perm': 'man-perm',
@@ -376,88 +284,12 @@ const ACCESSORY_FALLBACK: Record<string, CharacterProfile['accessory']> = {
   ribbon: 'ribbon',
 };
 
-const PET_KIND_FALLBACK: Record<string, PetKind> = {
-  dog: 'dog',
-  cat: 'cat',
-};
-
-const PET_COLOR_FALLBACK: Record<string, PetColor> = {
-  white: 'white',
-  black: 'black',
-  brown: 'brown',
-  cream: 'cream',
-  gray: 'gray',
-  grey: 'gray',
-  orange: 'orange',
-  spotted: 'spotted',
-};
-
 const GENDER_VALUES = new Set<CharacterProfile['gender']>(['girl', 'boy', 'woman', 'man']);
 
-const PET_NOTE_MAX = 40;
-
-export function sanitizePetNote(raw: unknown): string {
-  if (typeof raw !== 'string') return '';
-  return raw.replace(/\s+/g, ' ').trim().slice(0, PET_NOTE_MAX);
-}
-
-export function createPetId(): string {
-  return `pet_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
-}
-
-export function createPet(kind: PetKind, color: PetColor = 'brown'): CharacterPet {
-  return { id: createPetId(), kind, color, note: '', enabled: true };
-}
-
-function normalizePet(raw: unknown): CharacterPet | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const obj = raw as Record<string, unknown>;
-  const kindRaw = typeof obj.kind === 'string' ? obj.kind : typeof obj.type === 'string' ? obj.type : '';
-  const kind = PET_KIND_FALLBACK[kindRaw];
-  if (!kind) return null;
-  const colorRaw = typeof obj.color === 'string' ? obj.color : '';
-  const color = PET_COLOR_FALLBACK[colorRaw] || 'brown';
-  const id =
-    typeof obj.id === 'string' && obj.id.trim()
-      ? obj.id.trim()
-      : createPetId();
-  const enabled = obj.enabled === false ? false : true;
-  return {
-    id,
-    kind,
-    color,
-    note: sanitizePetNote(obj.note ?? obj.petNote),
-    enabled,
-  };
-}
-
-function migrateLegacyPets(raw: Record<string, unknown>): CharacterPet[] {
-  const petRaw = typeof raw.pet === 'string' ? raw.pet : '';
-  if (!petRaw || petRaw === 'none') return [];
-  const kind = PET_KIND_FALLBACK[petRaw];
-  if (!kind) return [];
-  const colorRaw = typeof raw.petColor === 'string' ? raw.petColor : '';
-  const color = PET_COLOR_FALLBACK[colorRaw] || 'brown';
-  return [
-    {
-      id: createPetId(),
-      kind,
-      color,
-      note: sanitizePetNote(raw.petNote),
-      enabled: true,
-    },
-  ];
-}
-
-export function enabledPets(pets: CharacterPet[]): CharacterPet[] {
-  return pets.filter((pet) => pet.enabled !== false);
-}
-
-/** 이전 저장 형식도 새 필드로 보정 */
+/** 이전 저장 형식도 새 필드로 보정 (pets 등 구 필드는 무시) */
 export function normalizeCharacter(
   raw: Partial<CharacterProfile> | (Partial<CharacterProfile> & Record<string, unknown>),
 ): CharacterProfile {
-  const record = raw as Record<string, unknown>;
   const gender =
     typeof raw.gender === 'string' && GENDER_VALUES.has(raw.gender as CharacterProfile['gender'])
       ? (raw.gender as CharacterProfile['gender'])
@@ -479,44 +311,7 @@ export function normalizeCharacter(
   const accessory =
     (rawAccessory && ACCESSORY_FALLBACK[rawAccessory]) || DEFAULT_CHARACTER.accessory;
 
-  let pets: CharacterPet[] = [];
-  if (Array.isArray(raw.pets)) {
-    pets = raw.pets
-      .map(normalizePet)
-      .filter((p): p is CharacterPet => Boolean(p))
-      .slice(0, MAX_PETS);
-  } else {
-    pets = migrateLegacyPets(record);
-  }
-
-  return { gender, hairStyle, outfit, accessory, pets };
-}
-
-function describePet(pet: CharacterPet): string {
-  const note = sanitizePetNote(pet.note);
-  const color = PET_COLOR_EN[pet.color];
-  const breed = petBreedHint(note);
-  const breedBit = breed ? `${breed} ` : '';
-  // 메모는 닉네임/품종 힌트만 — 종류(kind)를 바꾸지 말 것
-  const noteBit = note
-    ? ` (owner nickname/breed hint: "${note}" — must NOT change species)`
-    : '';
-
-  // [PET:CAT]/[PET:DOG] 마커로 백엔드 종 고정.
-  // 반대 종 단어(dog/cat)는 부정문에 넣지 않음 — contains("dog") 오탐으로 종이 섞이던 원인
-  if (pet.kind === 'cat') {
-    return (
-      `[PET:CAT] one ${color} ${breedBit}domestic feline` +
-      noteBit +
-      ' — pointed ears, whiskers, cat face and cat body only; never a canine'
-    );
-  }
-
-  return (
-    `[PET:DOG] one ${color} ${breedBit}domestic canine` +
-    noteBit +
-    ' — dog snout, dog ears and dog body only; never a feline'
-  );
+  return { gender, hairStyle, outfit, accessory };
 }
 
 /** 이미지용 짧은 외형만 (일기 장면이 묻히지 않게 최소화). */
@@ -543,40 +338,6 @@ export function describeCharacter(
   const accessory = accessories[profile.accessory];
   if (accessory) parts.push(accessory);
 
-  if (profile.pets.length > 0) {
-    const active = enabledPets(profile.pets);
-    if (active.length > 0) {
-      const catCount = active.filter((p) => p.kind === 'cat').length;
-      const dogCount = active.filter((p) => p.kind === 'dog').length;
-      const petList = active.map(describePet).join('; ');
-
-      parts.push(`pets (${active.length}): ${petList}`);
-
-      if (catCount > 0 && dogCount === 0) {
-        parts.push(
-          `SPECIES LOCK: draw exactly ${catCount} feline CAT(s) beside the person — zero canines`,
-        );
-      } else if (dogCount > 0 && catCount === 0) {
-        parts.push(
-          `SPECIES LOCK: draw exactly ${dogCount} canine DOG(s) beside the person — zero felines`,
-        );
-      } else {
-        parts.push(
-          `SPECIES LOCK: draw exactly ${catCount} feline CAT(s) and ${dogCount} canine DOG(s) — do not swap species`,
-        );
-      }
-    } else {
-      // 펫이 전부 꺼짐 — 캐릭터 동반 동물 금지 (일기 장면 속 동물은 scene에서 처리)
-      parts.push(
-        '[NO_COMPANION_PET] character has no companion pet — do not draw a cat or dog beside the person as their pet',
-      );
-    }
-  } else {
-    parts.push(
-      '[NO_COMPANION_PET] character has no companion pet — do not draw a cat or dog beside the person as their pet',
-    );
-  }
-
   return parts.join(', ');
 }
 
@@ -587,17 +348,5 @@ export function summarizeCharacterKo(profile: CharacterProfile): string {
   const outfit = OUTFIT_OPTIONS.find((o) => o.value === profile.outfit)?.label ?? '';
   const accessory = ACCESSORY_OPTIONS.find((o) => o.value === profile.accessory)?.label ?? '';
   const bits = [gender, hair, outfit, accessory === '없음' ? '' : accessory];
-
-  const active = enabledPets(profile.pets);
-  if (active.length > 0) {
-    const petBits = active.map((pet) => {
-      const kind = PET_KIND_OPTIONS.find((o) => o.value === pet.kind)?.label ?? '';
-      const color = PET_COLOR_OPTIONS.find((o) => o.value === pet.color)?.label ?? '';
-      const note = sanitizePetNote(pet.note);
-      return [kind, color, note].filter(Boolean).join(' ');
-    });
-    bits.push(petBits.join(', '));
-  }
-
   return bits.filter(Boolean).join(' · ');
 }

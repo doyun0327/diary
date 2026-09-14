@@ -404,7 +404,15 @@ function Header({
                       <span className="header-menu__hint">{accountHint}</span>
                     </span>
                   </button>
-                  {isPro ? (
+                  {isPro && onOpenNyangTicket ? (
+                    <button
+                      type="button"
+                      className="header-menu__sub-badge is-pro"
+                      onClick={() => closeAnd(onOpenNyangTicket)}
+                    >
+                      {t('header.subscribed')}
+                    </button>
+                  ) : isPro ? (
                     <span className="header-menu__sub-badge is-pro">
                       {t('header.subscribed')}
                     </span>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CoachBubble from './CoachBubble';
 import {
   isWriteFabCoachSeen,
   markWriteFabCoachSeen,
@@ -33,17 +34,13 @@ function WriteFab({ onClick, showFirstWriteCoach = false }: WriteFabProps) {
   return (
     <div className="write-fab-wrap">
       {coachVisible && (
-        <div className="write-fab__coach" role="status">
+        <CoachBubble
+          className="write-fab__coach"
+          arrow="bottom-center"
+          onDismiss={dismissCoach}
+        >
           <p>{t('diary.coach.writeFab')}</p>
-          <button
-            type="button"
-            className="write-fab__coach-dismiss"
-            aria-label={t('common.close')}
-            onClick={dismissCoach}
-          >
-            ×
-          </button>
-        </div>
+        </CoachBubble>
       )}
       <button
         type="button"

@@ -6,6 +6,7 @@ import { getAccessToken } from "../hooks/useAuthSession";
 import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
+import CoachBubble from "../components/CoachBubble";
 import PagePager from "../components/PagePager";
 import { shareViaNative } from "../utils/nativeShare";
 import {
@@ -651,17 +652,13 @@ function RoomsHubPage({
                 {t("rooms.create")}
               </button>
               {canShowCreateCoach && (
-                <div className="rooms__create-coach" role="status">
+                <CoachBubble
+                  className="rooms__create-coach"
+                  arrow="top-right"
+                  onDismiss={dismissCreateCoach}
+                >
                   <p>{t("rooms.coach.create")}</p>
-                  <button
-                    type="button"
-                    className="rooms__create-coach-dismiss"
-                    aria-label={t("common.close")}
-                    onClick={dismissCreateCoach}
-                  >
-                    ×
-                  </button>
-                </div>
+                </CoachBubble>
               )}
             </div>
 

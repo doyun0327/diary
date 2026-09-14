@@ -59,6 +59,29 @@
   color: var(--color-text);
 }
 
+.app-modal__back {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.app-modal__back:hover {
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+}
+
 .app-modal__header {
   display: flex;
   align-items: center;
@@ -69,7 +92,15 @@
 
 .app-modal__header--with-close {
   padding-right: 36px;
+}
+
+.app-modal__header--with-back {
   padding-left: 36px;
+}
+
+.app-modal__header--with-close.app-modal__header--with-back {
+  padding-left: 36px;
+  padding-right: 36px;
 }
 
 .app-modal__header h3 {

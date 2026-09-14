@@ -136,8 +136,24 @@ export function requestSubscriptionPurchase() {
 export async function requestSubscriptionPurchaseAndSync(
   timeoutMs = 20_000,
 ): Promise<boolean> {
+  // 이미 Pro면 Play 결제창을 다시 열지 않음 (같은 계정 재구독 방지)
+  if (getDiaryAccessState().isPremiumActive) return true;
   if (!requestSubscriptionPurchase()) return false;
   scheduleSubscriptionSyncAfterPurchase();
+  return waitForPremiumActivation(timeoutMs);
+}
+
+/**
+ * Google 로그인 직후 — 스토어 구독 복원을 잠시 기다림.
+ * 이미 구독 중이면 true (결제창을 열지 않도록).
+ */
+export async function waitForRestoredPremiumAfterLogin(
+  userId?: string | null,
+  timeoutMs = 5_000,
+): Promise<boolean> {
+  if (getDiaryAccessState().isPremiumActive) return true;
+  if (!isFlutterApp()) return false;
+  restoreSubscriptionAfterAuth(userId);
   return waitForPremiumActivation(timeoutMs);
 }
 

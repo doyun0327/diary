@@ -264,13 +264,30 @@
   z-index: 30;
 }
 
-.diary-write__ai-remaining {
+.diary-write__ai-remaining-wrap {
+  position: relative;
   flex-shrink: 0;
   margin-left: 4px;
   display: inline-flex;
   align-items: center;
+}
+
+.diary-write__ai-remaining {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.diary-write__ai-remaining.is-open .diary-write__ai-remaining-n,
+.diary-write__ai-remaining:active .diary-write__ai-remaining-n {
+  color: var(--color-text);
 }
 
 .diary-write__ai-remaining-n {
@@ -278,6 +295,101 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-text-muted);
+}
+
+.diary-write__ai-quota-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.diary-write__coach-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+}
+
+/* 그림생성 버튼 위 말풍선 — CoachBubble + 위치 */
+.diary-write__coach {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  left: auto;
+  top: auto;
+}
+
+/* 횟수 상세 말풍선 — 테마색 */
+.diary-write__ai-quota-pop {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  top: auto;
+  transform: translateX(-50%);
+  z-index: 41;
+  min-width: 7.5rem;
+  width: max-content;
+  max-width: min(220px, calc(100vw - 48px));
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-float);
+  white-space: nowrap;
+  animation: diary-ai-quota-in 0.28s var(--ease-out, ease);
+  pointer-events: auto;
+}
+
+.diary-write__ai-quota-pop::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--color-surface);
+  filter: drop-shadow(0 1px 0 var(--color-border-soft));
+}
+
+.diary-write__ai-quota-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-family: var(--brand-font);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.diary-write__ai-quota-empty {
+  margin: 0;
+  font-family: var(--brand-font);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+@keyframes diary-ai-quota-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .diary-write__ai-quota-note {
@@ -292,89 +404,6 @@
   color: var(--color-text);
   text-align: left;
   white-space: pre-line;
-}
-
-.diary-write__coach-anchor {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  overflow: visible;
-}
-
-/* 그림생성 버튼 위 말풍선 */
-.diary-write__coach {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 10px);
-  left: auto;
-  top: auto;
-  z-index: 40;
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  width: max-content;
-  max-width: min(260px, calc(100vw - 48px));
-  margin: 0;
-  padding: 10px 10px 10px 12px;
-  border-radius: 14px;
-  background: #1a1a1a;
-  color: #ffffff;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
-  text-align: left;
-  animation: diary-coach-in 0.28s var(--ease-out, ease);
-  pointer-events: auto;
-}
-
-.diary-write__coach::after {
-  content: '';
-  position: absolute;
-  right: 18px;
-  left: auto;
-  top: 100%;
-  bottom: auto;
-  transform: none;
-  border: 7px solid transparent;
-  border-top-color: #1a1a1a;
-}
-
-.diary-write__coach--ai::after {
-  right: 18px;
-  left: auto;
-}
-
-.diary-write__coach p {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 650;
-  line-height: 1.4;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
-.diary-write__coach-dismiss {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  margin: -2px -2px 0 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: inherit;
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-@keyframes diary-coach-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .diary-write__ai-char {
@@ -659,6 +688,38 @@
   margin: 8px 0 0;
   font-size: 0.85rem;
   color: var(--color-danger);
+}
+
+.diary-write__ai-source-list {
+  display: grid;
+  gap: 10px;
+}
+
+.diary-write__ai-source-btn {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-border-soft);
+  border-radius: 16px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.diary-write__ai-source-btn:active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-border);
+}
+
+.diary-write__ai-source-desc {
+  font-family: var(--brand-font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
 }
 
 .diary-write__ai-photo {

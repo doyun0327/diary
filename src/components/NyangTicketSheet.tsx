@@ -8,8 +8,8 @@ import {
 import { AI_PACK_PRODUCTS, type AiPackProductId } from '../utils/aiPackProducts';
 import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
-  getAiPackCredits,
   getDiaryAccessState,
+  getPurchasedAiPackCredits,
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
@@ -18,6 +18,7 @@ import {
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
   requestSubscriptionRestore,
+  waitForRestoredPremiumAfterLogin,
 } from '../utils/subscription';
 import {
   clearPendingNyangPurchase,
@@ -25,8 +26,17 @@ import {
   type PendingNyangPurchase,
 } from '../utils/pendingNyangPurchase';
 import { fetchTipStorePrices } from '../utils/tipPurchase';
-import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
+import {
+  getAccessToken,
+  getAuthSession,
+  isGoogleSignedIn,
+  useAuthSession,
+} from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn } from '../lib/googleAuth';
+import {
+  isWelcomeAiPurchase,
+  syncWelcomeFromPurchaseHistory,
+} from '../utils/welcomeAiCredits';
 import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 import './NyangTicketSheet.css';
@@ -138,7 +148,9 @@ function NyangTicketSheet({
     setHistoryError(null);
     try {
       const data = await fetchPurchaseRecords(token);
-      setHistory(data.items ?? []);
+      const items = data.items ?? [];
+      syncWelcomeFromPurchaseHistory(items);
+      setHistory(items);
     } catch (err) {
       setHistoryError(
         err instanceof Error ? err.message : t('nyangTicket.historyLoadFailed'),
@@ -149,12 +161,13 @@ function NyangTicketSheet({
   }, [t]);
 
   useEffect(() => {
-    if (tab === 'history') void loadHistory();
+    if (tab === 'history' || tab === 'packs') void loadHistory();
   }, [tab, loadHistory]);
 
   void accessTick;
   const access = getDiaryAccessState();
-  const packLeft = getAiPackCredits();
+  // Welcome 체험권은 구매가 아니므로 AI 그림충전 잔량에서 제외
+  const packLeft = getPurchasedAiPackCredits();
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
 
@@ -273,8 +286,25 @@ function NyangTicketSheet({
     if (busy) return;
     setMessage(null);
     setError(null);
+    if (getDiaryAccessState().isPremiumActive) {
+      setMessage(t('nyangTicket.subscribed'));
+      return;
+    }
     const pending: PendingNyangPurchase = { kind: 'subscribe' };
+    const wasGoogle = isGoogleSignedIn();
     if (!(await ensureGoogleMember(pending))) return;
+    // 로그아웃 후 같은 Google로 다시 로그인 → 기존 Play 구독 복원 대기
+    if (
+      !wasGoogle &&
+      (await waitForRestoredPremiumAfterLogin(getAuthSession()?.userId))
+    ) {
+      setMessage(t('nyangTicket.subscribed'));
+      return;
+    }
+    if (getDiaryAccessState().isPremiumActive) {
+      setMessage(t('nyangTicket.subscribed'));
+      return;
+    }
     await runSubscribe();
   };
 
@@ -305,7 +335,15 @@ function NyangTicketSheet({
     void (async () => {
       if (autoPurchase.kind === 'subscribe') {
         setTab('subscribe');
+        // 같은 계정 기존 구독이면 결제창 대신 "이미 구독 중"만 표시
+        const alreadyPro = await waitForRestoredPremiumAfterLogin(
+          getAuthSession()?.userId,
+        );
         if (cancelled) return;
+        if (alreadyPro || getDiaryAccessState().isPremiumActive) {
+          setMessage(t('nyangTicket.subscribed'));
+          return;
+        }
         await runSubscribe();
         return;
       }
@@ -323,6 +361,11 @@ function NyangTicketSheet({
   const purchaseTitle = (row: PurchaseRecordDto) => {
     if (row.kind === 'subscription') {
       return t('nyangTicket.historyItemSubscription');
+    }
+    if (isWelcomeAiPurchase(row)) {
+      return t('nyangTicket.historyItemWelcome', {
+        n: row.creditsGranted > 0 ? row.creditsGranted : 3,
+      });
     }
     if (row.creditsGranted > 0) {
       return t('nyangTicket.historyItemPack', { n: row.creditsGranted });

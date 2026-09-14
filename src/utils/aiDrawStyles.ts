@@ -1,15 +1,20 @@
 /**
- * AI 그림 스타일 — 사진 기반, 전부 GPT Image 2 (reference) 경로.
- * webtoonHero | oilPastel | jpRetroFilm
+ * AI 그림 스타일
+ * - 사진 경로: webtoonHero | oilPastel | jpRetroFilm (GPT Image 2 + reference)
+ * - 일기 텍스트 경로: textOil (예전 오일파스텔·diaryLine, 사진 없음)
  */
 
-export type AiDrawStyleId = 'webtoonHero' | 'oilPastel' | 'jpRetroFilm';
+/** 사진 첨부 생성용 — AI_DRAW_STYLES 에만 포함 */
+export type AiPhotoDrawStyleId = 'webtoonHero' | 'oilPastel' | 'jpRetroFilm';
+
+/** 전체 스타일 id (일기 textOil 포함) */
+export type AiDrawStyleId = AiPhotoDrawStyleId | 'textOil';
 
 /** 웹툰주인공 st */
 export const WEBTOON_HERO_STYLE_PROMPT =
   'A casual, expressive hand-drawn anime-inspired illustration with a strong sense of personality. Simplified and slightly exaggerated character proportions, simple facial features, expressive eyes, and loosely drawn hair. The illustration should feel spontaneous and artistic rather than polished or perfectly designed. Bold, slightly imperfect black outlines with visible hand-drawn energy. Large areas of flat color with very minimal shading, simple color shapes, and subtle soft texture. Minimal and simple background. Dynamic close-up composition with the character filling most of the frame. A stylish, youthful, nostalgic illustration with a playful and effortlessly cool feeling. Use a cohesive and expressive color palette that can change freely depending on the image, while maintaining a bold, simple, artistic atmosphere. Avoid poster design, editorial illustration, realistic anatomy, cinematic lighting, detailed backgrounds, and overly polished rendering.';
 
-/** 오일파스텔 st */
+/** 오일파스텔 st (사진 첨부용 — 변경하지 말 것) */
 export const OIL_PASTEL_STYLE_PROMPT = [
   'Redraw the attached photo as a thick oil-pastel doodle on white paper.',
   'Simple round face, bright expression, eyes as two small dots, minimal nose and mouth.',
@@ -25,8 +30,14 @@ export const OIL_PASTEL_STYLE_PROMPT = [
 export const JP_RETRO_FILM_STYLE_PROMPT =
   'A stylish and emotional retro Japanese anime illustration with simple yet expressive linework and soft flat coloring. A carefully balanced, artistic color palette with subtle color bleeding and slightly grainy analog texture. Dreamy, nostalgic, and cinematic atmosphere. Minimal background and character-focused composition. Vintage anime and analog illustration aesthetic. The color palette can vary freely depending on the mood of the scene while maintaining the same nostalgic, dreamy, stylish emotional atmosphere. CRITICAL: Absolutely no writing anywhere in the image — no Japanese, Chinese, Korean, English, or any other language; no kanji, hiragana, katakana, hangul, letters, numbers, signs, posters, captions, speech bubbles, watermarks, logos, or labels.';
 
+/**
+ * 일기 텍스트 → 오일파스텔 스타일 id.
+ * 프롬프트는 서버 buildOilPastelImagePrompt 만 사용 (프론트 미전송).
+ */
+export const TEXT_OIL_STYLE_ID = 'textOil' as const;
+
 export const AI_DRAW_STYLES: {
-  id: AiDrawStyleId;
+  id: AiPhotoDrawStyleId;
   previewSrcs: string[];
   enabled: boolean;
 }[] = [
@@ -165,11 +176,15 @@ export function preloadAiStylePreviews() {
 }
 
 export function isAiDrawStyleEnabled(styleId: AiDrawStyleId): boolean {
+  if (styleId === 'textOil') return true;
   return AI_DRAW_STYLES.find((s) => s.id === styleId)?.enabled !== false;
 }
 
 export function stylePromptFor(styleId: AiDrawStyleId): string {
   switch (styleId) {
+    case 'textOil':
+      // 프롬프트 없음 — 백엔드 기존 오일 텍스트 프롬프트만 사용
+      return '';
     case 'oilPastel':
       return OIL_PASTEL_STYLE_PROMPT;
     case 'jpRetroFilm':
@@ -183,10 +198,15 @@ export function stylePromptFor(styleId: AiDrawStyleId): string {
 /** 레거시 id → 현재 id */
 export function normalizeAiDrawStyleId(raw: string | null | undefined): AiDrawStyleId {
   const s = (raw ?? '').trim();
+  if (s === 'textOil' || s === 'text_oil' || s === 'text-oil') return 'textOil';
   if (s === 'oilPastel' || s === 'oil_pastel' || s === 'oil-pastel') return 'oilPastel';
   if (s === 'jpRetroFilm' || s === 'jpRetro' || s === 'retroFilm') return 'jpRetroFilm';
   // cartoonChar / kidSketch / storybook → 웹툰주인공
   return 'webtoonHero';
+}
+
+export function isPhotoAiDrawStyle(styleId: AiDrawStyleId): styleId is AiPhotoDrawStyleId {
+  return styleId === 'webtoonHero' || styleId === 'oilPastel' || styleId === 'jpRetroFilm';
 }
 
 /** AI 참조용 사진 → JPEG data URL */

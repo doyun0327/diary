@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { RoomMember } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
 import RoomSafetyModal, { type SafetyTarget } from './RoomSafetyModal';
+import CoachBubble from './CoachBubble';
 import {
   isUserBlocked,
   subscribeBlockedUsers,
@@ -127,17 +128,13 @@ function RoomMemberAvatars({
   return (
     <div className="room-members" ref={rootRef}>
       {showPokeCoach && (
-        <div className="room-members__coach" role="status">
+        <CoachBubble
+          className="room-members__coach"
+          arrow="bottom-center"
+          onDismiss={() => onDismissPokeCoach?.()}
+        >
           <p>{t('rooms.coach.poke')}</p>
-          <button
-            type="button"
-            className="room-members__coach-dismiss"
-            aria-label={t('common.close')}
-            onClick={() => onDismissPokeCoach?.()}
-          >
-            ×
-          </button>
-        </div>
+        </CoachBubble>
       )}
       <div className="room-members__stack" role="list" aria-label={t('rooms.membersAria')}>
         {visible.map((member) => (

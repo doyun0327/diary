@@ -18,10 +18,19 @@ import CalendarPopup from '../components/CalendarPopup';
 import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
-import { generateDiaryImage, type AiProgress } from '../api/aiImage';
+import { extractSceneLine, generateDiaryImage, type AiProgress } from '../api/aiImage';
 import AppModal from '../components/AppModal';
+import CoachBubble from '../components/CoachBubble';
 import { formatDate, today } from '../utils/date';
-import { AI_DRAW_STYLES, aiStylePreviewSrc, fileToAiReferenceDataUrl, isAiDrawStyleEnabled, subscribeAiStylePreviewsReady, type AiDrawStyleId } from '../utils/aiDrawStyles';
+import {
+  AI_DRAW_STYLES,
+  aiStylePreviewSrc,
+  fileToAiReferenceDataUrl,
+  isAiDrawStyleEnabled,
+  subscribeAiStylePreviewsReady,
+  TEXT_OIL_STYLE_ID,
+  type AiDrawStyleId,
+} from '../utils/aiDrawStyles';
 import { diaryEditFontStack, defaultFontIdForLanguage, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
 import {
   AI_REWARD_AD_ENABLED,
@@ -36,10 +45,13 @@ import {
   getAiDrawsToday,
   getAiPackCredits,
   getDiaryAccessState,
+  getPurchasedAiPackCredits,
+  getWelcomeAiCreditsRemaining,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
+  noteAiPackCreditConsumedPreferWelcome,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
@@ -238,6 +250,8 @@ function DiaryWritePage({
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  /** 그림 생성: 일기(textOil) vs 사진 */
+  const [aiSourceOpen, setAiSourceOpen] = useState(false);
   /** 모달에서 고른 스타일 (확인 전까지 대기) */
   const [aiStyleSelectedId, setAiStyleSelectedId] =
     useState<AiDrawStyleId>('webtoonHero');
@@ -248,12 +262,15 @@ function DiaryWritePage({
   const [aiLoginOpen, setAiLoginOpen] = useState(false);
   const [aiLoginBusy, setAiLoginBusy] = useState(false);
   const [aiLoginError, setAiLoginError] = useState<string | null>(null);
+  const [aiQuotaDetailOpen, setAiQuotaDetailOpen] = useState(false);
   const googleBtnHostRef = useRef<HTMLDivElement>(null);
   const { signInWithGoogleIdToken } = useAuthSession();
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
   const aiStyleRef = useRef<AiDrawStyleId>('webtoonHero');
+  /** diary = textOil(일기), photo = 사진+스타일3 */
+  const aiSourceRef = useRef<'diary' | 'photo'>('photo');
   const aiReferenceImageRef = useRef<string | null>(null);
   const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free' | 'ai-pack'>(
     'none',
@@ -816,6 +833,37 @@ function DiaryWritePage({
     };
   })();
   const aiLeft = Math.max(0, aiQuota.limit - aiQuota.used);
+  const aiQuotaBreakdown = (() => {
+    void accessTick;
+    const lines: { key: string; n: number; labelKey: string }[] = [];
+    if (canUseProAiQuota()) {
+      const sub = Math.max(0, getDiaryAccessState().monthlyRemaining);
+      if (sub > 0) {
+        lines.push({ key: 'sub', n: sub, labelKey: 'quota.breakdownSub' });
+      }
+    }
+    const welcome = getWelcomeAiCreditsRemaining();
+    if (welcome > 0) {
+      lines.push({ key: 'welcome', n: welcome, labelKey: 'quota.breakdownWelcome' });
+    }
+    const purchased = getPurchasedAiPackCredits();
+    if (purchased > 0) {
+      lines.push({ key: 'pack', n: purchased, labelKey: 'quota.breakdownPack' });
+    }
+    if (lines.length === 0) {
+      const ad = getAiDrawCredits();
+      if (ad > 0) {
+        lines.push({ key: 'ad', n: ad, labelKey: 'quota.breakdownAd' });
+      } else if (!canUseProAiQuota()) {
+        lines.push({
+          key: 'ad-daily',
+          n: Math.max(0, FREE_DAILY_AI_AD_LIMIT - getAiDrawsToday()),
+          labelKey: 'quota.breakdownAd',
+        });
+      }
+    }
+    return lines;
+  })();
   /** 미로그인 + 오늘 광고 1회 소진 → 로그인만 (광고 스킵 숨김). 내일 리셋되면 다시 둘 다 */
   const guestDailyAiExhausted =
     !isGoogleSignedIn() && isAiDailyLimitReached();
@@ -882,6 +930,7 @@ function DiaryWritePage({
       try {
         const view = await consumeAiPackCreditsRemote(token);
         applyAiPackCreditsFromServer(view.credits);
+        noteAiPackCreditConsumedPreferWelcome();
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -899,37 +948,36 @@ function DiaryWritePage({
       return true;
     }
 
-    if (canUseProAiQuota() && !isProAiMonthlyLimitReached()) {
-      const token = getAccessToken();
-      if (token) {
-        try {
-          const usage = await fetchMonthlyUsage(token);
-          applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
-          if (usage.allowed !== false && usage.used < usage.limit) {
-            aiQuotaKindRef.current = 'pro-server';
-            return true;
-          }
-          if (!(await reserveProOverflowQuota())) {
-            promptProMonthlyExhausted();
-            return false;
-          }
-          return true;
-        } catch {
-          // 로컬 잔여로 폴백
-        }
-      }
-      if (getDiaryAccessState().monthlyRemaining > 0) {
-        aiQuotaKindRef.current = 'pro-local';
+    // Pro: 로그인 환영·팩 잔량 먼저 → 그다음 구독 월 한도 → 광고
+    if (canUseProAiQuota()) {
+      if (await reserveAiPack()) {
+        aiQuotaKindRef.current = 'ai-pack';
         return true;
       }
-      if (!(await reserveProOverflowQuota())) {
-        promptProMonthlyExhausted();
-        return false;
+      if (!isProAiMonthlyLimitReached()) {
+        const token = getAccessToken();
+        if (token) {
+          try {
+            const usage = await fetchMonthlyUsage(token);
+            applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+            if (usage.allowed !== false && usage.used < usage.limit) {
+              aiQuotaKindRef.current = 'pro-server';
+              return true;
+            }
+            if (!(await reserveProOverflowQuota())) {
+              promptProMonthlyExhausted();
+              return false;
+            }
+            return true;
+          } catch {
+            // 로컬 잔여로 폴백
+          }
+        }
+        if (getDiaryAccessState().monthlyRemaining > 0) {
+          aiQuotaKindRef.current = 'pro-local';
+          return true;
+        }
       }
-      return true;
-    }
-
-    if (canUseProAiQuota() && isProAiMonthlyLimitReached()) {
       if (!(await reserveProOverflowQuota())) {
         promptProMonthlyExhausted();
         return false;
@@ -1003,13 +1051,16 @@ function DiaryWritePage({
     }
   };
 
+  const openAiSourcePicker = () => {
+    setAiPhotoError(null);
+    setAiSourceOpen(true);
+  };
+
   const handleAiDraw = () => {
     clearPurchaseShield();
-    // 웹: 로그인 없이 바로 스타일 선택 (로컬 테스트용)
+    // 웹: 로그인 없이 방식 선택
     if (!isFlutterApp()) {
-      setAiPhotoError(null);
-      setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
-      setAiStyleOpen(true);
+      openAiSourcePicker();
       return;
     }
     // 앱: 미연동이면 Google 로그인 유도
@@ -1020,9 +1071,7 @@ function DiaryWritePage({
     }
     void (async () => {
       await claimWelcomeAiCredits();
-      setAiPhotoError(null);
-      setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
-      setAiStyleOpen(true);
+      openAiSourcePicker();
     })();
   };
 
@@ -1030,8 +1079,8 @@ function DiaryWritePage({
     setAiLoginOpen(false);
     setAiLoginBusy(false);
     setAiLoginError(null);
-    setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
-    setAiStyleOpen(true);
+    setAiPhotoError(null);
+    setAiSourceOpen(true);
   }, []);
 
   const finishAiLoginAndDraw = useCallback(async () => {
@@ -1039,9 +1088,72 @@ function DiaryWritePage({
     setAiLoginOpen(false);
     setAiLoginBusy(false);
     setAiLoginError(null);
-    setAiStyleSelectedId(aiStyleRef.current || 'webtoonHero');
-    setAiStyleOpen(true);
+    setAiPhotoError(null);
+    setAiSourceOpen(true);
   }, []);
+
+  /** 광고·한도 확인 후 생성 (방식·스타일 확정된 뒤) */
+  const beginAiDrawAfterSetup = () => {
+    if (!isFlutterApp()) {
+      void runAiDraw();
+      return;
+    }
+    if (canUseProAiQuota()) {
+      if (isProAiMonthlyLimitReached()) {
+        promptProMonthlyExhausted();
+        return;
+      }
+      void runAiDraw();
+      return;
+    }
+    if (isAiDailyLimitReached()) {
+      promptAiDrawBlocked();
+      return;
+    }
+    if (needsAiAdBeforeDraw()) {
+      void handleWatchAd();
+      return;
+    }
+    void runAiDraw();
+  };
+
+  const proceedDiaryDraw = () => {
+    const line = extractSceneLine(content) || title.trim();
+    if (!line) {
+      setAiError(t('write.err.needContent'));
+      setAiSourceOpen(false);
+      return;
+    }
+    aiSourceRef.current = 'diary';
+    aiStyleRef.current = TEXT_OIL_STYLE_ID;
+    setAiSourceOpen(false);
+    beginAiDrawAfterSetup();
+  };
+
+  const openPhotoStylePicker = () => {
+    aiSourceRef.current = 'photo';
+    setAiSourceOpen(false);
+    setAiPhotoError(null);
+    setAiStyleSelectedId(
+      aiStyleRef.current === TEXT_OIL_STYLE_ID ? 'webtoonHero' : aiStyleRef.current,
+    );
+    setAiStyleOpen(true);
+  };
+
+  const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
+    if (!aiReferenceImageRef.current?.startsWith('data:image/')) {
+      setAiPhotoError(t('write.err.aiNeedPhoto'));
+      return;
+    }
+    if (!isAiDrawStyleEnabled(styleId) || styleId === TEXT_OIL_STYLE_ID) {
+      setAiPhotoError(t('write.ai.styleDisabled'));
+      return;
+    }
+    aiSourceRef.current = 'photo';
+    aiStyleRef.current = styleId;
+    setAiStyleOpen(false);
+    beginAiDrawAfterSetup();
+  };
 
   const handleAiGoogleLogin = () => {
     if (aiLoginBusy) return;
@@ -1115,43 +1227,6 @@ function DiaryWritePage({
     };
   }, [aiLoginOpen, handleAiGoogleIdToken, t]);
 
-  const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
-    if (!aiReferenceImageRef.current?.startsWith('data:image/')) {
-      setAiPhotoError(t('write.err.aiNeedPhoto'));
-      return;
-    }
-    if (!isAiDrawStyleEnabled(styleId)) {
-      setAiPhotoError(t('write.ai.styleDisabled'));
-      return;
-    }
-    aiStyleRef.current = styleId;
-    setAiStyleOpen(false);
-
-    // 웹: 광고·일일/월간 한도 없이 바로 생성
-    if (!isFlutterApp()) {
-      void runAiDraw();
-      return;
-    }
-    if (canUseProAiQuota()) {
-      if (isProAiMonthlyLimitReached()) {
-        promptProMonthlyExhausted();
-        return;
-      }
-      void runAiDraw();
-      return;
-    }
-    if (isAiDailyLimitReached()) {
-      promptAiDrawBlocked();
-      return;
-    }
-    if (needsAiAdBeforeDraw()) {
-      // 스타일 고른 뒤 확인 모달 없이 바로 보상형 광고
-      void handleWatchAd();
-      return;
-    }
-    void runAiDraw();
-  };
-
   const handleAiPhotoPick = async (file: File | undefined) => {
     if (!file) return;
     setAiPhotoError(null);
@@ -1197,15 +1272,24 @@ function DiaryWritePage({
         await capturePreviousSnapshot();
       previousCanvasStateRef.current = previousState;
 
+      const isDiary = aiSourceRef.current === 'diary'
+        || aiStyleRef.current === TEXT_OIL_STYLE_ID;
       const ref = aiReferenceImageRef.current;
-      if (!ref?.startsWith('data:image/')) {
+      if (!isDiary && !ref?.startsWith('data:image/')) {
         throw new Error(t('write.err.aiNeedPhoto'));
       }
+      if (isDiary) {
+        const line = extractSceneLine(content) || title.trim();
+        if (!line) {
+          throw new Error(t('write.err.needContent'));
+        }
+      }
+
       const { imageUrl, notice, imageSource } = await generateDiaryImage({
         title,
         content,
-        style: aiStyleRef.current,
-        referenceImage: ref,
+        style: isDiary ? TEXT_OIL_STYLE_ID : aiStyleRef.current,
+        referenceImage: isDiary ? null : ref,
         accessToken: getAccessToken(),
         onProgress: setAiProgress,
       });
@@ -1642,25 +1726,59 @@ function DiaryWritePage({
                       {aiLabel}
                     </button>
                     {isFlutterApp() && (
-                      <span
-                        className="diary-write__ai-remaining"
-                        title={t('quota.deductAfterDone')}
-                      >
-                        <span className="diary-write__ai-remaining-n">{aiLeft}</span>
+                      <span className="diary-write__ai-remaining-wrap">
+                        <button
+                          type="button"
+                          className={`diary-write__ai-remaining${aiQuotaDetailOpen ? ' is-open' : ''}`}
+                          title={t('quota.deductAfterDone')}
+                          aria-expanded={aiQuotaDetailOpen}
+                          aria-label={t('quota.breakdownAria', { n: aiLeft })}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAiQuotaDetailOpen((open) => !open);
+                          }}
+                        >
+                          <span className="diary-write__ai-remaining-n">{aiLeft}</span>
+                        </button>
+                        {aiQuotaDetailOpen && (
+                          <>
+                            <button
+                              type="button"
+                              className="diary-write__ai-quota-scrim"
+                              aria-label={t('common.close')}
+                              onClick={() => setAiQuotaDetailOpen(false)}
+                            />
+                            <div
+                              className="diary-write__ai-quota-pop"
+                              role="dialog"
+                              aria-label={t('quota.breakdownTitle')}
+                            >
+                              {aiQuotaBreakdown.length > 0 ? (
+                                <ul className="diary-write__ai-quota-list">
+                                  {aiQuotaBreakdown.map((line) => (
+                                    <li key={line.key}>
+                                      {t(line.labelKey, { n: line.n })}
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="diary-write__ai-quota-empty">
+                                  {t('quota.breakdownEmpty')}
+                                </p>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </span>
                     )}
                     {coach === 'ai' && (
-                      <div className="diary-write__coach diary-write__coach--ai" role="status">
+                      <CoachBubble
+                        className="diary-write__coach diary-write__coach--ai"
+                        arrow="bottom-right"
+                        onDismiss={dismissAiCoach}
+                      >
                         <p>{t('write.coach.ai')}</p>
-                        <button
-                          type="button"
-                          className="diary-write__coach-dismiss"
-                          aria-label={t('common.close')}
-                          onClick={dismissAiCoach}
-                        >
-                          ×
-                        </button>
-                      </div>
+                      </CoachBubble>
                     )}
                   </div>
                 </div>
@@ -1703,13 +1821,52 @@ function DiaryWritePage({
               onPrimary={saveAndLeave}
             />
           )}
+          {aiSourceOpen && (
+            <AppModal
+              title={t('write.ai.sourceTitle')}
+              panelClassName="app-modal__panel--ai-source"
+              onDismiss={() => setAiSourceOpen(false)}
+              showClose
+              closeAriaLabel={t('common.close')}
+            >
+              <div className="diary-write__ai-source-list">
+                <button
+                  type="button"
+                  className="diary-write__ai-source-btn"
+                  aria-label={t('write.ai.sourceDiary')}
+                  onClick={proceedDiaryDraw}
+                >
+                  <span className="diary-write__ai-source-desc">
+                    {t('write.ai.sourceDiaryDesc')}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="diary-write__ai-source-btn"
+                  aria-label={t('write.ai.sourcePhoto')}
+                  onClick={openPhotoStylePicker}
+                >
+                  <span className="diary-write__ai-source-desc">
+                    {t('write.ai.sourcePhotoDesc')}
+                  </span>
+                </button>
+              </div>
+            </AppModal>
+          )}
           {aiStyleOpen && (
             <AppModal
               title={t('write.ai.styleTitle')}
               panelClassName="app-modal__panel--ai-style"
               onDismiss={() => {
                 setAiStyleOpen(false);
+                setAiPhotoError(null);
               }}
+              onBack={() => {
+                setAiStyleOpen(false);
+                setAiPhotoError(null);
+                setAiSourceOpen(true);
+              }}
+              backAriaLabel={t('common.back')}
               showClose
               closeAriaLabel={t('common.close')}
               primaryLabel={t('write.ai.styleConfirm')}

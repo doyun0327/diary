@@ -298,20 +298,20 @@ async function pollDrawJob(
 
 /**
  * 백엔드에 AI 그림 생성 요청 (비동기 큐).
- * 첨부 사진(referenceImage)만 사용 — 캐릭터 외형 텍스트는 보내지 않음.
+ *
+ * - 사진 경로: referenceImage + webtoonHero|oilPastel|jpRetroFilm
+ * - 일기 경로: diaryLine + style textOil (캐릭터·사진 없음)
  *
  * POST /api/ai/draw → 202 { jobId, status: queued }
  * GET  /api/ai/draw/{jobId} → queued|running|done|failed
- *
- * 구버전 동기 200 응답도 그대로 지원.
  */
 export async function generateDiaryImage(input: {
   title?: string;
   content?: string;
-  /** webtoonHero | oilPastel | jpRetroFilm — 전부 사진 + GPT Image 2 */
+  /** webtoonHero | oilPastel | jpRetroFilm | textOil */
   style?: AiDrawStyleId;
-  /** 필수 — data:image/...;base64,... */
-  referenceImage: string;
+  /** 사진 경로 필수. textOil 이면 생략 */
+  referenceImage?: string | null;
   /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
   accessToken?: string | null;
   onProgress?: (step: AiProgress) => void;
@@ -319,12 +319,16 @@ export async function generateDiaryImage(input: {
   const title = input.title?.trim() ?? '';
   const diaryLine = extractSceneLine(input.content ?? '') || title;
   const referenceImage = input.referenceImage?.trim() || '';
+  const styleId = normalizeAiDrawStyleId(input.style);
+  const isTextOil = styleId === 'textOil';
 
-  if (!referenceImage.startsWith('data:image/')) {
+  if (!isTextOil && !referenceImage.startsWith('data:image/')) {
     throw new Error('그림을 만들려면 사진을 첨부해 주세요');
   }
+  if (isTextOil && !diaryLine) {
+    throw new Error('일기 내용을 먼저 적어 주세요');
+  }
 
-  const styleId = normalizeAiDrawStyleId(input.style);
   const stylePrompt = stylePromptFor(styleId);
 
   const payload: Record<string, unknown> = {
@@ -332,13 +336,23 @@ export async function generateDiaryImage(input: {
     title: title || undefined,
     sceneMode: 'full' as const,
     style: styleId,
-    stylePrompt,
-    referenceImage,
-    referenceImageBase64: referenceImage,
   };
+  // textOil: 캐릭터·사진·사진용 stylePrompt 미전송 (서버 오일 텍스트 프롬프트 사용)
+  if (!isTextOil) {
+    if (stylePrompt) payload.stylePrompt = stylePrompt;
+    payload.referenceImage = referenceImage;
+    payload.referenceImageBase64 = referenceImage;
+  }
 
   console.info('[AI] ===== POST /api/ai/draw =====');
-  console.info('[AI] body keys:', Object.keys(payload), 'hasRef=true style=', styleId);
+  console.info(
+    '[AI] body keys:',
+    Object.keys(payload),
+    'hasRef=',
+    !isTextOil,
+    'style=',
+    styleId,
+  );
 
   input.onProgress?.('waiting');
 

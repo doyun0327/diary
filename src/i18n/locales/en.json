@@ -314,6 +314,7 @@
     "historyLoadFailed": "Couldn't load purchase history.",
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
     "historyItemPack": "{{n}}"
   },
   "credits": {
@@ -557,7 +558,14 @@
     "drawConfirmLead": "{{n}} left\nDeducted when the drawing finishes.",
     "drawConfirmOk": "Draw",
     "deductAfterDone": "Credits are used only after the drawing finishes.",
-    "deductAfterDoneShort": "After done"
+    "deductAfterDoneShort": "After done",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -602,9 +610,15 @@
       "puzzleAria": "Picture slide puzzle",
       "puzzleTile": "Puzzle piece {{n}}",
       "tip": "Tip",
-      "tipBody": "Upload a photo and AI sketches it onto the canvas. Then keep drawing by hand.",
+      "tipBody": "Draw from your diary text, or upload a photo and pick a style.",
       "tipVisible": "The scene in the photo",
       "tipAsk": " should be clear.",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "Makes an oil-pastel scene from what you wrote.",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Upload a photo and pick a style.",
       "styleTitle": "Which style?",
       "styleLead": "Attach a photo, pick a style, then tap Confirm.",
       "styleConfirm": "Confirm",
@@ -844,30 +858,7 @@
       "glasses": "Glasses",
       "hat": "Hat",
       "ribbon": "Ribbon"
-    },
-    "petLabel": "Pet",
-    "petHint": "You can add up to {{max}} pets.\nTurn off to keep settings but skip them in drawings.",
-    "petEmpty": "None yet. Add one below.",
-    "petAdd": "Add {{kind}}",
-    "petOn": "On",
-    "petOff": "Off",
-    "petRemove": "Remove",
-    "pet": {
-      "dog": "Dog",
-      "cat": "Cat"
-    },
-    "petColorLabel": "Color",
-    "petColor": {
-      "white": "White",
-      "black": "Black",
-      "brown": "Brown",
-      "cream": "Cream",
-      "gray": "Gray",
-      "orange": "Orange",
-      "spotted": "Spotted"
-    },
-    "petNoteLabel": "Name / breed (optional)",
-    "petNotePlaceholder": "e.g. Momo, Golden Retriever"
+    }
   },
   "export": {
     "title": "Export",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomDetail, RoomPost } from '../types/room';
 import BackIcon from '../components/BackIcon';
+import CoachBubble from '../components/CoachBubble';
 import PagePager from '../components/PagePager';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomDiaryPickerSheet from '../components/RoomDiaryPickerSheet';
@@ -259,17 +260,13 @@ function RoomPage({
         <h2>{room?.name ?? t('rooms.title')}</h2>
         <div className="rooms__toolbar-share-wrap">
           {canShowShareCoach && (
-            <div className="rooms__share-coach" role="status">
+            <CoachBubble
+              className="rooms__share-coach"
+              arrow="top-right"
+              onDismiss={() => setShowShareCoach(false)}
+            >
               <p>{t('rooms.sharePrompt')}</p>
-              <button
-                type="button"
-                className="rooms__share-coach-dismiss"
-                aria-label={t('common.close')}
-                onClick={() => setShowShareCoach(false)}
-              >
-                ×
-              </button>
-            </div>
+            </CoachBubble>
           )}
           <button
             type="button"
@@ -318,17 +315,13 @@ function RoomPage({
           {!loading && visibleFeedPosts.length > 0 && (
             <div className="rooms__coach-anchor">
               {showCoach && (
-                <div className="rooms__coach" role="status">
+                <CoachBubble
+                  className="rooms__coach"
+                  arrow="bottom-center"
+                  onDismiss={dismissCoach}
+                >
                   <p>{t('rooms.coach.comment')}</p>
-                  <button
-                    type="button"
-                    className="rooms__coach-dismiss"
-                    aria-label={t('common.close')}
-                    onClick={dismissCoach}
-                  >
-                    ×
-                  </button>
-                </div>
+                </CoachBubble>
               )}
               <div
                 className="rooms__feed-stage"
