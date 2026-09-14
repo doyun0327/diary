@@ -37,6 +37,8 @@
     "footer": "천천히, 하루씩",
     "account": "계정",
     "accountHintEmpty": "프로필 · 계정",
+    "subscribed": "구독 중",
+    "subscribeCta": "구독하기",
     "rooms": "PageBy",
     "roomsHint": "내 방 목록",
     "character": "캐릭터",
@@ -247,9 +249,10 @@
       "noAccountPhoto": "이 계정에는 프로필 사진이 없어요"
     },
     "ok": {
-      "nameSaved": "저장되었습니다.",
-      "photoSaved": "프로필 사진을 저장했어요",
-      "photoRemoved": "프로필 사진을 삭제했어요"
+      "nameSaved": "프로필이 변경되었어요.",
+      "profileChanged": "프로필이 변경되었어요.",
+      "photoSaved": "프로필이 변경되었어요.",
+      "photoRemoved": "프로필이 변경되었어요."
     },
     "err": {
       "nameRequired": "이름을 입력해 주세요",
@@ -284,7 +287,7 @@
     "tabsAria": "냥 티켓 메뉴",
     "subscribeTitle": "구독",
     "subscribeTitleWithLeft": "구독 (잔여: {{n}}장)",
-    "subscribeLead": "매달 AI 그림 {{n}}장씩 지급돼요.",
+    "subscribeLead": "매달 {{n}}장의 그림을 생성할 수 있어요!",
     "subscribeCta": "PRO 구독하기",
     "subscribed": "구독 중",
     "subscribeDone": "구독이 시작됐어요!",
@@ -293,7 +296,7 @@
     "packsTitle": "AI 그림 충전",
     "packsTitleWithLeft": "AI 그림 충전 (잔여: {{n}}장)",
     "packsRemaining": "잔여 : {{n}} 장",
-    "packsLead": "한 번 사면 바로 쓸 수 있어요.",
+    "packsLead": "원하는 만큼 AI 그림을 추가해보세요.\n구독하지 않아도 이용할 수 있어요.",
     "packLabel": "{{n}}장",
     "buy": "구매",
     "packDone": "{{n}}장을 구매했어요",
@@ -575,6 +578,7 @@
     "contentPlaceholder": "예) 오늘 수영을 했다. 오늘 운동을 했다.",
     "collapseCanvas": "그림 접기",
     "expandCanvas": "그림 펼치기",
+    "drawingLoading": "불러오는 중!",
     "ai": {
       "button": "그림생성 📸",
       "sceneStep": "프롬프트 만드는 중…",

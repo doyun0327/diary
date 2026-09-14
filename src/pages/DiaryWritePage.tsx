@@ -217,6 +217,14 @@ function DiaryWritePage({
       ),
   );
   const [canvasCollapsed, setCanvasCollapsed] = useState(false);
+  /** 수정 진입 시 기존 그림 하이드레이션 중 */
+  const [drawingLoading, setDrawingLoading] = useState(() =>
+    Boolean(
+      initialEntry?.imageUrl ||
+        initialEntry?.canvasState ||
+        resumeDraft?.hasDrawing,
+    ),
+  );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
@@ -476,8 +484,15 @@ function DiaryWritePage({
     const entryCanvas = initialEntry?.canvasState;
     const entryImage = initialEntry?.imageUrl;
     const draftHasDrawing = resumeDraft?.hasDrawing;
+    const needsLoad = Boolean(
+      entryImage ||
+        entryCanvas ||
+        draftHasDrawing,
+    );
+    setDrawingLoading(needsLoad);
+    if (!needsLoad) return;
 
-    const applyCanvas = (
+    const applyCanvas = async (
       state: DiaryCanvasState | null | undefined,
       src: string | null | undefined,
     ) => {
@@ -485,7 +500,10 @@ function DiaryWritePage({
       const canvas = canvasRef.current;
       if (!canvas) {
         if (attempts++ < 90) {
-          window.requestAnimationFrame(() => applyCanvas(state, src));
+          await new Promise<void>((resolve) => {
+            window.requestAnimationFrame(() => resolve());
+          });
+          if (!cancelled) await applyCanvas(state, src);
         }
         return;
       }
@@ -495,31 +513,43 @@ function DiaryWritePage({
             (state.stickers?.length ?? 0) > 0 ||
             state.inkUrl),
       );
-      if (hasLayers && state) {
-        void canvas.loadCanvasState(state, src ?? undefined).catch(() => {
-          if (!cancelled && src) void canvas.loadEditableImage(src);
-        });
-        drawingTouchedRef.current = true;
-        return;
-      }
-      if (src) {
-        void canvas.loadEditableImage(src).catch(() => {
-          if (!cancelled) void canvas.loadImage(src);
-        });
-        drawingTouchedRef.current = true;
+      try {
+        if (hasLayers && state) {
+          try {
+            await canvas.loadCanvasState(state, src ?? undefined);
+          } catch {
+            if (!cancelled && src) await canvas.loadEditableImage(src);
+          }
+          drawingTouchedRef.current = true;
+          return;
+        }
+        if (src) {
+          try {
+            await canvas.loadEditableImage(src);
+          } catch {
+            if (!cancelled) await canvas.loadImage(src);
+          }
+          drawingTouchedRef.current = true;
+        }
+      } finally {
+        // keep going
       }
     };
 
     void (async () => {
-      if (draftHasDrawing) {
-        const media = await loadWriteDraftMedia();
-        if (cancelled) return;
-        if (media.canvasState || media.imageUrl) {
-          applyCanvas(media.canvasState, media.imageUrl);
-          return;
+      try {
+        if (draftHasDrawing) {
+          const media = await loadWriteDraftMedia();
+          if (cancelled) return;
+          if (media.canvasState || media.imageUrl) {
+            await applyCanvas(media.canvasState, media.imageUrl);
+            return;
+          }
         }
+        await applyCanvas(entryCanvas, entryImage);
+      } finally {
+        if (!cancelled) setDrawingLoading(false);
       }
-      applyCanvas(entryCanvas, entryImage);
     })();
 
     return () => {
@@ -1562,6 +1592,11 @@ function DiaryWritePage({
 
           <div className="diary-write__draw">
             <div className="diary-write__canvas-wrap">
+            {drawingLoading ? (
+              <div className="diary-write__canvas-loading" role="status" aria-live="polite">
+                {t('write.drawingLoading')}
+              </div>
+            ) : null}
             <DrawingCanvas
               ref={canvasRef}
               fontId={fontId}

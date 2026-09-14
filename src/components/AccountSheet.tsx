@@ -450,6 +450,7 @@ function AccountSheet({
   const useAccountPhoto = () => {
     if (!session?.photoUrl) return;
     applyAuthPhoto(session.photoUrl);
+    showToast(t('account.ok.profileChanged'));
   };
 
   const saveName = () => {
@@ -467,7 +468,7 @@ function AccountSheet({
         await syncProfileToRooms({ nickname: name, avatarUrl });
       }
     })();
-    showToast(t('account.ok.nameSaved'));
+    showToast(t('account.ok.profileChanged'));
   };
 
   const onPickPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -483,6 +484,7 @@ function AccountSheet({
         nickname: nameDraft.trim() || nickname,
         avatarUrl: dataUrl,
       });
+      showToast(t('account.ok.profileChanged'));
     } catch {
       // 메시지 UI 없음
     } finally {
@@ -497,6 +499,7 @@ function AccountSheet({
       avatarUrl: null,
     });
     setPhotoMenuOpen(false);
+    showToast(t('account.ok.profileChanged'));
   };
 
   const openPhotoPicker = () => {

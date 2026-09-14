@@ -512,6 +512,23 @@
   flex-shrink: 0;
 }
 
+.diary-write__canvas-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  color: var(--color-text-muted);
+  font-family: var(--brand-font);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
 .diary-write__draw {
   display: flex;
   flex-direction: column;

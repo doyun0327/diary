@@ -10,6 +10,7 @@ import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
   getAiPackCredits,
   getDiaryAccessState,
+  MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import { isFlutterApp } from '../utils/nativeShare';
@@ -410,33 +411,41 @@ function NyangTicketSheet({
                 </span>
               </div>
             ) : (
-              <button
-                type="button"
-                className="account-sheet__btn account-sheet__btn--solid nyang-ticket__btn"
-                disabled={busy != null}
-                onClick={() => void handleSubscribe()}
-              >
-                {busy === 'google'
-                  ? t('nyangTicket.signingIn')
-                  : busy === 'sub'
-                    ? t('common.processing')
-                    : (
-                      <span className="nyang-ticket__cta-with-price">
-                        <span>{t('nyangTicket.subscribeCta')}</span>
-                        {priceFor(SUB_PRODUCT_ID) ? (
-                          <span className="nyang-ticket__price">
-                            {priceFor(SUB_PRODUCT_ID)}
-                          </span>
-                        ) : null}
-                      </span>
-                    )}
-              </button>
+              <>
+                <p className="nyang-ticket__panel-lead">
+                  {t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })}
+                </p>
+                <button
+                  type="button"
+                  className="account-sheet__btn account-sheet__btn--solid nyang-ticket__btn"
+                  disabled={busy != null}
+                  onClick={() => void handleSubscribe()}
+                >
+                  {busy === 'google'
+                    ? t('nyangTicket.signingIn')
+                    : busy === 'sub'
+                      ? t('common.processing')
+                      : (
+                        <span className="nyang-ticket__cta-with-price">
+                          <span>{t('nyangTicket.subscribeCta')}</span>
+                          {priceFor(SUB_PRODUCT_ID) ? (
+                            <span className="nyang-ticket__price">
+                              {priceFor(SUB_PRODUCT_ID)}
+                            </span>
+                          ) : null}
+                        </span>
+                      )}
+                </button>
+              </>
             )}
           </section>
         )}
 
         {tab === 'packs' && (
           <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
+            <p className="nyang-ticket__panel-lead">
+              {t('nyangTicket.packsLead')}
+            </p>
             <div className="nyang-ticket__sub-status" aria-live="polite">
               <span className="nyang-ticket__sub-status-title">
                 {t('nyangTicket.packsRemaining', { n: packLeft })}

@@ -81,6 +81,15 @@
   min-height: 240px;
 }
 
+.nyang-ticket__panel-lead {
+  margin: 0 0 12px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  white-space: pre-line;
+}
+
 .nyang-ticket__btn {
   width: 100%;
   margin-top: 0;

@@ -2,6 +2,10 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { formatYearMonth } from '../utils/date';
+import {
+  getDiaryAccessState,
+  subscribeDiaryAccess,
+} from '../utils/diaryAccess';
 import MonthYearPicker from './MonthYearPicker';
 import './Header.css';
 
@@ -292,6 +296,9 @@ function Header({
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const [accessTick, setAccessTick] = useState(0);
+
+  useEffect(() => subscribeDiaryAccess(() => setAccessTick((n) => n + 1)), []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -367,6 +374,8 @@ function Header({
   const accountHint = nickname.trim()
     ? nickname.trim()
     : t('header.accountHintEmpty');
+  void accessTick;
+  const isPro = getDiaryAccessState().isPremiumActive;
 
   const menu =
     menuOpen &&
@@ -376,19 +385,40 @@ function Header({
         <nav className="header-menu__panel">
           <ul className="header-menu__list">
             {onOpenAccount && (
-              <MenuItem
-                icon={
-                  avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="header-menu__avatar-img" />
-                  ) : (
-                    <IconUser />
-                  )
-                }
-                label={t('header.account')}
-                hint={accountHint}
-                tone="cream"
-                onClick={() => closeAnd(onOpenAccount)}
-              />
+              <li>
+                <div className="header-menu__item header-menu__item--cream header-menu__item--account">
+                  <button
+                    type="button"
+                    className="header-menu__account-main"
+                    onClick={() => closeAnd(onOpenAccount)}
+                  >
+                    <span className="header-menu__icon">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="" className="header-menu__avatar-img" />
+                      ) : (
+                        <IconUser />
+                      )}
+                    </span>
+                    <span className="header-menu__text">
+                      <span className="header-menu__label">{t('header.account')}</span>
+                      <span className="header-menu__hint">{accountHint}</span>
+                    </span>
+                  </button>
+                  {isPro ? (
+                    <span className="header-menu__sub-badge is-pro">
+                      {t('header.subscribed')}
+                    </span>
+                  ) : onOpenNyangTicket ? (
+                    <button
+                      type="button"
+                      className="header-menu__sub-badge is-cta"
+                      onClick={() => closeAnd(onOpenNyangTicket)}
+                    >
+                      {t('header.subscribeCta')}
+                    </button>
+                  ) : null}
+                </div>
+              </li>
             )}
             {onOpenRooms && (
               <MenuItem

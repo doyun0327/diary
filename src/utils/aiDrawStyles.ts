@@ -33,34 +33,21 @@ export const AI_DRAW_STYLES: {
   {
     id: 'webtoonHero',
     enabled: true,
-    previewSrcs: [
-      '/preview/웹툰4.jpg',
-      '/preview/웹툰1.jpg',
-      '/preview/웹툰2.jpg',
-      '/preview/웹툰3.jpg',
-    ],
+    previewSrcs: ['/preview/final_웹툰.jpg'],
   },
   {
     id: 'oilPastel',
     enabled: true,
-    previewSrcs: [
-      '/preview/오일1.jpg',
-      '/preview/오일2.jpg',
-      '/preview/오일3.jpg',
-    ],
+    previewSrcs: ['/preview/final_오일.jpg'],
   },
   {
     id: 'jpRetroFilm',
     enabled: true,
-    previewSrcs: [
-      '/preview/일본3.jpg',
-      '/preview/일본1.jpg',
-      '/preview/일본2.jpg',
-    ],
+    previewSrcs: ['/preview/final_일본.jpg'],
   },
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v7';
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v8';
 /** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
 const previewBlobUrlBySrc = new Map<string, string>();
 const previewReadyListeners = new Set<() => void>();

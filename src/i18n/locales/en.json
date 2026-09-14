@@ -37,6 +37,8 @@
     "footer": "Slowly, day by day",
     "account": "Account",
     "accountHintEmpty": "Photo · account",
+    "subscribed": "Subscribed",
+    "subscribeCta": "Subscribe",
     "rooms": "PageBy",
     "roomsHint": "My rooms",
     "character": "Character",
@@ -247,9 +249,10 @@
       "noAccountPhoto": "This account has no profile photo"
     },
     "ok": {
-      "nameSaved": "Name saved",
-      "photoSaved": "Profile photo saved",
-      "photoRemoved": "Profile photo removed"
+      "nameSaved": "Profile updated.",
+      "profileChanged": "Profile updated.",
+      "photoSaved": "Profile updated.",
+      "photoRemoved": "Profile updated."
     },
     "err": {
       "nameRequired": "Please enter a name",
@@ -284,7 +287,7 @@
     "tabsAria": "Nyang Ticket tabs",
     "subscribeTitle": "Subscription",
     "subscribeTitleWithLeft": "Subscription ({{n}} left)",
-    "subscribeLead": "{{n}} AI drawings are granted every month.",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
     "subscribeCta": "Subscribe to PRO",
     "subscribed": "Subscribed",
     "subscribeDone": "Subscription started!",
@@ -293,7 +296,7 @@
     "packsTitle": "AI drawing packs",
     "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
     "packsRemaining": "Left: {{n}}",
-    "packsLead": "Buy once and use right away.",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
     "packLabel": "{{n}}",
     "buy": "Buy",
     "packDone": "Purchased {{n}} drawings",
@@ -575,6 +578,7 @@
     "contentPlaceholder": "e.g. I went swimming today. I worked out today.",
     "collapseCanvas": "Hide drawing",
     "expandCanvas": "Show drawing",
+    "drawingLoading": "Loading!",
     "ai": {
       "button": "Generate drawing",
       "sceneStep": "Writing prompt…",

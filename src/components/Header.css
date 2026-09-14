@@ -314,6 +314,71 @@
   color: var(--color-text-muted);
 }
 
+.header-menu__item--account {
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  cursor: default;
+}
+
+.header-menu__item--account:active {
+  transform: none;
+  background: var(--color-surface);
+}
+
+.header-menu__account-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 8px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.header-menu__account-main:active {
+  background: var(--color-bg-soft);
+}
+
+.header-menu__sub-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: none;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.header-menu__sub-badge.is-pro {
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
+}
+
+.header-menu__sub-badge.is-cta {
+  background: var(--color-accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.header-menu__sub-badge.is-cta:active {
+  transform: scale(0.96);
+  opacity: 0.92;
+}
+
 .header-menu__item--toggle {
   cursor: pointer;
 }
