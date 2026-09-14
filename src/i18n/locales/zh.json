@@ -492,7 +492,8 @@
     "drawConfirmLead": "剩余 {{n}} 次\n画完后才会扣次。",
     "drawConfirmOk": "画",
     "deductAfterDone": "画完成功后才会扣次。",
-    "deductAfterDoneShort": "完成后扣次"
+    "deductAfterDoneShort": "完成后扣次",
+    "breakdownInstallFree": "{{n}} : 首次免费"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "这个角色会成为画中的主角",
       "rewardTitle": "看广告获得 1 次 AI 绘画",
       "loginForFreeTitle": "AI 绘画",
-      "loginForFreeLead": "登录后可免费绘制 3 幅！",
+      "loginForFreeLead": "看广告或订阅后即可用 AI 绘画。",
+      "guestPaywallLead": "看广告可今天画 1 次，订阅后每月可画更多。",
+      "guestDailyExhaustedLead": "今天的广告次数已用完。订阅后每月可画更多。",
       "loginForFreeCta": "使用 Google 登录",
       "loginSkipCta": "看广告绘制 1 次",
       "loginBusy": "登录中…",

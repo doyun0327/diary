@@ -493,7 +493,8 @@
     "drawConfirmLead": "{{n}} übrig\nWird abgezogen, wenn die Zeichnung fertig ist.",
     "drawConfirmOk": "Zeichnen",
     "deductAfterDone": "Abzug erst, wenn die Zeichnung fertig ist.",
-    "deductAfterDoneShort": "Nach Fertig"
+    "deductAfterDoneShort": "Nach Fertig",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -528,7 +529,9 @@
       "characterTitle": "Dieser Charakter wird zur Hauptfigur",
       "rewardTitle": "Werbung ansehen für 1 KI-Zeichnung",
       "loginForFreeTitle": "KI-Zeichnung",
-      "loginForFreeLead": "Melde dich an und zeichne 3 KI-Bilder kostenlos!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "Mit Google anmelden",
       "loginSkipCta": "1× mit Werbung zeichnen",
       "loginBusy": "Anmeldung…",

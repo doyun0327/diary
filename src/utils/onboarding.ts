@@ -1,7 +1,20 @@
+import {
+  canUseProAiQuota,
+  getPurchasedAiPackCredits,
+  isPremiumActiveNow,
+} from './diaryAccess';
+
 const CHARACTER_DONE_KEY = 'picture-diary-onboarding-character-done';
 const CHARACTER_COACH_KEY = 'picture-diary-onboarding-character-coach';
 const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
-/** 완성 후 차감 안내 노출 횟수 (최대 3) */
+/**
+ * 어떻게 그릴까요? 튜토리얼 진행
+ * - 없음 / "0": 일기 예시 아직
+ * - "diary": 일기 예시 봄 → 사진 예시 남음
+ * - "1": 완료
+ */
+const AI_SOURCE_INTRO_KEY = 'picture-diary-onboarding-ai-source-intro';
+/** 완성 후 차감 안내 노출 횟수 (최대 3) — 구독·구매권 보유자만 */
 const AI_DEDUCT_COACH_COUNT_KEY = 'picture-diary-onboarding-ai-deduct-coach-count';
 const WRITE_FAB_COACH_KEY = 'picture-diary-onboarding-write-fab-coach';
 const ROOM_COMMENT_COACH_KEY = 'picture-diary-onboarding-room-comment-coach';
@@ -107,12 +120,56 @@ export function isAiCoachSeen(): boolean {
   return readFlag(AI_COACH_KEY);
 }
 
+/** 그림생성 버튼 첫 안내 — 아직 안 눌렀으면 */
+export function shouldShowAiClickCoach(): boolean {
+  return !isAiCoachSeen();
+}
+
 export function markAiCoachSeen() {
   writeFlag(AI_COACH_KEY);
 }
 
-/** 완성 후 차감 — 처음 3번만 흘려가게 */
+/** 일기→그림 튜토리얼 전부 봤는지 */
+export function isAiSourceIntroSeen(): boolean {
+  return getAiSourceTutorialProgress() === 'done';
+}
+
+export type AiSourceTutorialProgress = 'need-diary' | 'need-photo' | 'done';
+
+export function getAiSourceTutorialProgress(): AiSourceTutorialProgress {
+  try {
+    const raw = localStorage.getItem(AI_SOURCE_INTRO_KEY);
+    if (raw === '1' || raw === 'done') return 'done';
+    if (raw === 'diary') return 'need-photo';
+    return 'need-diary';
+  } catch {
+    return 'need-diary';
+  }
+}
+
+/** 일기 예시(X) 닫음 → 사진 단계로 */
+export function markAiSourceDiaryTutorialSeen() {
+  try {
+    if (getAiSourceTutorialProgress() === 'done') return;
+    localStorage.setItem(AI_SOURCE_INTRO_KEY, 'diary');
+  } catch {
+    // ignore
+  }
+}
+
+/** 사진 예시까지 완료 */
+export function markAiSourceIntroSeen() {
+  writeFlag(AI_SOURCE_INTRO_KEY);
+}
+
+/** 구독(Pro) 또는 AI 그림충전 구매 잔량이 있으면 true */
+function hasPaidAiQuotaForDeductCoach(): boolean {
+  return isPremiumActiveNow() || canUseProAiQuota() || getPurchasedAiPackCredits() > 0;
+}
+
+/** 완성 후 차감 — 구독·구매권 있는 사람에게만 처음 3번 */
 export function shouldShowAiDeductCoach(): boolean {
+  if (!hasPaidAiQuotaForDeductCoach()) return false;
   return getAiDeductCoachShowCount() < 3;
 }
 

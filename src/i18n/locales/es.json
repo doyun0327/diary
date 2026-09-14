@@ -492,7 +492,8 @@
     "drawConfirmLead": "Quedan {{n}}\nSe descuenta al terminar el dibujo.",
     "drawConfirmOk": "Dibujar",
     "deductAfterDone": "Se descuenta solo cuando termina el dibujo.",
-    "deductAfterDoneShort": "Al terminar"
+    "deductAfterDoneShort": "Al terminar",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "Este personaje será el protagonista",
       "rewardTitle": "Mira un anuncio por 1 dibujo IA",
       "loginForFreeTitle": "Dibujo IA",
-      "loginForFreeLead": "¡Inicia sesión para dibujar 3 veces gratis!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "Iniciar sesión con Google",
       "loginSkipCta": "Dibujar 1 vez con anuncio",
       "loginBusy": "Iniciando sesión…",

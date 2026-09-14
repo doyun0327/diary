@@ -6,12 +6,16 @@ const POLL_MS = 2500;
 /**
  * 배포(MAINTENANCE) 중이면 true.
  * 이미 열린 WebView/탭도 폴링으로 감지한다.
+ * 로컬 dev에는 deploy-status.json 이 없어 폴링하지 않음.
  */
 export function useDeployMaintenance(): boolean {
   const [maintenance, setMaintenance] = useState(false);
   const wasOnRef = useRef(false);
 
   useEffect(() => {
+    // Vite 개발 서버 — 배포 상태 엔드포인트 없음 → 404 스팸 방지
+    if (import.meta.env.DEV) return;
+
     let cancelled = false;
     let timer: number | undefined;
 

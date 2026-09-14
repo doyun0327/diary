@@ -492,7 +492,8 @@
     "drawConfirmLead": "残り {{n}} 回\n描き終わると消化されます。",
     "drawConfirmOk": "描く",
     "deductAfterDone": "描き終わると回数が減ります。",
-    "deductAfterDoneShort": "完成後に消化"
+    "deductAfterDoneShort": "完成後に消化",
+    "breakdownInstallFree": "{{n}} : 初回無料"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "このキャラクターが主人公になります",
       "rewardTitle": "広告を見てAI描画1回",
       "loginForFreeTitle": "AI絵",
-      "loginForFreeLead": "ログインすると無料で3枚描けます！",
+      "loginForFreeLead": "広告を見るか、登録するとAI絵を描けます。",
+      "guestPaywallLead": "広告を見ると今日1回描けます。登録すると毎月もっと描けます。",
+      "guestDailyExhaustedLead": "今日の広告分は使い切りました。登録すると毎月もっと描けます。",
       "loginForFreeCta": "Googleでログイン",
       "loginSkipCta": "広告で1回描く",
       "loginBusy": "ログイン中…",

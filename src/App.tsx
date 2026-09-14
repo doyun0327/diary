@@ -145,7 +145,7 @@ function App() {
   const { session, markSynced, ensureGuestSession, refreshMe } = useAuthSession();
   const googleReauthToastShownRef = useRef(false);
   const { character, setCharacter } = useCharacter();
-  const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl } =
+  const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl, gender, setGender, ageGroup, setAgeGroup } =
     useClientProfile();
   const screenLock = useScreenLock();
   const [page, setPage] = useState<Page>(() => readResumeWrite().page);
@@ -1052,9 +1052,18 @@ function App() {
         <ProfileSetup
           initialName={nickname}
           initialAvatar={avatarUrl}
-          onComplete={({ nickname: nextName, avatarUrl: nextAvatar }) => {
+          initialGender={gender}
+          initialAgeGroup={ageGroup}
+          onComplete={({
+            nickname: nextName,
+            avatarUrl: nextAvatar,
+            gender: nextGender,
+            ageGroup: nextAge,
+          }) => {
             setNickname(nextName);
             setAvatarUrl(nextAvatar);
+            setGender(nextGender);
+            setAgeGroup(nextAge);
             markProfileSetupDone();
             setOnboardingTick((n) => n + 1);
             void ensureGuestSession(clientId, nextName).catch((err) => {
@@ -1242,8 +1251,12 @@ function App() {
             nickname={nickname}
             avatarUrl={avatarUrl}
             clientId={clientId}
+            gender={gender}
+            ageGroup={ageGroup}
             onNicknameChange={setNickname}
             onAvatarChange={setAvatarUrl}
+            onGenderChange={setGender}
+            onAgeGroupChange={setAgeGroup}
             onSyncDiaries={syncWithCloud}
             syncMonth={viewMonthKey}
             onMonthSynced={(month) => {

@@ -13,10 +13,12 @@ export const FREE_DAILY_AI_AD_LIMIT = 1;
 export const FREE_DAILY_DIARY_AD_LIMIT = FREE_DAILY_AI_AD_LIMIT;
 /** @deprecated 일기 저장 광고 — AI 생성 시 차감 */
 export const DIARY_REWARD_AD_ENABLED = false;
-/** @deprecated 일일 광고 한도로 대체 */
-export const FREE_AI_DRAWS_TOTAL = 0;
+/** @deprecated 설치 1회 무료는 DEVICE_AI_INSTALL_FREE_USED_KEY 사용 */
+export const FREE_AI_DRAWS_TOTAL = 1;
 /** @deprecated FREE_AI_DRAWS_TOTAL */
 export const FREE_AI_DRAWS_PER_DAY = FREE_AI_DRAWS_TOTAL;
+/** 앱 설치 후 기기당 AI 그림 무료 1회 (계정·게스트 공통) */
+export const INSTALL_FREE_AI_DRAWS = 1;
 /** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드) */
 export const AI_REWARD_AD_ENABLED = true;
 /** 설치 후 검색·보내기 무료 체험 기간 */
@@ -27,6 +29,8 @@ const FEATURE_TRIAL_START_KEY = "picture-diary-search-export-trial-start-v2";
 const STORAGE_KEY = "picture-diary-access-v1";
 /** 계정 키와 무관 — 이 기기에서 확인된 Pro 만료 (재로그인·게스트 전환 대비) */
 const DEVICE_PREMIUM_UNTIL_KEY = "picture-diary-device-premium-until-v1";
+/** 계정 키와 무관 — 이 기기 설치 후 AI 무료 1회 ("1"=사용함, "0"=남음, 없음=미판정) */
+const DEVICE_AI_INSTALL_FREE_USED_KEY = "picture-diary-ai-install-free-used-v1";
 const ENTRIES_KEY = "picture-diary-entries";
 
 export const SUBSCRIPTION_CHANGE_EVENT = "diary-subscription-change";
@@ -629,9 +633,86 @@ export function getRemainingAiDrawsToday() {
   return getRemainingFreeAiDraws();
 }
 
-/** 오늘 광고로 더 이상 AI 그림을 생성할 수 없음 (팩 잔여 있으면 false) */
+function hasAnyDiaryEntryOnDevice() {
+  try {
+    const raw = localStorage.getItem(ENTRIES_KEY);
+    if (!raw) return false;
+    const arr = JSON.parse(raw) as unknown;
+    return Array.isArray(arr) && arr.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function hasAnyPriorAiQuotaUseOnDevice() {
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith(`${STORAGE_KEY}:`)) continue;
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (Number(parsed.diaryCreatesToday ?? 0) > 0) return true;
+      if (Number(parsed.aiFreeDrawsUsed ?? 0) > 0) return true;
+      if (Number(parsed.monthlyLimitUsed ?? 0) > 0) return true;
+      if (Number(parsed.aiDrawCredits ?? 0) > 0) return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+/** 기존 기기(업데이트)는 설치 무료 대상이 아님 — 한 번만 판정 */
+function migrateInstallFreeFlagIfNeeded() {
+  try {
+    const cur = localStorage.getItem(DEVICE_AI_INSTALL_FREE_USED_KEY);
+    if (cur === "0" || cur === "1") return;
+    const legacy =
+      hasAnyDiaryEntryOnDevice() || hasAnyPriorAiQuotaUseOnDevice();
+    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, legacy ? "1" : "0");
+  } catch {
+    // ignore
+  }
+}
+
+/** 이 기기에서 설치 무료 AI 1회를 아직 쓸 수 있음 */
+export function canUseInstallFreeAiDraw() {
+  migrateInstallFreeFlagIfNeeded();
+  try {
+    return localStorage.getItem(DEVICE_AI_INSTALL_FREE_USED_KEY) !== "1";
+  } catch {
+    return true;
+  }
+}
+
+/** 설치 무료 AI 1회 소모 (성공 시에만 호출). 이미 썼으면 false */
+export function consumeInstallFreeAiDraw() {
+  if (!canUseInstallFreeAiDraw()) return false;
+  try {
+    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, "1");
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** 생성 실패 등으로 설치 무료 슬롯 환불 */
+export function refundInstallFreeAiDraw() {
+  try {
+    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, "0");
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+  return true;
+}
+
+/** 오늘 광고로 더 이상 AI 그림을 생성할 수 없음 (팩·설치무료 있으면 false) */
 export function isAiDailyLimitReached() {
   if (!AI_REWARD_AD_ENABLED) return false;
+  if (canUseInstallFreeAiDraw()) return false;
   const state = loadAccessState();
   normalizeDailyAiState(state);
   normalizeAiCredits(state);
@@ -647,6 +728,7 @@ export function isAiDailyLimitReached() {
 /** AI 그림 생성 전 광고 시청이 필요함 */
 export function needsAiAdBeforeDraw() {
   if (!AI_REWARD_AD_ENABLED) return false;
+  if (canUseInstallFreeAiDraw()) return false;
   const state = loadAccessState();
   normalizeDailyAiState(state);
   normalizeAiCredits(state);

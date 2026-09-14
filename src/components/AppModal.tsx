@@ -47,9 +47,15 @@ export default function AppModal({
   const canClose = Boolean(onDismiss);
   const showX = showClose ?? canClose;
   const showBack = Boolean(onBack);
+  const headerBar = showBack || showX;
 
   return (
-    <div className="app-modal" role="dialog" aria-modal="true" aria-labelledby={ariaLabelledBy}>
+    <div
+      className="app-modal"
+      role="dialog"
+      aria-modal="true"
+      {...(title ? { 'aria-labelledby': ariaLabelledBy } : {})}
+    >
       <button
         type="button"
         className="app-modal__backdrop"
@@ -58,36 +64,43 @@ export default function AppModal({
         disabled={!canClose}
       />
       <div className={['app-modal__panel', panelClassName].filter(Boolean).join(' ')}>
-        {showBack && onBack ? (
-          <button
-            type="button"
-            className="app-modal__back"
-            onClick={onBack}
-            aria-label={backAriaLabel}
-          >
-            <BackIcon size={20} strokeWidth={2.25} />
-          </button>
-        ) : null}
-        {showX && onDismiss ? (
-          <button
-            type="button"
-            className="app-modal__close"
-            onClick={onDismiss}
-            aria-label={closeAriaLabel}
-          >
-            <CloseIcon />
-          </button>
-        ) : null}
         <div
           className={[
             'app-modal__header',
-            showX && onDismiss ? 'app-modal__header--with-close' : '',
-            showBack ? 'app-modal__header--with-back' : '',
+            headerBar ? 'app-modal__header--bar' : '',
           ]
             .filter(Boolean)
             .join(' ')}
         >
-          <h3 id={ariaLabelledBy}>{title}</h3>
+          {headerBar ? (
+            showBack && onBack ? (
+              <button
+                type="button"
+                className="app-modal__back"
+                onClick={onBack}
+                aria-label={backAriaLabel}
+              >
+                <BackIcon size={20} strokeWidth={2.25} />
+              </button>
+            ) : (
+              <span className="app-modal__header-slot" aria-hidden />
+            )
+          ) : null}
+          {title ? <h3 id={ariaLabelledBy}>{title}</h3> : <span id={ariaLabelledBy} className="app-modal__header-title-spacer" aria-hidden />}
+          {headerBar ? (
+            showX && onDismiss ? (
+              <button
+                type="button"
+                className="app-modal__close"
+                onClick={onDismiss}
+                aria-label={closeAriaLabel}
+              >
+                <CloseIcon />
+              </button>
+            ) : (
+              <span className="app-modal__header-slot" aria-hidden />
+            )
+          ) : null}
         </div>
         {lead ? <p className="app-modal__lead">{lead}</p> : null}
         {children}

@@ -492,7 +492,8 @@
     "drawConfirmLead": "剩餘 {{n}} 次\n畫完後才會扣次。",
     "drawConfirmOk": "畫",
     "deductAfterDone": "畫完成功後才會扣次。",
-    "deductAfterDoneShort": "完成後扣次"
+    "deductAfterDoneShort": "完成後扣次",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "這個角色會成為畫中的主角",
       "rewardTitle": "看廣告獲得 1 次 AI 繪畫",
       "loginForFreeTitle": "AI 繪畫",
-      "loginForFreeLead": "登入後可免費繪製 3 幅！",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "使用 Google 登入",
       "loginSkipCta": "看廣告繪製 1 次",
       "loginBusy": "登入中…",

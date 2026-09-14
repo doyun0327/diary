@@ -272,6 +272,57 @@
   color: var(--color-text-muted);
 }
 
+.account-sheet__label--spaced {
+  margin-top: 14px;
+}
+
+.account-sheet__radios {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.account-sheet__radios--wrap {
+  flex-wrap: wrap;
+}
+
+.account-sheet__radio {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border-soft);
+  background: var(--color-surface);
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.account-sheet__radios--wrap .account-sheet__radio {
+  flex: 1 1 calc(33.33% - 6px);
+  min-width: 4.5rem;
+}
+
+.account-sheet__radio:has(input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  color: var(--color-accent-text);
+}
+
+.account-sheet__radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
 .account-sheet__hint {
   margin: 0 0 10px;
   font-size: 0.8rem;

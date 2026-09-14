@@ -208,7 +208,10 @@
     "nameHint": "Name shown in PageBy",
     "nameHintLoggedIn": "Your name stays on this device after sign-out",
     "namePlaceholder": "Enter your name",
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
     "save": "Save",
+    "demographicsSaved": "Gender and age saved",
     "profile": {
       "label": "Profile on this device",
       "hint": "Separate from sign-in. Name and photo used only in this app."
@@ -492,8 +495,23 @@
     "pickPhotoAria": "Choose profile photo",
     "nameLabel": "Name",
     "namePlaceholder": "Name friends will see (optional)",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
     "start": "Next",
     "errName": "Please enter a name",
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group",
     "errNeedPhoto": "Please add a profile photo",
     "errImage": "Image files only",
     "errPhoto": "Couldn't process the photo"
@@ -565,6 +583,7 @@
     "breakdownWelcome": "{{n}} : Welcome",
     "breakdownPack": "{{n}} : AI pack",
     "breakdownAd": "{{n}} : Ad",
+    "breakdownInstallFree": "{{n}} : First free",
     "breakdownEmpty": "No credits left"
   },
   "write": {
@@ -588,7 +607,7 @@
     "expandCanvas": "Show drawing",
     "drawingLoading": "Loading!",
     "ai": {
-      "button": "Generate drawing",
+      "button": "Generate drawing 📸",
       "sceneStep": "Writing prompt…",
       "drawStep": "Drawing…",
       "statusWaiting": "Waiting…",
@@ -615,10 +634,20 @@
       "tipAsk": " should be clear.",
       "sourceTitle": "How should we draw?",
       "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
       "sourceDiary": "Draw from diary",
-      "sourceDiaryDesc": "Makes an oil-pastel scene from what you wrote.",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
       "sourcePhoto": "Draw from photo",
-      "sourcePhotoDesc": "Upload a photo and pick a style.",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
       "styleTitle": "Which style?",
       "styleLead": "Attach a photo, pick a style, then tap Confirm.",
       "styleConfirm": "Confirm",
@@ -654,7 +683,9 @@
       "characterTitle": "This character becomes the protagonist",
       "rewardTitle": "Watch an ad for 1 AI draw",
       "loginForFreeTitle": "AI drawing",
-      "loginForFreeLead": "Sign in to draw 3 AI pictures for free!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "Sign in with Google",
       "loginSkipCta": "Draw once with an ad",
       "loginBusy": "Signing in…",
@@ -730,6 +761,7 @@
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
+      "click": "Try tapping!",
       "ai": "Credits are used after the drawing finishes"
     }
   },

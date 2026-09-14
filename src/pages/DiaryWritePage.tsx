@@ -27,6 +27,7 @@ import {
   aiStylePreviewSrc,
   fileToAiReferenceDataUrl,
   isAiDrawStyleEnabled,
+  preloadAiStylePreviews,
   subscribeAiStylePreviewsReady,
   TEXT_OIL_STYLE_ID,
   type AiDrawStyleId,
@@ -36,9 +37,11 @@ import {
   AI_REWARD_AD_ENABLED,
   applyAiPackCreditsFromServer,
   applyMonthlyUsageFromServer,
+  canUseInstallFreeAiDraw,
   canUseProAiQuota,
   consumeAiDrawDailyQuota,
   consumeAiPackCredit,
+  consumeInstallFreeAiDraw,
   consumeProAiDrawQuota,
   FREE_DAILY_AI_AD_LIMIT,
   getAiDrawCredits,
@@ -57,6 +60,12 @@ import {
 import {
   shouldShowAiDeductCoach,
   markAiDeductCoachShown,
+  shouldShowAiClickCoach,
+  markAiCoachSeen,
+  getAiSourceTutorialProgress,
+  markAiSourceDiaryTutorialSeen,
+  markAiSourceIntroSeen,
+  type AiSourceTutorialProgress,
 } from '../utils/onboarding';
 import {
   clearWriteDraft,
@@ -71,8 +80,12 @@ import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resol
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
 import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
+import {
+  readStoredAgeGroup,
+  readStoredGender,
+} from '../hooks/useClientProfile';
+import { profileLookForAi } from '../utils/profileDemographics';
 import { requestNativeGoogleSignIn, mountGoogleSignInButton } from '../lib/googleAuth';
-import { claimWelcomeAiCredits } from '../utils/welcomeAiCredits';
 import {
   consumeAiPackCreditsRemote,
   consumeMonthlyUsage,
@@ -252,6 +265,12 @@ function DiaryWritePage({
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
   /** 그림 생성: 일기(textOil) vs 사진 */
   const [aiSourceOpen, setAiSourceOpen] = useState(false);
+  /** 튜토리얼 중 예시 패널: diary | photo */
+  const [aiSourceTutPanel, setAiSourceTutPanel] = useState<
+    'diary' | 'photo' | null
+  >(null);
+  const [aiSourceTutProgress, setAiSourceTutProgress] =
+    useState<AiSourceTutorialProgress>(() => getAiSourceTutorialProgress());
   /** 모달에서 고른 스타일 (확인 전까지 대기) */
   const [aiStyleSelectedId, setAiStyleSelectedId] =
     useState<AiDrawStyleId>('webtoonHero');
@@ -272,15 +291,15 @@ function DiaryWritePage({
   /** diary = textOil(일기), photo = 사진+스타일3 */
   const aiSourceRef = useRef<'diary' | 'photo'>('photo');
   const aiReferenceImageRef = useRef<string | null>(null);
-  const aiQuotaKindRef = useRef<'none' | 'pro-server' | 'pro-local' | 'free' | 'ai-pack'>(
-    'none',
-  );
+  const aiQuotaKindRef = useRef<
+    'none' | 'pro-server' | 'pro-local' | 'free' | 'install-free' | 'ai-pack'
+  >('none');
   const [aiPickOpen, setAiPickOpen] = useState(false);
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
   const [accessTick, setAccessTick] = useState(0);
-  const [, setAiPreviewTick] = useState(0);
+  const [aiPreviewTick, setAiPreviewTick] = useState(0);
   const [purchaseClickShield, setPurchaseClickShield] = useState(false);
   const proPurchaseGuardUntilRef = useRef(0);
   const purchaseShieldTimerRef = useRef<number | null>(null);
@@ -345,11 +364,14 @@ function DiaryWritePage({
     hadImage:
       Boolean(initialEntry?.imageUrl) || Boolean(resumeDraft?.hasDrawing),
   });
-  const [coach, setCoach] = useState<'ai' | null>(() => {
+  const [coach, setCoach] = useState<'click' | 'ai' | null>(() => {
     if (isEdit) return null;
+    if (shouldShowAiClickCoach()) return 'click';
     if (shouldShowAiDeductCoach()) return 'ai';
     return null;
   });
+  /** 이 작성 화면에서 차감 코치를 이미 띄웠는지 (accessTick으로 반복 노출 방지) */
+  const aiDeductCoachShownThisVisitRef = useRef(coach === 'ai');
   const canvasRef = useRef<DrawingCanvasHandle>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
@@ -448,21 +470,35 @@ function DiaryWritePage({
       setCoach(null);
       return;
     }
-    if (shouldShowAiDeductCoach()) {
-      setCoach('ai');
+    // 첫 방문: 그림생성 클릭 유도가 우선
+    if (shouldShowAiClickCoach()) {
+      setCoach('click');
       return;
     }
-    setCoach(null);
-  }, [isEdit]);
+    if (!shouldShowAiDeductCoach()) {
+      setCoach((prev) => (prev === 'click' ? null : prev === 'ai' ? null : prev));
+      return;
+    }
+    if (aiDeductCoachShownThisVisitRef.current) return;
+    aiDeductCoachShownThisVisitRef.current = true;
+    setCoach('ai');
+  }, [isEdit, accessTick]);
 
   const dismissAiCoach = () => {
     setCoach((prev) => {
-      if (prev === 'ai') markAiDeductCoachShown();
-      return prev === 'ai' ? null : prev;
+      if (prev === 'click') {
+        markAiCoachSeen();
+        return null;
+      }
+      if (prev === 'ai') {
+        markAiDeductCoachShown();
+        return null;
+      }
+      return prev;
     });
   };
 
-  // 그림생성 옆 말풍선 — 약 5초
+  // 차감 안내만 자동 닫힘 — 클릭해보세요는 누를 때까지 유지
   useEffect(() => {
     if (coach !== 'ai') return;
     const timer = window.setTimeout(() => {
@@ -819,9 +855,12 @@ function DiaryWritePage({
         limit: status.monthlyLimit + pack,
       };
     }
-    // 무료: 환영/팩이 있으면 3→2→1, 다 쓰면 광고 일일 1
+    // 무료: 팩 → 설치 무료 1회 → 광고 일일 1
     if (pack > 0) {
       return { used: 0, limit: pack };
+    }
+    if (canUseInstallFreeAiDraw()) {
+      return { used: 0, limit: 1 };
     }
     const adCredits = getAiDrawCredits();
     if (adCredits > 0) {
@@ -850,7 +889,17 @@ function DiaryWritePage({
     if (purchased > 0) {
       lines.push({ key: 'pack', n: purchased, labelKey: 'quota.breakdownPack' });
     }
-    if (lines.length === 0) {
+    if (canUseInstallFreeAiDraw() && !canUseProAiQuota()) {
+      lines.push({ key: 'install-free', n: 1, labelKey: 'quota.breakdownInstallFree' });
+    }
+    const hasCreditLine = lines.some(
+      (l) =>
+        l.key === 'sub' ||
+        l.key === 'welcome' ||
+        l.key === 'pack' ||
+        l.key === 'install-free',
+    );
+    if (!hasCreditLine) {
       const ad = getAiDrawCredits();
       if (ad > 0) {
         lines.push({ key: 'ad', n: ad, labelKey: 'quota.breakdownAd' });
@@ -864,9 +913,6 @@ function DiaryWritePage({
     }
     return lines;
   })();
-  /** 미로그인 + 오늘 광고 1회 소진 → 로그인만 (광고 스킵 숨김). 내일 리셋되면 다시 둘 다 */
-  const guestDailyAiExhausted =
-    !isGoogleSignedIn() && isAiDailyLimitReached();
 
   const promptAiDrawBlocked = () => {
     if (getAiPackCredits() > 0) {
@@ -948,7 +994,7 @@ function DiaryWritePage({
       return true;
     }
 
-    // Pro: 로그인 환영·팩 잔량 먼저 → 그다음 구독 월 한도 → 광고
+    // Pro: 팩 잔량 먼저 → 그다음 구독 월 한도 → 광고
     if (canUseProAiQuota()) {
       if (await reserveAiPack()) {
         aiQuotaKindRef.current = 'ai-pack';
@@ -987,6 +1033,10 @@ function DiaryWritePage({
 
     if (await reserveAiPack()) {
       aiQuotaKindRef.current = 'ai-pack';
+      return true;
+    }
+    if (canUseInstallFreeAiDraw()) {
+      aiQuotaKindRef.current = 'install-free';
       return true;
     }
     if (getAiDrawCredits() > 0) {
@@ -1044,6 +1094,13 @@ function DiaryWritePage({
       return;
     }
 
+    if (kind === 'install-free') {
+      if (!consumeInstallFreeAiDraw()) {
+        console.warn('[ai] commit install-free failed, image kept');
+      }
+      return;
+    }
+
     if (kind === 'free') {
       if (!consumeAiDrawDailyQuota()) {
         console.warn('[ai] commit free slot failed, image kept');
@@ -1053,38 +1110,55 @@ function DiaryWritePage({
 
   const openAiSourcePicker = () => {
     setAiPhotoError(null);
+    setAiSourceTutPanel(null);
+    setAiSourceTutProgress(getAiSourceTutorialProgress());
     setAiSourceOpen(true);
+  };
+
+  const dismissAiSourcePicker = () => {
+    // 예시 패널이 열려 있으면 먼저 닫고 다음 단계로
+    if (aiSourceTutPanel === 'diary') {
+      markAiSourceDiaryTutorialSeen();
+      setAiSourceTutProgress('need-photo');
+      setAiSourceTutPanel(null);
+      return;
+    }
+    if (aiSourceTutPanel === 'photo') {
+      markAiSourceIntroSeen();
+      setAiSourceTutProgress('done');
+      setAiSourceTutPanel(null);
+      return;
+    }
+    setAiSourceOpen(false);
   };
 
   const handleAiDraw = () => {
     clearPurchaseShield();
-    // 웹: 로그인 없이 방식 선택
+    if (shouldShowAiClickCoach()) {
+      markAiCoachSeen();
+      setCoach((c) => (c === 'click' ? null : c));
+    }
+    // 웹: 로그인·한도 없이 방식 선택
     if (!isFlutterApp()) {
       openAiSourcePicker();
       return;
     }
-    // 앱: 미연동이면 Google 로그인 유도
-    if (!isGoogleSignedIn()) {
-      setAiLoginError(null);
-      setAiLoginOpen(true);
-      return;
+    // 게스트·무료: 설치 무료·팩·광고슬롯 없으면 구독/광고 유도
+    if (!canUseProAiQuota()) {
+      if (
+        getAiPackCredits() <= 0 &&
+        getAiDrawCredits() <= 0 &&
+        !canUseInstallFreeAiDraw() &&
+        isAiDailyLimitReached()
+      ) {
+        setAiDailyLimitOpen(true);
+        return;
+      }
     }
-    void (async () => {
-      await claimWelcomeAiCredits();
-      openAiSourcePicker();
-    })();
+    openAiSourcePicker();
   };
 
-  const continueAsGuestAiDraw = useCallback(() => {
-    setAiLoginOpen(false);
-    setAiLoginBusy(false);
-    setAiLoginError(null);
-    setAiPhotoError(null);
-    setAiSourceOpen(true);
-  }, []);
-
   const finishAiLoginAndDraw = useCallback(async () => {
-    await claimWelcomeAiCredits();
     setAiLoginOpen(false);
     setAiLoginBusy(false);
     setAiLoginError(null);
@@ -1106,18 +1180,28 @@ function DiaryWritePage({
       void runAiDraw();
       return;
     }
+    if (canUseInstallFreeAiDraw() || getAiPackCredits() > 0 || getAiDrawCredits() > 0) {
+      void runAiDraw();
+      return;
+    }
     if (isAiDailyLimitReached()) {
       promptAiDrawBlocked();
       return;
     }
     if (needsAiAdBeforeDraw()) {
-      void handleWatchAd();
+      // 비회원: 자동 광고 재생 대신 광고 1회 + 구독하기
+      setRewardPromptOpen(true);
       return;
     }
     void runAiDraw();
   };
 
   const proceedDiaryDraw = () => {
+    // 튜토리얼: 첫 클릭은 예시만 보여 줌
+    if (aiSourceTutProgress === 'need-diary') {
+      setAiSourceTutPanel('diary');
+      return;
+    }
     const line = extractSceneLine(content) || title.trim();
     if (!line) {
       setAiError(t('write.err.needContent'));
@@ -1131,6 +1215,12 @@ function DiaryWritePage({
   };
 
   const openPhotoStylePicker = () => {
+    if (aiSourceTutProgress === 'need-diary') return;
+    if (aiSourceTutProgress === 'need-photo') {
+      preloadAiStylePreviews();
+      setAiSourceTutPanel('photo');
+      return;
+    }
     aiSourceRef.current = 'photo';
     setAiSourceOpen(false);
     setAiPhotoError(null);
@@ -1290,6 +1380,9 @@ function DiaryWritePage({
         content,
         style: isDiary ? TEXT_OIL_STYLE_ID : aiStyleRef.current,
         referenceImage: isDiary ? null : ref,
+        character: isDiary
+          ? profileLookForAi(readStoredGender(), readStoredAgeGroup())
+          : null,
         accessToken: getAccessToken(),
         onProgress: setAiProgress,
       });
@@ -1715,72 +1808,85 @@ function DiaryWritePage({
           <div className="diary-write__section-head">
             <div className="diary-write__ai-block">
               <div className="diary-write__ai-actions">
-                <div className="diary-write__ai-draw">
-                  <div className="diary-write__coach-anchor diary-write__coach-anchor--ai">
-                    <button
-                      type="button"
-                      className="diary-write__ai-link"
-                      onClick={handleAiDraw}
-                      disabled={aiLoading}
-                    >
-                      {aiLabel}
-                    </button>
-                    {isFlutterApp() && (
-                      <span className="diary-write__ai-remaining-wrap">
-                        <button
-                          type="button"
-                          className={`diary-write__ai-remaining${aiQuotaDetailOpen ? ' is-open' : ''}`}
-                          title={t('quota.deductAfterDone')}
-                          aria-expanded={aiQuotaDetailOpen}
-                          aria-label={t('quota.breakdownAria', { n: aiLeft })}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setAiQuotaDetailOpen((open) => !open);
-                          }}
-                        >
-                          <span className="diary-write__ai-remaining-n">{aiLeft}</span>
-                        </button>
-                        {aiQuotaDetailOpen && (
-                          <>
-                            <button
-                              type="button"
-                              className="diary-write__ai-quota-scrim"
-                              aria-label={t('common.close')}
-                              onClick={() => setAiQuotaDetailOpen(false)}
-                            />
-                            <div
-                              className="diary-write__ai-quota-pop"
-                              role="dialog"
-                              aria-label={t('quota.breakdownTitle')}
-                            >
-                              {aiQuotaBreakdown.length > 0 ? (
-                                <ul className="diary-write__ai-quota-list">
-                                  {aiQuotaBreakdown.map((line) => (
-                                    <li key={line.key}>
-                                      {t(line.labelKey, { n: line.n })}
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="diary-write__ai-quota-empty">
-                                  {t('quota.breakdownEmpty')}
-                                </p>
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </span>
-                    )}
-                    {coach === 'ai' && (
-                      <CoachBubble
-                        className="diary-write__coach diary-write__coach--ai"
-                        arrow="bottom-right"
-                        onDismiss={dismissAiCoach}
+                <div className="diary-write__ai-draw-row">
+                  <div
+                    className={[
+                      'diary-write__ai-draw',
+                      coach === 'click' ? 'diary-write__ai-draw--pulse' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    <div className="diary-write__coach-anchor diary-write__coach-anchor--ai">
+                      <button
+                        type="button"
+                        className="diary-write__ai-link"
+                        onClick={handleAiDraw}
+                        disabled={aiLoading}
                       >
-                        <p>{t('write.coach.ai')}</p>
-                      </CoachBubble>
-                    )}
+                        {aiLabel}
+                      </button>
+                      {(coach === 'click' || coach === 'ai') && (
+                        <CoachBubble
+                          className="diary-write__coach diary-write__coach--ai"
+                          arrow="bottom-right"
+                          onDismiss={dismissAiCoach}
+                        >
+                          <p>
+                            {coach === 'click'
+                              ? t('write.coach.click')
+                              : t('write.coach.ai')}
+                          </p>
+                        </CoachBubble>
+                      )}
+                    </div>
                   </div>
+                  {isFlutterApp() && (
+                    <span className="diary-write__ai-remaining-wrap">
+                      <button
+                        type="button"
+                        className={`diary-write__ai-remaining${aiQuotaDetailOpen ? ' is-open' : ''}`}
+                        title={t('quota.deductAfterDone')}
+                        aria-expanded={aiQuotaDetailOpen}
+                        aria-label={t('quota.breakdownAria', { n: aiLeft })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAiQuotaDetailOpen((open) => !open);
+                        }}
+                      >
+                        <span className="diary-write__ai-remaining-n">{aiLeft}</span>
+                      </button>
+                      {aiQuotaDetailOpen && (
+                        <>
+                          <button
+                            type="button"
+                            className="diary-write__ai-quota-scrim"
+                            aria-label={t('common.close')}
+                            onClick={() => setAiQuotaDetailOpen(false)}
+                          />
+                          <div
+                            className="diary-write__ai-quota-pop"
+                            role="dialog"
+                            aria-label={t('quota.breakdownTitle')}
+                          >
+                            {aiQuotaBreakdown.length > 0 ? (
+                              <ul className="diary-write__ai-quota-list">
+                                {aiQuotaBreakdown.map((line) => (
+                                  <li key={line.key}>
+                                    {t(line.labelKey, { n: line.n })}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="diary-write__ai-quota-empty">
+                                {t('quota.breakdownEmpty')}
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1823,34 +1929,119 @@ function DiaryWritePage({
           )}
           {aiSourceOpen && (
             <AppModal
-              title={t('write.ai.sourceTitle')}
+              title={
+                aiSourceTutPanel === 'diary'
+                  ? t('write.ai.sourceTutDiaryTitle')
+                  : aiSourceTutPanel === 'photo'
+                    ? t('write.ai.sourceTutPhotoTitle')
+                    : t('write.ai.sourceTitle')
+              }
               panelClassName="app-modal__panel--ai-source"
-              onDismiss={() => setAiSourceOpen(false)}
+              onDismiss={dismissAiSourcePicker}
               showClose
               closeAriaLabel={t('common.close')}
+              primaryLabel={aiSourceTutPanel ? t('common.ok') : undefined}
+              onPrimary={aiSourceTutPanel ? dismissAiSourcePicker : undefined}
             >
-              <div className="diary-write__ai-source-list">
-                <button
-                  type="button"
-                  className="diary-write__ai-source-btn"
-                  aria-label={t('write.ai.sourceDiary')}
-                  onClick={proceedDiaryDraw}
-                >
-                  <span className="diary-write__ai-source-desc">
-                    {t('write.ai.sourceDiaryDesc')}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="diary-write__ai-source-btn"
-                  aria-label={t('write.ai.sourcePhoto')}
-                  onClick={openPhotoStylePicker}
-                >
-                  <span className="diary-write__ai-source-desc">
-                    {t('write.ai.sourcePhotoDesc')}
-                  </span>
-                </button>
-              </div>
+              {aiSourceTutPanel === 'diary' ? (
+                <div className="diary-write__ai-source-example">
+                  <img
+                    src="/preview/textoil.png"
+                    alt=""
+                    className="diary-write__ai-source-example-img"
+                    decoding="async"
+                  />
+                  <p className="diary-write__ai-source-example-cap">
+                    {t('write.ai.sourceTutDiaryBody')}
+                  </p>
+                  <p className="diary-write__ai-source-example-note">
+                    {t('write.ai.sourceTutDiaryProfileNote')}
+                  </p>
+                  <p className="diary-write__ai-source-example-note diary-write__ai-source-example-note--sub">
+                    {t('write.ai.sourceTutDiaryProfileChange')}
+                  </p>
+                </div>
+              ) : null}
+              {aiSourceTutPanel === 'photo' ? (
+                <div className="diary-write__ai-source-example">
+                  <div className="diary-write__ai-source-styles">
+                    {AI_DRAW_STYLES.map((style) => {
+                      void aiPreviewTick;
+                      const path = style.previewSrcs[0] ?? '';
+                      const coverSrc =
+                        (path ? aiStylePreviewSrc(path) : '') || path;
+                      return (
+                        <div
+                          key={style.id}
+                          className="diary-write__ai-source-style"
+                        >
+                          <img
+                            src={coverSrc}
+                            alt=""
+                            className="diary-write__ai-source-style-img"
+                            decoding="async"
+                          />
+                          <span className="diary-write__ai-source-style-name">
+                            {t(`write.ai.style.${style.id}.name`)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="diary-write__ai-source-example-note diary-write__ai-source-example-note--sub">
+                    {t('write.ai.sourceTutPhotoBody')}
+                  </p>
+                </div>
+              ) : null}
+              {aiSourceTutPanel == null ? (
+                <div className="diary-write__ai-source-list">
+                  <button
+                    type="button"
+                    className={[
+                      'diary-write__ai-source-btn',
+                      aiSourceTutProgress === 'need-diary'
+                        ? 'diary-write__ai-source-btn--pulse'
+                        : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    aria-label={t('write.ai.sourceDiary')}
+                    onClick={proceedDiaryDraw}
+                  >
+                    <span className="diary-write__ai-source-desc diary-write__ai-source-desc--solo">
+                      {aiSourceTutProgress === 'need-diary'
+                        ? t('write.ai.sourceTutDiaryTap')
+                        : t('write.ai.sourceDiaryDesc')}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={[
+                      'diary-write__ai-source-btn',
+                      aiSourceTutProgress === 'need-photo'
+                        ? 'diary-write__ai-source-btn--pulse'
+                        : '',
+                      aiSourceTutProgress === 'need-diary'
+                        ? 'diary-write__ai-source-btn--locked'
+                        : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    aria-label={t('write.ai.sourcePhoto')}
+                    aria-disabled={aiSourceTutProgress === 'need-diary'}
+                    disabled={aiSourceTutProgress === 'need-diary'}
+                    onClick={openPhotoStylePicker}
+                  >
+                    <span className="diary-write__ai-source-desc diary-write__ai-source-desc--solo">
+                      {aiSourceTutProgress === 'need-diary'
+                        ? t('write.ai.sourceTutPhotoLocked')
+                        : aiSourceTutProgress === 'need-photo'
+                          ? t('write.ai.sourceTutPhotoTap')
+                          : t('write.ai.sourcePhotoDesc')}
+                    </span>
+                  </button>
+                </div>
+              ) : null}
             </AppModal>
           )}
           {aiStyleOpen && (
@@ -2004,50 +2195,35 @@ function DiaryWritePage({
           {aiLoginOpen && (
             <AppModal
               title={t('write.ai.loginForFreeTitle')}
-              lead={t('write.ai.loginForFreeLead')}
+              lead={t('write.ai.guestPaywallLead')}
               onDismiss={() => {
                 if (aiLoginBusy) return;
-                if (guestDailyAiExhausted) {
-                  // 오늘 광고분 소진 — 닫기만 (광고로 이어가지 않음)
-                  setAiLoginOpen(false);
-                  setAiLoginError(null);
-                  return;
-                }
-                continueAsGuestAiDraw();
+                setAiLoginOpen(false);
+                setAiLoginError(null);
               }}
               showClose={!aiLoginBusy}
               closeAriaLabel={t('common.close')}
               primaryLabel={
-                isFlutterApp()
-                  ? aiLoginBusy
-                    ? t('write.ai.loginBusy')
-                    : t('write.ai.loginForFreeCta')
-                  : undefined
+                aiLoginBusy ? t('write.ai.loginBusy') : t('write.ai.loginSkipCta')
               }
               onPrimary={
-                isFlutterApp() && !aiLoginBusy
-                  ? () => handleAiGoogleLogin()
-                  : undefined
-              }
-              secondaryLabel={
-                aiLoginBusy || guestDailyAiExhausted
+                aiLoginBusy
                   ? undefined
-                  : t('write.ai.loginSkipCta')
+                  : () => {
+                      setAiLoginOpen(false);
+                      void handleWatchAd();
+                    }
               }
+              secondaryLabel={aiLoginBusy ? undefined : t('header.subscribeCta')}
               onSecondary={
-                aiLoginBusy || guestDailyAiExhausted
+                aiLoginBusy
                   ? undefined
-                  : () => continueAsGuestAiDraw()
+                  : () => {
+                      setAiLoginOpen(false);
+                      openNyangTicket();
+                    }
               }
             >
-              {!isFlutterApp() && (
-                <div className="diary-write__ai-login-google">
-                  <div ref={googleBtnHostRef} />
-                  {aiLoginBusy && (
-                    <p className="diary-write__ai-login-busy">{t('write.ai.loginBusy')}</p>
-                  )}
-                </div>
-              )}
               {aiLoginError && (
                 <p className="diary-write__ai-login-error" role="alert">
                   {aiLoginError}
@@ -2058,27 +2234,34 @@ function DiaryWritePage({
           {rewardPromptOpen && (
             <AppModal
               title={t('write.ai.rewardTitle')}
-              lead={t('write.ai.rewardLeadDaily')}
+              lead={t('write.ai.guestPaywallLead')}
               onDismiss={() => {
                 clearPurchaseShield();
                 setRewardPromptOpen(false);
               }}
               showClose
               closeAriaLabel={t('common.close')}
-              primaryLabel={t('write.ai.rewardCta')}
+              primaryLabel={t('write.ai.loginSkipCta')}
               onPrimary={() => void handleWatchAd()}
+              secondaryLabel={t('header.subscribeCta')}
+              onSecondary={() => {
+                clearPurchaseShield();
+                setRewardPromptOpen(false);
+                openNyangTicket();
+              }}
             />
           )}
           {aiDailyLimitOpen && (
             <AppModal
               title={t('write.ai.chargeTitle')}
+              lead={t('write.ai.guestDailyExhaustedLead')}
               onDismiss={() => {
                 clearPurchaseShield();
                 setAiDailyLimitOpen(false);
               }}
               showClose
               closeAriaLabel={t('common.close')}
-              primaryLabel={t('write.ai.goPurchase')}
+              primaryLabel={t('header.subscribeCta')}
               onPrimary={() => {
                 clearPurchaseShield();
                 setAiDailyLimitOpen(false);

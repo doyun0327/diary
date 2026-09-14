@@ -11,6 +11,12 @@ import {
 import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
 import { isFlutterApp } from '../utils/nativeShare';
 import { invalidateAllRoomCaches } from '../utils/roomCache';
+import {
+  PROFILE_AGE_GROUPS,
+  PROFILE_GENDERS,
+  type ProfileAgeGroup,
+  type ProfileGender,
+} from '../utils/profileDemographics';
 import './AccountSheet.css';
 import type { DiarySyncResult, SyncCloudOptions } from '../api/diariesApi';
 
@@ -18,8 +24,12 @@ interface AccountSheetProps {
   nickname: string;
   avatarUrl: string | null;
   clientId: string;
+  gender?: ProfileGender | null;
+  ageGroup?: ProfileAgeGroup | null;
   onNicknameChange: (name: string) => void;
   onAvatarChange: (dataUrl: string | null) => void;
+  onGenderChange?: (gender: ProfileGender) => void;
+  onAgeGroupChange?: (ageGroup: ProfileAgeGroup) => void;
   /** 서버와 일기 동기화 */
   onSyncDiaries: (
     since: string | null,
@@ -113,8 +123,12 @@ function AccountSheet({
   nickname,
   avatarUrl,
   clientId,
+  gender = null,
+  ageGroup = null,
   onNicknameChange,
   onAvatarChange,
+  onGenderChange,
+  onAgeGroupChange,
   onSyncDiaries,
   syncMonth,
   onMonthSynced,
@@ -684,6 +698,53 @@ function AccountSheet({
     </section>
   );
 
+  const demographicsSection = (
+    <section className="account-sheet__block">
+      <p className="account-sheet__label">{t('account.genderLabel')}</p>
+      <div className="account-sheet__radios" role="radiogroup" aria-label={t('account.genderLabel')}>
+        {PROFILE_GENDERS.map((id) => (
+          <label key={id} className="account-sheet__radio">
+            <input
+              type="radio"
+              name="account-gender"
+              value={id}
+              checked={gender === id}
+              onChange={() => {
+                onGenderChange?.(id);
+                showToast(t('account.demographicsSaved'));
+              }}
+            />
+            <span>{t(`profileSetup.gender.${id}`)}</span>
+          </label>
+        ))}
+      </div>
+      <p className="account-sheet__label account-sheet__label--spaced">
+        {t('account.ageLabel')}
+      </p>
+      <div
+        className="account-sheet__radios account-sheet__radios--wrap"
+        role="radiogroup"
+        aria-label={t('account.ageLabel')}
+      >
+        {PROFILE_AGE_GROUPS.map((id) => (
+          <label key={id} className="account-sheet__radio">
+            <input
+              type="radio"
+              name="account-age"
+              value={id}
+              checked={ageGroup === id}
+              onChange={() => {
+                onAgeGroupChange?.(id);
+                showToast(t('account.demographicsSaved'));
+              }}
+            />
+            <span>{t(`profileSetup.age.${id}`)}</span>
+          </label>
+        ))}
+      </div>
+    </section>
+  );
+
   return (
     <div className="account-sheet" role="dialog" aria-label={t('account.aria')}>
       <div className="account-sheet__backdrop" onClick={onClose} />
@@ -704,11 +765,13 @@ function AccountSheet({
           <>
             {photoSection}
             {nameSection}
+            {demographicsSection}
           </>
         ) : (
           <>
             {photoSection}
             {nameSection}
+            {demographicsSection}
             <section className="account-sheet__block account-sheet__block--sync">
               <div className="account-sheet__sync-intro">
                 <p className="account-sheet__label account-sheet__label--sync">

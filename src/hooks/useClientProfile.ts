@@ -1,9 +1,17 @@
 import { useCallback, useState } from 'react';
 import { createId } from '../utils/id';
+import {
+  isProfileAgeGroup,
+  isProfileGender,
+  type ProfileAgeGroup,
+  type ProfileGender,
+} from '../utils/profileDemographics';
 
 const CLIENT_ID_KEY = 'picture-diary-client-id';
 const NICKNAME_KEY = 'picture-diary-nickname';
 const AVATAR_KEY = 'picture-diary-avatar';
+const GENDER_KEY = 'picture-diary-gender';
+const AGE_GROUP_KEY = 'picture-diary-age-group';
 
 export function readStoredClientId(): string {
   return loadClientId();
@@ -11,6 +19,14 @@ export function readStoredClientId(): string {
 
 export function readStoredNickname(): string {
   return loadNickname();
+}
+
+export function readStoredGender(): ProfileGender | null {
+  return loadGender();
+}
+
+export function readStoredAgeGroup(): ProfileAgeGroup | null {
+  return loadAgeGroup();
 }
 
 function loadClientId(): string {
@@ -45,11 +61,33 @@ function loadAvatarUrl(): string | null {
   }
 }
 
-/** 친구 방용 닉네임 · 프로필 사진 · 기기 ID */
+function loadGender(): ProfileGender | null {
+  try {
+    const raw = localStorage.getItem(GENDER_KEY);
+    return isProfileGender(raw) ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+function loadAgeGroup(): ProfileAgeGroup | null {
+  try {
+    const raw = localStorage.getItem(AGE_GROUP_KEY);
+    return isProfileAgeGroup(raw) ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 친구 방용 닉네임 · 프로필 사진 · 성별 · 연령 · 기기 ID */
 export function useClientProfile() {
   const [clientId] = useState(loadClientId);
   const [nickname, setNicknameState] = useState(loadNickname);
   const [avatarUrl, setAvatarUrlState] = useState<string | null>(loadAvatarUrl);
+  const [gender, setGenderState] = useState<ProfileGender | null>(loadGender);
+  const [ageGroup, setAgeGroupState] = useState<ProfileAgeGroup | null>(
+    loadAgeGroup,
+  );
 
   const setNickname = useCallback((next: string) => {
     const trimmed = next.trim().slice(0, 20);
@@ -71,7 +109,37 @@ export function useClientProfile() {
     }
   }, []);
 
-  return { clientId, nickname, setNickname, avatarUrl, setAvatarUrl };
+  const setGender = useCallback((next: ProfileGender | null) => {
+    setGenderState(next);
+    try {
+      if (next) localStorage.setItem(GENDER_KEY, next);
+      else localStorage.removeItem(GENDER_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setAgeGroup = useCallback((next: ProfileAgeGroup | null) => {
+    setAgeGroupState(next);
+    try {
+      if (next) localStorage.setItem(AGE_GROUP_KEY, next);
+      else localStorage.removeItem(AGE_GROUP_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  return {
+    clientId,
+    nickname,
+    setNickname,
+    avatarUrl,
+    setAvatarUrl,
+    gender,
+    setGender,
+    ageGroup,
+    setAgeGroup,
+  };
 }
 
 export function getClientHeaders(): HeadersInit {

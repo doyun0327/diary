@@ -46,13 +46,14 @@ export default function FortuneCookie({
     let i = 0;
     let intervalId = 0;
     const startId = window.setTimeout(() => {
-      const ms = chars.length > 80 ? 78 : 95;
+      // 글자 하나씩 — 길게 읽을 수 있게 여유 있게
+      const ms = chars.length > 80 ? 130 : 155;
       intervalId = window.setInterval(() => {
         i += 1;
         setTyped(chars.slice(0, i).join(''));
         if (i >= chars.length) window.clearInterval(intervalId);
       }, ms);
-    }, 380);
+    }, 480);
 
     return () => {
       window.clearTimeout(startId);

@@ -492,7 +492,8 @@
     "drawConfirmLead": "Còn {{n}}\nChỉ trừ khi vẽ xong.",
     "drawConfirmOk": "Vẽ",
     "deductAfterDone": "Chỉ trừ lượt khi vẽ xong.",
-    "deductAfterDoneShort": "Trừ khi xong"
+    "deductAfterDoneShort": "Trừ khi xong",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "Nhân vật này sẽ thành nhân vật chính",
       "rewardTitle": "Xem quảng cáo để vẽ AI 1 lần",
       "loginForFreeTitle": "Vẽ AI",
-      "loginForFreeLead": "Đăng nhập để vẽ AI miễn phí 3 lần!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "Đăng nhập bằng Google",
       "loginSkipCta": "Vẽ 1 lần bằng quảng cáo",
       "loginBusy": "Đang đăng nhập…",

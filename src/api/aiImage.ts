@@ -312,6 +312,8 @@ export async function generateDiaryImage(input: {
   style?: AiDrawStyleId;
   /** 사진 경로 필수. textOil 이면 생략 */
   referenceImage?: string | null;
+  /** textOil 주인공 외형 (성별·연령 기반). 없으면 서버 기본 a child */
+  character?: string | null;
   /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
   accessToken?: string | null;
   onProgress?: (step: AiProgress) => void;
@@ -321,6 +323,7 @@ export async function generateDiaryImage(input: {
   const referenceImage = input.referenceImage?.trim() || '';
   const styleId = normalizeAiDrawStyleId(input.style);
   const isTextOil = styleId === 'textOil';
+  const character = input.character?.trim() || '';
 
   if (!isTextOil && !referenceImage.startsWith('data:image/')) {
     throw new Error('그림을 만들려면 사진을 첨부해 주세요');
@@ -337,8 +340,10 @@ export async function generateDiaryImage(input: {
     sceneMode: 'full' as const,
     style: styleId,
   };
-  // textOil: 캐릭터·사진·사진용 stylePrompt 미전송 (서버 오일 텍스트 프롬프트 사용)
-  if (!isTextOil) {
+  // textOil: 프로필 성별·연령 → character 만 전송 (사진·stylePrompt 없음)
+  if (isTextOil) {
+    if (character) payload.character = character;
+  } else {
     if (stylePrompt) payload.stylePrompt = stylePrompt;
     payload.referenceImage = referenceImage;
     payload.referenceImageBase64 = referenceImage;

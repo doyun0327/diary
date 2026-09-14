@@ -492,7 +492,8 @@
     "drawConfirmLead": "Sisa {{n}}\nDipotong setelah gambar selesai.",
     "drawConfirmOk": "Gambar",
     "deductAfterDone": "Kuota dipotong setelah gambar selesai.",
-    "deductAfterDoneShort": "Setelah selesai"
+    "deductAfterDoneShort": "Setelah selesai",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "Karakter ini menjadi tokoh utama",
       "rewardTitle": "Tonton iklan untuk 1 gambar AI",
       "loginForFreeTitle": "Gambar AI",
-      "loginForFreeLead": "Masuk untuk menggambar AI gratis 3 kali!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "Masuk dengan Google",
       "loginSkipCta": "Gambar 1x dengan iklan",
       "loginBusy": "Masuk…",

@@ -44,21 +44,21 @@ export const AI_DRAW_STYLES: {
   {
     id: 'webtoonHero',
     enabled: true,
-    previewSrcs: ['/preview/final_웹툰.jpg'],
+    previewSrcs: ['/preview/final_webtoon.jpg'],
   },
   {
     id: 'oilPastel',
     enabled: true,
-    previewSrcs: ['/preview/final_오일.jpg'],
+    previewSrcs: ['/preview/final_oil.jpg'],
   },
   {
     id: 'jpRetroFilm',
     enabled: true,
-    previewSrcs: ['/preview/final_일본.jpg'],
+    previewSrcs: ['/preview/final_jp.jpg'],
   },
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v8';
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v9';
 /** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
 const previewBlobUrlBySrc = new Map<string, string>();
 const previewReadyListeners = new Set<() => void>();
@@ -214,11 +214,19 @@ export const GPT_IMAGE2_MIN_AREA = 655_360;
 export const GPT_IMAGE2_MAX_AREA = 8_294_400;
 /** 긴 변 : 짧은 변 최대 비율 */
 export const GPT_IMAGE2_MAX_ASPECT = 3;
+/** 한 변 최대 (미만) — 규격은 3840 미만, 16 배수로 3824 */
+export const GPT_IMAGE2_MAX_EDGE = 3824;
+
+function snapMultipleOf16(n: number): number {
+  return Math.max(16, Math.round(n / 16) * 16);
+}
 
 /**
  * 원본 픽셀을 GPT Image 2 규격에 맞게 크롭·스케일.
  * - 면적 655,360 ~ 8,294,400
  * - 비율 최대 3:1 (초과 시 중앙 크롭)
+ * - 가로·세로 모두 16의 배수
+ * - 한 변 ≤ 3824
  */
 export function fitGptImage2Size(
   srcW: number,
@@ -247,10 +255,16 @@ export function fitGptImage2Size(
     sh = nextH;
   }
 
-  // 2) 면적 맞추기
+  // 2) 면적·최대 변 맞추기 (스케일만, 아직 16 배수 X)
   let outW = sw;
   let outH = sh;
-  const area = outW * outH;
+  const long = Math.max(outW, outH);
+  if (long > GPT_IMAGE2_MAX_EDGE) {
+    const scale = GPT_IMAGE2_MAX_EDGE / long;
+    outW = Math.max(1, Math.floor(outW * scale));
+    outH = Math.max(1, Math.floor(outH * scale));
+  }
+  let area = outW * outH;
   if (area > GPT_IMAGE2_MAX_AREA) {
     const scale = Math.sqrt(GPT_IMAGE2_MAX_AREA / area);
     outW = Math.max(1, Math.floor(outW * scale));
@@ -261,34 +275,45 @@ export function fitGptImage2Size(
     outH = Math.max(1, Math.ceil(outH * scale));
   }
 
-  // 반올림 오차로 면적/비율 다시 보정
-  let outArea = outW * outH;
-  if (outArea > GPT_IMAGE2_MAX_AREA) {
-    const scale = Math.sqrt(GPT_IMAGE2_MAX_AREA / outArea);
-    outW = Math.max(1, Math.floor(outW * scale));
-    outH = Math.max(1, Math.floor(outH * scale));
-    outArea = outW * outH;
-  }
-  if (outArea < GPT_IMAGE2_MIN_AREA) {
-    const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / outArea);
-    outW = Math.max(1, Math.ceil(outW * scale));
-    outH = Math.max(1, Math.ceil(outH * scale));
-  }
-  if (outW / outH > GPT_IMAGE2_MAX_ASPECT) {
-    outW = Math.max(1, Math.floor(outH * GPT_IMAGE2_MAX_ASPECT));
-  } else if (outH / outW > GPT_IMAGE2_MAX_ASPECT) {
-    outH = Math.max(1, Math.floor(outW * GPT_IMAGE2_MAX_ASPECT));
-  }
-  // 비율 보정 후 면적 하한 재확인
-  if (outW * outH < GPT_IMAGE2_MIN_AREA) {
-    const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / (outW * outH));
-    outW = Math.max(1, Math.ceil(outW * scale));
-    outH = Math.max(1, Math.ceil(outH * scale));
+  // 3) 16 배수로 스냅 후 규격 재검증 (최대 몇 번)
+  for (let i = 0; i < 8; i++) {
+    outW = snapMultipleOf16(outW);
+    outH = snapMultipleOf16(outH);
+
+    if (outW > GPT_IMAGE2_MAX_EDGE) outW = GPT_IMAGE2_MAX_EDGE;
+    if (outH > GPT_IMAGE2_MAX_EDGE) outH = GPT_IMAGE2_MAX_EDGE;
+    outW = snapMultipleOf16(Math.min(outW, GPT_IMAGE2_MAX_EDGE));
+    outH = snapMultipleOf16(Math.min(outH, GPT_IMAGE2_MAX_EDGE));
+
     if (outW / outH > GPT_IMAGE2_MAX_ASPECT) {
-      outW = Math.max(1, Math.floor(outH * GPT_IMAGE2_MAX_ASPECT));
+      outW = snapMultipleOf16(outH * GPT_IMAGE2_MAX_ASPECT);
     } else if (outH / outW > GPT_IMAGE2_MAX_ASPECT) {
-      outH = Math.max(1, Math.floor(outW * GPT_IMAGE2_MAX_ASPECT));
+      outH = snapMultipleOf16(outW * GPT_IMAGE2_MAX_ASPECT);
     }
+
+    area = outW * outH;
+    if (area > GPT_IMAGE2_MAX_AREA) {
+      const scale = Math.sqrt(GPT_IMAGE2_MAX_AREA / area);
+      outW = Math.max(16, Math.floor((outW * scale) / 16) * 16);
+      outH = Math.max(16, Math.floor((outH * scale) / 16) * 16);
+      continue;
+    }
+    if (area < GPT_IMAGE2_MIN_AREA) {
+      const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / area);
+      outW = Math.max(16, Math.ceil((outW * scale) / 16) * 16);
+      outH = Math.max(16, Math.ceil((outH * scale) / 16) * 16);
+      continue;
+    }
+    break;
+  }
+
+  // 최종 안전망
+  outW = snapMultipleOf16(outW);
+  outH = snapMultipleOf16(outH);
+  if (outW / outH > GPT_IMAGE2_MAX_ASPECT) {
+    outW = snapMultipleOf16(Math.min(outW, outH * GPT_IMAGE2_MAX_ASPECT));
+  } else if (outH / outW > GPT_IMAGE2_MAX_ASPECT) {
+    outH = snapMultipleOf16(Math.min(outH, outW * GPT_IMAGE2_MAX_ASPECT));
   }
 
   return { outW, outH, sx, sy, sw, sh };
@@ -300,7 +325,12 @@ export function fileToAiReferenceDataUrl(
   quality = 0.85,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith('image/')) {
+    // 일부 기기에서 type 이 비어 있음 — 확장자로 보정
+    const name = (file.name || '').toLowerCase();
+    const looksImage =
+      file.type.startsWith('image/') ||
+      /\.(jpe?g|png|webp|gif|heic|heif|bmp)$/.test(name);
+    if (!looksImage && file.type !== '') {
       reject(new Error('image-only'));
       return;
     }
@@ -310,10 +340,13 @@ export function fileToAiReferenceDataUrl(
       const src = String(reader.result ?? '');
       const img = new Image();
       img.onload = () => {
-        const { outW, outH, sx, sy, sw, sh } = fitGptImage2Size(
-          img.naturalWidth || img.width,
-          img.naturalHeight || img.height,
-        );
+        const srcW = img.naturalWidth || img.width;
+        const srcH = img.naturalHeight || img.height;
+        if (!srcW || !srcH) {
+          reject(new Error('load-failed'));
+          return;
+        }
+        const { outW, outH, sx, sy, sw, sh } = fitGptImage2Size(srcW, srcH);
         const canvas = document.createElement('canvas');
         canvas.width = outW;
         canvas.height = outH;

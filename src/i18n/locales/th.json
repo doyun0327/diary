@@ -492,7 +492,8 @@
     "drawConfirmLead": "เหลือ {{n}}\nหักเมื่อวาดเสร็จ",
     "drawConfirmOk": "วาด",
     "deductAfterDone": "หักครั้งเมื่อวาดเสร็จแล้วเท่านั้น",
-    "deductAfterDoneShort": "หักเมื่อเสร็จ"
+    "deductAfterDoneShort": "หักเมื่อเสร็จ",
+    "breakdownInstallFree": "{{n}} : First free"
   },
   "write": {
     "title": {
@@ -527,7 +528,9 @@
       "characterTitle": "ตัวละครนี้จะเป็นตัวเอก",
       "rewardTitle": "ดูโฆษณาเพื่อวาด AI 1 ครั้ง",
       "loginForFreeTitle": "วาด AI",
-      "loginForFreeLead": "เข้าสู่ระบบเพื่อวาด AI ฟรี 3 ครั้ง!",
+      "loginForFreeLead": "Watch an ad or subscribe to draw with AI.",
+      "guestPaywallLead": "Watch an ad to draw once today, or subscribe for more each month.",
+      "guestDailyExhaustedLead": "You've used today's ad draw. Subscribe for more drawings each month.",
       "loginForFreeCta": "เข้าสู่ระบบด้วย Google",
       "loginSkipCta": "วาด 1 ครั้งด้วยโฆษณา",
       "loginBusy": "กำลังเข้าสู่ระบบ…",
