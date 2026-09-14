@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import BackIcon from './BackIcon';
 import CloseIcon from './CloseIcon';
 import './AppModal.css';
 
@@ -8,6 +9,9 @@ type AppModalProps = {
   children?: ReactNode;
   /** 배경 클릭 / X 닫기 */
   onDismiss?: () => void;
+  /** 좌상단 뒤로가기 (2depth 등) */
+  onBack?: () => void;
+  backAriaLabel?: string;
   /** 우상단 X 버튼 표시 (onDismiss 있을 때 기본 true) */
   showClose?: boolean;
   primaryLabel?: string;
@@ -28,6 +32,8 @@ export default function AppModal({
   lead,
   children,
   onDismiss,
+  onBack,
+  backAriaLabel = 'back',
   showClose,
   primaryLabel,
   onPrimary,
@@ -40,6 +46,7 @@ export default function AppModal({
 }: AppModalProps) {
   const canClose = Boolean(onDismiss);
   const showX = showClose ?? canClose;
+  const showBack = Boolean(onBack);
 
   return (
     <div className="app-modal" role="dialog" aria-modal="true" aria-labelledby={ariaLabelledBy}>
@@ -51,6 +58,16 @@ export default function AppModal({
         disabled={!canClose}
       />
       <div className={['app-modal__panel', panelClassName].filter(Boolean).join(' ')}>
+        {showBack && onBack ? (
+          <button
+            type="button"
+            className="app-modal__back"
+            onClick={onBack}
+            aria-label={backAriaLabel}
+          >
+            <BackIcon size={20} strokeWidth={2.25} />
+          </button>
+        ) : null}
         {showX && onDismiss ? (
           <button
             type="button"
@@ -61,7 +78,15 @@ export default function AppModal({
             <CloseIcon />
           </button>
         ) : null}
-        <div className={`app-modal__header${showX && onDismiss ? ' app-modal__header--with-close' : ''}`}>
+        <div
+          className={[
+            'app-modal__header',
+            showX && onDismiss ? 'app-modal__header--with-close' : '',
+            showBack ? 'app-modal__header--with-back' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
           <h3 id={ariaLabelledBy}>{title}</h3>
         </div>
         {lead ? <p className="app-modal__lead">{lead}</p> : null}
