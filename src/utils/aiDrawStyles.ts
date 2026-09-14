@@ -209,11 +209,95 @@ export function isPhotoAiDrawStyle(styleId: AiDrawStyleId): styleId is AiPhotoDr
   return styleId === 'webtoonHero' || styleId === 'oilPastel' || styleId === 'jpRetroFilm';
 }
 
-/** AI 참조용 사진 → JPEG data URL */
+/** GPT Image 2 reference: width×height 면적 */
+export const GPT_IMAGE2_MIN_AREA = 655_360;
+export const GPT_IMAGE2_MAX_AREA = 8_294_400;
+/** 긴 변 : 짧은 변 최대 비율 */
+export const GPT_IMAGE2_MAX_ASPECT = 3;
+
+/**
+ * 원본 픽셀을 GPT Image 2 규격에 맞게 크롭·스케일.
+ * - 면적 655,360 ~ 8,294,400
+ * - 비율 최대 3:1 (초과 시 중앙 크롭)
+ */
+export function fitGptImage2Size(
+  srcW: number,
+  srcH: number,
+): {
+  outW: number;
+  outH: number;
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
+} {
+  let sx = 0;
+  let sy = 0;
+  let sw = Math.max(1, Math.round(srcW));
+  let sh = Math.max(1, Math.round(srcH));
+
+  // 1) 비율 3:1 초과 → 중앙 크롭
+  if (sw / sh > GPT_IMAGE2_MAX_ASPECT) {
+    const nextW = Math.max(1, Math.round(sh * GPT_IMAGE2_MAX_ASPECT));
+    sx = Math.floor((sw - nextW) / 2);
+    sw = nextW;
+  } else if (sh / sw > GPT_IMAGE2_MAX_ASPECT) {
+    const nextH = Math.max(1, Math.round(sw * GPT_IMAGE2_MAX_ASPECT));
+    sy = Math.floor((sh - nextH) / 2);
+    sh = nextH;
+  }
+
+  // 2) 면적 맞추기
+  let outW = sw;
+  let outH = sh;
+  const area = outW * outH;
+  if (area > GPT_IMAGE2_MAX_AREA) {
+    const scale = Math.sqrt(GPT_IMAGE2_MAX_AREA / area);
+    outW = Math.max(1, Math.floor(outW * scale));
+    outH = Math.max(1, Math.floor(outH * scale));
+  } else if (area < GPT_IMAGE2_MIN_AREA) {
+    const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / area);
+    outW = Math.max(1, Math.ceil(outW * scale));
+    outH = Math.max(1, Math.ceil(outH * scale));
+  }
+
+  // 반올림 오차로 면적/비율 다시 보정
+  let outArea = outW * outH;
+  if (outArea > GPT_IMAGE2_MAX_AREA) {
+    const scale = Math.sqrt(GPT_IMAGE2_MAX_AREA / outArea);
+    outW = Math.max(1, Math.floor(outW * scale));
+    outH = Math.max(1, Math.floor(outH * scale));
+    outArea = outW * outH;
+  }
+  if (outArea < GPT_IMAGE2_MIN_AREA) {
+    const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / outArea);
+    outW = Math.max(1, Math.ceil(outW * scale));
+    outH = Math.max(1, Math.ceil(outH * scale));
+  }
+  if (outW / outH > GPT_IMAGE2_MAX_ASPECT) {
+    outW = Math.max(1, Math.floor(outH * GPT_IMAGE2_MAX_ASPECT));
+  } else if (outH / outW > GPT_IMAGE2_MAX_ASPECT) {
+    outH = Math.max(1, Math.floor(outW * GPT_IMAGE2_MAX_ASPECT));
+  }
+  // 비율 보정 후 면적 하한 재확인
+  if (outW * outH < GPT_IMAGE2_MIN_AREA) {
+    const scale = Math.sqrt(GPT_IMAGE2_MIN_AREA / (outW * outH));
+    outW = Math.max(1, Math.ceil(outW * scale));
+    outH = Math.max(1, Math.ceil(outH * scale));
+    if (outW / outH > GPT_IMAGE2_MAX_ASPECT) {
+      outW = Math.max(1, Math.floor(outH * GPT_IMAGE2_MAX_ASPECT));
+    } else if (outH / outW > GPT_IMAGE2_MAX_ASPECT) {
+      outH = Math.max(1, Math.floor(outW * GPT_IMAGE2_MAX_ASPECT));
+    }
+  }
+
+  return { outW, outH, sx, sy, sw, sh };
+}
+
+/** AI 참조용 사진 → JPEG data URL (GPT Image 2 규격에 맞춤) */
 export function fileToAiReferenceDataUrl(
   file: File,
-  maxEdge = 1280,
-  quality = 0.82,
+  quality = 0.85,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith('image/')) {
@@ -226,18 +310,19 @@ export function fileToAiReferenceDataUrl(
       const src = String(reader.result ?? '');
       const img = new Image();
       img.onload = () => {
-        const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
-        const w = Math.max(1, Math.round(img.width * scale));
-        const h = Math.max(1, Math.round(img.height * scale));
+        const { outW, outH, sx, sy, sw, sh } = fitGptImage2Size(
+          img.naturalWidth || img.width,
+          img.naturalHeight || img.height,
+        );
         const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
+        canvas.width = outW;
+        canvas.height = outH;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           reject(new Error('canvas-failed'));
           return;
         }
-        ctx.drawImage(img, 0, 0, w, h);
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.onerror = () => reject(new Error('load-failed'));

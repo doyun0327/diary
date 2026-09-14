@@ -31,7 +31,7 @@ export function getStoredThemeId(): ThemeId {
   } catch {
     // ignore
   }
-  return 'paper';
+  return 'lemon';
 }
 
 function syncThemeToNative(id: ThemeId) {
