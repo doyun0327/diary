@@ -12,23 +12,18 @@ export { downloadViaAnchor as downloadBlob } from './saveBlob';
 export const BOOK_W = 900;
 export const BOOK_H = 1200;
 
-/** SNS 공유 전용 — 인스타 등에서 확대해도 덜 깨지게 */
-const SNS_W = 1080;
-const SNS_H = 1440;
-
 const BOOK_CAPTURE = {
   scale: 1.2,
   type: 'image/jpeg',
   quality: 0.8,
 } as const;
 
+/** SNS: 일기 paper 실제 크기 그대로 (큰 프레임에 끼워 늘리지 않음) */
 const SNS_CAPTURE = {
-  scale: 2.5,
+  scale: 2,
   type: 'image/jpeg',
   quality: 0.92,
 } as const;
-
-const SNS_JPEG_QUALITY = 0.92;
 
 /** PDF 저장 전용 — 그림 영역 약 70% 축소(30% 크기) + JPEG 품질 */
 const BOOK_PDF_CAPTURE = {
@@ -395,21 +390,45 @@ export async function renderEntryBookPage(
   }
 }
 
-/** SNS(인스타 등) 공유 전용 — 고해상도·고품질 JPEG. 친구방/PDF와 분리 */
+/** SNS(인스타 등) 공유 — 일기 paper + 바깥 여백(둥근 테두리 잘림 방지) + @PageBy */
 export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
   const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
   const paperUrl = URL.createObjectURL(paperBlob);
   try {
     const img = await loadImage(paperUrl);
-    const { canvas, ctx } = createPageCanvas(SNS_W, SNS_H);
-    const bg = themeColor('--color-bg', '#ffffff');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, SNS_W, SNS_H);
-    const slot = fillImageInFrame(ctx, img, SNS_W, SNS_H);
+    const pw = Math.max(1, img.naturalWidth || img.width);
+    const ph = Math.max(1, img.naturalHeight || img.height);
+    // 카톡 등에서 둥근 모서리가 잘리지 않도록 바깥 여백
+    const margin = Math.max(28, Math.round(Math.min(pw, ph) * 0.06));
+    const footerH = Math.max(32, Math.round(ph * 0.045));
+    const canvasW = pw + margin * 2;
+    const canvasH = ph + margin * 2 + footerH;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('일기장 페이지를 만들 수 없어요');
 
-    const blob = await canvasToBlob(canvas, 'image/jpeg', SNS_JPEG_QUALITY);
-    const page = await pageFromBlob(blob, entry.title || formatDate(entry.date));
-    return { ...page, slot };
+    const outerBg = themeColor('--color-bg', '#f7f6f4');
+    ctx.fillStyle = outerBg;
+    ctx.fillRect(0, 0, canvasW, canvasH);
+    ctx.drawImage(img, margin, margin, pw, ph);
+
+    const fontSize = Math.max(15, Math.round(pw * 0.036));
+    const padX = margin;
+    // 일기 웹폰트 미로딩 시에도 ASCII 태그가 보이도록 시스템 폰트 사용
+    ctx.font = `600 ${fontSize}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = themeColor('--color-text-muted', '#6b6b6b');
+    ctx.fillText(
+      '@PageBy',
+      canvasW - padX,
+      margin + ph + footerH / 2,
+    );
+
+    const blob = await canvasToBlob(canvas, 'image/jpeg', SNS_CAPTURE.quality);
+    return pageFromBlob(blob, entry.title || formatDate(entry.date));
   } finally {
     URL.revokeObjectURL(paperUrl);
   }

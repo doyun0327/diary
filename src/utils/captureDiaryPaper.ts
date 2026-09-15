@@ -180,6 +180,8 @@ export type CapturePaperOptions = {
   quality?: number;
   /** 그림 영역(.diary-detail__image) 가로 비율 — PDF 등 (1=100%, 0.3≈70% 축소) */
   imageScale?: number;
+  /** offscreen 캡처 시 paper CSS 폭 (기본 420) */
+  paperWidth?: number;
 };
 
 async function waitForImages(root: HTMLElement): Promise<void> {
@@ -447,9 +449,13 @@ export async function captureDiaryEntryPaperBlob(
   if (paperElement) {
     return captureDiaryPaperBlob(paperElement, entry.fontId, options);
   }
-  const { paper, dispose } = mountOffscreenDiaryPaper(entry, OFFSCREEN_PAPER_WIDTH, {
-    imageScale: options?.imageScale,
-  });
+  const { paper, dispose } = mountOffscreenDiaryPaper(
+    entry,
+    options?.paperWidth ?? OFFSCREEN_PAPER_WIDTH,
+    {
+      imageScale: options?.imageScale,
+    },
+  );
   try {
     return await captureDiaryPaperBlob(paper, entry.fontId, options);
   } finally {
