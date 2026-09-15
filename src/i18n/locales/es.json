@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}"
+    "packLabel": "{{n}}",
+    "subscribeLeadNote": "Los dibujos no usados caducan a fin de mes. (Sin acumulación)",
+    "subscribeMonthly": "Suscripción mensual",
+    "subscribeYearly": "Suscripción anual",
+    "subscribeMonthlyCta": "Suscripción mensual",
+    "subscribeYearlyCta": "Suscripción anual",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Renueva: {{date}}",
+    "planChangeBlockedShort": "No disponible",
+    "planChangeBlocked": "No puedes cambiar de plan mientras estás suscrito. Cancela en la tienda y vuelve a suscribirte cuando termine el periodo.",
+    "subscribed": "Suscrito",
+    "nextRenewal": "Próxima renovación {{date}}",
+    "historyItemSubscriptionMonthly": "PRO mensual",
+    "historyItemSubscriptionYearly": "PRO anual"
   },
   "credits": {
     "moodIcons": "Iconos de ánimo: designed by {{author}} from Flaticon"

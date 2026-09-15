@@ -16,9 +16,16 @@ import './DiaryBookViewer.css';
 
 const PDF_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
 
-function pickRandomLottie(pool: object[]): object | null {
+function pickRandomLottie(
+  pool: object[],
+  exclude: object | null = null,
+): object | null {
   if (pool.length === 0) return null;
-  return pool[Math.floor(Math.random() * pool.length)] ?? null;
+  if (pool.length === 1) return pool[0] ?? null;
+  const candidates =
+    exclude != null ? pool.filter((item) => item !== exclude) : pool;
+  const list = candidates.length > 0 ? candidates : pool;
+  return list[Math.floor(Math.random() * list.length)] ?? null;
 }
 
 function PdfLoadingLottie({ animationData }: { animationData: object }) {
@@ -161,10 +168,22 @@ function DiaryBookViewer({
   useEffect(() => {
     let cancelled = false;
     void Promise.all(
-      PDF_LOTTIE_URLS.map((url) => fetch(url).then((res) => res.json() as Promise<object>)),
+      PDF_LOTTIE_URLS.map(async (url) => {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return null;
+          return (await res.json()) as object;
+        } catch {
+          return null;
+        }
+      }),
     )
-      .then((pool) => {
-        if (!cancelled) setPdfLottiePool(pool);
+      .then((results) => {
+        if (!cancelled) {
+          setPdfLottiePool(
+            results.filter((item): item is object => item != null),
+          );
+        }
       })
       .catch(() => {
         if (!cancelled) setPdfLottiePool([]);
@@ -221,7 +240,7 @@ function DiaryBookViewer({
       return;
     }
     setDownloading(true);
-    setPdfLottie(pickRandomLottie(pdfLottiePool));
+    setPdfLottie((prev) => pickRandomLottie(pdfLottiePool, prev));
     setPdfLottieKey((key) => key + 1);
     setError(null);
     try {

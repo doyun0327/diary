@@ -78,7 +78,11 @@
 }
 
 .nyang-ticket__panel {
-  min-height: 240px;
+  /* AI 그림충전(lead + 잔여 + 팩 3개) 기준으로 탭 전환 시 높이 고정 */
+  height: 320px;
+  min-height: 320px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nyang-ticket__panel-lead {
@@ -90,12 +94,20 @@
   white-space: pre-line;
 }
 
+.nyang-ticket__lead-note {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  opacity: 0.92;
+}
+
 .nyang-ticket__remaining {
-  margin: -4px 0 12px;
-  font-size: 0.86rem;
+  display: block;
+  margin-top: 6px;
+  font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.4;
   color: var(--color-text);
+  text-align: right;
 }
 
 .nyang-ticket__btn {
@@ -159,8 +171,27 @@
   text-align: left;
 }
 
+.nyang-ticket__pack-btn.is-subscribed {
+  border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.nyang-ticket__pack-btn.is-locked .nyang-ticket__pack-cta {
+  color: var(--color-text-muted);
+}
+
+.nyang-ticket__plan-hint {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
 .nyang-ticket__pack-copy {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
@@ -170,6 +201,7 @@
 .nyang-ticket__pack-title-row {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   min-width: 0;
 }
@@ -218,6 +250,7 @@
   margin: 4px 0 0;
   font-size: 0.86rem;
   font-weight: 600;
+  line-height: 1.45;
   color: var(--color-text);
   text-align: center;
 }

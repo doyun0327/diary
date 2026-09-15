@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}} ครั้ง"
+    "packLabel": "{{n}} ครั้ง",
+    "subscribeLeadNote": "โควต้าที่เหลือหมดอายุสิ้นเดือน (ไม่ยกไปเดือนถัดไป)",
+    "subscribeMonthly": "รายเดือน",
+    "subscribeYearly": "รายปี",
+    "subscribeMonthlyCta": "รายเดือน",
+    "subscribeYearlyCta": "รายปี",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "ต่ออายุ: {{date}}",
+    "planChangeBlockedShort": "เปลี่ยนไม่ได้",
+    "planChangeBlocked": "เปลี่ยนแผนระหว่างสมัครสมาชิกไม่ได้ ยกเลิกในสโตร์แล้วสมัครใหม่หลังสิ้นสุดรอบ",
+    "subscribed": "สมัครอยู่",
+    "nextRenewal": "ต่ออายุถัดไป {{date}}",
+    "historyItemSubscriptionMonthly": "PRO รายเดือน",
+    "historyItemSubscriptionYearly": "PRO รายปี"
   },
   "credits": {
     "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon"

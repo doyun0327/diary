@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}枚"
+    "packLabel": "{{n}}枚",
+    "subscribeLeadNote": "月末に残った枚数は消えます。（繰り越しなし）",
+    "subscribeMonthly": "月間プラン",
+    "subscribeYearly": "年間プラン",
+    "subscribeMonthlyCta": "月間プラン",
+    "subscribeYearlyCta": "年間プラン",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "更新日: {{date}}",
+    "planChangeBlockedShort": "変更不可",
+    "planChangeBlocked": "加入中はプランを変更できません。ストアで解約し、期間終了後に改めてご加入ください。",
+    "subscribed": "加入中",
+    "nextRenewal": "次回更新 {{date}}",
+    "historyItemSubscriptionMonthly": "PRO 月間",
+    "historyItemSubscriptionYearly": "PRO 年間"
   },
   "credits": {
     "moodIcons": "気分アイコン：designed by {{author}} from Flaticon"

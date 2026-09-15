@@ -113,7 +113,11 @@ function RoomMemberAvatars({
       });
       lastPokeAt.current.set(member.userId, Date.now());
       onDismissPokeCoach?.();
-      showToast(t('rooms.pokeSent'));
+      showToast(
+        t('rooms.pokeSent', {
+          name: member.nickname.trim() || t('common.anonymous'),
+        }),
+      );
     } catch (err) {
       showToast(err instanceof Error ? err.message : t('rooms.pokeFail'));
     } finally {

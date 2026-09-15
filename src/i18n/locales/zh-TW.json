@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}張"
+    "packLabel": "{{n}}張",
+    "subscribeLeadNote": "月底未用完的張數會失效。（不可結轉）",
+    "subscribeMonthly": "月訂閱",
+    "subscribeYearly": "年訂閱",
+    "subscribeMonthlyCta": "月訂閱",
+    "subscribeYearlyCta": "年訂閱",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "續訂日: {{date}}",
+    "planChangeBlockedShort": "無法變更",
+    "planChangeBlocked": "訂閱期間無法更換方案。請先在商店取消，待目前週期結束後再重新訂閱。",
+    "subscribed": "訂閱中",
+    "nextRenewal": "下次續訂 {{date}}",
+    "historyItemSubscriptionMonthly": "PRO 月訂閱",
+    "historyItemSubscriptionYearly": "PRO 年訂閱"
   },
   "credits": {
     "moodIcons": "心情圖標：designed by {{author}} from Flaticon"

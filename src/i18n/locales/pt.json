@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}"
+    "packLabel": "{{n}}",
+    "subscribeLeadNote": "Desenhos não usados expiram no fim do mês. (Sem acumulação)",
+    "subscribeMonthly": "Assinatura mensal",
+    "subscribeYearly": "Assinatura anual",
+    "subscribeMonthlyCta": "Assinatura mensal",
+    "subscribeYearlyCta": "Assinatura anual",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Renova: {{date}}",
+    "planChangeBlockedShort": "Indisponível",
+    "planChangeBlocked": "Não é possível trocar de plano enquanto estiver assinado. Cancele na loja e assine de novo após o período.",
+    "subscribed": "Assinado",
+    "nextRenewal": "Próxima renovação {{date}}",
+    "historyItemSubscriptionMonthly": "PRO mensal",
+    "historyItemSubscriptionYearly": "PRO anual"
   },
   "credits": {
     "moodIcons": "Ícones de humor: designed by {{author}} from Flaticon"

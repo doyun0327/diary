@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}"
+    "packLabel": "{{n}}",
+    "subscribeLeadNote": "Les dessins restants expirent en fin de mois. (Pas de report)",
+    "subscribeMonthly": "Abonnement mensuel",
+    "subscribeYearly": "Abonnement annuel",
+    "subscribeMonthlyCta": "Abonnement mensuel",
+    "subscribeYearlyCta": "Abonnement annuel",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Renouvellement : {{date}}",
+    "planChangeBlockedShort": "Indisponible",
+    "planChangeBlocked": "Impossible de changer d'offre pendant l'abonnement. Annulez dans le store, puis réabonnez-vous après la période.",
+    "subscribed": "Abonné",
+    "nextRenewal": "Prochain renouvellement {{date}}",
+    "historyItemSubscriptionMonthly": "PRO mensuel",
+    "historyItemSubscriptionYearly": "PRO annuel"
   },
   "credits": {
     "moodIcons": "Icônes d'humeur : designed by {{author}} from Flaticon"

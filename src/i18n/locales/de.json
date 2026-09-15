@@ -251,7 +251,20 @@
     "de": "Deutsch"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}"
+    "packLabel": "{{n}}",
+    "subscribeLeadNote": "Ungenutzte Zeichnungen verfallen am Monatsende. (Kein Übertrag)",
+    "subscribeMonthly": "Monatsabo",
+    "subscribeYearly": "Jahresabo",
+    "subscribeMonthlyCta": "Monatsabo",
+    "subscribeYearlyCta": "Jahresabo",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Verlangerung: {{date}}",
+    "planChangeBlockedShort": "Nicht möglich",
+    "planChangeBlocked": "Während des Abos kannst du den Tarif nicht wechseln. Kündige im Store und abonniere nach Ablauf erneut.",
+    "subscribed": "Aktiv",
+    "nextRenewal": "Nächste Verlängerung {{date}}",
+    "historyItemSubscriptionMonthly": "PRO monatlich",
+    "historyItemSubscriptionYearly": "PRO jährlich"
   },
   "credits": {
     "moodIcons": "Stimmungs-Icons: entworfen von {{author}} von Flaticon"

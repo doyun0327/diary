@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}} lần"
+    "packLabel": "{{n}} lần",
+    "subscribeLeadNote": "Số lần còn lại hết hạn cuối tháng. (Không chuyển sang tháng sau)",
+    "subscribeMonthly": "Gói tháng",
+    "subscribeYearly": "Gói năm",
+    "subscribeMonthlyCta": "Gói tháng",
+    "subscribeYearlyCta": "Gói năm",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Gia hạn: {{date}}",
+    "planChangeBlockedShort": "Không đổi được",
+    "planChangeBlocked": "Không thể đổi gói khi đang đăng ký. Hủy trong cửa hàng, rồi đăng ký lại sau khi hết chu kỳ.",
+    "subscribed": "Đang đăng ký",
+    "nextRenewal": "Gia hạn tiếp theo {{date}}",
+    "historyItemSubscriptionMonthly": "PRO tháng",
+    "historyItemSubscriptionYearly": "PRO năm"
   },
   "credits": {
     "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"

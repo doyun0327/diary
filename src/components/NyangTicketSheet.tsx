@@ -63,7 +63,7 @@ interface NyangTicketSheetProps {
   autoPurchase?: PendingNyangPurchase | null;
   onAutoPurchaseConsumed?: () => void;
   /** 저장 토스트와 동일한 하단 안내 */
-  onAppToast?: (message: string) => void;
+  onAppToast?: (message: string, durationMs?: number) => void;
 }
 
 function formatPurchaseDate(ms: number, locale: string) {
@@ -76,6 +76,14 @@ function formatPurchaseDate(ms: number, locale: string) {
   } catch {
     return new Date(ms).toLocaleDateString();
   }
+}
+
+function formatRenewalYmd(ms: number) {
+  const d = new Date(ms);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function NyangTicketSheet({
@@ -189,9 +197,7 @@ function NyangTicketSheet({
   const subLeft = Math.max(0, access.monthlyRemaining);
   const activeSubProductId = isPro ? getActiveSubProductId() : null;
   const nextRenewalMs = isPro ? getProBillingPeriodEndMs() : null;
-  const nextRenewalLabel = nextRenewalMs
-    ? formatPurchaseDate(nextRenewalMs, i18n.language)
-    : null;
+  const nextRenewalYmd = nextRenewalMs ? formatRenewalYmd(nextRenewalMs) : null;
 
   const recordSubscriptionPurchase = async (productId?: string | null) => {
     const token = getAccessToken();
@@ -314,7 +320,12 @@ function NyangTicketSheet({
     setMessage(null);
     setError(null);
     if (getDiaryAccessState().isPremiumActive) {
-      setMessage(t('nyangTicket.subscribed'));
+      const active = getActiveSubProductId();
+      if (active === productId) {
+        setMessage(t('nyangTicket.subscribed'));
+        return;
+      }
+      setMessage(t('nyangTicket.planChangeBlocked'));
       return;
     }
     const pending: PendingNyangPurchase = { kind: 'subscribe', productId };
@@ -329,7 +340,7 @@ function NyangTicketSheet({
       return;
     }
     if (getDiaryAccessState().isPremiumActive) {
-      setMessage(t('nyangTicket.subscribed'));
+      setMessage(t('nyangTicket.planChangeBlocked'));
       return;
     }
     await runSubscribe(productId);
@@ -478,23 +489,31 @@ function NyangTicketSheet({
         {tab === 'subscribe' && (
           <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
             <p className="nyang-ticket__panel-lead">
-              {t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })}
+              {t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })}{' '}
+              <br />
+              <span className="nyang-ticket__lead-note">
+                {t('nyangTicket.subscribeLeadNote')}
+              </span>
+              {isPro ? (
+                <>
+                  <br />
+                  <span className="nyang-ticket__remaining" aria-live="polite">
+                    {t('nyangTicket.packsRemaining', { n: subLeft })}
+                  </span>
+                </>
+              ) : null}
             </p>
-            {isPro ? (
-              <p className="nyang-ticket__remaining" aria-live="polite">
-                {t('nyangTicket.packsRemaining', { n: subLeft })}
-              </p>
-            ) : null}
             <ul className="nyang-ticket__packs">
               {SUB_PRODUCTS.map((plan) => {
                 const price = subPriceLabel(plan.id);
                 const isYearly = plan.id === SUB_YEARLY_PRODUCT_ID;
                 const isActivePlan = activeSubProductId === plan.id;
+                const isLockedOther = isPro && !isActivePlan;
                 return (
                   <li key={plan.id}>
                     <button
                       type="button"
-                      className="nyang-ticket__pack-btn"
+                      className={`nyang-ticket__pack-btn${isActivePlan ? ' is-subscribed' : ''}${isLockedOther ? ' is-locked' : ''}`}
                       disabled={busy != null}
                       onClick={() => void handleSubscribe(plan.id)}
                     >
@@ -520,9 +539,9 @@ function NyangTicketSheet({
                           : busy === plan.id
                             ? t('common.processing')
                             : isActivePlan
-                              ? (nextRenewalLabel
-                                  ? t('nyangTicket.nextRenewal', {
-                                      date: nextRenewalLabel,
+                              ? (nextRenewalYmd
+                                  ? t('nyangTicket.renewalDate', {
+                                      date: nextRenewalYmd,
                                     })
                                   : t('nyangTicket.subscribed'))
                               : (price ?? t('nyangTicket.buy'))}

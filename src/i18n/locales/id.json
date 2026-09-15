@@ -250,7 +250,20 @@
     "zh-TW": "繁體中文"
   },
   "nyangTicket": {
-    "packLabel": "{{n}}"
+    "packLabel": "{{n}}",
+    "subscribeLeadNote": "Sisa kuota hangus di akhir bulan. (Tidak dibawa)",
+    "subscribeMonthly": "Langganan bulanan",
+    "subscribeYearly": "Langganan tahunan",
+    "subscribeMonthlyCta": "Langganan bulanan",
+    "subscribeYearlyCta": "Langganan tahunan",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
+    "renewalDate": "Perpanjang: {{date}}",
+    "planChangeBlockedShort": "Tidak bisa diubah",
+    "planChangeBlocked": "Tidak bisa ganti paket saat berlangganan. Batalkan di toko, lalu berlangganan lagi setelah periode berakhir.",
+    "subscribed": "Berlangganan",
+    "nextRenewal": "Perpanjang berikutnya {{date}}",
+    "historyItemSubscriptionMonthly": "PRO bulanan",
+    "historyItemSubscriptionYearly": "PRO tahunan"
   },
   "credits": {
     "moodIcons": "Ikon mood: designed by {{author}} from Flaticon"
