@@ -1,5 +1,5 @@
 import type { DiaryEntry } from '../types/diary';
-import { renderEntryBookPage, revokeBookPage } from './diaryBook';
+import { renderSnsSharePage, revokeBookPage } from './diaryBook';
 import { isFlutterApp, shareViaNative } from './nativeShare';
 
 export type ShareTarget = 'sns';
@@ -60,7 +60,7 @@ async function tryNativeShare(file: File, title: string, text: string): Promise<
 
 /** SNS용 일기 이미지 미리 생성 (공유 시트 열릴 때) */
 export function prefetchDiaryShareBlob(entry: DiaryEntry): Promise<Blob> {
-  return renderEntryBookPage(entry).then((page) => {
+  return renderSnsSharePage(entry).then((page) => {
     const blob = page.blob;
     revokeBookPage(page);
     return blob;
@@ -78,10 +78,10 @@ export async function shareDiaryTo(
   _target: ShareTarget = 'sns',
   options?: { paperElement?: HTMLElement | null; blob?: Blob },
 ): Promise<{ result: 'shared' | 'downloaded'; previewUrl?: string; isMobileShare: boolean }> {
-  let ownedPage: Awaited<ReturnType<typeof renderEntryBookPage>> | null = null;
+  let ownedPage: Awaited<ReturnType<typeof renderSnsSharePage>> | null = null;
   let blob = options?.blob;
   if (!blob) {
-    ownedPage = await renderEntryBookPage(entry);
+    ownedPage = await renderSnsSharePage(entry);
     blob = ownedPage.blob;
   }
 

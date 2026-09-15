@@ -12,11 +12,23 @@ export { downloadViaAnchor as downloadBlob } from './saveBlob';
 export const BOOK_W = 900;
 export const BOOK_H = 1200;
 
+/** SNS 공유 전용 — 인스타 등에서 확대해도 덜 깨지게 */
+const SNS_W = 1080;
+const SNS_H = 1440;
+
 const BOOK_CAPTURE = {
   scale: 1.2,
   type: 'image/jpeg',
   quality: 0.8,
 } as const;
+
+const SNS_CAPTURE = {
+  scale: 2.5,
+  type: 'image/jpeg',
+  quality: 0.92,
+} as const;
+
+const SNS_JPEG_QUALITY = 0.92;
 
 /** PDF 저장 전용 — 그림 영역 약 70% 축소(30% 크기) + JPEG 품질 */
 const BOOK_PDF_CAPTURE = {
@@ -99,21 +111,26 @@ const FRAME_PAD_X = 0.06;
 const FRAME_PAD_Y = 0.08;
 const FRAME_R = 20;
 
-function frameRect() {
-  const x = Math.round(BOOK_W * FRAME_PAD_X);
-  const y = Math.round(BOOK_H * FRAME_PAD_Y);
+function frameRect(pageW = BOOK_W, pageH = BOOK_H) {
+  const x = Math.round(pageW * FRAME_PAD_X);
+  const y = Math.round(pageH * FRAME_PAD_Y);
   return {
     x,
     y,
-    w: BOOK_W - x * 2,
-    h: BOOK_H - y * 2,
+    w: pageW - x * 2,
+    h: pageH - y * 2,
   };
 }
 
 export type BookSlot = { x: number; y: number; w: number; h: number };
 
-export function paperSlotInBook(iw: number, ih: number): BookSlot {
-  const frame = frameRect();
+export function paperSlotInBook(
+  iw: number,
+  ih: number,
+  pageW = BOOK_W,
+  pageH = BOOK_H,
+): BookSlot {
+  const frame = frameRect(pageW, pageH);
   const scale = Math.min(frame.w / Math.max(iw, 1), frame.h / Math.max(ih, 1));
   const w = iw * scale;
   const h = ih * scale;
@@ -131,9 +148,11 @@ function drawBookFrame(
   surface: string,
   border: string,
   frame: BookSlot = frameRect(),
+  pageW = BOOK_W,
+  pageH = BOOK_H,
 ) {
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, BOOK_W, BOOK_H);
+  ctx.fillRect(0, 0, pageW, pageH);
 
   ctx.fillStyle = surface;
   ctx.shadowColor = 'rgba(0,0,0,0.08)';
@@ -155,8 +174,15 @@ function drawBookFrame(
 function fillImageInFrame(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
+  pageW = BOOK_W,
+  pageH = BOOK_H,
 ): BookSlot {
-  const slot = paperSlotInBook(img.naturalWidth || img.width, img.naturalHeight || img.height);
+  const slot = paperSlotInBook(
+    img.naturalWidth || img.width,
+    img.naturalHeight || img.height,
+    pageW,
+    pageH,
+  );
   ctx.save();
   roundRect(ctx, slot.x, slot.y, slot.w, slot.h, FRAME_R);
   ctx.clip();
@@ -165,10 +191,13 @@ function fillImageInFrame(
   return slot;
 }
 
-function createPageCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
+function createPageCanvas(
+  pageW = BOOK_W,
+  pageH = BOOK_H,
+): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
   const canvas = document.createElement('canvas');
-  canvas.width = BOOK_W;
-  canvas.height = BOOK_H;
+  canvas.width = pageW;
+  canvas.height = pageH;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('일기장 페이지를 만들 수 없어요');
   return { canvas, ctx };
@@ -359,6 +388,26 @@ export async function renderEntryBookPage(
     const slot = fillImageInFrame(ctx, img);
 
     const blob = await canvasToBlob(canvas, 'image/jpeg', 0.85);
+    const page = await pageFromBlob(blob, entry.title || formatDate(entry.date));
+    return { ...page, slot };
+  } finally {
+    URL.revokeObjectURL(paperUrl);
+  }
+}
+
+/** SNS(인스타 등) 공유 전용 — 고해상도·고품질 JPEG. 친구방/PDF와 분리 */
+export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
+  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
+  const paperUrl = URL.createObjectURL(paperBlob);
+  try {
+    const img = await loadImage(paperUrl);
+    const { canvas, ctx } = createPageCanvas(SNS_W, SNS_H);
+    const bg = themeColor('--color-bg', '#ffffff');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, SNS_W, SNS_H);
+    const slot = fillImageInFrame(ctx, img, SNS_W, SNS_H);
+
+    const blob = await canvasToBlob(canvas, 'image/jpeg', SNS_JPEG_QUALITY);
     const page = await pageFromBlob(blob, entry.title || formatDate(entry.date));
     return { ...page, slot };
   } finally {
