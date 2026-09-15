@@ -8,6 +8,8 @@ import {
 import { AI_PACK_PRODUCTS, type AiPackProductId } from '../utils/aiPackProducts';
 import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
+  applySubscriptionStatus,
+  getActiveSubProductId,
   getDiaryAccessState,
   getProBillingPeriodEndMs,
   getPurchasedAiPackCredits,
@@ -26,6 +28,14 @@ import {
   setPendingNyangPurchase,
   type PendingNyangPurchase,
 } from '../utils/pendingNyangPurchase';
+import {
+  formatSubFallbackPrice,
+  SUB_MONTHLY_PRODUCT_ID,
+  SUB_PRODUCTS,
+  SUB_YEARLY_PRODUCT_ID,
+  yearlyDiscountPercent,
+  type SubProductId,
+} from '../utils/subscriptionProducts';
 import { fetchTipStorePrices } from '../utils/tipPurchase';
 import {
   getAccessToken,
@@ -43,9 +53,7 @@ import './AccountSheet.css';
 import './NyangTicketSheet.css';
 
 type TabId = 'subscribe' | 'packs' | 'history';
-type BusyState = 'sub' | 'google' | AiPackProductId | null;
-
-const SUB_PRODUCT_ID = 'pageby_monthly';
+type BusyState = 'google' | SubProductId | AiPackProductId | null;
 
 interface NyangTicketSheetProps {
   onClose: () => void;
@@ -138,6 +146,14 @@ function NyangTicketSheet({
     return null;
   };
 
+  const subPriceLabel = (productId: SubProductId) => {
+    const store = priceFor(productId);
+    if (store) return store;
+    const fallback = SUB_PRODUCTS.find((p) => p.id === productId)?.fallbackPriceKrw;
+    if (fallback == null) return null;
+    return formatSubFallbackPrice(fallback, i18n.language);
+  };
+
   const loadHistory = useCallback(async () => {
     const token = getAccessToken();
     if (!token || !isGoogleSignedIn()) {
@@ -171,6 +187,7 @@ function NyangTicketSheet({
   const packLeft = getPurchasedAiPackCredits();
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
+  const activeSubProductId = isPro ? getActiveSubProductId() : null;
   const nextRenewalMs = isPro ? getProBillingPeriodEndMs() : null;
   const nextRenewalLabel = nextRenewalMs
     ? formatPurchaseDate(nextRenewalMs, i18n.language)
@@ -182,7 +199,7 @@ function NyangTicketSheet({
     try {
       await recordPurchaseRemote(token, {
         kind: 'subscription',
-        productId: (productId && productId.trim()) || SUB_PRODUCT_ID,
+        productId: (productId && productId.trim()) || SUB_MONTHLY_PRODUCT_ID,
         creditsGranted: 0,
       });
       void loadHistory();
@@ -228,17 +245,22 @@ function NyangTicketSheet({
     }
   };
 
-  const runSubscribe = async () => {
+  const runSubscribe = async (productId: SubProductId) => {
     if (!isFlutterApp()) {
       setError(t('subscription.appOnly'));
       return;
     }
-    setBusy('sub');
+    setBusy(productId);
     try {
-      const ok = await requestSubscriptionPurchaseAndSync();
+      const ok = await requestSubscriptionPurchaseAndSync(productId);
       if (ok) {
+        applySubscriptionStatus(
+          true,
+          getProBillingPeriodEndMs(),
+          productId,
+        );
         setMessage(t('nyangTicket.subscribeDone'));
-        await recordSubscriptionPurchase(SUB_PRODUCT_ID);
+        await recordSubscriptionPurchase(productId);
       }
     } finally {
       setBusy(null);
@@ -287,7 +309,7 @@ function NyangTicketSheet({
     }
   };
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = async (productId: SubProductId) => {
     if (busy) return;
     setMessage(null);
     setError(null);
@@ -295,7 +317,7 @@ function NyangTicketSheet({
       setMessage(t('nyangTicket.subscribed'));
       return;
     }
-    const pending: PendingNyangPurchase = { kind: 'subscribe' };
+    const pending: PendingNyangPurchase = { kind: 'subscribe', productId };
     const wasGoogle = isGoogleSignedIn();
     if (!(await ensureGoogleMember(pending))) return;
     // 로그아웃 후 같은 Google로 다시 로그인 → 기존 Play 구독 복원 대기
@@ -310,7 +332,7 @@ function NyangTicketSheet({
       setMessage(t('nyangTicket.subscribed'));
       return;
     }
-    await runSubscribe();
+    await runSubscribe(productId);
   };
 
   /** 숨김: 제목 길게 누르기 → 수동 복원 */
@@ -349,7 +371,7 @@ function NyangTicketSheet({
           setMessage(t('nyangTicket.subscribed'));
           return;
         }
-        await runSubscribe();
+        await runSubscribe(autoPurchase.productId ?? SUB_MONTHLY_PRODUCT_ID);
         return;
       }
       setTab('packs');
@@ -365,6 +387,12 @@ function NyangTicketSheet({
 
   const purchaseTitle = (row: PurchaseRecordDto) => {
     if (row.kind === 'subscription') {
+      if (row.productId === SUB_YEARLY_PRODUCT_ID) {
+        return t('nyangTicket.historyItemSubscriptionYearly');
+      }
+      if (row.productId === SUB_MONTHLY_PRODUCT_ID) {
+        return t('nyangTicket.historyItemSubscriptionMonthly');
+      }
       return t('nyangTicket.historyItemSubscription');
     }
     if (isWelcomeAiPurchase(row)) {
@@ -449,48 +477,61 @@ function NyangTicketSheet({
 
         {tab === 'subscribe' && (
           <section className="account-sheet__block nyang-ticket__panel" role="tabpanel">
+            <p className="nyang-ticket__panel-lead">
+              {t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })}
+            </p>
             {isPro ? (
-              <div className="nyang-ticket__sub-status" aria-live="polite">
-                <span className="nyang-ticket__sub-status-title">
-                  {t('nyangTicket.subscribed')}
-                </span>
-                {nextRenewalLabel ? (
-                  <span className="nyang-ticket__sub-status-renew">
-                    {t('nyangTicket.nextRenewal', { date: nextRenewalLabel })}
-                  </span>
-                ) : null}
-                <span className="nyang-ticket__sub-status-left">
-                  {t('nyangTicket.packsRemaining', { n: subLeft })}
-                </span>
-              </div>
-            ) : (
-              <>
-                <p className="nyang-ticket__panel-lead">
-                  {t('nyangTicket.subscribeLead', { n: MONTHLY_AI_DRAW_LIMIT })}
-                </p>
-                <button
-                  type="button"
-                  className="account-sheet__btn account-sheet__btn--solid nyang-ticket__btn"
-                  disabled={busy != null}
-                  onClick={() => void handleSubscribe()}
-                >
-                  {busy === 'google'
-                    ? t('nyangTicket.signingIn')
-                    : busy === 'sub'
-                      ? t('common.processing')
-                      : (
-                        <span className="nyang-ticket__cta-with-price">
-                          <span>{t('nyangTicket.subscribeCta')}</span>
-                          {priceFor(SUB_PRODUCT_ID) ? (
-                            <span className="nyang-ticket__price">
-                              {priceFor(SUB_PRODUCT_ID)}
+              <p className="nyang-ticket__remaining" aria-live="polite">
+                {t('nyangTicket.packsRemaining', { n: subLeft })}
+              </p>
+            ) : null}
+            <ul className="nyang-ticket__packs">
+              {SUB_PRODUCTS.map((plan) => {
+                const price = subPriceLabel(plan.id);
+                const isYearly = plan.id === SUB_YEARLY_PRODUCT_ID;
+                const isActivePlan = activeSubProductId === plan.id;
+                return (
+                  <li key={plan.id}>
+                    <button
+                      type="button"
+                      className="nyang-ticket__pack-btn"
+                      disabled={busy != null}
+                      onClick={() => void handleSubscribe(plan.id)}
+                    >
+                      <span className="nyang-ticket__pack-copy">
+                        <span className="nyang-ticket__pack-title-row">
+                          <span className="nyang-ticket__pack-name">
+                            {isYearly
+                              ? t('nyangTicket.subscribeYearly')
+                              : t('nyangTicket.subscribeMonthly')}
+                          </span>
+                          {isYearly ? (
+                            <span className="nyang-ticket__discount-badge">
+                              {t('nyangTicket.subscribeYearlyBadge', {
+                                percent: yearlyDiscountPercent(),
+                              })}
                             </span>
                           ) : null}
                         </span>
-                      )}
-                </button>
-              </>
-            )}
+                      </span>
+                      <span className="nyang-ticket__pack-cta">
+                        {busy === 'google'
+                          ? t('nyangTicket.signingIn')
+                          : busy === plan.id
+                            ? t('common.processing')
+                            : isActivePlan
+                              ? (nextRenewalLabel
+                                  ? t('nyangTicket.nextRenewal', {
+                                      date: nextRenewalLabel,
+                                    })
+                                  : t('nyangTicket.subscribed'))
+                              : (price ?? t('nyangTicket.buy'))}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         )}
 

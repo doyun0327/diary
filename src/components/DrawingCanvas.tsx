@@ -33,7 +33,7 @@ import {
   isPremiumActiveNow,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
-import { requestSubscriptionPurchaseAndSync } from '../utils/subscription';
+import { openNyangTicket } from '../utils/openNyangTicket';
 import AppModal from './AppModal';
 import CloseIcon from './CloseIcon';
 import './DrawingCanvas.css';
@@ -2465,7 +2465,7 @@ function DrawingCanvas({
                 setStickerPremiumOpen(false);
                 setStickerOpen(false);
                 setFontOpen(false);
-                void requestSubscriptionPurchaseAndSync();
+                openNyangTicket('subscribe');
               }}
             />
           )}

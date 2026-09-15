@@ -90,29 +90,17 @@
   white-space: pre-line;
 }
 
+.nyang-ticket__remaining {
+  margin: -4px 0 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
 .nyang-ticket__btn {
   width: 100%;
   margin-top: 0;
-}
-
-.nyang-ticket__cta-with-price {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  line-height: 1.25;
-}
-
-.nyang-ticket__price {
-  font-size: 0.78rem;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.nyang-ticket__pack-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text);
 }
 
 .nyang-ticket__sub-status {
@@ -171,6 +159,42 @@
   text-align: left;
 }
 
+.nyang-ticket__pack-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nyang-ticket__pack-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.nyang-ticket__pack-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.nyang-ticket__discount-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #fff;
+  background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
 .nyang-ticket__pack-btn:disabled {
   opacity: 0.55;
   cursor: default;
@@ -182,9 +206,12 @@
 
 .nyang-ticket__pack-cta {
   flex-shrink: 0;
-  font-size: 0.82rem;
+  max-width: 46%;
+  font-size: 0.78rem;
   font-weight: 700;
+  line-height: 1.3;
   color: var(--color-accent);
+  text-align: right;
 }
 
 .nyang-ticket__msg {

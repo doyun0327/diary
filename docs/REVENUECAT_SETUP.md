@@ -5,10 +5,13 @@
 | 항목 | 값 |
 |------|-----|
 | 무료 | 가입 후 **5장** (검색·보내기 불가) |
-| 구독 | **월 1,900원** (`pageby_monthly`, 스토어에서 현지 가격 표시) |
-| 구독 혜택 | **검색**, **보내기**, **월 50장** 작성 |
+| 월간 구독 | **₩2,900 / 월** (`pageby_monthly`) |
+| 연간 구독 | **₩29,800 / 년** (`pageby_yearly`) |
+| 구독 혜택 | **검색**, **보내기**, **월 50장** AI 그림 |
 
-코드 상수: `src/utils/diaryAccess.ts`, `lib/subscription_config.dart`
+코드 상수:
+- Web: `src/utils/subscriptionProducts.ts`, `src/utils/diaryAccess.ts`
+- Flutter: `diary_app/lib/subscription_config.dart`
 
 ---
 
@@ -35,32 +38,36 @@ flutter run --dart-define=REVENUECAT_GOOGLE_KEY=goog_xxx --dart-define=REVENUECA
 
 ## 2. Google Play Console (Android)
 
-1. **Monetize → Subscriptions** → 구독 생성
-2. Product ID: **`pageby_monthly`**
-3. 가격: **₩1,900 / 1 month**
-4. RevenueCat 대시보드 → Google Play 서비스 계정 JSON 연결
+1. **Monetize → Subscriptions** → 구독 생성 (같은 구독 그룹에 base plan 2개 권장)
+2. Product ID:
+   - **`pageby_monthly`** — ₩2,900 / 1 month
+   - **`pageby_yearly`** — ₩29,800 / 1 year
+3. RevenueCat 대시보드 → Google Play 서비스 계정 JSON 연결
 
 ---
 
 ## 3. App Store Connect (iOS)
 
 1. **Subscriptions** 그룹 생성
-2. Product ID: **`pageby_monthly`**
-3. 가격: **₩1,900 / 1 month**
-4. RevenueCat에 App Store Connect API Key 연결
+2. Product ID:
+   - **`pageby_monthly`** — ₩2,900 / month
+   - **`pageby_yearly`** — ₩29,800 / year
+3. RevenueCat에 App Store Connect API Key 연결
 
 ---
 
 ## 4. RevenueCat Entitlement / Offering
 
 1. **Entitlements** → `premium` 생성
-2. **`pageby_monthly`** 를 `premium` entitlement에 연결
-3. **Offerings** → `default` offering 에 monthly 패키지 추가
+2. **`pageby_monthly`**, **`pageby_yearly`** 를 모두 `premium` entitlement에 연결
+3. **Offerings** → `default` offering 에:
+   - Monthly 패키지 → `pageby_monthly`
+   - Annual 패키지 → `pageby_yearly`
 
 앱 코드의 ID와 반드시 일치:
 
 - Entitlement: `premium`
-- Product: `pageby_monthly`
+- Products: `pageby_monthly`, `pageby_yearly`
 
 ---
 
@@ -70,7 +77,7 @@ flutter run --dart-define=REVENUECAT_GOOGLE_KEY=goog_xxx --dart-define=REVENUECA
 |---------------------|------|
 | `subscriptionIdentify` | RevenueCat `logIn(userId)` |
 | `subscriptionSync` | 구독 상태 조회 → WebView 전달 |
-| `subscriptionPurchase` | 월 구독 결제 |
+| `subscriptionPurchase` | `{ productId?: "pageby_monthly" \| "pageby_yearly" }` 해당 구독 결제 (없으면 월간) |
 | `subscriptionRestore` | 구매 복원 |
 
 WebView 콜백:
@@ -101,7 +108,7 @@ await webController.runJavaScript('''
 
 1. [Google Play Console](https://play.google.com/console) → **pageBy** (`com.yun.diary_app`)
 2. **수익 창출 설정**이 완료돼 있어야 함 (은행·세금·상인 계정)
-3. **수익 창출 → 구독** 에 `pageby_monthly` (₩3,300/월) **활성** 상태인지 확인
+3. **수익 창출 → 구독** 에 `pageby_monthly`, `pageby_yearly` **활성** 상태인지 확인
 4. **설정 → 라이선스 테스트** (영문: *Settings → License testing*)
 5. **라이선스 테스터**에 테스트용 **Gmail** 추가  
    - 예: 본인 갤럭시에 로그인된 Google 계정  
@@ -128,7 +135,7 @@ flutter build appbundle --release \
 
 1. RevenueCat `subscription_config.dart` 에 **Google Public API Key** 입력
 2. 앱에서 일기 **5장까지 작성** → 6번째에 구독 모달
-3. **월 3,300원 구독하기** → Play 결제창  
+3. **월간 / 연간 구독** → Play 결제창  
    - 라이선스 테스터는 **실제 청구 없음** (카드에 TEST / 무료 테스트 표시)
 4. [RevenueCat Dashboard](https://app.revenuecat.com/) → Customers → entitlement **`premium`** active 확인
 
@@ -148,7 +155,7 @@ Play **테스트 구독**은 짧게 돌아갑니다 (대략):
 
 | 증상 | 확인 |
 |------|------|
-| 결제창 안 뜸 | RevenueCat 키 `REPLACE_ME` 아닌지, Offering에 `pageby_monthly` 연결 |
+| 결제창 안 뜸 | RevenueCat 키 `REPLACE_ME` 아닌지, Offering에 `pageby_monthly` / `pageby_yearly` 연결 |
 | "아이템을 구매할 수 없음" | 구독 상품 **활성** 여부, 내부 테스트 AAB 업로드 여부 |
 | 테스터인데 유료로 뜸 | Play 스토어 Gmail ≠ 라이선스 테스터 Gmail |
 | debug `flutter run` 만 사용 | **내부 테스트 Play 설치본**으로 다시 테스트 |
@@ -164,6 +171,6 @@ App Store Connect → **Sandbox Tester** 계정 생성 → 실기기 **설정 �
 ## 8. 출시 전 체크
 
 - [ ] API 키가 `REPLACE_ME` 가 아님
-- [ ] Play / App Store 가격 ₩3,300
+- [ ] Play / App Store 가격 월 ₩2,900 / 연 ₩29,800
 - [ ] 앱 내 구독 안내·해지 방법 문구 (설정/앱 정보)
 - [ ] iOS **구매 복원** 버튼 (구현됨: 한도 모달 하단)

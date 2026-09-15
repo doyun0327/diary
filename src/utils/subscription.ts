@@ -6,6 +6,10 @@ import {
 import { isGoogleSignedIn } from '../hooks/useAuthSession';
 import { isFlutterApp, postDiaryNative } from './nativeShare';
 import { setPendingNyangPurchase } from './pendingNyangPurchase';
+import {
+  SUB_MONTHLY_PRODUCT_ID,
+  type SubProductId,
+} from './subscriptionProducts';
 
 export type SubscriptionStatusPayload = {
   active: boolean;
@@ -121,24 +125,27 @@ export function refreshSubscriptionStatus(timeoutMs = 1800): Promise<boolean> {
   });
 }
 
-export function requestSubscriptionPurchase() {
+export function requestSubscriptionPurchase(
+  productId: SubProductId = SUB_MONTHLY_PRODUCT_ID,
+) {
   if (!isGoogleSignedIn()) {
-    setPendingNyangPurchase({ kind: 'subscribe' });
+    setPendingNyangPurchase({ kind: 'subscribe', productId });
     window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
     return false;
   }
   if (!isFlutterApp()) return false;
-  postDiaryNative({ type: 'subscriptionPurchase' });
+  postDiaryNative({ type: 'subscriptionPurchase', productId });
   return true;
 }
 
 /** 구독 결제 시작 + Pro 활성화 대기 (이미 가입됨 → 복원 포함) */
 export async function requestSubscriptionPurchaseAndSync(
+  productId: SubProductId = SUB_MONTHLY_PRODUCT_ID,
   timeoutMs = 20_000,
 ): Promise<boolean> {
   // 이미 Pro면 Play 결제창을 다시 열지 않음 (같은 계정 재구독 방지)
   if (getDiaryAccessState().isPremiumActive) return true;
-  if (!requestSubscriptionPurchase()) return false;
+  if (!requestSubscriptionPurchase(productId)) return false;
   scheduleSubscriptionSyncAfterPurchase();
   return waitForPremiumActivation(timeoutMs);
 }

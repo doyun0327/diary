@@ -89,7 +89,6 @@ import {
   identifySubscriptionUser,
   installSubscriptionBridge,
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
-  requestSubscriptionPurchaseAndSync,
   restoreSubscriptionAfterAuth,
   syncSubscriptionFromNative,
 } from "./utils/subscription";
@@ -99,7 +98,6 @@ import {
 } from "./utils/openNyangTicket";
 import {
   clearPendingNyangPurchase,
-  setPendingNyangPurchase,
   takePendingNyangPurchase,
   type PendingNyangPurchase,
 } from "./utils/pendingNyangPurchase";
@@ -185,7 +183,6 @@ function App() {
     useState<SubscriptionModalReason | null>(null);
   const [writeSaveEnabled, setWriteSaveEnabled] = useState(true);
   const [writeSaving, setWriteSaving] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
   const [googleLoginForProOpen, setGoogleLoginForProOpen] = useState(false);
   const [pagebyAfterSavePromptOpen, setPagebyAfterSavePromptOpen] =
     useState(false);
@@ -368,7 +365,6 @@ function App() {
   useEffect(() => {
     const onNeedGoogle = () => {
       setSubscriptionModal(null);
-      setSubscribing(false);
       setNyangTicketOpen(false);
       setGoogleLoginForProOpen(true);
     };
@@ -379,7 +375,6 @@ function App() {
 
   const closeSubscriptionModal = useCallback(() => {
     setSubscriptionModal(null);
-    setSubscribing(false);
   }, []);
 
   const pendingSearchSelectRef = useRef<string | null>(null);
@@ -1427,34 +1422,15 @@ function App() {
             onDismiss={closeSubscriptionModal}
             showClose
             primaryLabel={
-              subscriptionModal === "search" || subscriptionModal === "export"
+              isFlutterApp()
                 ? t("write.ai.goPurchase")
-                : subscribing
-                  ? t("common.processing")
-                  : isFlutterApp()
-                    ? t("subscription.subscribeCta")
-                    : t("subscription.appOnly")
+                : t("subscription.appOnly")
             }
             onPrimary={() => {
-              if (subscriptionModal === "search" || subscriptionModal === "export") {
-                closeSubscriptionModal();
-                setNyangTicketTab("subscribe");
-                setNyangTicketOpen(true);
-                return;
-              }
-              if (subscribing) return;
-              if (!isGoogleSignedIn()) {
-                setPendingNyangPurchase({ kind: "subscribe" });
-                closeSubscriptionModal();
-                setGoogleLoginForProOpen(true);
-                return;
-              }
-              if (!isFlutterApp()) return;
-              setSubscribing(true);
               closeSubscriptionModal();
-              void requestSubscriptionPurchaseAndSync().finally(() =>
-                setSubscribing(false),
-              );
+              if (!isFlutterApp()) return;
+              setNyangTicketTab("subscribe");
+              setNyangTicketOpen(true);
             }}
             closeAriaLabel={t("common.close")}
           >

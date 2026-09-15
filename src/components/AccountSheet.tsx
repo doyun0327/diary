@@ -647,7 +647,6 @@ function AccountSheet({
       <label className="account-sheet__label" htmlFor="account-name">
         {t('account.nameLabel')}
       </label>
-     
       <div className="account-sheet__name-row">
         <input
           id="account-name"
@@ -655,9 +654,9 @@ function AccountSheet({
           value={nameDraft}
           maxLength={20}
           placeholder={t('account.namePlaceholder')}
-              onChange={(e) => {
-                setNameDraft(e.target.value);
-              }}
+          onChange={(e) => {
+            setNameDraft(e.target.value);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -673,28 +672,6 @@ function AccountSheet({
           {t('account.save')}
         </button>
       </div>
-      {cloudSignedIn ? (
-        <div className="account-sheet__account-actions">
-          <button
-            type="button"
-            className="account-sheet__account-action"
-            disabled={authBusy !== null}
-            onClick={() => void handleSignOut()}
-          >
-            {authBusy === 'signOut'
-              ? t('account.sync.syncing')
-              : t('account.sync.signOut')}
-          </button>
-          <button
-            type="button"
-            className="account-sheet__account-action"
-            disabled={authBusy !== null}
-            onClick={() => setWithdrawOpen(true)}
-          >
-            {t('account.withdraw.button')}
-          </button>
-        </div>
-      ) : null}
     </section>
   );
 
@@ -722,7 +699,7 @@ function AccountSheet({
         {t('account.ageLabel')}
       </p>
       <div
-        className="account-sheet__radios account-sheet__radios--wrap"
+        className="account-sheet__radios account-sheet__radios--age"
         role="radiogroup"
         aria-label={t('account.ageLabel')}
       >
@@ -745,6 +722,31 @@ function AccountSheet({
     </section>
   );
 
+  const accountActionsSection = cloudSignedIn ? (
+    <section className="account-sheet__block account-sheet__block--actions">
+      <div className="account-sheet__account-actions">
+        <button
+          type="button"
+          className="account-sheet__account-action"
+          disabled={authBusy !== null}
+          onClick={() => void handleSignOut()}
+        >
+          {authBusy === 'signOut'
+            ? t('account.sync.syncing')
+            : t('account.sync.signOut')}
+        </button>
+        <button
+          type="button"
+          className="account-sheet__account-action"
+          disabled={authBusy !== null}
+          onClick={() => setWithdrawOpen(true)}
+        >
+          {t('account.withdraw.button')}
+        </button>
+      </div>
+    </section>
+  ) : null;
+
   return (
     <div className="account-sheet" role="dialog" aria-label={t('account.aria')}>
       <div className="account-sheet__backdrop" onClick={onClose} />
@@ -766,6 +768,7 @@ function AccountSheet({
             {photoSection}
             {nameSection}
             {demographicsSection}
+            {accountActionsSection}
           </>
         ) : (
           <>

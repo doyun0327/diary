@@ -1,4 +1,9 @@
 import { isGoogleSignedIn } from "../hooks/useAuthSession";
+import {
+  matchSubProductId,
+  SUB_MONTHLY_PRODUCT_ID,
+  type SubProductId,
+} from "./subscriptionProducts";
 
 export const FREE_ENTRY_GRANT = 5;
 /** @deprecated 일기 평생 무료 N장 — 현재는 일일 광고 한도 사용 */
@@ -96,6 +101,9 @@ export function setDiaryAccessAccountId(accountId: string) {
     (!state.premiumUntil || state.premiumUntil < prev.premiumUntil)
   ) {
     state.premiumUntil = prev.premiumUntil;
+    if (prev.premiumProductId && !state.premiumProductId) {
+      state.premiumProductId = prev.premiumProductId;
+    }
     changed = true;
   }
   if (hydratePremiumFromDevice(state)) changed = true;
@@ -129,6 +137,8 @@ function storageKey() {
 
 type AccessState = {
   premiumUntil: number | null;
+  /** 활성 구독 상품 ID (pageby_monthly / pageby_yearly 등) */
+  premiumProductId: string | null;
   monthlyLimitUsed: number;
   monthKey: string | null;
   aiDrawCredits: number;
@@ -227,6 +237,7 @@ function loadAccessState(): AccessState {
     if (!raw) {
       return {
         premiumUntil: null,
+        premiumProductId: null,
         monthlyLimitUsed: 0,
         monthKey: getMonthKey(),
         aiDrawCredits: 0,
@@ -251,6 +262,11 @@ function loadAccessState(): AccessState {
     return {
       premiumUntil:
         typeof parsed.premiumUntil === "number" ? parsed.premiumUntil : null,
+      premiumProductId:
+        typeof parsed.premiumProductId === "string" &&
+        parsed.premiumProductId.trim()
+          ? parsed.premiumProductId.trim()
+          : null,
       monthlyLimitUsed: Number(parsed.monthlyLimitUsed ?? 0),
       monthKey:
         typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
@@ -269,6 +285,7 @@ function loadAccessState(): AccessState {
   } catch {
     return {
       premiumUntil: null,
+      premiumProductId: null,
       monthlyLimitUsed: 0,
       monthKey: getMonthKey(),
       aiDrawCredits: 0,
@@ -321,15 +338,17 @@ export function applySubscriptionStatus(
       productId.length > 0 &&
       !productId.includes("churu") &&
       !productId.includes("ai_draw") &&
-      (productId.includes("pageby") ||
-        productId.includes("premium") ||
-        productId === "pageby_monthly"));
+      (productId.includes("pageby") || productId.includes("premium")));
 
   if (treatActive) {
     state.premiumUntil =
       until != null && until > now
         ? until
         : now + 30 * 24 * 60 * 60 * 1000;
+    const trimmed = typeof productId === "string" ? productId.trim() : "";
+    if (trimmed) {
+      state.premiumProductId = trimmed;
+    }
     writeDevicePremiumUntil(state.premiumUntil);
   } else {
     const localValid = Boolean(state.premiumUntil && state.premiumUntil > now);
@@ -345,10 +364,20 @@ export function applySubscriptionStatus(
       return;
     }
     state.premiumUntil = null;
+    state.premiumProductId = null;
     writeDevicePremiumUntil(null);
   }
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+}
+
+/** 현재 활성 구독 상품 (월간/연간). Pro인데 ID 없으면 월간으로 간주 */
+export function getActiveSubProductId(): SubProductId | null {
+  const state = loadAccessState();
+  if (!state.premiumUntil || state.premiumUntil <= Date.now()) return null;
+  return (
+    matchSubProductId(state.premiumProductId) ?? SUB_MONTHLY_PRODUCT_ID
+  );
 }
 
 export function getStoredDiaryEntryCount() {

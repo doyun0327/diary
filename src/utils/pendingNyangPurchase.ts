@@ -1,7 +1,9 @@
 import type { AiPackProductId } from './aiPackProducts';
+import type { SubProductId } from './subscriptionProducts';
+import { SUB_MONTHLY_PRODUCT_ID } from './subscriptionProducts';
 
 export type PendingNyangPurchase =
-  | { kind: 'subscribe' }
+  | { kind: 'subscribe'; productId?: SubProductId }
   | { kind: 'pack'; productId: AiPackProductId };
 
 let pending: PendingNyangPurchase | null = null;
@@ -18,4 +20,13 @@ export function takePendingNyangPurchase(): PendingNyangPurchase | null {
   const next = pending;
   pending = null;
   return next;
+}
+
+export function pendingSubscribeProductId(
+  pendingPurchase: PendingNyangPurchase | null | undefined,
+): SubProductId {
+  if (pendingPurchase?.kind === 'subscribe' && pendingPurchase.productId) {
+    return pendingPurchase.productId;
+  }
+  return SUB_MONTHLY_PRODUCT_ID;
 }

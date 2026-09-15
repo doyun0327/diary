@@ -292,6 +292,11 @@
     "subscribeTitleWithLeft": "구독 (잔여: {{n}}장)",
     "subscribeLead": "매달 {{n}}장의 그림을 생성할 수 있어요!",
     "subscribeCta": "PRO 구독하기",
+    "subscribeMonthly": "월간 구독",
+    "subscribeYearly": "연간 구독",
+    "subscribeMonthlyCta": "월간 구독",
+    "subscribeYearlyCta": "연간 구독",
+    "subscribeYearlyBadge": "{{percent}}% OFF",
     "subscribed": "구독 중",
     "nextRenewal": "다음 갱신 {{date}}",
     "subscribeDone": "구독이 시작됐어요!",
@@ -318,6 +323,8 @@
     "historyLoadFailed": "구매 내역을 불러오지 못했어요.",
     "historyDone": "완료",
     "historyItemSubscription": "PRO 구독",
+    "historyItemSubscriptionMonthly": "PRO 월간 구독",
+    "historyItemSubscriptionYearly": "PRO 연간 구독",
     "historyItemWelcome": "{{n}}회 (Welcome 체험권)",
     "historyItemPack": "{{n}}장"
   },
@@ -507,7 +514,7 @@
       "teens": "10대",
       "20s": "20대",
       "30s": "30대",
-      "40plus": "40대 이상"
+      "40plus": "40대+"
     },
     "start": "다음",
     "errName": "이름을 입력해 주세요",
