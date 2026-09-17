@@ -1,10 +1,11 @@
 import { jsPDF } from 'jspdf';
 import type { DiaryEntry } from '../types/diary';
 import { formatDate } from './date';
-import { fontFamilyForEntry } from './fonts';
+import { ensureDiaryFontReady, fontFamilyForEntry } from './fonts';
 import { captureDiaryEntryPaperBlob, type CapturePaperOptions } from './captureDiaryPaper';
 import { materializeImageSrc } from './materializeImage';
 import { downloadToDevice } from './saveBlob';
+import { withTimeout } from './withTimeout';
 
 export { downloadViaAnchor as downloadBlob } from './saveBlob';
 
@@ -18,18 +19,78 @@ const BOOK_CAPTURE = {
   quality: 0.8,
 } as const;
 
+/** 화면에서 넘기며 볼 때 — 일기 그림 축소 없이 (상세와 동일 비율) */
+export const BOOK_PREVIEW_CAPTURE: CapturePaperOptions = {
+  scale: 1.2,
+  type: 'image/jpeg',
+  quality: 0.82,
+  paperWidth: 420,
+};
+
+export const BOOK_PREVIEW_SIZE = { w: BOOK_W, h: BOOK_H } as const;
+
 /** SNS: 일기 paper 실제 크기 그대로 (큰 프레임에 끼워 늘리지 않음) */
-const SNS_CAPTURE = {
+export const SNS_CAPTURE: CapturePaperOptions = {
   scale: 2,
   type: 'image/jpeg',
   quality: 0.92,
-} as const;
+};
 
-/** PDF 저장 전용 — 그림 영역 약 70% 축소(30% 크기) + JPEG 품질 */
-const BOOK_PDF_CAPTURE = {
-  quality: 0.85,
-  imageScale: 0.3,
-} as const;
+/**
+ * PDF 전용 — SNS와 같은 구도(그림 축소 없음)이되 scale↓ 로 캡처 가속.
+ * (scale 2는 픽셀 4배 → 장당 체감이 큼)
+ */
+export const BOOK_PDF_CAPTURE: CapturePaperOptions = {
+  scale: 1.15,
+  type: 'image/jpeg',
+  quality: 0.84,
+  paperWidth: 420,
+};
+
+/** offscreen 캡처가 동시에 겹치면 WebView가 수 장에서 멈춤 → 한 번에 하나 */
+let captureQueue: Promise<unknown> = Promise.resolve();
+let captureEpoch = 0;
+
+/**
+ * 진행 중·대기 중 캡처가 끝날 때까지 기다림.
+ * (예전 reset은 대기열만 끊고 실행 중 캡처는 남겨 동시 캡처 → 3~5장에서 멈춤)
+ */
+export async function drainBookCaptureQueue(): Promise<void> {
+  captureEpoch += 1;
+  try {
+    await captureQueue;
+  } catch {
+    // ignore
+  }
+}
+
+/** @deprecated drainBookCaptureQueue 사용 */
+export function resetBookCaptureQueue() {
+  void drainBookCaptureQueue();
+}
+
+function enqueueCapture<T>(task: () => Promise<T>): Promise<T> {
+  const epoch = captureEpoch;
+  const result = captureQueue.then(
+    () => {
+      if (epoch !== captureEpoch) {
+        return Promise.reject(new Error('캡처가 취소됐어요'));
+      }
+      return task();
+    },
+    () => {
+      if (epoch !== captureEpoch) {
+        return Promise.reject(new Error('캡처가 취소됐어요'));
+      }
+      return task();
+    },
+  );
+  captureQueue = result.then(
+    () => undefined,
+    () => undefined,
+  );
+  return result;
+}
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -198,15 +259,6 @@ function createPageCanvas(
   return { canvas, ctx };
 }
 
-async function blobToDataUrl(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new Error('이미지를 읽지 못했어요'));
-    reader.readAsDataURL(blob);
-  });
-}
-
 async function pageFromBlob(blob: Blob, label: string): Promise<BookPage> {
   const blobUrl = URL.createObjectURL(blob);
   try {
@@ -368,26 +420,53 @@ export async function renderCoverBookPage(
 export async function renderEntryBookPage(
   entry: DiaryEntry,
   captureOptions?: CapturePaperOptions,
+  pageSize?: { w: number; h: number },
 ): Promise<BookPage> {
-  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, {
-    ...BOOK_CAPTURE,
-    ...captureOptions,
-  });
-  const paperUrl = URL.createObjectURL(paperBlob);
-  try {
-    const img = await loadImage(paperUrl);
-    const { canvas, ctx } = createPageCanvas();
-    const bg = themeColor('--color-bg', '#ffffff');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, BOOK_W, BOOK_H);
-    const slot = fillImageInFrame(ctx, img);
+  const run = async () => {
+    const pageW = pageSize?.w ?? BOOK_W;
+    const pageH = pageSize?.h ?? BOOK_H;
+    const paperBlob = await captureDiaryEntryPaperBlob(entry, null, {
+      ...BOOK_CAPTURE,
+      ...captureOptions,
+    });
+    const paperUrl = URL.createObjectURL(paperBlob);
+    try {
+      const img = await loadImage(paperUrl);
+      const { canvas, ctx } = createPageCanvas(pageW, pageH);
+      const bg = themeColor('--color-bg', '#ffffff');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, pageW, pageH);
+      const slot = fillImageInFrame(ctx, img, pageW, pageH);
 
-    const blob = await canvasToBlob(canvas, 'image/jpeg', 0.85);
-    const page = await pageFromBlob(blob, entry.title || formatDate(entry.date));
-    return { ...page, slot };
-  } finally {
-    URL.revokeObjectURL(paperUrl);
-  }
+      const blob = await canvasToBlob(canvas, 'image/jpeg', 0.85);
+      const page = await pageFromBlob(blob, entry.title || formatDate(entry.date));
+      return { ...page, slot };
+    } finally {
+      URL.revokeObjectURL(paperUrl);
+    }
+  };
+
+  // 한 장씩 큐. 타임아웃은 “대기”만 끊지 않고, 실제 작업이 끝날 때까지 큐를 점유
+  return enqueueCapture(async () => {
+    const work = run();
+    try {
+      return await withTimeout(
+        work,
+        45_000,
+        '일기 페이지를 만드는 데 시간이 너무 걸려요',
+      );
+    } catch (err) {
+      // 타임아웃 후에도 백그라운드 work가 끝날 때까지 기다려 다음 장과 겹치지 않게
+      await Promise.race([
+        work.then(
+          () => undefined,
+          () => undefined,
+        ),
+        new Promise<void>((r) => window.setTimeout(r, 5_000)),
+      ]);
+      throw err;
+    }
+  });
 }
 
 /** 이미지에 바깥 여백 + @PageBy 푸터 (SNS 공유·캔버스 다운로드 공통) */
@@ -436,14 +515,36 @@ export async function stampPageByOnImage(
   }
 }
 
-/** SNS(인스타 등) 공유 — 일기 paper + 바깥 여백(둥근 테두리 잘림 방지) + @PageBy */
+/** SNS(인스타 등) 공유 — 일기 paper + 바깥 여백 + @PageBy (실제 일기 크기) */
 export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
-  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
-  const stamped = await stampPageByOnImage(paperBlob, {
-    type: SNS_CAPTURE.type,
-    quality: SNS_CAPTURE.quality,
+  const run = async () => {
+    const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
+    const stamped = await stampPageByOnImage(paperBlob, {
+      type: SNS_CAPTURE.type ?? 'image/jpeg',
+      quality: SNS_CAPTURE.quality ?? 0.92,
+    });
+    return pageFromBlob(stamped, entry.title || formatDate(entry.date));
+  };
+
+  return enqueueCapture(async () => {
+    const work = run();
+    try {
+      return await withTimeout(
+        work,
+        45_000,
+        '일기 페이지를 만드는 데 시간이 너무 걸려요',
+      );
+    } catch (err) {
+      await Promise.race([
+        work.then(
+          () => undefined,
+          () => undefined,
+        ),
+        new Promise<void>((r) => window.setTimeout(r, 5_000)),
+      ]);
+      throw err;
+    }
   });
-  return pageFromBlob(stamped, entry.title || formatDate(entry.date));
 }
 
 /** 표지 + 일기 페이지들 (날짜 오름차순) — PDF 등에서 전부 필요할 때 */
@@ -453,9 +554,9 @@ export async function buildBookPages(entries: DiaryEntry[]): Promise<BookPage[]>
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const rest: BookPage[] = [];
   for (const entry of sorted) {
-    rest.push(await renderEntryBookPage(entry, BOOK_PDF_CAPTURE));
+    rest.push(await renderSnsSharePage(entry));
   }
-  const cover = await renderCoverBookPage(sorted, { slot: rest[0]?.slot });
+  const cover = await renderCoverBookPage(sorted);
   return [cover, ...rest];
 }
 
@@ -473,17 +574,129 @@ export async function buildPdfFromBookPages(pages: BookPage[]): Promise<Blob> {
 
   for (let i = 0; i < pages.length; i += 1) {
     const page = pages[i];
-    const w = page.width;
-    const h = page.height;
-    if (i > 0) {
-      pdf.addPage([w, h], w >= h ? 'landscape' : 'portrait');
+    await appendBookPageToPdf(pdf, page, i === 0);
+    if (i % 4 === 3) {
+      await new Promise<void>((r) => window.setTimeout(r, 0));
     }
-    const dataUrl = await blobToDataUrl(page.blob);
-    const format = page.blob.type.includes('jpeg') ? 'JPEG' : 'PNG';
-    pdf.addImage(dataUrl, format, 0, 0, w, h);
   }
 
   return pdf.output('blob');
+}
+
+async function appendBookPageToPdf(
+  pdf: InstanceType<typeof jsPDF>,
+  page: BookPage,
+  isFirst: boolean,
+): Promise<void> {
+  const w = page.width;
+  const h = page.height;
+  if (!isFirst) {
+    pdf.addPage([w, h], w >= h ? 'landscape' : 'portrait');
+  }
+  // dataURL base64 변환은 느리고 메모리를 두 배로 씀 → blob URL 이미지 직접 사용
+  const img = await loadImage(page.blobUrl);
+  const format = page.blob.type.includes('png') ? 'PNG' : 'JPEG';
+  pdf.addImage(img, format, 0, 0, w, h);
+}
+
+/** PDF용 SNS 구도 페이지 (큐 우회 — buildStreamingDiaryPdf 가 이미 직렬) */
+async function renderPdfSharePage(entry: DiaryEntry): Promise<BookPage> {
+  const work = (async () => {
+    const paperBlob = await captureDiaryEntryPaperBlob(entry, null, BOOK_PDF_CAPTURE);
+    const stamped = await stampPageByOnImage(paperBlob, {
+      type: BOOK_PDF_CAPTURE.type ?? 'image/jpeg',
+      quality: BOOK_PDF_CAPTURE.quality ?? 0.84,
+    });
+    return pageFromBlob(stamped, entry.title || formatDate(entry.date));
+  })();
+  try {
+    return await withTimeout(
+      work,
+      40_000,
+      '일기 페이지를 만드는 데 시간이 너무 걸려요',
+    );
+  } catch (err) {
+    await Promise.race([
+      work.then(
+        () => undefined,
+        () => undefined,
+      ),
+      new Promise<void>((r) => window.setTimeout(r, 3_000)),
+    ]);
+    throw err;
+  }
+}
+
+/**
+ * 유료 PDF — 표지 + SNS와 같은 구도 일기 페이지 (빠른 캡처).
+ * 한 장 렌더 → PDF에 넣고 즉시 메모리 해제. 다음 장 캡처는 파이프라인.
+ */
+export async function buildStreamingDiaryPdf(
+  entries: DiaryEntry[],
+  options?: {
+    avatarUrl?: string | null;
+    rangeStart?: string;
+    rangeEnd?: string;
+    onProgress?: (current: number, total: number) => void;
+  },
+): Promise<Blob> {
+  if (entries.length === 0) throw new Error('다운로드할 일기가 없어요');
+
+  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+  const total = sorted.length;
+  await drainBookCaptureQueue();
+
+  const fontIds = [...new Set(sorted.map((e) => e.fontId).filter(Boolean))];
+  await Promise.all(
+    fontIds.map((id) => ensureDiaryFontReady(id).catch(() => undefined)),
+  );
+
+  const yieldToMain = () =>
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 0);
+    });
+
+  // 표지는 슬롯 맞추기용 풀캡처 없이 바로 생성 (장당 1회 절약)
+  const cover = await renderCoverBookPage(sorted, {
+    avatarUrl: options?.avatarUrl,
+    rangeStart: options?.rangeStart,
+    rangeEnd: options?.rangeEnd,
+  });
+
+  let coverPage: BookPage | null = cover;
+  const pdf = new jsPDF({
+    orientation: cover.width >= cover.height ? 'landscape' : 'portrait',
+    unit: 'px',
+    format: [cover.width, cover.height],
+    hotfixes: ['px_scaling'],
+  });
+
+  try {
+    await appendBookPageToPdf(pdf, coverPage, true);
+    revokeBookPage(coverPage);
+    coverPage = null;
+
+    // 캡처는 한 장만: 다음 장 캡처 ↔ 현재 장 PDF 삽입을 겹침
+    let page = await renderPdfSharePage(sorted[0]);
+    for (let i = 0; i < sorted.length; i += 1) {
+      options?.onProgress?.(i + 1, total);
+      const nextPromise =
+        i + 1 < sorted.length ? renderPdfSharePage(sorted[i + 1]) : null;
+      try {
+        await appendBookPageToPdf(pdf, page, false);
+      } finally {
+        revokeBookPage(page);
+      }
+      await yieldToMain();
+      if (nextPromise) {
+        page = await nextPromise;
+      }
+    }
+
+    return pdf.output('blob');
+  } finally {
+    if (coverPage) revokeBookPage(coverPage);
+  }
 }
 
 /** 페이지 이미지들로 PDF 생성 */

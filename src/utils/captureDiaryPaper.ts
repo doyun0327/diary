@@ -110,7 +110,13 @@ let fontsReadyOnce: Promise<void> | null = null;
 
 function waitDocumentFonts(): Promise<void> {
   if (!fontsReadyOnce) {
-    fontsReadyOnce = document.fonts?.ready.then(() => undefined) ?? Promise.resolve();
+    const ready = document.fonts?.ready.then(() => undefined) ?? Promise.resolve();
+    fontsReadyOnce = Promise.race([
+      ready,
+      new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 3_000);
+      }),
+    ]);
   }
   return fontsReadyOnce;
 }
@@ -125,11 +131,16 @@ function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
 
   const pending = (async () => {
     try {
-      // 로컬 diary-fonts.css 에서 해당 family @font-face 만 뽑아 data URL 로 심음
-      let css = await fetch('/fonts/diary-fonts.css').then((r) => {
-        if (!r.ok) throw new Error(`font css ${r.status}`);
-        return r.text();
-      });
+      const ctrl = new AbortController();
+      const timer = window.setTimeout(() => ctrl.abort(), 8_000);
+      let css: string;
+      try {
+        const res = await fetch('/fonts/diary-fonts.css', { signal: ctrl.signal });
+        if (!res.ok) throw new Error(`font css ${res.status}`);
+        css = await res.text();
+      } finally {
+        window.clearTimeout(timer);
+      }
 
       const blocks = css.split(/(?=@font-face\s*\{)/);
       const relevant = blocks.filter((block) => {
@@ -149,23 +160,32 @@ function buildEmbeddedFontCss(fontFamily: string): Promise<string> {
           const abs = url.startsWith('http') || url.startsWith('data:')
             ? url
             : new URL(url, window.location.origin).href;
-          const res = await fetch(abs);
-          if (!res.ok) return;
-          const buf = await res.arrayBuffer();
-          const mime =
-            res.headers.get('content-type') ||
-            (url.includes('.woff2')
-              ? 'font/woff2'
-              : url.includes('.woff')
-                ? 'font/woff'
-                : 'font/ttf');
-          const dataUrl = `data:${mime};base64,${arrayBufferToBase64(buf)}`;
-          css = css.split(url).join(dataUrl);
+          const fontCtrl = new AbortController();
+          const fontTimer = window.setTimeout(() => fontCtrl.abort(), 8_000);
+          try {
+            const res = await fetch(abs, { signal: fontCtrl.signal });
+            if (!res.ok) return;
+            const buf = await res.arrayBuffer();
+            const mime =
+              res.headers.get('content-type') ||
+              (url.includes('.woff2')
+                ? 'font/woff2'
+                : url.includes('.woff')
+                  ? 'font/woff'
+                  : 'font/ttf');
+            const dataUrl = `data:${mime};base64,${arrayBufferToBase64(buf)}`;
+            css = css.split(url).join(dataUrl);
+          } catch {
+            // 개별 폰트 실패는 무시
+          } finally {
+            window.clearTimeout(fontTimer);
+          }
         }),
       );
 
       return css;
     } catch {
+      fontCssCache.delete(name);
       return '';
     }
   })();
@@ -184,24 +204,27 @@ export type CapturePaperOptions = {
   paperWidth?: number;
 };
 
-async function waitForImages(root: HTMLElement): Promise<void> {
+async function waitForImages(root: HTMLElement, timeoutMs = 8_000): Promise<void> {
   const imgs = Array.from(root.querySelectorAll('img'));
   await Promise.all(
     imgs.map((img) => {
       if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise<void>((resolve, reject) => {
-        const onLoad = () => {
+      return new Promise<void>((resolve) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
           cleanup();
           resolve();
         };
-        const onError = () => {
-          cleanup();
-          reject(new Error('그림을 불러오지 못했어요'));
-        };
+        const onLoad = () => finish();
+        const onError = () => finish();
         const cleanup = () => {
           img.removeEventListener('load', onLoad);
           img.removeEventListener('error', onError);
+          window.clearTimeout(timer);
         };
+        const timer = window.setTimeout(finish, timeoutMs);
         img.addEventListener('load', onLoad);
         img.addEventListener('error', onError);
       });
@@ -277,12 +300,19 @@ export async function captureDiaryPaperBlob(
   const fontName = primaryFontName(diaryFont);
 
   await materializeImagesInElement(element);
-  await waitForImages(element);
+  await waitForImages(element, 6_000);
   await waitDocumentFonts();
   if (!loadedFontFaces.has(fontName)) {
     try {
-      await document.fonts.load(`400 24px "${fontName}"`);
-      await document.fonts.load(`700 24px "${fontName}"`);
+      await Promise.race([
+        Promise.all([
+          document.fonts.load(`400 24px "${fontName}"`),
+          document.fonts.load(`700 24px "${fontName}"`),
+        ]),
+        new Promise<void>((resolve) => {
+          window.setTimeout(resolve, 2_000);
+        }),
+      ]);
     } catch {
       // 시스템 폰트만 있는 경우 무시
     }
@@ -295,31 +325,39 @@ export async function captureDiaryPaperBlob(
     getComputedStyle(document.documentElement).getPropertyValue('--color-surface').trim() ||
     '#ffffff';
 
-  const blob = await domToBlob(element, {
-    scale: options?.scale ?? 2,
-    ...(options?.type ? { type: options.type } : {}),
-    ...(options?.quality != null ? { quality: options.quality } : {}),
-    backgroundColor,
-    includeStyleProperties: [...CAPTURE_STYLE_PROPS],
-    font: fontCss ? { cssText: fontCss } : undefined,
-    style: {
-      margin: '0',
-      boxShadow: 'none',
-    },
-    onCloneNode: (cloned) => {
-      if (!(cloned instanceof HTMLElement)) return;
-      const walk = (source: Element, clone: Element) => {
-        applyCaptureStyles(source, clone, diaryFont);
-        const sourceChildren = Array.from(source.children);
-        const cloneChildren = Array.from(clone.children);
-        const len = Math.min(sourceChildren.length, cloneChildren.length);
-        for (let i = 0; i < len; i += 1) {
-          walk(sourceChildren[i], cloneChildren[i]);
-        }
-      };
-      walk(element, cloned);
-    },
-  });
+  const blob = await Promise.race([
+    domToBlob(element, {
+      scale: options?.scale ?? 2,
+      ...(options?.type ? { type: options.type } : {}),
+      ...(options?.quality != null ? { quality: options.quality } : {}),
+      backgroundColor,
+      includeStyleProperties: [...CAPTURE_STYLE_PROPS],
+      font: fontCss ? { cssText: fontCss } : undefined,
+      style: {
+        margin: '0',
+        boxShadow: 'none',
+      },
+      onCloneNode: (cloned) => {
+        if (!(cloned instanceof HTMLElement)) return;
+        const walk = (source: Element, clone: Element) => {
+          applyCaptureStyles(source, clone, diaryFont);
+          const sourceChildren = Array.from(source.children);
+          const cloneChildren = Array.from(clone.children);
+          const len = Math.min(sourceChildren.length, cloneChildren.length);
+          for (let i = 0; i < len; i += 1) {
+            walk(sourceChildren[i], cloneChildren[i]);
+          }
+        };
+        walk(element, cloned);
+      },
+    }),
+    new Promise<Blob>((_, reject) => {
+      window.setTimeout(
+        () => reject(new Error('일기 화면 캡처 시간이 초과됐어요')),
+        20_000,
+      );
+    }),
+  ]);
 
   if (!blob) throw new Error('이미지를 만들지 못했어요');
   return blob;

@@ -4,7 +4,10 @@ import { useLottie } from 'lottie-react';
 import type { DiaryEntry } from '../types/diary';
 import { exportPdfFilename } from '../utils/dateRange';
 import {
-  buildPdfFromBookPages,
+  BOOK_PREVIEW_CAPTURE,
+  BOOK_PREVIEW_SIZE,
+  buildStreamingDiaryPdf,
+  drainBookCaptureQueue,
   renderCoverBookPage,
   renderEntryBookPage,
   revokeBookPage,
@@ -68,6 +71,10 @@ function DiaryBookViewer({
   const [index, setIndex] = useState(0);
   const [flip, setFlip] = useState<'none' | 'next' | 'prev'>('none');
   const [downloading, setDownloading] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
   const [pdfLottiePool, setPdfLottiePool] = useState<object[]>([]);
   const [pdfLottie, setPdfLottie] = useState<object | null>(null);
   const [pdfLottieKey, setPdfLottieKey] = useState(0);
@@ -76,8 +83,28 @@ function DiaryBookViewer({
   const pagesRef = useRef(pages);
   const jobsRef = useRef(new Map<number, Promise<void>>());
   const genRef = useRef(0);
+  const flipLockRef = useRef(false);
+  /** 현재 인덱스 근처만 유지 (멀리 있는 페이지 blob 해제) */
+  const KEEP_RADIUS = 2;
 
   pagesRef.current = pages;
+
+  const pruneDistantPages = useCallback((center: number) => {
+    setPages((prev) => {
+      let changed = false;
+      const next = [...prev];
+      for (let i = 1; i < next.length; i += 1) {
+        if (!next[i]) continue;
+        if (Math.abs(i - center) <= KEEP_RADIUS) continue;
+        revokeBookPage(next[i]!);
+        next[i] = null;
+        pagesRef.current[i] = null;
+        jobsRef.current.delete(i);
+        changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, []);
 
   const ensurePage = useCallback(
     (i: number) => {
@@ -89,7 +116,11 @@ function DiaryBookViewer({
 
       const job = (async () => {
         try {
-          const page = await renderEntryBookPage(sorted[i - 1]);
+          const page = await renderEntryBookPage(
+            sorted[i - 1],
+            BOOK_PREVIEW_CAPTURE,
+            BOOK_PREVIEW_SIZE,
+          );
           if (gen !== genRef.current) {
             revokeBookPage(page);
             return;
@@ -104,6 +135,8 @@ function DiaryBookViewer({
           if (gen === genRef.current) {
             setError(err instanceof Error ? err.message : t('book.err.build'));
           }
+        } finally {
+          jobsRef.current.delete(i);
         }
       })();
 
@@ -144,6 +177,8 @@ function DiaryBookViewer({
         if (gen === genRef.current) {
           setError(err instanceof Error ? err.message : t('book.err.build'));
         }
+      } finally {
+        jobsRef.current.delete(0);
       }
     })();
 
@@ -194,10 +229,18 @@ function DiaryBookViewer({
   }, []);
 
   useEffect(() => {
+    if (downloading) return;
     void ensureCover();
-    void ensurePage(1);
-    if (index > 0) void ensurePage(index);
-  }, [ensureCover, ensurePage, index]);
+    if (index > 0) {
+      void ensurePage(index);
+    } else {
+      void ensurePage(1);
+    }
+    // 앞뒤 미리 준비
+    if (index + 1 < total) void ensurePage(index + 1);
+    if (index > 1) void ensurePage(index - 1);
+    pruneDistantPages(index);
+  }, [downloading, ensureCover, ensurePage, index, pruneDistantPages, total]);
 
   const isCover = index === 0;
   const cover = pages[0];
@@ -219,12 +262,26 @@ function DiaryBookViewer({
   }, [entries, rangeStart, rangeEnd]);
 
   const go = (dir: 'next' | 'prev') => {
-    if (flip !== 'none' || busy) return;
+    if (flip !== 'none' || busy || flipLockRef.current) return;
     if (dir === 'next' && !canNext) return;
     if (dir === 'prev' && !canPrev) return;
     const nextIndex = dir === 'next' ? index + 1 : index - 1;
-    if (nextIndex > 0) void ensurePage(nextIndex);
-    setFlip(dir);
+
+    flipLockRef.current = true;
+    void (async () => {
+      try {
+        if (nextIndex === 0) {
+          await ensureCover();
+          if (!pagesRef.current[0]) return;
+        } else {
+          await ensurePage(nextIndex);
+          if (!pagesRef.current[nextIndex]) return;
+        }
+        setFlip(dir);
+      } finally {
+        flipLockRef.current = false;
+      }
+    })();
   };
 
   const onFlipEnd = () => {
@@ -240,24 +297,37 @@ function DiaryBookViewer({
       return;
     }
     setDownloading(true);
+    const diaryTotal = sorted.length;
+    setPdfProgress({ current: 0, total: diaryTotal });
     setPdfLottie((prev) => pickRandomLottie(pdfLottiePool, prev));
     setPdfLottieKey((key) => key + 1);
     setError(null);
+
     try {
-      await Promise.all([
-        ensureCover(),
-        ...Array.from({ length: total - 1 }, (_, i) => ensurePage(i + 1)),
-      ]);
-      const rest = pagesRef.current.filter((p): p is BookPage => p != null);
-      if (rest.length !== total) {
-        throw new Error(t('book.err.build'));
-      }
-      const blob = await buildPdfFromBookPages(rest);
+      // 미리보기 페이지·캡처를 먼저 비워 PDF와 메모리가 겹치지 않게
+      genRef.current += 1;
+      jobsRef.current.clear();
+      pagesRef.current.forEach((page) => {
+        if (page) revokeBookPage(page);
+      });
+      pagesRef.current = Array.from({ length: total }, () => null);
+      setPages(Array.from({ length: total }, () => null));
+      await drainBookCaptureQueue();
+
+      const blob = await buildStreamingDiaryPdf(sorted, {
+        avatarUrl,
+        rangeStart,
+        rangeEnd,
+        onProgress: (current, progressTotal) => {
+          setPdfProgress({ current, total: progressTotal });
+        },
+      });
       await downloadToDevice(blob, pdfName);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('book.err.build'));
     } finally {
       setDownloading(false);
+      setPdfProgress(null);
     }
   };
 
@@ -376,7 +446,14 @@ function DiaryBookViewer({
           {pdfLottie ? (
             <PdfLoadingLottie key={pdfLottieKey} animationData={pdfLottie} />
           ) : null}
-          <p className="diary-book__pdf-overlay-text">{t('book.saving')}</p>
+          <p className="diary-book__pdf-overlay-text">
+            {pdfProgress
+              ? t('book.savingProgress', {
+                  current: pdfProgress.current,
+                  total: pdfProgress.total,
+                })
+              : t('book.saving')}
+          </p>
         </div>
       )}
     </div>

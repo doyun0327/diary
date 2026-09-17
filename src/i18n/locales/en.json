@@ -946,6 +946,7 @@
     "pdfAria": "Save PDF",
     "pdfTitle": "Save PDF",
     "saving": "Making your PDF…",
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})",
     "building": "Writing your diary…",
     "prevPage": "Previous page",
     "nextPage": "Next page",
