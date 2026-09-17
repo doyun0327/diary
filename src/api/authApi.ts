@@ -1,4 +1,5 @@
 import { apiUrl } from './config';
+import { API_UI_TIMEOUT_MS, fetchWithTimeout } from './fetchTimeout';
 
 export interface AuthUserDto {
   id: string;
@@ -28,11 +29,15 @@ export async function loginWithGoogleIdToken(
     headers.Authorization = `Bearer ${guestAccessToken}`;
   }
 
-  const res = await fetch(apiUrl('/api/auth/google'), {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ idToken }),
-  });
+  const res = await fetchWithTimeout(
+    apiUrl('/api/auth/google'),
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ idToken }),
+    },
+    API_UI_TIMEOUT_MS,
+  );
 
   if (!res.ok) {
     let message = `로그인 실패 (HTTP ${res.status})`;
@@ -53,14 +58,18 @@ export async function loginAsGuest(
   clientId: string,
   nickname: string,
 ): Promise<AuthResponseDto> {
-  const res = await fetch(apiUrl('/api/auth/guest'), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+  const res = await fetchWithTimeout(
+    apiUrl('/api/auth/guest'),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ clientId, nickname }),
     },
-    body: JSON.stringify({ clientId, nickname }),
-  });
+    API_UI_TIMEOUT_MS,
+  );
 
   if (!res.ok) {
     let message = `게스트 로그인 실패 (HTTP ${res.status})`;

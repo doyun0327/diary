@@ -548,6 +548,7 @@ export function useDiary() {
         serverTime: res.serverTime || new Date().toISOString(),
         entryCount: localEntries.length,
         upToDate: !hadDeletes && !hadUploads,
+        pulledCount: 0,
       } satisfies DiarySyncResult;
     }
 
@@ -595,6 +596,7 @@ export function useDiary() {
       serverTime: res.serverTime || new Date().toISOString(),
       entryCount: hydrated.length,
       upToDate: !hadDeletes && !hadUploads && !hadRemoteChanges,
+      pulledCount: (res.entries ?? []).length,
     } satisfies DiarySyncResult;
   }, []);
 

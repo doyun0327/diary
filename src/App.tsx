@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import Header from "./components/Header";
@@ -61,6 +61,7 @@ import {
 } from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
+import { roomsNeedGoogleLogin } from "./utils/roomsAuthGate";
 import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
 import { preloadAiStylePreviews } from "./utils/aiDrawStyles";
@@ -425,6 +426,8 @@ function App() {
   useEffect(() => {
     if (needsProfileSetup) return;
     if (getAccessToken()) return;
+    // Google 로그아웃 직후엔 자동 게스트 세션 만들지 않음 (재로그인 유도)
+    if (roomsNeedGoogleLogin()) return;
     const nick = nickname.trim() || t("common.anonymous");
     void ensureGuestSession(clientId, nick)
       .then(() => prefetchRoomsList())
@@ -455,12 +458,45 @@ function App() {
     ? entries.find((e) => e.id === editingId)
     : undefined;
 
+  const entriesByDate = useMemo(
+    () =>
+      [...entries].sort((a, b) => {
+        const byDate = a.date.localeCompare(b.date);
+        if (byDate !== 0) return byDate;
+        const byCreated = a.createdAt.localeCompare(b.createdAt);
+        if (byCreated !== 0) return byCreated;
+        return a.id.localeCompare(b.id);
+      }),
+    [entries],
+  );
+
+  const detailAdjacent = useMemo(() => {
+    if (!selectedEntry) return { prev: null, next: null };
+    const index = entriesByDate.findIndex((e) => e.id === selectedEntry.id);
+    if (index < 0) return { prev: null, next: null };
+    return {
+      prev: index > 0 ? entriesByDate[index - 1] : null,
+      next: index < entriesByDate.length - 1 ? entriesByDate[index + 1] : null,
+    };
+  }, [entriesByDate, selectedEntry]);
+
   const handleSelect = (id: string) => {
     setSearchOpen(false);
     setSelectedId(id);
     setEditingId(null);
     setPage("detail");
   };
+
+  const handleDetailNavigate = useCallback(
+    (direction: "prev" | "next") => {
+      const target =
+        direction === "prev" ? detailAdjacent.prev : detailAdjacent.next;
+      if (!target) return;
+      setSelectedId(target.id);
+      setSelectedDate(target.date);
+    },
+    [detailAdjacent],
+  );
 
   const handleSearchSelect = (id: string) => {
     handleSelect(id);
@@ -471,6 +507,18 @@ function App() {
   const prevCalendarMonthRef = useRef<string | null>(null);
 
   const viewMonthKey = monthKey(calYear, calMonth);
+
+  /** 공유 피커 — 이전 달 일기 클라우드 pull */
+  const pullMonthDiaries = useCallback(
+    async (month: string) => {
+      const auth = getAuthSession();
+      if (!getAccessToken() || auth?.provider !== "google") return 0;
+      const result = await syncWithCloud(null, { month, pullOnly: true });
+      markSynced(result.serverTime);
+      return result.pulledCount ?? 0;
+    },
+    [syncWithCloud, markSynced],
+  );
 
   /** Google 로그인 중이면 서버와 LWW 동기화 (업·다운로드) */
   const queueCloudSync = useCallback(
@@ -903,7 +951,7 @@ function App() {
     setPage("rooms");
   };
 
-  // 초대 딥링크: URL·Flutter 주입 → (브라우저면 앱/스토어 시도) → 친구방 자동 입장
+  // 초대 딥링크: URL·Flutter 주입 → (브라우저면 앱/스토어만, 웹 입장 차단)
   useEffect(() => {
     const applyInvite = (raw: string | null | undefined) => {
       const code = normalizeInviteCode(raw);
@@ -915,9 +963,12 @@ function App() {
     const fromBoot = captureInviteFromLocation();
     if (fromBoot) {
       if (!isFlutterApp()) {
+        // 웹 브라우저: 앱·스토어로만 보냄 (친구방 웹 자동입장 금지)
+        takePendingRoomInvite();
         tryOpenAppOrStore(fromBoot);
+      } else {
+        applyInvite(fromBoot);
       }
-      applyInvite(fromBoot);
     }
 
     const onInviteEvent = () => {
@@ -1171,10 +1222,15 @@ function App() {
         )}
         {page === "detail" && selectedEntry && (
           <DiaryDetailPage
+            key={selectedEntry.id}
             entry={selectedEntry}
             onBack={() => setPage("home")}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onGoPrevDay={() => handleDetailNavigate("prev")}
+            onGoNextDay={() => handleDetailNavigate("next")}
+            hasPrevDay={detailAdjacent.prev != null}
+            hasNextDay={detailAdjacent.next != null}
             onOpenRooms={() => {
               setActiveRoomId(null);
               setActivePostId(null);
@@ -1218,6 +1274,7 @@ function App() {
             nickname={nickname}
             clientId={clientId}
             ensureGuestSession={ensureGuestSession}
+            onPullMonthDiaries={pullMonthDiaries}
             onBack={() => {
               setActivePostId(null);
               setPage("rooms");
@@ -1265,6 +1322,14 @@ function App() {
               startupSyncQueuedRef.current = true;
             }}
             onClearLocalDiaries={clearLocalDiaries}
+            onCloudSessionEnded={() => {
+              setActiveRoomId(null);
+              setActivePostId(null);
+              if (page === "room" || page === "room-post" || page === "rooms") {
+                setPage("rooms");
+              }
+              setAccountOpen(true);
+            }}
             onClose={() => setAccountOpen(false)}
             onCloudSyncLoadingChange={setCloudSyncLoading}
           />,

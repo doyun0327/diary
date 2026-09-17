@@ -355,7 +355,7 @@
       "copyCode": "Sao chép mã",
       "share": "Chia sẻ",
       "shareTitle": "Lời mời phòng PageBy",
-      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}\n\nNhấn link để vào ngay. Nếu chưa cài app sẽ chuyển đến cửa hàng.",
+      "shareText": "Thử nhật ký vẽ cùng nhau nhé? 🖍️\nMỗi ngày vẽ một trang!\n\nMã mời: {{code}}\n\nLink mời: Chạm vào đây để vào!",
       "enterRoom": "Vào phòng",
       "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
     },

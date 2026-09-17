@@ -19,6 +19,7 @@ import {
   getCachedRoomFeed,
 } from '../utils/roomCache';
 import { prefetchRoomFeed } from '../utils/roomPrefetch';
+import { getAccessToken } from '../hooks/useAuthSession';
 import {
   isRoomPostUnread,
   markRoomPostSeen,
@@ -43,7 +44,13 @@ interface RoomPageProps {
   entries: DiaryEntry[];
   nickname: string;
   clientId: string;
-  ensureGuestSession: (clientId: string, nickname: string) => Promise<unknown>;
+  ensureGuestSession: (
+    clientId: string,
+    nickname: string,
+    opts?: { force?: boolean },
+  ) => Promise<unknown>;
+  /** Google 계정 이전 달 일기 pull (공유 피커용) */
+  onPullMonthDiaries?: (month: string) => Promise<number>;
   onBack: () => void;
   onOpenPost: (postId: string) => void;
 }
@@ -55,6 +62,7 @@ function RoomPage({
   nickname,
   clientId,
   ensureGuestSession,
+  onPullMonthDiaries,
   onBack,
   onOpenPost,
 }: RoomPageProps) {
@@ -168,6 +176,10 @@ function RoomPage({
 
     setError(null);
     try {
+      const nick = nickname.trim();
+      if (nick && clientId.trim() && !getAccessToken()) {
+        await ensureGuestSession(clientId, nick);
+      }
       await prefetchRoomFeed(roomId, {
         page: postsPage,
         size: ROOM_POSTS_PAGE_SIZE,
@@ -184,7 +196,7 @@ function RoomPage({
     } finally {
       setLoading(false);
     }
-  }, [roomId, postsPage, applyFeed, t]);
+  }, [roomId, postsPage, applyFeed, t, nickname, clientId, ensureGuestSession]);
 
   useEffect(() => {
     void refresh();
@@ -403,6 +415,7 @@ function RoomPage({
           nickname={nickname}
           clientId={clientId}
           ensureGuestSession={ensureGuestSession}
+          onPullMonth={onPullMonthDiaries}
           onClose={() => setPickerOpen(false)}
           onShared={() => {
             setToast(t('rooms.shareDiaryDone'));

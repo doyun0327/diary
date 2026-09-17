@@ -31,6 +31,10 @@ export const GOOGLE_REAUTH_EVENT = 'diary-google-reauth';
 
 const TOKEN_EXPIRY_SKEW_MS = 30_000;
 
+/** 동시 ensureGuestSession 호출을 하나로 합침 (허브+App 자동세션 레이스 방지) */
+let guestSessionInflight: Promise<AuthSession> | null = null;
+let guestSessionInflightKey = '';
+
 function notifyAuthChanged() {
   try {
     window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
@@ -286,7 +290,8 @@ export function useAuthSession() {
       opts?: { force?: boolean },
     ) => {
     const nick = nickname.trim();
-    if (!clientId.trim() || !nick) {
+    const deviceId = clientId.trim();
+    if (!deviceId || !nick) {
       throw new Error('닉네임이 필요해요');
     }
     const current = loadSession();
@@ -294,11 +299,10 @@ export function useAuthSession() {
     if (current?.provider === 'google' && isAccessTokenUsable(loadToken())) {
       return current;
     }
-    // 만료된 Google 잔여 세션이면 비우고 게스트로
+    // 만료된 Google 잔여 세션이면 비우고 게스트로 (재로그인 유도 이벤트는 내지 않음)
     if (current?.provider === 'google') {
       saveToken(null);
       saveSession(null);
-      notifyGoogleReauth();
     }
     // 이미 게스트 JWT가 있으면 매번 /auth/guest 호출하지 않음 (닉 변경 시 force)
     const after = loadSession();
@@ -309,13 +313,50 @@ export function useAuthSession() {
     ) {
       return after;
     }
-    const auth = await loginAsGuest(clientId.trim(), nick);
-    const provider = providerFromAuthUser(auth.user.provider);
-    const next = sessionFromAuth(provider, auth, current?.lastSyncedAt ?? null);
-    saveToken(auth.accessToken);
-    saveSession(next);
-    setSession(next);
-    return next;
+
+    const inflightKey = `${deviceId}\0${nick}\0${opts?.force ? '1' : '0'}`;
+    if (guestSessionInflight && guestSessionInflightKey === inflightKey) {
+      return guestSessionInflight;
+    }
+
+    const requestGuest = async () => {
+      const auth = await loginAsGuest(deviceId, nick);
+      if (!auth?.accessToken) {
+        throw new Error('게스트 토큰을 받지 못했어요');
+      }
+      const provider = providerFromAuthUser(auth.user.provider);
+      const next = sessionFromAuth(
+        provider,
+        auth,
+        loadSession()?.lastSyncedAt ?? current?.lastSyncedAt ?? null,
+      );
+      saveToken(auth.accessToken);
+      saveSession(next);
+      setSession(next);
+      return next;
+    };
+
+    const run = (async () => {
+      try {
+        return await requestGuest();
+      } catch {
+        // 동시 호출·순간 네트워크 실패 시 한 번 재시도
+        await new Promise<void>((r) => {
+          window.setTimeout(() => r(), 450);
+        });
+        return await requestGuest();
+      }
+    })();
+
+    guestSessionInflightKey = inflightKey;
+    guestSessionInflight = run.finally(() => {
+      if (guestSessionInflightKey === inflightKey) {
+        guestSessionInflight = null;
+        guestSessionInflightKey = '';
+      }
+    });
+
+    return guestSessionInflight;
   },
   []);
 

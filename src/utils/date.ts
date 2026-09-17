@@ -35,3 +35,14 @@ export function today(): string {
 export function monthKey(year: number, monthIndex: number): string {
   return `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
 }
+
+/** YYYY-MM → 한 달 이전 */
+export function prevMonthKey(ym: string): string {
+  const [y, m] = ym.split('-').map((v) => Number(v));
+  if (!y || !m) {
+    const now = new Date();
+    return monthKey(now.getFullYear(), now.getMonth());
+  }
+  const d = new Date(y, m - 2, 1);
+  return monthKey(d.getFullYear(), d.getMonth());
+}

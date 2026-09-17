@@ -28,6 +28,7 @@ import {
 } from '../utils/assetStickerLocalCache';
 import { getEmojiStickerImageUrl } from '../utils/emojiStickerImage';
 import { STICKER_CATEGORIES, stickerItemValue, type StickerCategoryId } from '../utils/stickers';
+import { trimDrawingToContent } from '../utils/trimDrawingToContent';
 import type { DiaryCanvasState } from '../types/diary';
 import {
   isPremiumActiveNow,
@@ -1249,17 +1250,25 @@ function DrawingCanvas({
           if (!p?.src?.trim()) continue;
           try {
             const safeSrc = await resolveLayerSrc(p.src.trim());
-            const img = await loadHtmlImage(safeSrc);
+            // AI 바깥 여백만 제거 — 위치·크기는 저장값 그대로 (줄어들지 않게)
+            const trimmedSrc = await trimDrawingToContent(safeSrc);
+            const img = await loadHtmlImage(trimmedSrc);
             const id = p.id || createId();
             photoImages.current.set(id, img);
+
+            const width = normalized ? p.width * rect.width : p.width * sx;
+            const height = normalized ? p.height * rect.height : p.height * sy;
+            const x = normalized ? p.x * rect.width : p.x * sx;
+            const y = normalized ? p.y * rect.height : p.y * sy;
+
             nextPhotos.push({
               id,
-              src: safeSrc,
-              x: normalized ? p.x * rect.width : p.x * sx,
-              y: normalized ? p.y * rect.height : p.y * sy,
-              width: normalized ? p.width * rect.width : p.width * sx,
-              height: normalized ? p.height * rect.height : p.height * sy,
-              aspect: p.aspect || img.width / Math.max(1, img.height),
+              src: trimmedSrc,
+              x,
+              y,
+              width,
+              height,
+              aspect: img.width / Math.max(1, img.height),
               rotation: p.rotation || 0,
             });
           } catch (err) {
@@ -1275,7 +1284,8 @@ function DrawingCanvas({
         ) {
           try {
             const safeSrc = await resolveLayerSrc(fallbackSrc.trim());
-            const img = await loadHtmlImage(safeSrc);
+            const trimmedSrc = await trimDrawingToContent(safeSrc);
+            const img = await loadHtmlImage(trimmedSrc);
             const id = createId();
             const aspect = img.width / Math.max(1, img.height);
             let width = rect.width * 0.85;
@@ -1287,7 +1297,7 @@ function DrawingCanvas({
             photoImages.current.set(id, img);
             nextPhotos.push({
               id,
-              src: safeSrc,
+              src: trimmedSrc,
               x: (rect.width - width) / 2,
               y: (rect.height - height) / 2,
               width,
@@ -1324,6 +1334,8 @@ function DrawingCanvas({
           });
         }
         setStickerLayers(nextStickers);
+        setActivePhotoId(null);
+        setActiveStickerId(null);
         setMode('none');
         setColorsOpen(false);
         setFontOpen(false);
@@ -1354,7 +1366,9 @@ function DrawingCanvas({
       setActiveStickerId(null);
       await ensureCanvasLayout();
       const safeSrc = await resolveLayerSrc(src);
-      await addPhotoLayerAsync(safeSrc, 0.85, true);
+      // 수정 진입 등에서 자동 선택하지 않음 — 흰 여백·외곽은 잘라 내용만 레이어로
+      const trimmedSrc = await trimDrawingToContent(safeSrc);
+      await addPhotoLayerAsync(trimmedSrc, 0.85, false);
       } finally {
         suppressDirtyRef.current = false;
       }
@@ -1364,7 +1378,8 @@ function DrawingCanvas({
       await ensureCanvasLayout();
       for (const src of srcs) {
         const safeSrc = await resolveLayerSrc(src);
-        await addPhotoLayerAsync(safeSrc, 0.45, false);
+        const trimmedSrc = await trimDrawingToContent(safeSrc);
+        await addPhotoLayerAsync(trimmedSrc, 0.45, false);
       }
     },
     loadImages: async (srcs: string[]) => {
@@ -1390,7 +1405,8 @@ function DrawingCanvas({
 
       for (let i = 0; i < srcs.length; i++) {
         const safeSrc = await resolveLayerSrc(srcs[i]);
-        const img = await loadHtmlImage(safeSrc);
+        const trimmedSrc = await trimDrawingToContent(safeSrc);
+        const img = await loadHtmlImage(trimmedSrc);
         const aspect = img.width / Math.max(1, img.height);
         let width = rect.width * fit;
         let height = width / aspect;
@@ -1408,7 +1424,16 @@ function DrawingCanvas({
         }
         const id = createId();
         photoImages.current.set(id, img);
-        layers.push({ id, src: safeSrc, x, y, width, height, aspect, rotation: 0 });
+        layers.push({
+          id,
+          src: trimmedSrc,
+          x,
+          y,
+          width,
+          height,
+          aspect,
+          rotation: 0,
+        });
       }
 
       setPhotoLayers(layers);
@@ -1434,7 +1459,8 @@ function DrawingCanvas({
       setActiveStickerId(null);
       await ensureCanvasLayout();
       const safeSrc = await resolveLayerSrc(src);
-      await addPhotoLayerAsync(safeSrc, 0.85, false);
+      const trimmedSrc = await trimDrawingToContent(safeSrc);
+      await addPhotoLayerAsync(trimmedSrc, 0.85, false);
       } finally {
         suppressDirtyRef.current = false;
       }

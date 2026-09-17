@@ -860,9 +860,20 @@ function DiaryWritePage({
       const status = getDiaryAccessState();
       // 월한도 + 추가구매·환영 팩 잔량
       const remaining = Math.max(0, status.monthlyRemaining) + pack;
+      if (remaining > 0) {
+        return {
+          used: Math.max(0, status.monthlyLimit + pack - remaining),
+          limit: status.monthlyLimit + pack,
+        };
+      }
+      // 월 50장 소진 후: 광고로 받는 오늘 1회
+      const adCredits = getAiDrawCredits();
+      if (adCredits > 0) {
+        return { used: 0, limit: adCredits };
+      }
       return {
-        used: Math.max(0, status.monthlyLimit + pack - remaining),
-        limit: status.monthlyLimit + pack,
+        used: getAiDrawsToday(),
+        limit: FREE_DAILY_AI_AD_LIMIT,
       };
     }
     // 무료: 팩 → 설치 무료 1회 → 광고 일일 1
@@ -913,12 +924,16 @@ function DiaryWritePage({
       const ad = getAiDrawCredits();
       if (ad > 0) {
         lines.push({ key: 'ad', n: ad, labelKey: 'quota.breakdownAd' });
-      } else if (!canUseProAiQuota()) {
-        lines.push({
-          key: 'ad-daily',
-          n: Math.max(0, FREE_DAILY_AI_AD_LIMIT - getAiDrawsToday()),
-          labelKey: 'quota.breakdownAd',
-        });
+      } else {
+        const dailyLeft = Math.max(0, FREE_DAILY_AI_AD_LIMIT - getAiDrawsToday());
+        // 무료 회원, 또는 Pro 월한도·팩 소진 후 광고 1회
+        if (dailyLeft > 0 || !canUseProAiQuota()) {
+          lines.push({
+            key: 'ad-daily',
+            n: dailyLeft,
+            labelKey: 'quota.breakdownAd',
+          });
+        }
       }
     }
     return lines;

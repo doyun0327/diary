@@ -355,7 +355,7 @@
       "copyCode": "Copier le code",
       "share": "Partager",
       "shareTitle": "Invitation salon PageBy",
-      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}\n\nOuvre le lien pour rejoindre tout de suite. Sans l’app, tu iras sur le store.",
+      "shareText": "Envie d’essayer un journal illustré ? 🖍️\nDessinons-en un ensemble chaque jour !\n\nCode : {{code}}\n\nLien d’invitation : Appuie ici pour rejoindre !",
       "enterRoom": "Entrer dans le salon",
       "created": "Salon créé !\n\nCode d'invitation : {{code}}\n\nPartagez ce code avec vos amis."
     },

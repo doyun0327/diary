@@ -33,6 +33,10 @@ interface DiaryDetailPageProps {
   onBack: () => void;
   onEdit: () => void;
   onDelete: (id: string) => void;
+  onGoPrevDay?: () => void;
+  onGoNextDay?: () => void;
+  hasPrevDay?: boolean;
+  hasNextDay?: boolean;
   onOpenRooms: () => void;
   onOpenRoom: (roomId: string) => void;
 }
@@ -49,6 +53,10 @@ function DiaryDetailPage({
   onBack,
   onEdit,
   onDelete,
+  onGoPrevDay,
+  onGoNextDay,
+  hasPrevDay = false,
+  hasNextDay = false,
   onOpenRooms,
   onOpenRoom,
 }: DiaryDetailPageProps) {
@@ -71,6 +79,7 @@ function DiaryDetailPage({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const paperRef = useRef<HTMLDivElement>(null);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const knownRoomsRef = useRef(new Map<string, RoomSummary>());
   const shareImagePromiseRef = useRef<Promise<string | undefined> | null>(null);
   const snsBlobPromiseRef = useRef<Promise<Blob> | null>(null);
@@ -101,6 +110,34 @@ function DiaryDetailPage({
   useEffect(() => {
     void ensureDiaryFontReady(entry.fontId);
   }, [entry.fontId]);
+
+  const overlaysBlockingSwipe =
+    shareOpen || moreOpen || confirmDelete || feedback != null;
+
+  const onDaySwipeStart = (clientX: number, clientY: number) => {
+    if (overlaysBlockingSwipe) {
+      swipeStartRef.current = null;
+      return;
+    }
+    swipeStartRef.current = { x: clientX, y: clientY };
+  };
+
+  const onDaySwipeEnd = (clientX: number, clientY: number) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start || overlaysBlockingSwipe) return;
+    const dx = clientX - start.x;
+    const dy = clientY - start.y;
+    if (Math.abs(dx) < 56 || Math.abs(dy) > 110 || Math.abs(dx) <= Math.abs(dy) * 1.15) {
+      return;
+    }
+    // 왼쪽 스와이프 → 다음날, 오른쪽 스와이프 → 이전날
+    if (dx < 0) {
+      if (hasNextDay) onGoNextDay?.();
+    } else if (hasPrevDay) {
+      onGoPrevDay?.();
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -432,7 +469,7 @@ function DiaryDetailPage({
   };
 
   return createPortal(
-    <article className="diary-detail">
+    <article className="diary-detail" data-no-swipe>
       <div className="diary-detail__toolbar">
         <button
           type="button"
@@ -550,7 +587,20 @@ function DiaryDetailPage({
         </div>
       </div>
 
-      <div className="diary-detail__main">
+      <div
+        className="diary-detail__main"
+        onTouchStart={(e) => {
+          if (e.touches.length !== 1) return;
+          onDaySwipeStart(e.touches[0].clientX, e.touches[0].clientY);
+        }}
+        onTouchEnd={(e) => {
+          if (e.changedTouches.length !== 1) return;
+          onDaySwipeEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }}
+        onTouchCancel={() => {
+          swipeStartRef.current = null;
+        }}
+      >
       <div
         className="diary-detail__paper"
         ref={paperRef}

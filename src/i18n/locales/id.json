@@ -355,7 +355,7 @@
       "copyCode": "Salin kode",
       "share": "Bagikan",
       "shareTitle": "Undangan ruang PageBy",
-      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}\n\nKetuk tautan untuk masuk. Jika belum instal, akan ke toko aplikasi.",
+      "shareText": "Mau coba diary bergambar? 🖍️\nAyo gambar satu setiap hari!\n\nKode: {{code}}\n\nTautan undangan: Ketuk di sini untuk masuk!",
       "enterRoom": "Masuk ruang",
       "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
     },

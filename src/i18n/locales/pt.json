@@ -355,7 +355,7 @@
       "copyCode": "Copiar código",
       "share": "Compartilhar",
       "shareTitle": "Convite para sala PageBy",
-      "shareText": "Quer experimentar um diário ilustrado? 🖍️\nVamos desenhar um juntos todo dia!\n\nCódigo: {{code}}\n\nToque no link para entrar. Sem o app, você vai para a loja.",
+      "shareText": "Quer experimentar um diário ilustrado? 🖍️\nVamos desenhar um juntos todo dia!\n\nCódigo: {{code}}\n\nLink do convite: Toque aqui para entrar!",
       "enterRoom": "Entrar na sala",
       "created": "Sala criada!\n\nCódigo de convite: {{code}}\n\nCompartilhe este código com amigos."
     },

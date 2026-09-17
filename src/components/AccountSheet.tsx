@@ -12,6 +12,10 @@ import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAut
 import { isFlutterApp } from '../utils/nativeShare';
 import { invalidateAllRoomCaches } from '../utils/roomCache';
 import {
+  clearRoomsNeedGoogleLogin,
+  markRoomsNeedGoogleLogin,
+} from '../utils/roomsAuthGate';
+import {
   PROFILE_AGE_GROUPS,
   PROFILE_GENDERS,
   type ProfileAgeGroup,
@@ -41,6 +45,8 @@ interface AccountSheetProps {
   onMonthSynced?: (month: string) => void;
   /** Google 로그아웃·탈퇴 시 이 기기 로컬 일기 비우기 */
   onClearLocalDiaries?: () => void;
+  /** Google 세션 종료 후 친구방 UI 초기화(목록·상세 나가기) */
+  onCloudSessionEnded?: () => void;
   onClose: () => void;
   /** Google 로그인 후 일기 동기화 중 전체 화면 로딩 */
   onCloudSyncLoadingChange?: (loading: boolean) => void;
@@ -133,6 +139,7 @@ function AccountSheet({
   syncMonth,
   onMonthSynced,
   onClearLocalDiaries,
+  onCloudSessionEnded,
   onClose,
   onCloudSyncLoadingChange,
 }: AccountSheetProps) {
@@ -219,6 +226,7 @@ function AccountSheet({
     onCloudSyncLoadingChange?.(true);
     try {
       const next = await signInWithGoogleIdToken(idToken);
+      clearRoomsNeedGoogleLogin();
       seedProfileFromAuth(next);
       try {
         const result = await onSyncDiaries(null, { month: syncMonth });
@@ -324,6 +332,7 @@ function AccountSheet({
         const idToken = await signInPromise;
         onCloudSyncLoadingChange?.(true);
         const next = await signInWithGoogleIdToken(idToken);
+        clearRoomsNeedGoogleLogin();
         const name = next.displayName.trim();
         if (name && !nickNow.trim()) {
           onNicknameChange(name);
@@ -426,10 +435,10 @@ function AccountSheet({
       onClearLocalDiaries?.();
       signOut();
       nativeGoogleSignOut();
-      const nick = nickname.trim() || t('common.anonymous');
-      void ensureGuestSession(clientId, nick).catch(() => {
-        // ignore
-      });
+      invalidateAllRoomCaches();
+      // 자동 게스트 전환 금지 — PageBy는 재로그인 유도
+      markRoomsNeedGoogleLogin();
+      onCloudSessionEnded?.();
       setAuthSuccess(t('account.sync.okSignedOut'));
       showToast(t('account.sync.okSignedOut'));
     } catch (err) {
@@ -449,11 +458,11 @@ function AccountSheet({
     try {
       await deleteAccount();
       onClearLocalDiaries?.();
+      invalidateAllRoomCaches();
       setWithdrawOpen(false);
-      const nick = nickname.trim() || t('common.anonymous');
-      void ensureGuestSession(clientId, nick).catch(() => {
-        // ignore
-      });
+      markRoomsNeedGoogleLogin();
+      onCloudSessionEnded?.();
+      showToast(t('account.sync.okSignedOut'));
     } catch {
       // 메시지 UI 없음
     } finally {

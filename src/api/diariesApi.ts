@@ -29,6 +29,8 @@ export interface DiarySyncResult {
   entryCount: number;
   /** 업로드·pull 할 변경 없이 완료 */
   upToDate: boolean;
+  /** pull 응답에 포함된 일기 수 (월 단위 pull 시 해당 월) */
+  pulledCount?: number;
 }
 
 function authHeaders(accessToken: string): HeadersInit {

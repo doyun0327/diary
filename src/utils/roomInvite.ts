@@ -107,7 +107,7 @@ export function captureInviteFromLocation(): string | null {
 
 /**
  * 모바일 브라우저에서 앱 실행 시도 → 없으면 스토어.
- * Flutter WebView·데스크톱에서는 호출하지 않음.
+ * 데스크톱은 스토어로 이동. Flutter WebView에서는 호출하지 않음.
  */
 export function tryOpenAppOrStore(inviteCode: string) {
   if (typeof window === 'undefined' || isFlutterApp()) return;
@@ -117,11 +117,15 @@ export function tryOpenAppOrStore(inviteCode: string) {
 
   const ua = navigator.userAgent || '';
   const isMobile = /android|iphone|ipad|ipod|mobile/i.test(ua);
-  if (!isMobile) return;
+  const install = getAppInstallUrl(code);
+
+  if (!isMobile) {
+    window.location.replace(install);
+    return;
+  }
 
   const host = getInviteWebOrigin().replace(/^https?:\/\//, '');
   const path = `join?code=${encodeURIComponent(code)}`;
-  const install = getAppInstallUrl(code);
 
   if (/android/i.test(ua)) {
     // 설치돼 있으면 앱, 없으면 browser_fallback_url(스토어)

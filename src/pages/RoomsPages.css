@@ -412,6 +412,38 @@
   flex-direction: column;
 }
 
+.rooms-sheet__head--diary-picker {
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.rooms-diary-picker__search {
+  display: block;
+  margin: 0 0 10px;
+}
+
+.rooms-diary-picker__search input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--color-text-muted) 28%, transparent);
+  border-radius: 12px;
+  background: #fff;
+  font-family: var(--brand-font);
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  outline: none;
+}
+
+.rooms-diary-picker__search input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.rooms-diary-picker__search input:focus {
+  border-color: color-mix(in srgb, var(--color-accent, #e8a838) 70%, #999);
+}
+
 .rooms-diary-picker__body {
   flex: 1;
   min-height: 0;
@@ -459,8 +491,15 @@
 }
 
 .rooms-diary-picker__checking {
-  margin: 10px 0 0;
+  margin: 0;
   text-align: center;
+}
+
+.rooms-diary-picker__footer {
+  min-height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rooms__btn:disabled,

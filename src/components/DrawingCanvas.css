@@ -47,20 +47,23 @@
 
 .drawing__photo {
   position: absolute;
+  box-sizing: border-box;
   pointer-events: auto;
   touch-action: none;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: none;
   border-radius: 4px;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color 0.15s, box-shadow 0.15s;
 }
 
 .drawing__photo:not(.active):hover {
-  border-color: rgba(232, 168, 56, 0.35);
+  outline-color: rgba(232, 168, 56, 0.35);
 }
 
 .drawing__photo.active {
-  border-color: var(--color-accent);
+  outline-color: var(--color-accent);
   box-shadow: 0 2px 12px rgba(232, 168, 56, 0.25);
   cursor: grab;
 }
@@ -68,7 +71,8 @@
 .drawing__photo img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  /* 수정 진입 시 저장 박스와 잘린 이미지 비율이 달라도 크기 유지 */
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
 }

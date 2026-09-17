@@ -35,6 +35,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   box-sizing: border-box;
   /* 메인: 앱헤더↔달력과 동일 (diary-list padding-top: 10px) */
   /* 하단 여백은 스크롤 영역 안 — Flutter WebView safe-bottom(env 0) 대응 */

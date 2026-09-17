@@ -2,7 +2,11 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { RoomSummary } from "../types/room";
 import * as roomsApi from "../api/roomsApi";
-import { getAccessToken } from "../hooks/useAuthSession";
+import {
+  AUTH_CHANGE_EVENT,
+  getAccessToken,
+  isGoogleSignedIn,
+} from "../hooks/useAuthSession";
 import BackIcon from "../components/BackIcon";
 import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
@@ -33,6 +37,7 @@ import {
   isValidInviteCode,
   normalizeInviteCode,
 } from "../utils/roomInvite";
+import { roomsNeedGoogleLogin } from "../utils/roomsAuthGate";
 import "./RoomsPages.css";
 
 const HUB_PAGE_SIZE = 10;
@@ -43,7 +48,11 @@ interface RoomsHubPageProps {
   avatarUrl: string | null;
   clientId: string;
   userId?: string | null;
-  ensureGuestSession: (clientId: string, nickname: string) => Promise<unknown>;
+  ensureGuestSession: (
+    clientId: string,
+    nickname: string,
+    opts?: { force?: boolean },
+  ) => Promise<unknown>;
   onOpenAccount: () => void;
   onOpenRoom: (roomId: string) => void;
   onBack: () => void;
@@ -96,7 +105,7 @@ function RoomsHubPage({
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => isGoogleSignedIn());
   const [error, setError] = useState<string | null>(null);
   const [unreadTick, setUnreadTick] = useState(0);
   const [sheet, setSheet] = useState<SheetKind>(null);
@@ -121,42 +130,74 @@ function RoomsHubPage({
   const [showCreateCoach, setShowCreateCoach] = useState(
     () => !isRoomCreateCoachSeen(),
   );
+  const [googleSignedIn, setGoogleSignedIn] = useState(() =>
+    isGoogleSignedIn(),
+  );
+  const [needGoogleLogin, setNeedGoogleLogin] = useState(() =>
+    roomsNeedGoogleLogin(),
+  );
+  const refreshSeqRef = useRef(0);
+  const ensureAuthInflightRef = useRef<Promise<void> | null>(null);
+  const roomsRef = useRef(rooms);
+  roomsRef.current = rooms;
 
   const shareReady = canShare(nickname);
   const canShowCreateCoach =
-    showCreateCoach && shareReady && !loading && rooms.length === 0;
+    showCreateCoach &&
+    shareReady &&
+    !loading &&
+    rooms.length === 0 &&
+    !error &&
+    !needGoogleLogin;
 
   const profileAvatar = () =>
     avatarUrl || letterAvatarDataUrl(nickname.trim() || "?");
 
-  const ensureAuth = async () => {
+  const ensureAuth = () => {
     if (!shareReady) {
-      throw new Error(t("rooms.err.needProfile"));
+      return Promise.reject(new Error(t("rooms.err.needProfile")));
     }
-    if (getAccessToken()) return;
-    try {
-      await ensureGuestSession(clientId, nickname.trim());
-    } catch (err) {
-      if (isNetworkError(err)) throw err;
-      throw new Error(t("rooms.err.guestAuth"));
-    }
+    if (getAccessToken()) return Promise.resolve();
+    if (ensureAuthInflightRef.current) return ensureAuthInflightRef.current;
+
+    const run = (async () => {
+      try {
+        await ensureGuestSession(clientId, nickname.trim());
+        if (!getAccessToken()) {
+          await ensureGuestSession(clientId, nickname.trim(), { force: true });
+        }
+        if (!getAccessToken()) {
+          throw new Error(t("rooms.err.guestAuth"));
+        }
+      } catch (err) {
+        if (isNetworkError(err)) throw err;
+        const msg = err instanceof Error ? err.message : "";
+        // 서버/타임아웃 메시지는 그대로 보여 줌 (원인 파악·재시도 유도)
+        if (msg.trim()) throw err;
+        throw new Error(t("rooms.err.guestAuth"));
+      }
+    })().finally(() => {
+      ensureAuthInflightRef.current = null;
+    });
+
+    ensureAuthInflightRef.current = run;
+    return run;
   };
 
   const refresh = async (pageOverride?: number) => {
+    const seq = ++refreshSeqRef.current;
     const targetPage = pageOverride ?? page;
-    const cached = shareReady
-      ? getCachedRoomsList(targetPage, HUB_PAGE_SIZE)
-      : null;
-    if (cached) {
-      setRooms(cached.content);
-      setPage(cached.page);
-      setPageCount(Math.max(1, cached.totalPages));
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
+    // 게스트·빈 목록은 안내 화면을 바로 두고 백그라운드 갱신 (콜드스타트 대기 UX 완화)
+    const blockUi = googleSignedIn || roomsRef.current.length > 0;
+    if (blockUi) setLoading(true);
     setError(null);
+
+    const safetyTimer = window.setTimeout(() => {
+      if (seq === refreshSeqRef.current) {
+        setLoading(false);
+      }
+    }, 12_000);
+
     try {
       if (!shareReady) {
         setRooms([]);
@@ -164,14 +205,39 @@ function RoomsHubPage({
         setPageCount(1);
         return;
       }
-      await ensureAuth();
-      const result = await prefetchRoomsList(targetPage, HUB_PAGE_SIZE);
-      if (result) {
-        setRooms(result.content);
-        setPage(result.page);
-        setPageCount(Math.max(1, result.totalPages));
+
+      // Google 로그아웃 직후·토큰 없음 → 목록 API 호출/게스트 발급 없이 재로그인 안내
+      if (roomsNeedGoogleLogin() && !getAccessToken()) {
+        setNeedGoogleLogin(true);
+        setRooms([]);
+        setPage(0);
+        setPageCount(1);
+        return;
       }
+
+      const cached = getCachedRoomsList(targetPage, HUB_PAGE_SIZE);
+      if (cached) {
+        if (seq !== refreshSeqRef.current) return;
+        setError(null);
+        setRooms(cached.content);
+        setPage(cached.page);
+        setPageCount(Math.max(1, cached.totalPages));
+        return;
+      }
+
+      await ensureAuth();
+      if (seq !== refreshSeqRef.current) return;
+
+      const result = await prefetchRoomsList(targetPage, HUB_PAGE_SIZE);
+      if (seq !== refreshSeqRef.current) return;
+
+      setError(null);
+      setNeedGoogleLogin(roomsNeedGoogleLogin() && !isGoogleSignedIn());
+      setRooms(result?.content ?? []);
+      setPage(result?.page ?? 0);
+      setPageCount(Math.max(1, result?.totalPages ?? 1));
     } catch (err) {
+      if (seq !== refreshSeqRef.current) return;
       setError(
         resolveNetworkErrorTitle(
           err,
@@ -182,7 +248,8 @@ function RoomsHubPage({
       setRooms([]);
       setPageCount(1);
     } finally {
-      setLoading(false);
+      window.clearTimeout(safetyTimer);
+      if (seq === refreshSeqRef.current) setLoading(false);
     }
   };
 
@@ -190,6 +257,29 @@ function RoomsHubPage({
     void refresh(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 프로필 준비될 때 다시 로드
   }, [shareReady, nickname, clientId]);
+
+  // Google 로그아웃 직후에만 목록 비우고 1회 재로드 (게스트 토큰 발급 AUTH는 무시)
+  useEffect(() => {
+    const onAuth = () => {
+      const nextGoogle = isGoogleSignedIn();
+      setNeedGoogleLogin(roomsNeedGoogleLogin() && !nextGoogle);
+      setGoogleSignedIn((prev) => {
+        if (prev && !nextGoogle) {
+          queueMicrotask(() => {
+            setRooms([]);
+            setPage(0);
+            setPageCount(1);
+            setCreatedRoom(null);
+            void refresh(0);
+          });
+        }
+        return nextGoogle;
+      });
+    };
+    window.addEventListener(AUTH_CHANGE_EVENT, onAuth);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, onAuth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount 시 구독
+  }, []);
 
   // 방 목록 피드 최신화 → 친구 새 글 N 배지
   useEffect(() => {
@@ -451,28 +541,21 @@ function RoomsHubPage({
   };
 
   const shareInviteCode = async (code: string) => {
-    const text = t("rooms.alert.shareText", { code });
     const inviteUrl = buildRoomInviteUrl(code);
+    // 안내 문구 + 실제 초대 URL (탭해서 입장)
+    const text = `${t("rooms.alert.shareText", { code })}\n${inviteUrl}`;
 
     const nativeOk = await shareViaNative({
       title: t("rooms.alert.shareTitle"),
       text,
-      url: inviteUrl,
     });
     if (nativeOk) return;
-
-    try {
-      await copyText(text);
-    } catch {
-      // ignore
-    }
 
     try {
       if (typeof navigator.share === "function") {
         await navigator.share({
           title: t("rooms.alert.shareTitle"),
           text,
-          url: inviteUrl,
         });
         return;
       }
@@ -481,7 +564,7 @@ function RoomsHubPage({
     }
 
     try {
-      await copyText(`${text}\n\n${inviteUrl}`);
+      await copyText(text);
     } catch {
       setError(t("rooms.err.copy"));
     }
@@ -664,12 +747,43 @@ function RoomsHubPage({
 
             {!loading && rooms.length === 0 && (
               <div className="rooms__empty rooms__empty--scrap rooms__empty--hub-cta">
-                <p className="rooms__empty-title">{t("rooms.empty")}</p>
+                {error ? (
+                  <>
+                    <p className="rooms__empty-title">{error}</p>
+                    <button
+                      type="button"
+                      className="rooms__btn primary rooms__btn--scrap"
+                      onClick={() => void refresh(0)}
+                    >
+                      {t("rooms.retryList")}
+                    </button>
+                  </>
+                ) : needGoogleLogin ? (
+                  <>
+                    <p className="rooms__empty-title">
+                      {t("rooms.emptyAfterLogout")}
+                    </p>
+                    <p className="rooms__empty-lead">
+                      {t("rooms.emptyLoginLead")}
+                    </p>
+                    <button
+                      type="button"
+                      className="rooms__btn primary rooms__btn--scrap"
+                      onClick={onOpenAccount}
+                    >
+                      {t("rooms.emptyLoginCta")}
+                    </button>
+                  </>
+                ) : (
+                  <p className="rooms__empty-title">{t("rooms.empty")}</p>
+                )}
               </div>
             )}
           </div>
 
-          {!sheet && error && <p className="rooms__error">{error}</p>}
+          {!sheet && error && rooms.length > 0 && (
+            <p className="rooms__error">{error}</p>
+          )}
 
           {loading && <p className="rooms__muted">{t("common.loading")}</p>}
 

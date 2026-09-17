@@ -54,16 +54,24 @@
 
 .coach-bubble__dismiss {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  margin: -2px -2px 0 0;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 50%;
   background: var(--color-bg-muted);
   color: var(--color-text-muted);
-  font-size: 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   line-height: 1;
   cursor: pointer;
+  /* × 글리프가 원 안에서 위로 뜨는 광학적 보정 */
+  padding-top: 3px;
 }
 
 .coach-bubble__dismiss:active {

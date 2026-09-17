@@ -8,6 +8,7 @@ import type {
   RoomSummaryPage,
 } from '../types/room';
 import { apiUrl, isRemoteApi } from './config';
+import { API_UI_TIMEOUT_MS, fetchWithTimeout } from './fetchTimeout';
 import {
   getDevMockRoomPost,
   isMockPagingPost,
@@ -41,8 +42,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const headers = authHeaders(init?.headers);
   let res: Response;
   try {
-    res = await fetch(apiUrl(path), { ...init, headers });
-  } catch {
+    res = await fetchWithTimeout(
+      apiUrl(path),
+      { ...init, headers },
+      API_UI_TIMEOUT_MS,
+    );
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('너무 오래')) {
+      throw err;
+    }
     throw new Error(
       isRemoteApi()
         ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'

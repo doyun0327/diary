@@ -355,7 +355,7 @@
       "copyCode": "複製邀請碼",
       "share": "分享",
       "shareTitle": "PageBy 好友房邀請",
-      "shareText": "要不要一起畫圖日記？ 🖍️\n我們每天畫一張吧！\n\n邀請碼：{{code}}\n\n點開連結即可進入。未安裝 App 會前往安裝頁面。",
+      "shareText": "要不要一起畫圖日記？ 🖍️\n我們每天畫一張吧！\n\n邀請碼：{{code}}\n\n邀請連結：點這裡進入！",
       "enterRoom": "進入房間",
       "created": "房間已創建！\n\n邀請碼：{{code}}\n\n把這個碼分享給朋友吧。"
     },
