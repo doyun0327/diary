@@ -1,5 +1,6 @@
 /** Play / RevenueCat 소모성 — 대시보드에 동일 ID로 등록 필요 */
 export type AiPackProductId =
+  | 'pageby_ai_draw_3'
   | 'pageby_ai_draw_10'
   | 'pageby_ai_draw_20'
   | 'pageby_ai_draw_50';
@@ -8,6 +9,7 @@ export const AI_PACK_PRODUCTS: {
   id: AiPackProductId;
   credits: number;
 }[] = [
+  { id: 'pageby_ai_draw_3', credits: 3 },
   { id: 'pageby_ai_draw_10', credits: 10 },
   { id: 'pageby_ai_draw_20', credits: 20 },
   { id: 'pageby_ai_draw_50', credits: 50 },

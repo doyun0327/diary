@@ -390,15 +390,24 @@ export async function renderEntryBookPage(
   }
 }
 
-/** SNS(인스타 등) 공유 — 일기 paper + 바깥 여백(둥근 테두리 잘림 방지) + @PageBy */
-export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
-  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
-  const paperUrl = URL.createObjectURL(paperBlob);
+/** 이미지에 바깥 여백 + @PageBy 푸터 (SNS 공유·캔버스 다운로드 공통) */
+export async function stampPageByOnImage(
+  source: Blob | string,
+  options?: { type?: string; quality?: number },
+): Promise<Blob> {
+  const type = options?.type ?? 'image/jpeg';
+  const quality = options?.quality ?? 0.92;
+  const objectUrl =
+    typeof source === 'string'
+      ? null
+      : URL.createObjectURL(source);
   try {
-    const img = await loadImage(paperUrl);
+    const img =
+      typeof source === 'string'
+        ? await loadImageSafe(source)
+        : await loadImage(objectUrl!);
     const pw = Math.max(1, img.naturalWidth || img.width);
     const ph = Math.max(1, img.naturalHeight || img.height);
-    // 카톡 등에서 둥근 모서리가 잘리지 않도록 바깥 여백
     const margin = Math.max(28, Math.round(Math.min(pw, ph) * 0.06));
     const footerH = Math.max(32, Math.round(ph * 0.045));
     const canvasW = pw + margin * 2;
@@ -407,7 +416,7 @@ export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
     canvas.width = canvasW;
     canvas.height = canvasH;
     const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('일기장 페이지를 만들 수 없어요');
+    if (!ctx) throw new Error('이미지를 만들 수 없어요');
 
     const outerBg = themeColor('--color-bg', '#f7f6f4');
     ctx.fillStyle = outerBg;
@@ -415,23 +424,26 @@ export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
     ctx.drawImage(img, margin, margin, pw, ph);
 
     const fontSize = Math.max(15, Math.round(pw * 0.036));
-    const padX = margin;
-    // 일기 웹폰트 미로딩 시에도 ASCII 태그가 보이도록 시스템 폰트 사용
     ctx.font = `600 ${fontSize}px system-ui, -apple-system, "Segoe UI", sans-serif`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = themeColor('--color-text-muted', '#6b6b6b');
-    ctx.fillText(
-      '@PageBy',
-      canvasW - padX,
-      margin + ph + footerH / 2,
-    );
+    ctx.fillText('@PageBy', canvasW - margin, margin + ph + footerH / 2);
 
-    const blob = await canvasToBlob(canvas, 'image/jpeg', SNS_CAPTURE.quality);
-    return pageFromBlob(blob, entry.title || formatDate(entry.date));
+    return canvasToBlob(canvas, type, quality);
   } finally {
-    URL.revokeObjectURL(paperUrl);
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
   }
+}
+
+/** SNS(인스타 등) 공유 — 일기 paper + 바깥 여백(둥근 테두리 잘림 방지) + @PageBy */
+export async function renderSnsSharePage(entry: DiaryEntry): Promise<BookPage> {
+  const paperBlob = await captureDiaryEntryPaperBlob(entry, null, SNS_CAPTURE);
+  const stamped = await stampPageByOnImage(paperBlob, {
+    type: SNS_CAPTURE.type,
+    quality: SNS_CAPTURE.quality,
+  });
+  return pageFromBlob(stamped, entry.title || formatDate(entry.date));
 }
 
 /** 표지 + 일기 페이지들 (날짜 오름차순) — PDF 등에서 전부 필요할 때 */

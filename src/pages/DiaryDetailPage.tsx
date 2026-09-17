@@ -14,6 +14,7 @@ import { getCachedRoomsList, invalidateRoomFeed } from '../utils/roomCache';
 import { prefetchRoomsList } from '../utils/roomPrefetch';
 import { isNetworkError, resolveNetworkErrorTitle } from '../utils/networkError';
 import { downloadToDevice } from '../utils/saveBlob';
+import { stampPageByOnImage } from '../utils/diaryBook';
 import { getDiaryImage } from '../utils/diaryImageStore';
 import { getAccessToken, useAuthSession } from '../hooks/useAuthSession';
 import { useClientProfile } from '../hooks/useClientProfile';
@@ -398,22 +399,21 @@ function DiaryDetailPage({
         return;
       }
 
-      let blob: Blob;
+      let sourceBlob: Blob;
       if (raw.startsWith('data:') || raw.startsWith('blob:')) {
         const res = await fetch(raw);
-        blob = await res.blob();
+        sourceBlob = await res.blob();
       } else {
         const res = await fetch(raw, { mode: 'cors', credentials: 'omit' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        blob = await res.blob();
+        sourceBlob = await res.blob();
       }
 
-      const ext = blob.type.includes('png')
-        ? 'png'
-        : blob.type.includes('webp')
-          ? 'webp'
-          : 'jpg';
-      const filename = `diary-${entry.date}-canvas.${ext}`;
+      const blob = await stampPageByOnImage(sourceBlob, {
+        type: 'image/jpeg',
+        quality: 0.92,
+      });
+      const filename = `diary-${entry.date}-canvas.jpg`;
       await downloadToDevice(blob, filename);
     } catch (err) {
       setFeedback({
