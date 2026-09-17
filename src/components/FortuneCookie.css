@@ -49,8 +49,8 @@
   outline: none;
   gap: 0;
   transition:
-    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    gap 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ai-fortune.is-open .ai-fortune__visual {
@@ -74,7 +74,7 @@
   width: calc(var(--cookie-size) / 2);
   height: var(--cookie-size);
   overflow: hidden;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ai-fortune__piece img {
@@ -134,7 +134,7 @@
     0 10px 20px rgba(80, 50, 20, 0.14),
     2px 3px 0 rgba(160, 130, 90, 0.08);
   opacity: 0;
-  animation: ai-fortune-slip-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+  animation: ai-fortune-slip-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* 꾸깃한 주름 하이라이트 */
@@ -294,7 +294,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  animation: ai-loading-fortune-in 0.4s ease both;
+  animation: ai-loading-fortune-in 0.25s ease both;
 }
 
 .diary-write__fortune-layer.is-loading {

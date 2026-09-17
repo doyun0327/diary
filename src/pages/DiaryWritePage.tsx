@@ -344,10 +344,17 @@ function DiaryWritePage({
     [purchaseClickShield],
   );
 
-  const showAiRetryToast = useCallback(() => {
-    setAiError(null);
-    onAppToast?.(t('write.err.aiRetry'));
-  }, [onAppToast, t]);
+  const showAiRetryToast = useCallback(
+    (detail?: string) => {
+      setAiError(null);
+      const text =
+        detail && detail.trim() && !/HTTP\s*\d|Exception|at com\./i.test(detail)
+          ? detail.trim()
+          : t('write.err.aiRetry');
+      onAppToast?.(text);
+    },
+    [onAppToast, t],
+  );
 
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -845,7 +852,7 @@ function DiaryWritePage({
   useEffect(() => {
     if (!aiLoading || aiProgress === 'waiting') return;
     if (fortuneVisible) return;
-    const timer = window.setTimeout(() => setFortuneVisible(true), 2800);
+    const timer = window.setTimeout(() => setFortuneVisible(true), 2000);
     return () => window.clearTimeout(timer);
   }, [aiLoading, aiProgress, fortuneVisible]);
 
@@ -1466,7 +1473,7 @@ function DiaryWritePage({
         setAiPhotoError(t('write.ai.photoTooLarge'));
         onAppToast?.(t('write.ai.photoTooLarge'));
       } else {
-        showAiRetryToast();
+        showAiRetryToast(msg);
       }
     } finally {
       setAiLoading(false);
