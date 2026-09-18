@@ -800,6 +800,8 @@
     "pngTitle": "PNG로 저장",
     "downloadAria": "그림 다운로드",
     "downloadTitle": "캔버스 그림만 저장",
+    "writeNewAria": "이 날짜로 새 일기 쓰기",
+    "writeNewTitle": "같은 날 새 일기",
     "shareAria": "공유하기",
     "moreAria": "더보기",
     "menuCloseAria": "메뉴 닫기",

@@ -799,6 +799,8 @@
     "pngTitle": "Save as PNG",
     "downloadAria": "Download drawing",
     "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day",
     "shareAria": "Share",
     "moreAria": "More",
     "menuCloseAria": "Close menu",

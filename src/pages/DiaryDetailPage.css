@@ -117,6 +117,12 @@
   cursor: wait;
 }
 
+.diary-detail__icon-btn svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
 .diary-detail__more-wrap {
   position: relative;
 }

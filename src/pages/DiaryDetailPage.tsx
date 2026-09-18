@@ -21,6 +21,7 @@ import { useClientProfile } from '../hooks/useClientProfile';
 import MoodIcon from '../components/MoodIcon';
 import DiaryDetailImage from '../components/DiaryDetailImage';
 import BackIcon from '../components/BackIcon';
+import PlusIcon from '../components/PlusIcon';
 import ShareIcon from '../components/ShareIcon';
 import PagePager from '../components/PagePager';
 import AppModal from '../components/AppModal';
@@ -33,6 +34,8 @@ interface DiaryDetailPageProps {
   entry: DiaryEntry;
   onBack: () => void;
   onEdit: () => void;
+  /** 같은 날짜로 새 일기 쓰기 */
+  onWriteNew: () => void;
   onDelete: (id: string) => void;
   onGoPrevDay?: () => void;
   onGoNextDay?: () => void;
@@ -57,6 +60,7 @@ function DiaryDetailPage({
   entry,
   onBack,
   onEdit,
+  onWriteNew,
   onDelete,
   onGoPrevDay,
   onGoNextDay,
@@ -496,6 +500,15 @@ function DiaryDetailPage({
         </button>
 
         <div className="diary-detail__actions">
+          <button
+            type="button"
+            className="diary-detail__icon-btn"
+            onClick={onWriteNew}
+            aria-label={t('detail.writeNewAria')}
+            title={t('detail.writeNewTitle')}
+          >
+            <PlusIcon size={20} strokeWidth={2} />
+          </button>
           {entry.imageUrl ? (
             <button
               type="button"

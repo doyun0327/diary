@@ -1230,6 +1230,9 @@ function App() {
             entry={selectedEntry}
             onBack={() => setPage("home")}
             onEdit={handleEdit}
+            onWriteNew={() => {
+              openWritePage(selectedEntry.date);
+            }}
             onDelete={handleDelete}
             onGoPrevDay={() => handleDetailNavigate("prev")}
             onGoNextDay={() => handleDetailNavigate("next")}
