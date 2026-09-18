@@ -46,7 +46,7 @@ export default function FortuneCookie({
     let i = 0;
     let intervalId = 0;
     const startId = window.setTimeout(() => {
-      const ms = chars.length > 80 ? 38 : 48;
+      const ms = chars.length > 80 ? 62 : 78;
       intervalId = window.setInterval(() => {
         i += 1;
         setTyped(chars.slice(0, i).join(''));

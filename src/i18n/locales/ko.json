@@ -422,7 +422,8 @@
     "sharePrompt": "일기를 공유해볼까요?",
     "emptyNoDiaries": "작성된 일기가 없습니다.",
     "shareDiary": "일기 공유",
-    "shareDiaryDone": "방에 공유했어요",
+    "shareDiaryDone": "{{name}} - 공유했어요!💛",
+    "shareDiaryDoneMany": "공유했어요!💛",
     "pickDiaryTitle": "어떤 일기를 공유할까요?",
     "pickDiaryHint": "{{name}}에 올릴 일기를 골라 주세요",
     "pickDiaryAria": "{{name}}에 공유할 일기 선택",
@@ -553,6 +554,7 @@
       "cta": "내 캐릭터 만들고 첫 그림 그리기"
     },
     "writeFabAria": "일기 쓰기",
+    "writeDayAria": "{{day}}일 일기 쓰기",
     "search": {
       "title": "일기 검색",
       "aria": "일기 검색",
@@ -572,7 +574,8 @@
       "imageAlt": "{{date}} 그림"
     },
     "coach": {
-      "writeFab": "첫 번째 일기를 쓰러 갈까요?"
+      "writeFab": "첫 번째 일기를 쓰러 갈까요?",
+      "writeDay": "빈 날짜를 눌러 일기를 써 보세요!"
     }
   },
   "subscription": {
@@ -595,9 +598,9 @@
   "quota": {
     "fraction": "{{used}}/{{limit}}",
     "drawConfirmTitle": "그림을 그릴까요?",
-    "drawConfirmLead": "남은 횟수 {{n}}회\n그림이 다 그려지면 차감돼요.",
+    "drawConfirmLead": "남은 횟수 {{n}}회\n그림이 완성되면 횟수가 차감돼요.",
     "drawConfirmOk": "그리기",
-    "deductAfterDone": "그림이 다 그려지면 횟수가 차감돼요.",
+    "deductAfterDone": "그림이 완성되면 횟수가 차감돼요.",
     "deductAfterDoneShort": "완성 후 차감",
     "breakdownTitle": "남은 횟수",
     "breakdownAria": "남은 횟수 {{n}}회, 상세 보기",
@@ -786,7 +789,7 @@
     "coach": {
       "character": "나를 정하면 AI가 그 모습으로 그려줘요",
       "click": "클릭해보세요!",
-      "ai": "그림이 완성되면 횟수가 차감돼요"
+      "ai": "그림이 완성되면\n횟수가 차감돼요"
     }
   },
   "detail": {

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import Header from "./components/Header";
-import WriteFab from "./components/WriteFab";
 import CharacterSetup from "./components/CharacterSetup";
 import ProfileSetup from "./components/ProfileSetup";
 import AccountSheet from "./components/AccountSheet";
@@ -191,6 +190,10 @@ function App() {
     string | null
   >(null);
   const calendarHighlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  /** 방 피드에서 방금 공유한 일기 카드 반짝 */
+  const [roomHighlightDiaryId, setRoomHighlightDiaryId] = useState<string | null>(
     null,
   );
   const [accessTick, setAccessTick] = useState(0);
@@ -657,22 +660,25 @@ function App() {
     googleReauthToastShownRef.current = false;
   }, [session?.provider, session?.userId]);
 
-  const pulseCalendarHighlight = useCallback((savedDate: string) => {
-    const [y, m] = savedDate.split("-").map(Number);
-    if (Number.isFinite(y) && Number.isFinite(m)) {
-      setCalYear(y);
-      setCalMonth(m - 1);
-    }
-    setSelectedDate(savedDate);
-    if (calendarHighlightTimerRef.current) {
-      clearTimeout(calendarHighlightTimerRef.current);
-    }
-    setCalendarHighlightDate(savedDate);
-    calendarHighlightTimerRef.current = setTimeout(() => {
-      setCalendarHighlightDate(null);
-      calendarHighlightTimerRef.current = null;
-    }, 1600);
-  }, []);
+  const pulseCalendarHighlight = useCallback(
+    (savedDate: string, durationMs = 1600) => {
+      const [y, m] = savedDate.split("-").map(Number);
+      if (Number.isFinite(y) && Number.isFinite(m)) {
+        setCalYear(y);
+        setCalMonth(m - 1);
+      }
+      setSelectedDate(savedDate);
+      if (calendarHighlightTimerRef.current) {
+        clearTimeout(calendarHighlightTimerRef.current);
+      }
+      setCalendarHighlightDate(savedDate);
+      calendarHighlightTimerRef.current = setTimeout(() => {
+        setCalendarHighlightDate(null);
+        calendarHighlightTimerRef.current = null;
+      }, durationMs);
+    },
+    [],
+  );
 
   const persistNewEntry = useCallback(
     async (entry: Omit<DiaryEntry, "id" | "createdAt" | "updatedAt">) => {
@@ -934,14 +940,11 @@ function App() {
     };
   }, []);
 
-  const openWritePage = () => {
+  const openWritePage = (date?: string) => {
+    if (date) setSelectedDate(date);
     setEditingId(null);
     clearWriteDraft();
     setPage("write");
-  };
-
-  const handleNewWrite = () => {
-    openWritePage();
   };
 
   const openRooms = () => {
@@ -1190,6 +1193,7 @@ function App() {
             <DiaryListPage
               entries={entries}
               onSelect={handleSelect}
+              onWriteDate={openWritePage}
               viewYear={calYear}
               viewMonth={calMonth}
               selectedDate={selectedDate}
@@ -1236,12 +1240,14 @@ function App() {
               setActivePostId(null);
               setPage("rooms");
             }}
-            onOpenRoom={(roomId) => {
+            onOpenRoom={(roomId, opts) => {
               void prefetchRoomFeed(roomId, { force: true });
+              setRoomHighlightDiaryId(opts?.highlightDiaryId ?? null);
               setActiveRoomId(roomId);
               setActivePostId(null);
               setPage("room");
             }}
+            onAppToast={showAppToast}
           />
         )}
         {page === "rooms" && (
@@ -1260,6 +1266,7 @@ function App() {
             }}
             onOpenRoom={(roomId) => {
               void prefetchRoomFeed(roomId, { force: true });
+              setRoomHighlightDiaryId(null);
               setActiveRoomId(roomId);
               setActivePostId(null);
               setPage("room");
@@ -1283,6 +1290,8 @@ function App() {
               setActivePostId(postId);
               setPage("room-post");
             }}
+            highlightDiaryId={roomHighlightDiaryId}
+            onHighlightConsumed={() => setRoomHighlightDiaryId(null)}
           />
         )}
         {page === "room-post" && activeRoomId && activePostId && (
@@ -1297,12 +1306,6 @@ function App() {
           />
         )}
       </main>
-      {page === "home" && (
-        <WriteFab
-          onClick={handleNewWrite}
-          showFirstWriteCoach={entries.length === 0}
-        />
-      )}
       {accountOpen &&
         createPortal(
           <AccountSheet

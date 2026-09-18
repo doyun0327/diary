@@ -4,41 +4,56 @@ import './SubscriptionBenefitsSwipe.css';
 
 const IMAGES = [2, 6, 7, 8] as const;
 
+interface SubscriptionBenefitsSwipeProps {
+  /** 냥 티켓 등 시트용 — 높이 축소 */
+  compact?: boolean;
+}
+
 /** 구독 모달 — Pro 소개 이미지 가로 스와이프 */
-export default function SubscriptionBenefitsSwipe() {
+export default function SubscriptionBenefitsSwipe({
+  compact = false,
+}: SubscriptionBenefitsSwipeProps = {}) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
-  const touchX = useRef<number | null>(null);
+  const startRef = useRef<{ x: number; y: number } | null>(null);
 
   const go = (next: number) => {
     setIndex(Math.max(0, Math.min(IMAGES.length - 1, next)));
   };
 
+  const onSwipeEnd = (x: number, y: number) => {
+    const start = startRef.current;
+    startRef.current = null;
+    if (!start) return;
+    const dx = x - start.x;
+    const dy = y - start.y;
+    // 세로 스크롤 중이면 슬라이드 넘기지 않음 (시트 스크롤과 충돌 방지)
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
+    if (dx < 0) go(index + 1);
+    else go(index - 1);
+  };
+
   return (
-    <div className="sub-benefits">
+    <div className={`sub-benefits${compact ? ' sub-benefits--compact' : ''}`}>
       <div
         className="sub-benefits__viewport"
         onTouchStart={(e) => {
-          touchX.current = e.changedTouches[0]?.clientX ?? null;
+          const t0 = e.changedTouches[0];
+          if (!t0) return;
+          startRef.current = { x: t0.clientX, y: t0.clientY };
         }}
         onTouchEnd={(e) => {
-          if (touchX.current == null) return;
-          const dx = (e.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
-          touchX.current = null;
-          if (dx < -40) go(index + 1);
-          if (dx > 40) go(index - 1);
+          const t0 = e.changedTouches[0];
+          if (!t0) return;
+          onSwipeEnd(t0.clientX, t0.clientY);
         }}
         onPointerDown={(e) => {
           if (e.pointerType === 'touch') return;
-          touchX.current = e.clientX;
+          startRef.current = { x: e.clientX, y: e.clientY };
         }}
         onPointerUp={(e) => {
           if (e.pointerType === 'touch') return;
-          if (touchX.current == null) return;
-          const dx = e.clientX - touchX.current;
-          touchX.current = null;
-          if (dx < -40) go(index + 1);
-          if (dx > 40) go(index - 1);
+          onSwipeEnd(e.clientX, e.clientY);
         }}
       >
         <div

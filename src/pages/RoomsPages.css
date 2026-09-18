@@ -1581,6 +1581,66 @@
   z-index: 0;
 }
 
+/* 방금 공유한 일기 — 캘린더 저장과 같은 테두리 샤라락 */
+@property --rooms-sparkle-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.rooms__gallery-body.just-shared {
+  z-index: 3;
+}
+
+.rooms__gallery-body.just-shared::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: 6;
+  border-radius: 10px;
+  padding: 2px;
+  box-sizing: border-box;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--rooms-sparkle-angle),
+    transparent 0deg,
+    transparent 250deg,
+    rgba(255, 236, 140, 0.25) 285deg,
+    rgba(255, 248, 200, 0.95) 310deg,
+    #fff8c8 325deg,
+    #ffd84a 338deg,
+    rgba(255, 220, 80, 0.55) 350deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 3px rgba(255, 220, 90, 0.75));
+  animation: rooms-just-shared-orbit 1.45s linear forwards;
+}
+
+@keyframes rooms-just-shared-orbit {
+  0% {
+    --rooms-sparkle-angle: 0deg;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    --rooms-sparkle-angle: 360deg;
+    opacity: 0;
+  }
+}
+
 .rooms__gallery-new {
   position: absolute;
   top: 6px;

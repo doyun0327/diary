@@ -87,6 +87,14 @@ function MoodCalendar({
     return map;
   }, [entries, monthPrefix]);
 
+  const datesWithEntry = useMemo(() => {
+    const set = new Set<string>();
+    for (const entry of entries) {
+      if (entry.date.startsWith(monthPrefix)) set.add(entry.date);
+    }
+    return set;
+  }, [entries, monthPrefix]);
+
   const monthThumbUrls = useMemo(() => {
     const urls: string[] = [];
     const seen = new Set<string>();
@@ -164,6 +172,7 @@ function MoodCalendar({
           }
           const dateStr = toDateString(viewYear, viewMonth, day);
           const mark = markByDate.get(dateStr);
+          const hasEntry = datesWithEntry.has(dateStr);
           const sticker = mark?.sticker;
           const imageUrl = mark?.imageUrl;
           const showDrawing =
@@ -186,14 +195,18 @@ function MoodCalendar({
                 'mood-cal__day',
                 showDrawing ? 'has-drawing' : '',
                 showMood ? 'has-mood' : '',
-                !showDrawing && !showMood ? 'is-empty' : '',
+                !hasEntry ? 'is-empty' : '',
                 isToday ? 'today' : '',
                 isSelected ? 'selected' : '',
                 isJustSaved ? 'just-saved' : '',
               ].filter(Boolean).join(' ')}
               aria-pressed={isSelected || undefined}
               onClick={() => onSelectDate?.(dateStr)}
-              aria-label={`${day}${moodLabel ? ` ${moodLabel}` : ''}`}
+              aria-label={
+                hasEntry
+                  ? `${day}${moodLabel ? ` ${moodLabel}` : ''}`
+                  : t('diary.writeDayAria', { day })
+              }
             >
               <span className="mood-cal__day-num">{day}</span>
               <span className="mood-cal__media" aria-hidden>

@@ -422,7 +422,8 @@
     "sharePrompt": "Want to share a diary?",
     "emptyNoDiaries": "No diaries yet.",
     "shareDiary": "Share diary",
-    "shareDiaryDone": "Shared to the room",
+    "shareDiaryDone": "{{name}} - Shared!💛",
+    "shareDiaryDoneMany": "Shared!💛",
     "pickDiaryTitle": "Which diary to share?",
     "pickDiaryHint": "Pick a diary to post in {{name}}",
     "pickDiaryAria": "Pick a diary to share in {{name}}",
@@ -553,6 +554,7 @@
       "cta": "Set my character & draw the first picture"
     },
     "writeFabAria": "Write diary",
+    "writeDayAria": "Write diary for day {{day}}",
     "search": {
       "title": "Search diaries",
       "aria": "Search diaries",
@@ -572,7 +574,8 @@
       "imageAlt": "Drawing for {{date}}"
     },
     "coach": {
-      "writeFab": "Shall we write your first diary?"
+      "writeFab": "Shall we write your first diary?",
+      "writeDay": "Tap an empty day to write!"
     }
   },
   "subscription": {
@@ -785,7 +788,7 @@
     "coach": {
       "character": "Set yourself so AI can draw you",
       "click": "Try tapping!",
-      "ai": "Credits are used after the drawing finishes"
+      "ai": "Credits are used\nafter the drawing finishes"
     }
   },
   "detail": {

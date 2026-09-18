@@ -428,20 +428,20 @@ function Header({
                 </div>
               </li>
             )}
-            {onOpenRooms && (
-              <MenuItem
-                icon={<IconUsers />}
-                label={t('header.rooms')}
-                tone="lavender"
-                onClick={() => closeAnd(onOpenRooms)}
-              />
-            )}
             {onOpenLanguage && (
               <MenuItem
                 icon={<IconGlobe />}
                 label={t('header.language')}
                 tone="mint"
                 onClick={() => closeAnd(onOpenLanguage)}
+              />
+            )}
+            {onOpenRooms && (
+              <MenuItem
+                icon={<IconUsers />}
+                label={t('header.rooms')}
+                tone="lavender"
+                onClick={() => closeAnd(onOpenRooms)}
               />
             )}
             {onOpenNyangTicket && (

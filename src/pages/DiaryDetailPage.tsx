@@ -39,7 +39,11 @@ interface DiaryDetailPageProps {
   hasPrevDay?: boolean;
   hasNextDay?: boolean;
   onOpenRooms: () => void;
-  onOpenRoom: (roomId: string) => void;
+  onOpenRoom: (
+    roomId: string,
+    opts?: { highlightDiaryId?: string },
+  ) => void;
+  onAppToast?: (message: string, durationMs?: number) => void;
 }
 
 type ShareStep = 'menu' | 'rooms';
@@ -60,6 +64,7 @@ function DiaryDetailPage({
   hasNextDay = false,
   onOpenRooms,
   onOpenRoom,
+  onAppToast,
 }: DiaryDetailPageProps) {
   const { t } = useTranslation();
   const { ensureGuestSession } = useAuthSession();
@@ -354,8 +359,18 @@ function DiaryDetailPage({
 
       closeShare({ force: true });
 
+      if (okNames.length === 1) {
+        onAppToast?.(
+          t('rooms.shareDiaryDone', { name: okNames[0] }),
+          2200,
+        );
+      } else if (okNames.length > 1) {
+        onAppToast?.(t('rooms.shareDiaryDoneMany'), 2200);
+      }
+
       if (okRoomIds.length === 1 && failNames.length === 0) {
-        onOpenRoom(okRoomIds[0]);
+        // 한 방만 성공 → 그 방으로 이동 + 공유한 일기 카드 반짝
+        onOpenRoom(okRoomIds[0], { highlightDiaryId: entry.id });
       } else if (okNames.length > 0 && failNames.length === 0) {
         setFeedback({
           kind: 'gotoRooms',

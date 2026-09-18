@@ -59,7 +59,7 @@ interface RoomDiaryPickerSheetProps {
   /** Google 로그인 시 해당 YYYY-MM 일기 pull. 받은 일기 수 */
   onPullMonth?: (month: string) => Promise<number>;
   onClose: () => void;
-  onShared: () => void;
+  onShared: (diaryId: string) => void;
 }
 
 function oldestLocalMonth(entries: DiaryEntry[]): string {
@@ -304,7 +304,7 @@ function RoomDiaryPickerSheet({
       rememberSharedDiaryFont(entry.id, fontId, fontSize);
       invalidateRoomFeed(roomId);
       setSharedIds((prev) => new Set(prev).add(entry.id));
-      onShared();
+      onShared(entry.id);
       onClose();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';

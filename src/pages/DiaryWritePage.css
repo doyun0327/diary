@@ -196,6 +196,13 @@
   margin-bottom: 10px;
   width: 100%;
   overflow: visible;
+  position: relative;
+  z-index: 35;
+}
+
+/* 말풍선 높이만큼 자리 확보 → paper overflow에 안 잘림 */
+.diary-write__section-head:has(.diary-write__coach--ai) {
+  padding-top: 78px;
 }
 
 .diary-write__section-head h2 {
@@ -268,7 +275,7 @@
   border: 1px solid var(--color-border-soft);
   position: relative;
   overflow: visible;
-  z-index: 30;
+  z-index: 40;
 }
 
 .diary-write__ai-draw--pulse {
@@ -340,6 +347,19 @@
   bottom: calc(100% + 10px);
   left: auto;
   top: auto;
+}
+
+/* 두 줄 안내 — 가로로 안 넘치게 */
+.diary-write__coach--ai {
+  z-index: 50;
+  max-width: min(200px, calc(100vw - 40px));
+  width: max-content;
+}
+
+.diary-write__coach--ai .coach-bubble__body p {
+  white-space: pre-line;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 /* 횟수 상세 말풍선 — 가장 긴 줄 너비에 맞춤 */

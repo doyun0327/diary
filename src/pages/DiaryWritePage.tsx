@@ -852,7 +852,7 @@ function DiaryWritePage({
   useEffect(() => {
     if (!aiLoading || aiProgress === 'waiting') return;
     if (fortuneVisible) return;
-    const timer = window.setTimeout(() => setFortuneVisible(true), 2000);
+    const timer = window.setTimeout(() => setFortuneVisible(true), 1500);
     return () => window.clearTimeout(timer);
   }, [aiLoading, aiProgress, fortuneVisible]);
 

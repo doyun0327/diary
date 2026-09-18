@@ -5,7 +5,7 @@
   flex-direction: column;
   gap: 18px;
   padding: 10px 14px 22px;
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
   min-height: 100%;
   background: var(--color-bg);
   font-family: var(--ui-font);
@@ -16,6 +16,20 @@
 .diary-list > * {
   position: relative;
   z-index: 1;
+}
+
+.diary-list__cal-wrap {
+  position: relative;
+  z-index: 2;
+}
+
+.diary-list__cal-coach {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 8px);
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: min(260px, 86vw);
 }
 
 .diary-list--empty {

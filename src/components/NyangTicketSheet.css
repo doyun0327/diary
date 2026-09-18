@@ -1,6 +1,7 @@
 .nyang-ticket__head {
   align-items: flex-start;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .nyang-ticket__head-text {
@@ -21,6 +22,13 @@
   color: var(--color-text-muted);
 }
 
+/* 헤더·탭 고정, 아래 패널만 스크롤 */
+.account-sheet__panel.nyang-ticket {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .nyang-ticket__tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -30,6 +38,10 @@
   border-radius: 14px;
   background: var(--color-bg-muted);
   align-items: stretch;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .nyang-ticket__tabs--3 {
@@ -78,11 +90,17 @@
 }
 
 .nyang-ticket__panel {
-  /* AI 그림충전(lead + 잔여 + 팩 3개) 기준으로 탭 전환 시 높이 고정 */
-  height: 320px;
-  min-height: 320px;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  max-height: none;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.nyang-ticket__benefits {
+  margin: 0 0 14px;
 }
 
 .nyang-ticket__panel-lead {
@@ -247,6 +265,7 @@
 }
 
 .nyang-ticket__msg {
+  flex-shrink: 0;
   margin: 4px 0 0;
   font-size: 0.86rem;
   font-weight: 600;
@@ -256,6 +275,7 @@
 }
 
 .nyang-ticket__err {
+  flex-shrink: 0;
   margin: 4px 0 0;
   font-size: 0.86rem;
   font-weight: 600;

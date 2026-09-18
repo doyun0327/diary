@@ -28,6 +28,7 @@ import {
   setPendingNyangPurchase,
   type PendingNyangPurchase,
 } from '../utils/pendingNyangPurchase';
+import SubscriptionBenefitsSwipe from './SubscriptionBenefitsSwipe';
 import {
   formatSubFallbackPrice,
   SUB_MONTHLY_PRODUCT_ID,
@@ -418,9 +419,29 @@ function NyangTicketSheet({
   };
 
   return (
-    <div className="account-sheet" role="dialog" aria-label={t('nyangTicket.aria')}>
-      <div className="account-sheet__backdrop" onClick={onClose} />
-      <div className="account-sheet__panel nyang-ticket">
+    <div
+      className="account-sheet"
+      role="dialog"
+      aria-label={t('nyangTicket.aria')}
+      data-no-swipe
+    >
+      <div
+        className="account-sheet__backdrop"
+        onPointerDown={(e) => {
+          // 패널에서 시작한 스크롤이 백드롭에서 끝나면 닫히지 않게
+          (e.currentTarget as HTMLElement).dataset.pressOk =
+            e.target === e.currentTarget ? '1' : '0';
+        }}
+        onClick={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if ((e.currentTarget as HTMLElement).dataset.pressOk !== '1') return;
+          onClose();
+        }}
+      />
+      <div
+        className="account-sheet__panel nyang-ticket"
+        onClick={(e) => e.stopPropagation()}
+      >
         <header className="account-sheet__head nyang-ticket__head">
           <div className="nyang-ticket__head-text">
             <h2
@@ -503,6 +524,9 @@ function NyangTicketSheet({
                 </>
               ) : null}
             </p>
+            <div className="nyang-ticket__benefits">
+              <SubscriptionBenefitsSwipe compact />
+            </div>
             <ul className="nyang-ticket__packs">
               {SUB_PRODUCTS.map((plan) => {
                 const price = subPriceLabel(plan.id);

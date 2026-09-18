@@ -53,6 +53,9 @@ interface RoomPageProps {
   onPullMonthDiaries?: (month: string) => Promise<number>;
   onBack: () => void;
   onOpenPost: (postId: string) => void;
+  /** 방금 공유한 일기 — 피드 카드 테두리 반짝 */
+  highlightDiaryId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 function RoomPage({
@@ -65,6 +68,8 @@ function RoomPage({
   onPullMonthDiaries,
   onBack,
   onOpenPost,
+  highlightDiaryId = null,
+  onHighlightConsumed,
 }: RoomPageProps) {
   const { t } = useTranslation();
   const [room, setRoom] = useState<RoomDetail | null>(null);
@@ -81,7 +86,10 @@ function RoomPage({
   const [blockTick, setBlockTick] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [sparkleDiaryId, setSparkleDiaryId] = useState<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
+  const sparkleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sparkleArmedRef = useRef<string | null>(null);
 
   useEffect(() => subscribeBlockedUsers(() => setBlockTick((n) => n + 1)), []);
   useEffect(
@@ -99,6 +107,38 @@ function RoomPage({
     void blockTick;
     return filterHiddenReportedPosts(filterBlockedAuthorId(posts));
   }, [posts, blockTick]);
+
+  useEffect(() => {
+    if (!highlightDiaryId) return;
+    sparkleArmedRef.current = null;
+    setSparkleDiaryId(highlightDiaryId);
+  }, [highlightDiaryId]);
+
+  useEffect(() => {
+    if (!sparkleDiaryId) {
+      sparkleArmedRef.current = null;
+      return;
+    }
+    if (sparkleArmedRef.current === sparkleDiaryId) return;
+    const visible = visibleFeedPosts.some(
+      (p) => p.diaryId?.trim() === sparkleDiaryId,
+    );
+    if (!visible) return;
+    sparkleArmedRef.current = sparkleDiaryId;
+    if (sparkleTimerRef.current) clearTimeout(sparkleTimerRef.current);
+    sparkleTimerRef.current = setTimeout(() => {
+      sparkleTimerRef.current = null;
+      setSparkleDiaryId(null);
+      onHighlightConsumed?.();
+    }, 1600);
+  }, [sparkleDiaryId, visibleFeedPosts, onHighlightConsumed]);
+
+  useEffect(
+    () => () => {
+      if (sparkleTimerRef.current) clearTimeout(sparkleTimerRef.current);
+    },
+    [],
+  );
 
   const postsPageCount = Math.max(1, totalPages);
 
@@ -355,6 +395,9 @@ function RoomPage({
                       const initial = (authorName || '?').slice(0, 1).toUpperCase();
                       const isOwnPost = Boolean(userId && post.authorUserId === userId);
                       const showNew = !isOwnPost && unreadPostIds.has(post.id);
+                      const isJustShared =
+                        Boolean(sparkleDiaryId) &&
+                        post.diaryId?.trim() === sparkleDiaryId;
                       return (
                       <li key={post.id}>
                         <button
@@ -376,7 +419,11 @@ function RoomPage({
                             </span>
                             <span className="rooms__gallery-name">{authorName}</span>
                           </span>
-                          <span className="rooms__gallery-body">
+                          <span
+                            className={`rooms__gallery-body${
+                              isJustShared ? ' just-shared' : ''
+                            }`}
+                          >
                             <RoomDiaryPaper post={post} compact />
                             {showNew ? (
                               <span
@@ -417,9 +464,15 @@ function RoomPage({
           ensureGuestSession={ensureGuestSession}
           onPullMonth={onPullMonthDiaries}
           onClose={() => setPickerOpen(false)}
-          onShared={() => {
-            setToast(t('rooms.shareDiaryDone'));
-            void refresh();
+          onShared={(diaryId) => {
+            setToast(t('rooms.shareDiaryDone', { name: room.name }));
+            sparkleArmedRef.current = null;
+            setSparkleDiaryId(diaryId);
+            if (postsPage === 0) {
+              void refresh();
+            } else {
+              setPostsPage(0);
+            }
           }}
         />
       )}

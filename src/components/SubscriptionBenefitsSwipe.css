@@ -8,7 +8,12 @@
   overflow: hidden;
   border-radius: 14px;
   background: #f7f7f7;
+  /* 세로 스크롤은 부모 시트에, 가로만 여기서 제스처 */
   touch-action: pan-y;
+}
+
+.sub-benefits--compact .sub-benefits__viewport {
+  height: min(38vh, 280px);
 }
 
 .sub-benefits__track {
