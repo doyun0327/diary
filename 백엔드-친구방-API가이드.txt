@@ -214,6 +214,13 @@ Response 200: RoomComment
 - text 공백이면 400
 
 
+(11) 댓글 삭제
+DELETE /api/rooms/{roomId}/posts/{postId}/comments/{commentId}
+Response 204
+- authorUserId != 로그인 사용자면 403
+- 댓글이 없거나 다른 post 소속이면 404
+
+
 ----------------------------------------------------------
 4. 컨트롤러 스케치 (참고)
 ----------------------------------------------------------
@@ -253,6 +260,9 @@ public class RoomController {
 
     @PostMapping("/{roomId}/posts/{postId}/comments")
     public RoomComment createComment(...) { ... }
+
+    @DeleteMapping("/{roomId}/posts/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(...) { ... }
 }
 
 

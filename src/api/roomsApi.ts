@@ -312,6 +312,17 @@ export function createComment(
   });
 }
 
+export function deleteComment(
+  roomId: string,
+  postId: string,
+  commentId: string,
+): Promise<void> {
+  return request<void>(
+    `/api/rooms/${roomId}/posts/${postId}/comments/${commentId}`,
+    { method: 'DELETE' },
+  );
+}
+
 export type UgcReportBody = {
   roomId: string;
   targetUserId: string;

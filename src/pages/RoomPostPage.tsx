@@ -86,6 +86,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [loading, setLoading] = useState(!cachedPost);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
+  const [confirmDeleteCommentId, setConfirmDeleteCommentId] = useState<
+    string | null
+  >(null);
+  const [commentDeleting, setCommentDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [safetyTarget, setSafetyTarget] = useState<SafetyTarget | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -101,6 +106,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentSpacerRef = useRef<HTMLDivElement>(null);
   const commentFocusedRef = useRef(false);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressArmedRef = useRef(false);
   const heightOnFocusRef = useRef(0);
   const syncKeyboardScrollRef = useRef<() => void>(() => {});
 
@@ -308,6 +315,24 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   }, [toast]);
 
   useEffect(() => {
+    if (!commentMenuId) return;
+    const onDown = (e: PointerEvent) => {
+      const menu = commentListRef.current?.querySelector('.rooms__comment-menu');
+      if (menu?.contains(e.target as Node)) return;
+      setCommentMenuId(null);
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [commentMenuId]);
+
+  useEffect(
+    () => () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
     if (post && isUserBlocked(post.authorUserId) && post.authorUserId !== userId) {
       onBack();
       return;
@@ -433,6 +458,46 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     }
   };
 
+  const clearLongPressTimer = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const startCommentLongPress = (commentId: string) => {
+    clearLongPressTimer();
+    longPressArmedRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      longPressArmedRef.current = true;
+      longPressTimerRef.current = null;
+      setCommentMenuId(commentId);
+    }, 480);
+  };
+
+  const endCommentLongPress = () => {
+    clearLongPressTimer();
+  };
+
+  const handleDeleteComment = async () => {
+    const commentId = confirmDeleteCommentId;
+    if (!commentId || commentDeleting) return;
+    setCommentDeleting(true);
+    setError(null);
+    try {
+      if (!commentId.startsWith('temp-')) {
+        await roomsApi.deleteComment(roomId, postId, commentId);
+      }
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      setConfirmDeleteCommentId(null);
+      setCommentMenuId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('rooms.err.delete'));
+    } finally {
+      setCommentDeleting(false);
+    }
+  };
+
   const openSafety = (target: SafetyTarget) => {
     if (!target.userId || target.userId === userId) return;
     setSafetyTarget(target);
@@ -545,7 +610,56 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                     </strong>
                   </div>
                 )}
-                <span className="rooms__comment-bubble">{c.text}</span>
+                <span
+                  className="rooms__comment-bubble"
+                  onPointerDown={
+                    isMine && !sending
+                      ? (e) => {
+                          if (e.button !== 0 && e.pointerType === 'mouse') return;
+                          startCommentLongPress(c.id);
+                        }
+                      : undefined
+                  }
+                  onPointerUp={isMine ? endCommentLongPress : undefined}
+                  onPointerCancel={isMine ? endCommentLongPress : undefined}
+                  onPointerLeave={isMine ? endCommentLongPress : undefined}
+                  onPointerMove={
+                    isMine
+                      ? (e) => {
+                          if (!longPressTimerRef.current) return;
+                          // 살짝만 움직여도 롱프레스 취소
+                          if (Math.abs(e.movementX) + Math.abs(e.movementY) > 6) {
+                            endCommentLongPress();
+                          }
+                        }
+                      : undefined
+                  }
+                  onContextMenu={
+                    isMine && !sending
+                      ? (e) => {
+                          e.preventDefault();
+                          setCommentMenuId(c.id);
+                        }
+                      : undefined
+                  }
+                >
+                  {c.text}
+                </span>
+                {commentMenuId === c.id ? (
+                  <div className="rooms__comment-menu" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="rooms__comment-menu-item rooms__comment-menu-item--danger"
+                      onClick={() => {
+                        setCommentMenuId(null);
+                        setConfirmDeleteCommentId(c.id);
+                      }}
+                    >
+                      {t('common.delete')}
+                    </button>
+                  </div>
+                ) : null}
                 {sending ? (
                   <span className="rooms__comment-status" aria-live="polite">
                     {t('rooms.commentSending')}
@@ -608,6 +722,28 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
           primaryLabel={busy ? t('rooms.deleting') : t('common.delete')}
           onPrimary={() => {
             if (!busy) void handleDelete();
+          }}
+        />
+      )}
+
+      {confirmDeleteCommentId && (
+        <AppModal
+          title={t('rooms.confirm.deleteComment')}
+          onDismiss={() => {
+            if (!commentDeleting) setConfirmDeleteCommentId(null);
+          }}
+          showClose={!commentDeleting}
+          closeAriaLabel={t('common.close')}
+          secondaryLabel={t('common.cancel')}
+          onSecondary={() => {
+            if (!commentDeleting) setConfirmDeleteCommentId(null);
+          }}
+          primaryDanger
+          primaryLabel={
+            commentDeleting ? t('rooms.deleting') : t('common.delete')
+          }
+          onPrimary={() => {
+            if (!commentDeleting) void handleDeleteComment();
           }}
         />
       )}

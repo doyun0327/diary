@@ -1910,6 +1910,7 @@
 }
 
 .rooms__comment--mine {
+  position: relative;
   align-self: flex-end;
   align-items: flex-end;
 }
@@ -1936,6 +1937,8 @@
   background: var(--rooms-comment-bg, var(--color-chat-other));
   color: var(--rooms-comment-fg, var(--color-chat-other-text));
   border: 1px solid var(--rooms-comment-border, var(--color-border-soft));
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .rooms__comment--mine .rooms__comment-bubble {
@@ -1953,6 +1956,43 @@
 .rooms__comment--failed .rooms__comment-bubble {
   opacity: 0.85;
   border-style: dashed;
+}
+
+.rooms__comment-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 5;
+  min-width: 88px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-float);
+}
+
+.rooms__comment-menu-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.rooms__comment-menu-item--danger {
+  color: #c0392b;
+}
+
+.rooms__comment-menu-item:active {
+  background: var(--color-bg-muted);
 }
 
 .rooms__comment-status {

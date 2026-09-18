@@ -462,7 +462,8 @@
       "created": "방이 만들어졌어요!\n\n초대코드: {{code}}\n\n친구에게 이 코드를 알려 주세요."
     },
     "confirm": {
-      "deletePost": "이 공유 일기를 방에서 삭제할까요?"
+      "deletePost": "이 공유 일기를 방에서 삭제할까요?",
+      "deleteComment": "메시지를 삭제할까요?"
     },
     "safety": {
       "moreAria": "차단 · 신고",
