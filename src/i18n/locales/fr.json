@@ -54,7 +54,9 @@
     "screenLock": "Verrouillage",
     "screenLockHint": "Verrouiller par mot de passe",
     "screenLockHintOn": "Activé · toucher pour désactiver",
-    "screenLockHintOff": "Désactivé · toucher pour activer"
+    "screenLockHintOff": "Désactivé · toucher pour activer",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "Décorer",
@@ -111,14 +113,43 @@
       "termsHeading": "Conditions d'utilisation",
       "termsBody": "PageBy est une application de journal personnel. Veuillez respecter les lois applicables lors de l'utilisation du service. Vous êtes responsable de votre compte, de votre pseudo et du contenu de votre journal. Il est interdit de publier ou de partager du contenu portant atteinte aux droits d'autrui. Les fonctionnalités peuvent changer sans préavis.",
       "privacyHeading": "Politique de confidentialité",
-      "privacyBody": "Les entrées de journal, dessins et données de profil peuvent être stockés sur votre appareil, et synchronisés avec le serveur lorsque vous utilisez les salons d'amis. Nous utilisons ces données uniquement pour le stockage, le partage et les fonctionnalités de l'app. Nous ne vendons pas de données personnelles et ne les partageons que lorsque la loi l'exige."
+      "privacyBody": "Les entrées de journal, dessins et données de profil peuvent être stockés sur votre appareil, et synchronisés avec le serveur lorsque vous utilisez les salons d'amis. Nous utilisons ces données uniquement pour le stockage, le partage et les fonctionnalités de l'app. Nous ne vendons pas de données personnelles et ne les partageons que lorsque la loi l'exige.",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "Attribution des ressources",
       "title": "Attribution des ressources",
       "iconsHeading": "Crédits des icônes",
       "libsHeading": "Bibliothèques open source",
-      "note": "Les icônes gratuites Flaticon nécessitent une attribution. Le lien ci-dessus est ce crédit."
+      "note": "Les icônes gratuites Flaticon nécessitent une attribution. Le lien ci-dessus est ce crédit.",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "Sync impossible",
       "sessionExpired": "Session expirée. Reconnectez-vous avec Google",
       "noAccountPhoto": "Ce compte n'a pas de photo",
-      "loadingDiaries": "Chargement de ton journal…"
+      "loadingDiaries": "Chargement de ton journal…",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "Nom enregistré",
       "photoSaved": "Photo de profil enregistrée",
-      "photoRemoved": "Photo de profil supprimée"
+      "photoRemoved": "Photo de profil supprimée",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "Veuillez entrer un nom",
@@ -230,7 +263,10 @@
       "photoRead": "Impossible de lire la photo",
       "photoProcess": "Impossible de traiter la photo",
       "photoLoad": "Impossible de charger la photo"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "Langue",
@@ -263,10 +299,44 @@
     "subscribed": "Abonné",
     "nextRenewal": "Prochain renouvellement {{date}}",
     "historyItemSubscriptionMonthly": "PRO mensuel",
-    "historyItemSubscriptionYearly": "PRO annuel"
+    "historyItemSubscriptionYearly": "PRO annuel",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "Icônes d'humeur : designed by {{author}} from Flaticon"
+    "moodIcons": "Icônes d'humeur : designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "Salons d'amis",
@@ -360,7 +430,8 @@
       "created": "Salon créé !\n\nCode d'invitation : {{code}}\n\nPartagez ce code avec vos amis."
     },
     "confirm": {
-      "deletePost": "Retirer ce journal partagé du salon ?"
+      "deletePost": "Retirer ce journal partagé du salon ?",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "Partager ce journal sur PageBy ?",
     "afterSavePromptLead": "Vous pouvez partager des journaux avec des amis !",
     "afterSavePromptOk": "Aller à PageBy",
-    "afterSavePromptLater": "Plus tard"
+    "afterSavePromptLater": "Plus tard",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "Entrez un nom",
     "errNeedPhoto": "Ajoutez une photo de profil",
     "errImage": "Fichiers image uniquement",
-    "errPhoto": "Impossible de traiter la photo"
+    "errPhoto": "Impossible de traiter la photo",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "Dessin du {{date}}"
     },
     "coach": {
-      "writeFab": "On écrit ton premier journal ?"
-    }
+      "writeFab": "On écrit ton premier journal ?",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "Limite de journaux",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "Dessiner",
     "deductAfterDone": "Déduit seulement quand le dessin est terminé.",
     "deductAfterDoneShort": "Après fin",
-    "breakdownInstallFree": "{{n}} : First free"
+    "breakdownInstallFree": "{{n}} : First free",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "CinémarétroJPst",
           "desc": "Teintes de film rêveuses et vibe anime 90s pour un rendu rétro."
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "Vous avez utilisé les 50 dessins IA de ce mois. Vous pourrez dessiner le mois prochain.",
       "aiMonthlyLimitAdsDone": "Limite du mois et pub du jour épuisées. Réessayez demain.",
       "saveFailed": "Impossible d'enregistrer le journal",
-      "adNotCompletedWrite": "Termine la pub pour enregistrer ce journal"
+      "adNotCompletedWrite": "Termine la pub pour enregistrer ce journal",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "Définis-toi pour que l’IA te dessine",
-      "ai": "Écris, puis laisse l’IA dessiner"
+      "ai": "Écris, puis laisse l’IA dessiner",
+      "click": "Try tapping!"
     },
     "saving": "Enregistrement…",
     "savingPrep": "Préparation du dessin…",
@@ -638,7 +793,8 @@
       "saveTitle": "Regarder une pub pour enregistrer 1 journal",
       "saveLead": "Limite atteinte. Regarde une pub pour enregistrer une entrée de plus.",
       "saveLeadPremium": "Limite mensuelle (50 entrées) atteinte. Regarde une pub pour enregistrer une entrée de plus."
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "Retour",
@@ -658,14 +814,21 @@
       "delete": "Supprimer ce journal ?"
     },
     "ok": {
-      "png": "Enregistré en PNG"
+      "png": "Enregistré en PNG",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "Échec de l'enregistrement PNG",
       "pngBlob": "Impossible de créer le PNG",
       "share": "Échec du partage",
-      "roomsList": "Impossible de charger les salons"
-    }
+      "roomsList": "Impossible de charger les salons",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "Partager",
@@ -733,13 +896,22 @@
     "outfitLabel": "Tenue",
     "gender": {
       "boy": "Garçon",
-      "girl": "Fille"
+      "girl": "Fille",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "Cheveux homme",
       "medium": "Carré femme",
       "curly": "Permanente femme",
-      "bald": "Chauve"
+      "bald": "Chauve",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "Manches courtes",
@@ -801,7 +973,8 @@
       "empty": "Aucun journal à télécharger",
       "page": "Impossible de créer la page",
       "image": "Impossible de charger le dessin"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "Stylo",

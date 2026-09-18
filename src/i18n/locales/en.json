@@ -784,7 +784,8 @@
       "aiAdDailyOnce": "Available once per day.",
       "aiMonthlyLimit": "You've used all 50 AI drawings this month. You can draw again next month.",
       "aiMonthlyLimitAdsDone": "You've used this month's limit and today's ad draw. Try again tomorrow.",
-      "aiFreeLimit": "You've used today's free AI drawing allowance."
+      "aiFreeLimit": "You've used today's free AI drawing allowance.",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "Set yourself so AI can draw you",

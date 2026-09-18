@@ -54,7 +54,9 @@
     "screenLock": "画面ロック",
     "screenLockHint": "パスワードでロック",
     "screenLockHintOn": "オン · タップでオフ",
-    "screenLockHintOff": "オフ · タップでオン"
+    "screenLockHintOff": "オフ · タップでオン",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "カスタム",
@@ -111,14 +113,43 @@
       "termsHeading": "利用規約",
       "termsBody": "PageByは個人の日記アプリです。法令を守り利用してください。アカウント、ニックネーム、日記内容の責任は利用者にあります。他者の権利を侵害する投稿・共有は禁止です。機能は予告なく変更される場合があります。",
       "privacyHeading": "プライバシーポリシー",
-      "privacyBody": "日記、絵、プロフィールは端末に保存され、フレンドルーム利用時はサーバーに同期される場合があります。データは日記の保存・共有・アプリ機能のためにのみ使用します。個人データを販売せず、法令に基づく場合を除き第三者に提供しません。"
+      "privacyBody": "日記、絵、プロフィールは端末に保存され、フレンドルーム利用時はサーバーに同期される場合があります。データは日記の保存・共有・アプリ機能のためにのみ使用します。個人データを販売せず、法令に基づく場合を除き第三者に提供しません。",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "リソース表記",
       "title": "リソース表記",
       "iconsHeading": "アイコンクレジット",
       "libsHeading": "オープンソースライブラリ",
-      "note": "無料のFlaticonアイコンには帰属表示が必要です。上のリンクがそのクレジットです。"
+      "note": "無料のFlaticonアイコンには帰属表示が必要です。上のリンクがそのクレジットです。",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "同期できませんでした",
       "sessionExpired": "ログインの有効期限が切れました。Googleでもう一度ログインしてください",
       "noAccountPhoto": "このアカウントにプロフィール写真がありません",
-      "loadingDiaries": "日記を読み込んでいます"
+      "loadingDiaries": "日記を読み込んでいます",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "ニックネームを保存しました",
       "photoSaved": "プロフィール写真を保存しました",
-      "photoRemoved": "プロフィール写真を削除しました"
+      "photoRemoved": "プロフィール写真を削除しました",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "ニックネームを入力してください",
@@ -230,7 +263,10 @@
       "photoRead": "写真を読み取れませんでした",
       "photoProcess": "写真を処理できませんでした",
       "photoLoad": "写真を読み込めませんでした"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "言語",
@@ -263,10 +299,44 @@
     "subscribed": "加入中",
     "nextRenewal": "次回更新 {{date}}",
     "historyItemSubscriptionMonthly": "PRO 月間",
-    "historyItemSubscriptionYearly": "PRO 年間"
+    "historyItemSubscriptionYearly": "PRO 年間",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "気分アイコン：designed by {{author}} from Flaticon"
+    "moodIcons": "気分アイコン：designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "フレンドルーム",
@@ -360,7 +430,8 @@
       "created": "ルームを作成しました！\n\n招待コード：{{code}}\n\nこのコードを友達に共有してください。"
     },
     "confirm": {
-      "deletePost": "この共有日記をルームから削除しますか？"
+      "deletePost": "この共有日記をルームから削除しますか？",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "この日記をPageByに載せてみますか？",
     "afterSavePromptLead": "友達と日記を共有できます！",
     "afterSavePromptOk": "PageByへ",
-    "afterSavePromptLater": "あとで"
+    "afterSavePromptLater": "あとで",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "名前を入力してください",
     "errNeedPhoto": "プロフィール写真を追加してください",
     "errImage": "画像ファイルのみ",
-    "errPhoto": "写真を処理できませんでした"
+    "errPhoto": "写真を処理できませんでした",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "{{date}} の絵"
     },
     "coach": {
-      "writeFab": "最初の日記を書いてみますか？"
-    }
+      "writeFab": "最初の日記を書いてみますか？",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "日記の作成上限",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "描く",
     "deductAfterDone": "描き終わると回数が減ります。",
     "deductAfterDoneShort": "完成後に消化",
-    "breakdownInstallFree": "{{n}} : 初回無料"
+    "breakdownInstallFree": "{{n}} : 初回無料",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "日本レトロ映画風st",
           "desc": "淡いフィルムの色合いと90年代アニメソウルでレトロに演出します。"
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "今月のAI描画50回を使い切りました。来月また描けます。",
       "aiMonthlyLimitAdsDone": "今月の上限と今日の広告分を使い切りました。明日また試してください。",
       "saveFailed": "日記を保存できませんでした",
-      "adNotCompletedWrite": "広告を最後まで見ると保存できます"
+      "adNotCompletedWrite": "広告を最後まで見ると保存できます",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "自分を決めるとAIがその姿で描きます",
-      "ai": "日記を書いてAIで絵を描いてみよう"
+      "ai": "日記を書いてAIで絵を描いてみよう",
+      "click": "Try tapping!"
     },
     "saving": "保存中…",
     "savingPrep": "絵を準備中…",
@@ -638,7 +793,8 @@
       "saveTitle": "広告を見て日記を1件保存",
       "saveLead": "上限に達しました。広告を見るとあと1件保存できます。",
       "saveLeadPremium": "今月の上限（50件）に達しました。広告を見るとあと1件保存できます。"
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "戻る",
@@ -658,14 +814,21 @@
       "delete": "この日記を削除しますか？"
     },
     "ok": {
-      "png": "PNGとして保存しました"
+      "png": "PNGとして保存しました",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "PNGの保存に失敗しました",
       "pngBlob": "PNGを作成できませんでした",
       "share": "共有に失敗しました",
-      "roomsList": "ルームを読み込めませんでした"
-    }
+      "roomsList": "ルームを読み込めませんでした",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "共有",
@@ -733,13 +896,22 @@
     "outfitLabel": "服装",
     "gender": {
       "boy": "男の子",
-      "girl": "女の子"
+      "girl": "女の子",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "男性の髪",
       "medium": "女性ボブ",
       "curly": "女性パーマ",
-      "bald": "ハゲ"
+      "bald": "ハゲ",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "半袖",
@@ -801,7 +973,8 @@
       "empty": "ダウンロードできる日記がありません",
       "page": "ページを作成できません",
       "image": "絵を読み込めませんでした"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "ペン",

@@ -54,7 +54,9 @@
     "screenLock": "Kunci layar",
     "screenLockHint": "Kunci dengan kata sandi",
     "screenLockHintOn": "Aktif · ketuk untuk mematikan",
-    "screenLockHintOff": "Mati · ketuk untuk mengaktifkan"
+    "screenLockHintOff": "Mati · ketuk untuk mengaktifkan",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "Hias",
@@ -111,14 +113,43 @@
       "termsHeading": "Syarat Layanan",
       "termsBody": "PageBy adalah aplikasi diary pribadi. Harap patuhi hukum yang berlaku saat menggunakan layanan. Anda bertanggung jawab atas akun, nama panggilan, dan isi diary. Dilarang memposting atau membagikan konten yang melanggar hak orang lain. Fitur dapat berubah tanpa pemberitahuan.",
       "privacyHeading": "Kebijakan Privasi",
-      "privacyBody": "Diary, gambar, dan data profil dapat disimpan di perangkat Anda, dan dapat disinkronkan ke server saat memakai ruang teman. Kami memakai data ini hanya untuk penyimpanan diary, berbagi, dan fitur aplikasi. Kami tidak menjual data pribadi, dan tidak membagikannya kecuali diwajibkan hukum."
+      "privacyBody": "Diary, gambar, dan data profil dapat disimpan di perangkat Anda, dan dapat disinkronkan ke server saat memakai ruang teman. Kami memakai data ini hanya untuk penyimpanan diary, berbagi, dan fitur aplikasi. Kami tidak menjual data pribadi, dan tidak membagikannya kecuali diwajibkan hukum.",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "Penyataan sumber daya",
       "title": "Penyataan sumber daya",
       "iconsHeading": "Kredit ikon",
       "libsHeading": "Pustaka open-source",
-      "note": "Ikon Flaticon gratis memerlukan atribusi. Tautan di atas adalah kredit tersebut."
+      "note": "Ikon Flaticon gratis memerlukan atribusi. Tautan di atas adalah kredit tersebut.",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "Gagal sinkron",
       "sessionExpired": "Sesi berakhir. Masuk lagi dengan Google",
       "noAccountPhoto": "Akun ini tidak punya foto profil",
-      "loadingDiaries": "Memuat diary…"
+      "loadingDiaries": "Memuat diary…",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "Nama disimpan",
       "photoSaved": "Foto profil disimpan",
-      "photoRemoved": "Foto profil dihapus"
+      "photoRemoved": "Foto profil dihapus",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "Masukkan nama",
@@ -230,7 +263,10 @@
       "photoRead": "Tidak bisa membaca foto",
       "photoProcess": "Tidak bisa memproses foto",
       "photoLoad": "Tidak bisa memuat foto"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "Bahasa",
@@ -263,10 +299,44 @@
     "subscribed": "Berlangganan",
     "nextRenewal": "Perpanjang berikutnya {{date}}",
     "historyItemSubscriptionMonthly": "PRO bulanan",
-    "historyItemSubscriptionYearly": "PRO tahunan"
+    "historyItemSubscriptionYearly": "PRO tahunan",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "Ikon mood: designed by {{author}} from Flaticon"
+    "moodIcons": "Ikon mood: designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "Ruang teman",
@@ -360,7 +430,8 @@
       "created": "Ruang dibuat!\n\nKode undangan: {{code}}\n\nBagikan kode ini ke teman."
     },
     "confirm": {
-      "deletePost": "Hapus diary bersama ini dari ruang?"
+      "deletePost": "Hapus diary bersama ini dari ruang?",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "Bagikan diary ini di PageBy?",
     "afterSavePromptLead": "Kamu bisa berbagi diary dengan teman!",
     "afterSavePromptOk": "Ke PageBy",
-    "afterSavePromptLater": "Nanti"
+    "afterSavePromptLater": "Nanti",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "Masukkan nama",
     "errNeedPhoto": "Tambahkan foto profil",
     "errImage": "Hanya file gambar",
-    "errPhoto": "Tidak bisa memproses foto"
+    "errPhoto": "Tidak bisa memproses foto",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "Gambar {{date}}"
     },
     "coach": {
-      "writeFab": "Mau tulis diary pertama?"
-    }
+      "writeFab": "Mau tulis diary pertama?",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "Batas diary",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "Gambar",
     "deductAfterDone": "Kuota dipotong setelah gambar selesai.",
     "deductAfterDoneShort": "Setelah selesai",
-    "breakdownInstallFree": "{{n}} : First free"
+    "breakdownInstallFree": "{{n}} : First free",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "FilmretroJPst",
           "desc": "Warna film sayu dan vibe anime 90-an untuk look retro."
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "Kuota 50 gambar AI bulan ini habis. Bisa menggambar lagi bulan depan.",
       "aiMonthlyLimitAdsDone": "Kuota bulanan dan jatah iklan hari ini habis. Coba lagi besok.",
       "saveFailed": "Gagal menyimpan diary",
-      "adNotCompletedWrite": "Selesaikan iklan untuk menyimpan diary ini"
+      "adNotCompletedWrite": "Selesaikan iklan untuk menyimpan diary ini",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "Atur dirimu agar AI menggambarmu",
-      "ai": "Tulis diary, lalu biarkan AI menggambar"
+      "ai": "Tulis diary, lalu biarkan AI menggambar",
+      "click": "Try tapping!"
     },
     "saving": "Menyimpan…",
     "savingPrep": "Menyiapkan gambar…",
@@ -638,7 +793,8 @@
       "saveTitle": "Tonton iklan untuk simpan 1 diary",
       "saveLead": "Batas tercapai. Tonton iklan untuk simpan satu lagi.",
       "saveLeadPremium": "Batas bulanan (50 entri) tercapai. Tonton iklan untuk simpan satu lagi."
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "Kembali",
@@ -658,14 +814,21 @@
       "delete": "Hapus diary ini?"
     },
     "ok": {
-      "png": "Disimpan sebagai PNG"
+      "png": "Disimpan sebagai PNG",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "Gagal menyimpan PNG",
       "pngBlob": "Tidak bisa membuat PNG",
       "share": "Bagikan gagal",
-      "roomsList": "Tidak bisa memuat ruang"
-    }
+      "roomsList": "Tidak bisa memuat ruang",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "Bagikan",
@@ -733,13 +896,22 @@
     "outfitLabel": "Pakaian",
     "gender": {
       "boy": "Anak laki-laki",
-      "girl": "Anak perempuan"
+      "girl": "Anak perempuan",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "Rambut pria",
       "medium": "Bob wanita",
       "curly": "Perm wanita",
-      "bald": "Botak"
+      "bald": "Botak",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "Lengan pendek",
@@ -801,7 +973,8 @@
       "empty": "Tidak ada diary untuk diunduh",
       "page": "Tidak bisa membuat halaman buku",
       "image": "Tidak bisa memuat gambar"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "Pena",

@@ -54,7 +54,9 @@
     "screenLock": "Khóa màn hình",
     "screenLockHint": "Khóa bằng mật khẩu",
     "screenLockHintOn": "Bật · chạm để tắt",
-    "screenLockHintOff": "Tắt · chạm để bật"
+    "screenLockHintOff": "Tắt · chạm để bật",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "Trang trí",
@@ -111,14 +113,43 @@
       "termsHeading": "Điều khoản sử dụng",
       "termsBody": "PageBy là ứng dụng nhật ký cá nhân. Vui lòng tuân thủ luật hiện hành khi dùng dịch vụ. Bạn chịu trách nhiệm về tài khoản, biệt danh và nội dung nhật ký. Không được đăng hoặc chia sẻ nội dung xâm phạm quyền của người khác. Tính năng có thể thay đổi mà không báo trước.",
       "privacyHeading": "Chính sách riêng tư",
-      "privacyBody": "Nhật ký, tranh vẽ và dữ liệu hồ sơ có thể lưu trên thiết bị của bạn, và có thể đồng bộ lên máy chủ khi dùng phòng bạn bè. Chúng tôi chỉ dùng dữ liệu này để lưu nhật ký, chia sẻ và các tính năng của app. Chúng tôi không bán dữ liệu cá nhân và không chia sẻ trừ khi pháp luật yêu cầu."
+      "privacyBody": "Nhật ký, tranh vẽ và dữ liệu hồ sơ có thể lưu trên thiết bị của bạn, và có thể đồng bộ lên máy chủ khi dùng phòng bạn bè. Chúng tôi chỉ dùng dữ liệu này để lưu nhật ký, chia sẻ và các tính năng của app. Chúng tôi không bán dữ liệu cá nhân và không chia sẻ trừ khi pháp luật yêu cầu.",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "Ghi nguồn tài nguyên",
       "title": "Ghi nguồn tài nguyên",
       "iconsHeading": "Ghi công biểu tượng",
       "libsHeading": "Thư viện mã nguồn mở",
-      "note": "Biểu tượng miễn phí Flaticon cần ghi nguồn. Liên kết phía trên chính là ghi công đó."
+      "note": "Biểu tượng miễn phí Flaticon cần ghi nguồn. Liên kết phía trên chính là ghi công đó.",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "Không đồng bộ được",
       "sessionExpired": "Phiên đăng nhập hết hạn. Hãy đăng nhập lại bằng Google",
       "noAccountPhoto": "Tài khoản này không có ảnh đại diện",
-      "loadingDiaries": "Đang tải nhật ký…"
+      "loadingDiaries": "Đang tải nhật ký…",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "Đã lưu tên",
       "photoSaved": "Đã lưu ảnh đại diện",
-      "photoRemoved": "Đã xóa ảnh đại diện"
+      "photoRemoved": "Đã xóa ảnh đại diện",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "Vui lòng nhập tên",
@@ -230,7 +263,10 @@
       "photoRead": "Không đọc được ảnh",
       "photoProcess": "Không xử lý được ảnh",
       "photoLoad": "Không tải được ảnh"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -263,10 +299,44 @@
     "subscribed": "Đang đăng ký",
     "nextRenewal": "Gia hạn tiếp theo {{date}}",
     "historyItemSubscriptionMonthly": "PRO tháng",
-    "historyItemSubscriptionYearly": "PRO năm"
+    "historyItemSubscriptionYearly": "PRO năm",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon"
+    "moodIcons": "Biểu tượng tâm trạng: designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "Phòng bạn bè",
@@ -360,7 +430,8 @@
       "created": "Đã tạo phòng!\n\nMã mời: {{code}}\n\nChia sẻ mã này với bạn bè."
     },
     "confirm": {
-      "deletePost": "Xóa nhật ký đã chia sẻ này khỏi phòng?"
+      "deletePost": "Xóa nhật ký đã chia sẻ này khỏi phòng?",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "Đăng nhật ký này lên PageBy?",
     "afterSavePromptLead": "Bạn có thể chia sẻ nhật ký với bạn bè!",
     "afterSavePromptOk": "Đến PageBy",
-    "afterSavePromptLater": "Để sau"
+    "afterSavePromptLater": "Để sau",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "Vui lòng nhập tên",
     "errNeedPhoto": "Vui lòng thêm ảnh hồ sơ",
     "errImage": "Chỉ tệp ảnh",
-    "errPhoto": "Không xử lý được ảnh"
+    "errPhoto": "Không xử lý được ảnh",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "Tranh ngày {{date}}"
     },
     "coach": {
-      "writeFab": "Viết nhật ký đầu tiên nhé?"
-    }
+      "writeFab": "Viết nhật ký đầu tiên nhé?",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "Giới hạn nhật ký",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "Vẽ",
     "deductAfterDone": "Chỉ trừ lượt khi vẽ xong.",
     "deductAfterDoneShort": "Trừ khi xong",
-    "breakdownInstallFree": "{{n}} : First free"
+    "breakdownInstallFree": "{{n}} : First free",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "PhimretroNhst",
           "desc": "Tone phim mơ màng và vibe anime thập niên 90 mang cảm giác retro."
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "Bạn đã dùng hết 50 lần vẽ AI tháng này. Tháng sau vẽ tiếp được.",
       "aiMonthlyLimitAdsDone": "Đã hết hạn mức tháng và lượt quảng cáo hôm nay. Hãy thử lại ngày mai.",
       "saveFailed": "Không lưu được nhật ký",
-      "adNotCompletedWrite": "Xem hết quảng cáo để lưu nhật ký này"
+      "adNotCompletedWrite": "Xem hết quảng cáo để lưu nhật ký này",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "Chọn nhân vật để AI vẽ đúng bạn",
-      "ai": "Viết nhật ký rồi để AI vẽ nhé"
+      "ai": "Viết nhật ký rồi để AI vẽ nhé",
+      "click": "Try tapping!"
     },
     "saving": "Đang lưu…",
     "savingPrep": "Đang chuẩn bị hình…",
@@ -638,7 +793,8 @@
       "saveTitle": "Xem quảng cáo để lưu 1 nhật ký",
       "saveLead": "Đã đạt giới hạn. Xem quảng cáo để lưu thêm 1 bài.",
       "saveLeadPremium": "Đã đạt giới hạn tháng (50 bài). Xem quảng cáo để lưu thêm 1 bài."
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "Quay lại",
@@ -658,14 +814,21 @@
       "delete": "Xóa nhật ký này?"
     },
     "ok": {
-      "png": "Đã lưu dạng PNG"
+      "png": "Đã lưu dạng PNG",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "Lưu PNG thất bại",
       "pngBlob": "Không tạo được PNG",
       "share": "Chia sẻ thất bại",
-      "roomsList": "Không tải được phòng"
-    }
+      "roomsList": "Không tải được phòng",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "Chia sẻ",
@@ -733,13 +896,22 @@
     "outfitLabel": "Trang phục",
     "gender": {
       "boy": "Nam",
-      "girl": "Nữ"
+      "girl": "Nữ",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "Tóc nam",
       "medium": "Tóc ngắn nữ",
       "curly": "Tóc uốn nữ",
-      "bald": "Hói"
+      "bald": "Hói",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "Áo ngắn tay",
@@ -801,7 +973,8 @@
       "empty": "Không có nhật ký để tải",
       "page": "Không tạo được trang sổ",
       "image": "Không tải được tranh"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "Bút",

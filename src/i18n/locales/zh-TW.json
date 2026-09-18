@@ -54,7 +54,9 @@
     "screenLock": "屏幕鎖定",
     "screenLockHint": "用密碼鎖定",
     "screenLockHintOn": "已開啟 · 點按關閉",
-    "screenLockHintOff": "已關閉 · 點按開啟"
+    "screenLockHintOff": "已關閉 · 點按開啟",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "裝扮",
@@ -111,14 +113,43 @@
       "termsHeading": "服務條款",
       "termsBody": "PageBy 是個人日記應用。請在遵守相關法律法規的前提下使用。您需對自己的賬號、暱稱和日記內容負責。禁止發佈或分享侵犯他人權利的內容。功能可能不經另行通知而變更。",
       "privacyHeading": "隱私政策",
-      "privacyBody": "日記、畫作和資料可能保存在本設備；使用好友房時也可能同步到服務器。我們僅將該數據用於日記存儲、分享與應用功能。我們不會出售個人數據，除依法要求外不會對外提供。"
+      "privacyBody": "日記、畫作和資料可能保存在本設備；使用好友房時也可能同步到服務器。我們僅將該數據用於日記存儲、分享與應用功能。我們不會出售個人數據，除依法要求外不會對外提供。",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "資源標示",
       "title": "資源標示",
       "iconsHeading": "圖標緻謝",
       "libsHeading": "開源庫",
-      "note": "免費的 Flaticon 圖標需註明出處。上方鏈接即為致謝。"
+      "note": "免費的 Flaticon 圖標需註明出處。上方鏈接即為致謝。",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "無法同步",
       "sessionExpired": "登入已過期，請重新使用 Google 登入",
       "noAccountPhoto": "此賬號沒有頭像",
-      "loadingDiaries": "正在載入日記…"
+      "loadingDiaries": "正在載入日記…",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "暱稱已保存",
       "photoSaved": "頭像已保存",
-      "photoRemoved": "頭像已刪除"
+      "photoRemoved": "頭像已刪除",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "請輸入暱稱",
@@ -230,7 +263,10 @@
       "photoRead": "無法讀取照片",
       "photoProcess": "無法處理照片",
       "photoLoad": "無法加載照片"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "語言",
@@ -263,10 +299,44 @@
     "subscribed": "訂閱中",
     "nextRenewal": "下次續訂 {{date}}",
     "historyItemSubscriptionMonthly": "PRO 月訂閱",
-    "historyItemSubscriptionYearly": "PRO 年訂閱"
+    "historyItemSubscriptionYearly": "PRO 年訂閱",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "心情圖標：designed by {{author}} from Flaticon"
+    "moodIcons": "心情圖標：designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "好友房",
@@ -360,7 +430,8 @@
       "created": "房間已創建！\n\n邀請碼：{{code}}\n\n把這個碼分享給朋友吧。"
     },
     "confirm": {
-      "deletePost": "從房間移除此分享日記？"
+      "deletePost": "從房間移除此分享日記？",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "要把這篇日記放到 PageBy 嗎？",
     "afterSavePromptLead": "可以和朋友分享日記！",
     "afterSavePromptOk": "前往 PageBy",
-    "afterSavePromptLater": "以後再說"
+    "afterSavePromptLater": "以後再說",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "請輸入名字",
     "errNeedPhoto": "請新增頭像",
     "errImage": "僅支援圖片檔",
-    "errPhoto": "無法處理照片"
+    "errPhoto": "無法處理照片",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "{{date}} 的畫"
     },
     "coach": {
-      "writeFab": "要去寫第一篇日記嗎？"
-    }
+      "writeFab": "要去寫第一篇日記嗎？",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "日記篇數上限",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "畫",
     "deductAfterDone": "畫完成功後才會扣次。",
     "deductAfterDoneShort": "完成後扣次",
-    "breakdownInstallFree": "{{n}} : First free"
+    "breakdownInstallFree": "{{n}} : First free",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "日系復古電影風st",
           "desc": "用朦朧膠片色調與90年代動畫感，復古地呈現。"
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "本月 50 次 AI 繪畫已用完。下個月可以再畫。",
       "aiMonthlyLimitAdsDone": "本月額度與今日廣告次數都已用完。請明天再試。",
       "saveFailed": "無法儲存日記",
-      "adNotCompletedWrite": "看完廣告才能儲存這篇日記"
+      "adNotCompletedWrite": "看完廣告才能儲存這篇日記",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "設定自己後，AI會按這個樣子畫畫",
-      "ai": "寫好日記後，用AI來畫畫吧"
+      "ai": "寫好日記後，用AI來畫畫吧",
+      "click": "Try tapping!"
     },
     "saving": "儲存中…",
     "savingPrep": "準備圖片中…",
@@ -638,7 +793,8 @@
       "saveTitle": "看廣告以儲存 1 篇日記",
       "saveLead": "已達上限。看廣告可再儲存 1 篇。",
       "saveLeadPremium": "已達本月上限（50 篇）。看廣告可再儲存 1 篇。"
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "返回",
@@ -658,14 +814,21 @@
       "delete": "刪除這篇日記？"
     },
     "ok": {
-      "png": "已保存為 PNG"
+      "png": "已保存為 PNG",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "PNG 保存失敗",
       "pngBlob": "無法創建 PNG",
       "share": "分享失敗",
-      "roomsList": "無法加載房間"
-    }
+      "roomsList": "無法加載房間",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "分享",
@@ -733,13 +896,22 @@
     "outfitLabel": "服裝",
     "gender": {
       "boy": "男孩",
-      "girl": "女孩"
+      "girl": "女孩",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "男士髮型",
       "medium": "女士短髮",
       "curly": "女士燙髮",
-      "bald": "光頭"
+      "bald": "光頭",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "短袖",
@@ -801,7 +973,8 @@
       "empty": "沒有可下載的日記",
       "page": "無法創建書頁",
       "image": "無法加載畫作"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "筆",

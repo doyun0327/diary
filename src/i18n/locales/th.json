@@ -54,7 +54,9 @@
     "screenLock": "ล็อกหน้าจอ",
     "screenLockHint": "ล็อกด้วยรหัสผ่าน",
     "screenLockHintOn": "เปิด · แตะเพื่อปิด",
-    "screenLockHintOff": "ปิด · แตะเพื่อเปิด"
+    "screenLockHintOff": "ปิด · แตะเพื่อเปิด",
+    "nyangTicket": "Nyang Ticket",
+    "nyangTicketHint": "Subscribe · AI top-up"
   },
   "decorate": {
     "title": "ตกแต่ง",
@@ -111,14 +113,43 @@
       "termsHeading": "ข้อกำหนดการให้บริการ",
       "termsBody": "PageBy เป็นแอปไดอารี่ส่วนตัว กรุณาใช้บริการตามกฎหมายที่เกี่ยวข้อง คุณรับผิดชอบบัญชี ชื่อเล่น และเนื้อหาไดอารี่ของตนเอง ห้ามโพสต์หรือแชร์เนื้อหาที่ละเมิดสิทธิ์ของผู้อื่น คุณสมบัติต่าง ๆ อาจเปลี่ยนแปลงโดยไม่แจ้งล่วงหน้า",
       "privacyHeading": "นโยบายความเป็นส่วนตัว",
-      "privacyBody": "รายการไดอารี่ ภาพวาด และข้อมูลโปรไฟล์อาจถูกเก็บไว้ในเครื่องของคุณ และอาจซิงค์กับเซิร์ฟเวอร์เมื่อใช้ห้องเพื่อน เราใช้ข้อมูลนี้เพื่อจัดเก็บไดอารี่ การแชร์ และฟีเจอร์ของแอปเท่านั้น เราไม่ขายข้อมูลส่วนบุคคล และไม่แชร์ยกเว้นเมื่อกฎหมายกำหนด"
+      "privacyBody": "รายการไดอารี่ ภาพวาด และข้อมูลโปรไฟล์อาจถูกเก็บไว้ในเครื่องของคุณ และอาจซิงค์กับเซิร์ฟเวอร์เมื่อใช้ห้องเพื่อน เราใช้ข้อมูลนี้เพื่อจัดเก็บไดอารี่ การแชร์ และฟีเจอร์ของแอปเท่านั้น เราไม่ขายข้อมูลส่วนบุคคล และไม่แชร์ยกเว้นเมื่อกฎหมายกำหนด",
+      "refundHeading": "Refund Policy",
+      "refundBody": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required."
     },
     "licenses": {
       "menu": "การระบุแหล่งที่มา",
       "title": "การระบุแหล่งที่มา",
       "iconsHeading": "เครดิตไอคอน",
       "libsHeading": "ไลบรารีโอเพนซอร์ส",
-      "note": "ไอคอนฟรีจาก Flaticon ต้องระบุแหล่งที่มา ลิงก์ด้านบนคือเครดิตนั้น"
+      "note": "ไอคอนฟรีจาก Flaticon ต้องระบุแหล่งที่มา ลิงก์ด้านบนคือเครดิตนั้น",
+      "usage": {
+        "mood.classic": "Mood · Classic",
+        "mood.cat": "Mood · Cat",
+        "mood.dog": "Mood · Dog",
+        "mood.love": "Mood · Love",
+        "mood.ghost": "Mood · Ghost",
+        "mood.weather": "Mood · Weather",
+        "mood.numbers": "Mood · Number1",
+        "mood.numbers2": "Mood · Number2",
+        "hair": "Character hairstyles",
+        "stickers": "Canvas stickers (illustrations)"
+      }
+    },
+    "churu": {
+      "menu": "Give churu",
+      "title": "Give churu",
+      "lead": "Churu gives me energy!",
+      "thanks": "Thanks! I'll enjoy the churu.",
+      "buying": "Preparing checkout…",
+      "appOnly": "You can give churu in the app",
+      "failed": "Couldn't complete the purchase. Please try again.",
+      "noProduct": "Couldn't find the churu product in the store. Please try again later.",
+      "products": {
+        "one": "1 churu",
+        "three": "3 churu",
+        "box": "Churu box"
+      }
     }
   },
   "theme": {
@@ -216,12 +247,14 @@
       "errSync": "ซิงค์ไม่ได้",
       "sessionExpired": "เซสชันหมดอายุแล้ว กรุณาเข้าสู่ระบบด้วย Google อีกครั้ง",
       "noAccountPhoto": "บัญชีนี้ไม่มีรูปโปรไฟล์",
-      "loadingDiaries": "กำลังโหลดไดอารี่…"
+      "loadingDiaries": "กำลังโหลดไดอารี่…",
+      "okSignedOutRooms": "Signed out. Friend rooms stay with your Google account — sign in again to see them."
     },
     "ok": {
       "nameSaved": "บันทึกชื่อแล้ว",
       "photoSaved": "บันทึกรูปโปรไฟล์แล้ว",
-      "photoRemoved": "ลบรูปโปรไฟล์แล้ว"
+      "photoRemoved": "ลบรูปโปรไฟล์แล้ว",
+      "profileChanged": "Profile updated."
     },
     "err": {
       "nameRequired": "กรุณาใส่ชื่อ",
@@ -230,7 +263,10 @@
       "photoRead": "อ่านรูปไม่ได้",
       "photoProcess": "ประมวลผลรูปไม่ได้",
       "photoLoad": "โหลดรูปไม่ได้"
-    }
+    },
+    "genderLabel": "Gender",
+    "ageLabel": "Age",
+    "demographicsSaved": "Gender and age saved"
   },
   "language": {
     "label": "ภาษา",
@@ -263,10 +299,44 @@
     "subscribed": "สมัครอยู่",
     "nextRenewal": "ต่ออายุถัดไป {{date}}",
     "historyItemSubscriptionMonthly": "PRO รายเดือน",
-    "historyItemSubscriptionYearly": "PRO รายปี"
+    "historyItemSubscriptionYearly": "PRO รายปี",
+    "aria": "Nyang Ticket",
+    "title": "Nyang Ticket",
+    "lead": "Subscribe or top up AI drawings.",
+    "tabsAria": "Nyang Ticket tabs",
+    "subscribeTitle": "Subscription",
+    "subscribeTitleWithLeft": "Subscription ({{n}} left)",
+    "subscribeLead": "Create up to {{n}} drawings every month!",
+    "subscribeCta": "Subscribe to PRO",
+    "subscribeDone": "Subscription started!",
+    "restoreStarted": "Restore requested.",
+    "restoreHint": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+    "packsTitle": "AI drawing packs",
+    "packsTitleWithLeft": "AI drawing packs ({{n}} left)",
+    "packsRemaining": "Left: {{n}}",
+    "packsLead": "Add as many AI drawings as you want.\nNo subscription required.",
+    "buy": "Buy",
+    "packDone": "Purchased {{n}} drawings",
+    "appOnly": "Purchases are available in the app only",
+    "noProduct": "Product not found. Check store setup.",
+    "notConfigured": "Billing isn’t ready. Please restart the app.",
+    "buyTimeout": "No response from the store. Please try again.",
+    "buyFailed": "Purchase failed. Please try again later.",
+    "googleRequired": "Google sign-in is required to purchase",
+    "googleLoginFailed": "Google sign-in failed. Please try again.",
+    "signingIn": "Signing in…",
+    "historyTitle": "History",
+    "historyEmpty": "No purchases yet.",
+    "historyNeedLogin": "Sign in with Google to see purchase history.",
+    "historyLoadFailed": "Couldn't load purchase history.",
+    "historyDone": "Done",
+    "historyItemSubscription": "PRO subscription",
+    "historyItemWelcome": "{{n}} draws (Welcome trial)",
+    "historyItemPack": "{{n}}"
   },
   "credits": {
-    "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon"
+    "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon",
+    "flaticonLine": "{{usage}}: designed by {{author}} from Flaticon"
   },
   "rooms": {
     "title": "ห้องเพื่อน",
@@ -360,7 +430,8 @@
       "created": "สร้างห้องแล้ว!\n\nรหัสเชิญ: {{code}}\n\nแชร์รหัสนี้ให้เพื่อน"
     },
     "confirm": {
-      "deletePost": "ลบไดอารี่ที่แชร์นี้ออกจากห้อง?"
+      "deletePost": "ลบไดอารี่ที่แชร์นี้ออกจากห้อง?",
+      "deleteComment": "Delete this message?"
     },
     "safety": {
       "moreAria": "Block or report",
@@ -429,7 +500,17 @@
     "afterSavePromptTitle": "แชร์ไดอารี่นี้บน PageBy ไหม?",
     "afterSavePromptLead": "แชร์ไดอารี่กับเพื่อนได้!",
     "afterSavePromptOk": "ไปที่ PageBy",
-    "afterSavePromptLater": "ไว้ทีหลัง"
+    "afterSavePromptLater": "ไว้ทีหลัง",
+    "emptyLoginLead": "Sign in with Google to see rooms from your account.",
+    "emptyLoginCta": "Sign in with Google",
+    "emptyAfterLogout": "Signed out",
+    "retryList": "Try again",
+    "shareDiaryDoneMany": "Shared!💛",
+    "pickDiaryEnd": "That's the last diary.",
+    "pickDiarySearchAria": "Search diaries",
+    "pickDiarySearchPlaceholder": "Search title, text, or date",
+    "pickDiarySearchEmpty": "No matching diaries",
+    "pickDiarySearchEnd": "End of search results."
   },
   "profileSetup": {
     "eyebrow": "PageBy",
@@ -443,7 +524,22 @@
     "errName": "กรุณาใส่ชื่อ",
     "errNeedPhoto": "กรุณาเพิ่มรูปโปรไฟล์",
     "errImage": "ไฟล์รูปเท่านั้น",
-    "errPhoto": "ประมวลผลรูปไม่ได้"
+    "errPhoto": "ประมวลผลรูปไม่ได้",
+    "genderLabel": "Gender",
+    "gender": {
+      "female": "Female",
+      "male": "Male"
+    },
+    "ageLabel": "Age",
+    "age": {
+      "child": "Child",
+      "teens": "Teens",
+      "20s": "20s",
+      "30s": "30s",
+      "40plus": "40+"
+    },
+    "errGender": "Please select a gender",
+    "errAge": "Please select an age group"
   },
   "appIntro": {
     "aria": "App introduction",
@@ -479,8 +575,10 @@
       "imageAlt": "ภาพวาดวันที่ {{date}}"
     },
     "coach": {
-      "writeFab": "ไปเขียนไดอารี่แรกกันไหม?"
-    }
+      "writeFab": "ไปเขียนไดอารี่แรกกันไหม?",
+      "writeDay": "Tap an empty day to write!"
+    },
+    "writeDayAria": "Write diary for day {{day}}"
   },
   "subscription": {
     "limitTitle": "จำกัดจำนวนไดอารี่",
@@ -506,7 +604,14 @@
     "drawConfirmOk": "วาด",
     "deductAfterDone": "หักครั้งเมื่อวาดเสร็จแล้วเท่านั้น",
     "deductAfterDoneShort": "หักเมื่อเสร็จ",
-    "breakdownInstallFree": "{{n}} : First free"
+    "breakdownInstallFree": "{{n}} : First free",
+    "breakdownTitle": "Credits left",
+    "breakdownAria": "{{n}} credits left, show details",
+    "breakdownSub": "{{n}} : Sub",
+    "breakdownWelcome": "{{n}} : Welcome",
+    "breakdownPack": "{{n}} : AI pack",
+    "breakdownAd": "{{n}} : Ad",
+    "breakdownEmpty": "No credits left"
   },
   "write": {
     "title": {
@@ -597,6 +702,52 @@
           "name": "ฟิล์มเรโทรญี่ปุ่นst",
           "desc": "โทนฟิล์มละมุนและกลิ่นอายอนิเมะยุค 90 ให้ฟีลเรโทร"
         }
+      },
+      "statusWaiting": "Waiting…",
+      "statusDrawing": "Drawing…",
+      "statusFinishing": "Finishing…",
+      "stepWaiting": "Wait",
+      "stepDrawing": "Draw",
+      "stepFinishing": "Done",
+      "sourceTitle": "How should we draw?",
+      "sourceLead": "Pick a way to create your drawing.",
+      "sourceExampleCaption": "Your diary can turn into a drawing like this",
+      "sourceTutDiaryTitle": "Draw from diary",
+      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
+      "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
+      "sourceTutDiaryTap": "Tap to see an example",
+      "sourceTutPhotoTitle": "Draw from photo",
+      "sourceTutPhotoBody": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "sourceTutPhotoTap": "Tap to see an example",
+      "sourceTutPhotoLocked": "Tap the top option first",
+      "sourceDiary": "Draw from diary",
+      "sourceDiaryDesc": "We draw a picture from what you wrote!",
+      "sourcePhoto": "Draw from photo",
+      "sourcePhotoDesc": "Turn your photo into a drawing",
+      "styleTitle": "Which style?",
+      "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleConfirm": "Confirm",
+      "styleSoon": "(Coming soon)",
+      "styleDisabled": "That style isn’t available yet. Pick another style.",
+      "stylePreview": "Preview",
+      "stylePreviewHide": "Hide preview",
+      "photoHint": "AI sketches your photo like an elementary-school doodle.",
+      "photoAdd": "Choose photo",
+      "photoChange": "Change photo",
+      "photoRemove": "Remove photo",
+      "photoError": "Couldn’t load that photo. Try another image.",
+      "photoTooLarge": "This image is too large. Please choose a smaller photo.",
+      "buyExtraTicket": "Buy extra tickets",
+      "chargeTitle": "AI drawing top-up",
+      "goPurchase": "Go to purchase",
+      "rewardLeadDaily": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "fortune": {
+        "tap": "Tap the fortune cookie",
+        "tapAria": "Open fortune cookie",
+        "again": "Tap again for another fortune",
+        "close": "Close fortune",
+        "label": "Today’s fortune"
       }
     },
     "confirm": {
@@ -624,11 +775,15 @@
       "aiMonthlyLimit": "ใช้โควตาวาด AI 50 ครั้งของเดือนนี้ครบแล้ว เดือนหน้าวาดได้อีก",
       "aiMonthlyLimitAdsDone": "ใช้โควตาเดือนนี้และโฆษณาวันนี้ครบแล้ว ลองใหม่พรุ่งนี้",
       "saveFailed": "บันทึกไดอารี่ไม่สำเร็จ",
-      "adNotCompletedWrite": "ดูโฆษณาจบเพื่อบันทึกไดอารี่นี้"
+      "adNotCompletedWrite": "ดูโฆษณาจบเพื่อบันทึกไดอารี่นี้",
+      "aiRetry": "Couldn't create the drawing. Please try again in a moment",
+      "aiNeedPhoto": "Attach a photo first",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
     },
     "coach": {
       "character": "ตั้งตัวเอง เพื่อให้ AI วาดตาม",
-      "ai": "เขียนไดอารี่แล้วให้ AI วาดภาพ"
+      "ai": "เขียนไดอารี่แล้วให้ AI วาดภาพ",
+      "click": "Try tapping!"
     },
     "saving": "กำลังบันทึก…",
     "savingPrep": "กำลังเตรียมภาพ…",
@@ -638,7 +793,8 @@
       "saveTitle": "ดูโฆษณาเพื่อบันทึกไดอารี่ 1 เรื่อง",
       "saveLead": "ถึงขีดจำกัดแล้ว ดูโฆษณาเพื่อบันทึกเพิ่มอีก 1 เรื่อง",
       "saveLeadPremium": "ถึงขีดจำกัดรายเดือน (50 เรื่อง) แล้ว ดูโฆษณาเพื่อบันทึกเพิ่มอีก 1 เรื่อง"
-    }
+    },
+    "drawingLoading": "Loading!"
   },
   "detail": {
     "backAria": "ย้อนกลับ",
@@ -658,14 +814,21 @@
       "delete": "ลบไดอารี่นี้?"
     },
     "ok": {
-      "png": "บันทึกเป็น PNG แล้ว"
+      "png": "บันทึกเป็น PNG แล้ว",
+      "download": "Drawing saved"
     },
     "err": {
       "png": "บันทึก PNG ไม่สำเร็จ",
       "pngBlob": "สร้าง PNG ไม่ได้",
       "share": "แชร์ไม่สำเร็จ",
-      "roomsList": "โหลดห้องไม่ได้"
-    }
+      "roomsList": "โหลดห้องไม่ได้",
+      "download": "Couldn't save drawing",
+      "noImage": "No drawing to save"
+    },
+    "downloadAria": "Download drawing",
+    "downloadTitle": "Save canvas drawing only",
+    "writeNewAria": "Write a new diary for this day",
+    "writeNewTitle": "New diary same day"
   },
   "share": {
     "title": "แชร์",
@@ -733,13 +896,22 @@
     "outfitLabel": "ชุด",
     "gender": {
       "boy": "ผู้ชาย",
-      "girl": "ผู้หญิง"
+      "girl": "ผู้หญิง",
+      "woman": "Woman",
+      "man": "Man"
     },
     "hair": {
       "short": "ผมผู้ชาย",
       "medium": "ผมสั้นผู้หญิง",
       "curly": "ดัดผมผู้หญิง",
-      "bald": "หัวล้าน"
+      "bald": "หัวล้าน",
+      "man-short": "Short style",
+      "man-perm": "Perm",
+      "woman-bob": "Short straight",
+      "woman-long": "Long straight",
+      "woman-perm": "Short perm",
+      "woman-long-perm": "Long perm",
+      "ponytail": "Ponytail"
     },
     "outfit": {
       "short-sleeve": "แขนสั้น",
@@ -801,7 +973,8 @@
       "empty": "ไม่มีไดอารี่ให้ดาวน์โหลด",
       "page": "สร้างหน้าสมุดไม่ได้",
       "image": "โหลดภาพวาดไม่ได้"
-    }
+    },
+    "savingProgress": "Making your PDF… ({{current}}/{{total}})"
   },
   "canvas": {
     "pen": "ปากกา",

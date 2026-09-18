@@ -1371,11 +1371,13 @@ function DiaryWritePage({
     } catch (err) {
       setAiReferenceImage(null);
       aiReferenceImageRef.current = null;
-      setAiPhotoError(
-        isAiPhotoTooLargeError(err)
-          ? t('write.ai.photoTooLarge')
-          : t('write.ai.photoError'),
-      );
+      const tooLarge = isAiPhotoTooLargeError(err);
+      const msg = tooLarge
+        ? t('write.ai.photoTooLarge')
+        : t('write.ai.photoError');
+      setAiPhotoError(msg);
+      // 백엔드 가기 전 — 고르는 시점에 바로 알림
+      onAppToast?.(msg, tooLarge ? 3200 : 2200);
     }
   };
 
