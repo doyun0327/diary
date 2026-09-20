@@ -332,7 +332,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "Simpan PDF",
+    "benefitSearch": "Cari diary",
+    "benefitNoAds": "Tanpa iklan",
+    "benefitDraw50": "50 gambar AI / bulan"
   },
   "credits": {
     "moodIcons": "Ikon mood: designed by {{author}} from Flaticon",

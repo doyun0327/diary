@@ -332,7 +332,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "PDFで保存",
+    "benefitSearch": "日記検索",
+    "benefitNoAds": "広告非表示",
+    "benefitDraw50": "毎月AIイラスト50枚"
   },
   "credits": {
     "moodIcons": "気分アイコン：designed by {{author}} from Flaticon",

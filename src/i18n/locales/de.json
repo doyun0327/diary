@@ -333,7 +333,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "Als PDF speichern",
+    "benefitSearch": "Tagebuch suchen",
+    "benefitNoAds": "Werbung entfernen",
+    "benefitDraw50": "50 KI-Zeichnungen / Monat"
   },
   "credits": {
     "moodIcons": "Stimmungs-Icons: entworfen von {{author}} von Flaticon",

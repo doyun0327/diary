@@ -146,9 +146,16 @@ function buildAiPickOptions(
   return options;
 }
 
-function pickRandomLottie(pool: object[]): object | null {
+function pickRandomLottie(
+  pool: object[],
+  exclude: object | null = null,
+): object | null {
   if (pool.length === 0) return null;
-  return pool[Math.floor(Math.random() * pool.length)] ?? null;
+  if (pool.length === 1) return pool[0] ?? null;
+  const candidates =
+    exclude != null ? pool.filter((item) => item !== exclude) : pool;
+  const list = candidates.length > 0 ? candidates : pool;
+  return list[Math.floor(Math.random() * list.length)] ?? null;
 }
 
 function scrollWritingFieldIntoView(el: HTMLElement | null) {
@@ -1418,7 +1425,7 @@ function DiaryWritePage({
 
     setAiProgress('waiting');
     setFortuneVisible(false);
-    setActiveAiLottie(pickRandomLottie(aiLottiePool));
+    setActiveAiLottie((prev) => pickRandomLottie(aiLottiePool, prev));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
 

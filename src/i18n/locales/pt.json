@@ -332,7 +332,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "Salvar em PDF",
+    "benefitSearch": "Buscar diários",
+    "benefitNoAds": "Sem anúncios",
+    "benefitDraw50": "50 desenhos IA / mês"
   },
   "credits": {
     "moodIcons": "Ícones de humor: designed by {{author}} from Flaticon",

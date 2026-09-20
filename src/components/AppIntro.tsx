@@ -2,9 +2,18 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './AppIntro.css';
 
-/** 1·2·3 소개 → 9 (체험/혜택) */
-const INTRO_IMAGES = [1, 2, 3, 9] as const;
+/** public/intro 구독 혜택 이미지 */
+const INTRO_IMAGES = [
+  { id: 'draw50', file: '50장.png', labelKey: 'nyangTicket.benefitDraw50' },
+  { id: 'pdf', file: 'pdf저장.png', labelKey: 'nyangTicket.benefitPdf' },
+  { id: 'search', file: '검색.png', labelKey: 'nyangTicket.benefitSearch' },
+  { id: 'noAds', file: '광고제거.png', labelKey: 'nyangTicket.benefitNoAds' },
+] as const;
 const SLIDE_COUNT = INTRO_IMAGES.length;
+
+function introSrc(file: string): string {
+  return `/intro/${encodeURIComponent(file)}`;
+}
 
 type AppIntroProps = {
   onFinish: () => void;
@@ -55,12 +64,12 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
           className="app-intro__track"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {INTRO_IMAGES.map((n, i) => (
-            <section key={n} className="app-intro__slide" aria-hidden={i !== index}>
+          {INTRO_IMAGES.map((item, i) => (
+            <section key={item.id} className="app-intro__slide" aria-hidden={i !== index}>
               <img
                 className="app-intro__image"
-                src={`/intro/${n}.png`}
-                alt={t('appIntro.sample', { n })}
+                src={introSrc(item.file)}
+                alt={t(item.labelKey)}
                 draggable={false}
               />
             </section>
@@ -69,13 +78,13 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
       </div>
 
       <div className="app-intro__dots" role="tablist" aria-label={t('appIntro.aria')}>
-        {INTRO_IMAGES.map((n, i) => (
+        {INTRO_IMAGES.map((item, i) => (
           <button
-            key={n}
+            key={item.id}
             type="button"
             className={`app-intro__dot${i === index ? ' is-active' : ''}`}
             onClick={() => go(i)}
-            aria-label={t('appIntro.sample', { n })}
+            aria-label={t(item.labelKey)}
             aria-current={i === index ? 'true' : undefined}
           />
         ))}

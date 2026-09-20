@@ -332,7 +332,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "บันทึกเป็น PDF",
+    "benefitSearch": "ค้นหาไดอารี่",
+    "benefitNoAds": "ปิดโฆษณา",
+    "benefitDraw50": "วาด AI 50 ภาพต่อเดือน"
   },
   "credits": {
     "moodIcons": "ไอคอนอารมณ์: designed by {{author}} from Flaticon",

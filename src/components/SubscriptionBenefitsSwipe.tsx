@@ -1,90 +1,155 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './SubscriptionBenefitsSwipe.css';
 
-const IMAGES = [2, 6, 7, 8] as const;
+/** public/intro — 구독 혜택 이미지 */
+const IMAGES = [
+  { id: 'draw50', file: '50장.png', labelKey: 'nyangTicket.benefitDraw50' },
+  { id: 'pdf', file: 'pdf저장.png', labelKey: 'nyangTicket.benefitPdf' },
+  { id: 'search', file: '검색.png', labelKey: 'nyangTicket.benefitSearch' },
+  { id: 'noAds', file: '광고제거.png', labelKey: 'nyangTicket.benefitNoAds' },
+] as const;
+
+function introSrc(file: string): string {
+  return `/intro/${encodeURIComponent(file)}`;
+}
 
 interface SubscriptionBenefitsSwipeProps {
-  /** 냥 티켓 등 시트용 — 높이 축소 */
+  /** 냥 티켓 등 시트용 — 썸네일 조금 더 작게 */
   compact?: boolean;
 }
 
-/** 구독 모달 — Pro 소개 이미지 가로 스와이프 */
+/** 구독 혜택 — 썸네일 스크롤 + 탭 시 확대 */
 export default function SubscriptionBenefitsSwipe({
   compact = false,
 }: SubscriptionBenefitsSwipeProps = {}) {
   const { t } = useTranslation();
-  const [index, setIndex] = useState(0);
-  const startRef = useRef<{ x: number; y: number } | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  const go = (next: number) => {
-    setIndex(Math.max(0, Math.min(IMAGES.length - 1, next)));
+  useEffect(() => {
+    if (previewIndex == null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPreviewIndex(null);
+      if (e.key === 'ArrowRight') {
+        setPreviewIndex((i) =>
+          i == null ? i : Math.min(IMAGES.length - 1, i + 1),
+        );
+      }
+      if (e.key === 'ArrowLeft') {
+        setPreviewIndex((i) => (i == null ? i : Math.max(0, i - 1)));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [previewIndex]);
+
+  const goPreview = (next: number) => {
+    setPreviewIndex(Math.max(0, Math.min(IMAGES.length - 1, next)));
   };
 
-  const onSwipeEnd = (x: number, y: number) => {
-    const start = startRef.current;
-    startRef.current = null;
-    if (!start) return;
+  const onPreviewSwipeStart = (x: number, y: number) => {
+    swipeStartRef.current = { x, y };
+  };
+
+  const onPreviewSwipeEnd = (x: number, y: number) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (start == null || previewIndex == null) return;
     const dx = x - start.x;
     const dy = y - start.y;
-    // 세로 스크롤 중이면 슬라이드 넘기지 않음 (시트 스크롤과 충돌 방지)
     if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
-    if (dx < 0) go(index + 1);
-    else go(index - 1);
+    if (dx < 0) goPreview(previewIndex + 1);
+    else goPreview(previewIndex - 1);
   };
+
+  const preview = previewIndex != null ? IMAGES[previewIndex] : null;
 
   return (
     <div className={`sub-benefits${compact ? ' sub-benefits--compact' : ''}`}>
-      <div
-        className="sub-benefits__viewport"
-        onTouchStart={(e) => {
-          const t0 = e.changedTouches[0];
-          if (!t0) return;
-          startRef.current = { x: t0.clientX, y: t0.clientY };
-        }}
-        onTouchEnd={(e) => {
-          const t0 = e.changedTouches[0];
-          if (!t0) return;
-          onSwipeEnd(t0.clientX, t0.clientY);
-        }}
-        onPointerDown={(e) => {
-          if (e.pointerType === 'touch') return;
-          startRef.current = { x: e.clientX, y: e.clientY };
-        }}
-        onPointerUp={(e) => {
-          if (e.pointerType === 'touch') return;
-          onSwipeEnd(e.clientX, e.clientY);
-        }}
-      >
-        <div
-          className="sub-benefits__track"
-          style={{ transform: `translateX(-${index * 100}%)` }}
-        >
-          {IMAGES.map((n, i) => (
-            <div key={n} className="sub-benefits__slide" aria-hidden={i !== index}>
+      <ul className="sub-benefits__grid" role="list">
+        {IMAGES.map((item, i) => (
+          <li key={item.id} className="sub-benefits__cell">
+            <button
+              type="button"
+              className="sub-benefits__thumb"
+              onClick={() => setPreviewIndex(i)}
+              aria-label={t(item.labelKey)}
+            >
               <img
-                className="sub-benefits__image"
-                src={`/intro/${n}.png`}
-                alt={t('appIntro.sample', { n })}
+                className="sub-benefits__thumb-img"
+                src={introSrc(item.file)}
+                alt=""
+                draggable={false}
+                loading="lazy"
+                decoding="async"
+              />
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {preview && previewIndex != null ? (
+        <div className="sub-benefits__lightbox" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="sub-benefits__lightbox-backdrop"
+            aria-label={t('common.close')}
+            onClick={() => setPreviewIndex(null)}
+          />
+          <div className="sub-benefits__lightbox-panel">
+            <div
+              className="sub-benefits__lightbox-stage"
+              onTouchStart={(e) => {
+                const t0 = e.changedTouches[0];
+                if (!t0) return;
+                onPreviewSwipeStart(t0.clientX, t0.clientY);
+              }}
+              onTouchEnd={(e) => {
+                const t0 = e.changedTouches[0];
+                if (!t0) return;
+                onPreviewSwipeEnd(t0.clientX, t0.clientY);
+              }}
+              onPointerDown={(e) => {
+                if (e.pointerType === 'touch') return;
+                onPreviewSwipeStart(e.clientX, e.clientY);
+              }}
+              onPointerUp={(e) => {
+                if (e.pointerType === 'touch') return;
+                onPreviewSwipeEnd(e.clientX, e.clientY);
+              }}
+            >
+              <img
+                className="sub-benefits__lightbox-img"
+                src={introSrc(preview.file)}
+                alt={t(preview.labelKey)}
                 draggable={false}
               />
             </div>
-          ))}
+            <div className="sub-benefits__lightbox-nav" aria-hidden>
+              <button
+                type="button"
+                className="sub-benefits__lightbox-nav-btn"
+                disabled={previewIndex <= 0}
+                onClick={() => goPreview(previewIndex - 1)}
+              >
+                ‹
+              </button>
+              <span className="sub-benefits__lightbox-count">
+                {previewIndex + 1} / {IMAGES.length}
+              </span>
+              <button
+                type="button"
+                className="sub-benefits__lightbox-nav-btn"
+                disabled={previewIndex >= IMAGES.length - 1}
+                onClick={() => goPreview(previewIndex + 1)}
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="sub-benefits__dots" role="tablist" aria-label={t('appIntro.aria')}>
-        {IMAGES.map((n, i) => (
-          <button
-            key={n}
-            type="button"
-            className={`sub-benefits__dot${i === index ? ' is-active' : ''}`}
-            onClick={() => go(i)}
-            aria-label={t('appIntro.sample', { n })}
-            aria-current={i === index ? 'true' : undefined}
-          />
-        ))}
-      </div>
+      ) : null}
     </div>
   );
 }

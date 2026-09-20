@@ -332,7 +332,11 @@
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
     "historyItemWelcome": "{{n}} draws (Welcome trial)",
-    "historyItemPack": "{{n}}"
+    "historyItemPack": "{{n}}",
+    "benefitPdf": "儲存為 PDF",
+    "benefitSearch": "搜尋日記",
+    "benefitNoAds": "移除廣告",
+    "benefitDraw50": "每月 50 張 AI 畫"
   },
   "credits": {
     "moodIcons": "心情圖標：designed by {{author}} from Flaticon",
