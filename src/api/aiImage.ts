@@ -181,15 +181,19 @@ async function pollDrawJob(
   jobId: string,
   onProgress?: (step: AiProgress) => void,
 ): Promise<AiDrawResult> {
-  // 백그라운드에서도 폴링 유지(완성 알림용). 타임아웃은 포그라운드 체류 시간만 집계.
+  // 서버 job 는 앱과 무관하게 계속 돌아감.
+  // 폴링도 백그라운드에서 끊지 않음 — 타임아웃은 포그라운드에서만 셈.
+  // (절대 상한만 두어 좀비 폴링 방지)
+  const ABSOLUTE_MAX_MS = 30 * 60 * 1000;
   let visibleElapsed = 0;
   let networkFailStreak = 0;
   const wallStart = Date.now();
-  // 숨김 상태에서도 너무 오래 돌지 않게 벽시계 상한 (타임아웃의 2배)
-  const wallLimitMs = POLL_TIMEOUT_MS * 2;
   onProgress?.('waiting');
 
-  while (visibleElapsed < POLL_TIMEOUT_MS && Date.now() - wallStart < wallLimitMs) {
+  while (
+    (isDocumentHidden() || visibleElapsed < POLL_TIMEOUT_MS) &&
+    Date.now() - wallStart < ABSOLUTE_MAX_MS
+  ) {
     const sliceStart = Date.now();
     const wasHidden = isDocumentHidden();
 
