@@ -31,6 +31,8 @@ export interface AiDrawResult {
   notice?: string;
   /** runware-cdn 등 */
   imageSource?: string;
+  /** 앱이 백그라운드일 때 완료됨 → 로컬 알림 대상 */
+  completedInBackground?: boolean;
 }
 
 type DrawPayload = {
@@ -149,35 +151,8 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
   return humanizeAiError(fallback);
 }
 
-/** 백그라운드면 포그라운드 복귀까지 대기 (폴링·타임아웃 일시정지) */
-function waitUntilDocumentVisible(): Promise<void> {
-  if (typeof document === 'undefined') return Promise.resolve();
-  if (document.visibilityState === 'visible') return Promise.resolve();
-  return new Promise((resolve) => {
-    const onChange = () => {
-      if (document.visibilityState !== 'visible') return;
-      document.removeEventListener('visibilitychange', onChange);
-      resolve();
-    };
-    document.addEventListener('visibilitychange', onChange);
-  });
-}
-
-/** 보이는 동안만 대기. 숨기면 중단하고 복귀 시 바로 다음 폴링 */
-async function sleepWhileVisible(ms: number): Promise<void> {
-  if (typeof document === 'undefined') {
-    await sleep(ms);
-    return;
-  }
-  await waitUntilDocumentVisible();
-  const end = Date.now() + ms;
-  while (Date.now() < end) {
-    if (document.visibilityState === 'hidden') {
-      await waitUntilDocumentVisible();
-      return;
-    }
-    await sleep(Math.min(300, end - Date.now()));
-  }
+function isDocumentHidden(): boolean {
+  return typeof document !== 'undefined' && document.visibilityState === 'hidden';
 }
 
 async function fetchDrawJobStatus(jobId: string): Promise<DrawPayload> {
@@ -206,13 +181,17 @@ async function pollDrawJob(
   jobId: string,
   onProgress?: (step: AiProgress) => void,
 ): Promise<AiDrawResult> {
+  // 백그라운드에서도 폴링 유지(완성 알림용). 타임아웃은 포그라운드 체류 시간만 집계.
   let visibleElapsed = 0;
   let networkFailStreak = 0;
+  const wallStart = Date.now();
+  // 숨김 상태에서도 너무 오래 돌지 않게 벽시계 상한 (타임아웃의 2배)
+  const wallLimitMs = POLL_TIMEOUT_MS * 2;
   onProgress?.('waiting');
 
-  while (visibleElapsed < POLL_TIMEOUT_MS) {
-    await waitUntilDocumentVisible();
+  while (visibleElapsed < POLL_TIMEOUT_MS && Date.now() - wallStart < wallLimitMs) {
     const sliceStart = Date.now();
+    const wasHidden = isDocumentHidden();
 
     let data: DrawPayload;
     try {
@@ -230,10 +209,10 @@ async function pollDrawJob(
           );
         }
         console.warn('[AI] poll network retry', networkFailStreak, 'jobId=', jobId);
-        if (document.visibilityState === 'visible') {
+        if (!isDocumentHidden()) {
           visibleElapsed += Date.now() - sliceStart;
         }
-        await sleepWhileVisible(POLL_NETWORK_RETRY_MS);
+        await sleep(POLL_NETWORK_RETRY_MS);
         continue;
       }
       throw err instanceof Error ? err : new Error(msg);
@@ -245,7 +224,10 @@ async function pollDrawJob(
     if (status === 'done') {
       onProgress?.('finishing');
       await sleep(450);
-      return parseImageResult(data);
+      return {
+        ...parseImageResult(data),
+        completedInBackground: wasHidden || isDocumentHidden(),
+      };
     }
     if (status === 'failed') {
       const refundUsage = data.refundUsage === 'true';
@@ -264,22 +246,22 @@ async function pollDrawJob(
       onProgress?.('waiting');
     }
 
-    if (document.visibilityState === 'visible') {
+    if (!isDocumentHidden()) {
       visibleElapsed += Date.now() - sliceStart;
     }
-    await sleepWhileVisible(POLL_INTERVAL_MS);
-    // sleep 구간은 타임아웃에 조금만 반영 (숨김 중 대기는 제외)
-    // sleepWhileVisible이 숨김으로 조기 반환하면 추가 시간 거의 없음
+    await sleep(POLL_INTERVAL_MS);
   }
 
-  // 타임아웃 직전 한 번 더 확인 (백그라운드에서 이미 끝났을 수 있음)
+  // 타임아웃 직전 한 번 더 확인
   try {
-    await waitUntilDocumentVisible();
     const last = await fetchDrawJobStatus(jobId);
     const status = (last.status || '').toLowerCase();
     if (status === 'done') {
       onProgress?.('finishing');
-      return parseImageResult(last);
+      return {
+        ...parseImageResult(last),
+        completedInBackground: isDocumentHidden(),
+      };
     }
     if (status === 'failed') {
       throw new AiDrawJobError(last.message?.trim() || '그림 생성에 실패했습니다', {
@@ -414,5 +396,8 @@ export async function generateDiaryImage(input: {
   input.onProgress?.('drawing');
   input.onProgress?.('finishing');
   await sleep(450);
-  return parseImageResult(data);
+  return {
+    ...parseImageResult(data),
+    completedInBackground: isDocumentHidden(),
+  };
 }

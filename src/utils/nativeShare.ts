@@ -53,6 +53,19 @@ export function postDiaryNative(data: Record<string, unknown>) {
   native.postMessage(JSON.stringify(data));
 }
 
+/** 백그라운드에서 AI 그림 완료 시 로컬 알림 (다운로드 알림과 동일 채널 패턴) */
+export function notifyAiDrawComplete(payload?: {
+  title?: string;
+  body?: string;
+}) {
+  if (!isFlutterApp()) return;
+  postDiaryNative({
+    type: 'aiDrawComplete',
+    title: payload?.title ?? '그림이 완성되었어요!',
+    body: payload?.body ?? '그림을 확인해 보세요.💛',
+  });
+}
+
 export async function requestAiRewardedAd(): Promise<boolean> {
   return requestRewardedAd("aiDraw");
 }

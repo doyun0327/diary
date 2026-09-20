@@ -85,7 +85,7 @@ import {
   writeDraftHasContent,
 } from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
-import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
+import { isFlutterApp, notifyAiDrawComplete, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
 import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
 import {
@@ -1432,7 +1432,8 @@ function DiaryWritePage({
     setActiveAiLottie((prev) => pickRandomLottie(aiLottiePool, prev));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
-    if (shouldShowAiBgHint()) {
+    // FCM 완료 알림은 구글 로그인(+푸시 토큰) 사용자만 — 안내 문구도 동일 조건
+    if (isGoogleSignedIn() && shouldShowAiBgHint()) {
       setAiBgHintVisible(true);
       markAiBgHintShown();
     } else {
@@ -1457,7 +1458,7 @@ function DiaryWritePage({
         }
       }
 
-      const { imageUrl, notice, imageSource } = await generateDiaryImage({
+      const { imageUrl, notice, imageSource, completedInBackground } = await generateDiaryImage({
         title,
         content,
         style: isDiary ? TEXT_OIL_STYLE_ID : aiStyleRef.current,
@@ -1468,6 +1469,13 @@ function DiaryWritePage({
         accessToken: getAccessToken(),
         onProgress: setAiProgress,
       });
+
+      if (completedInBackground && isGoogleSignedIn()) {
+        notifyAiDrawComplete({
+          title: t('write.ai.doneNotifyTitle'),
+          body: t('write.ai.doneNotifyBody'),
+        });
+      }
 
       const quotaKind = aiQuotaKindRef.current;
       await commitAiDrawQuota();
