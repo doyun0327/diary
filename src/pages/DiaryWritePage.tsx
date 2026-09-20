@@ -68,6 +68,8 @@ import {
   markAiDeductCoachShown,
   shouldShowAiClickCoach,
   markAiCoachSeen,
+  shouldShowAiBgHint,
+  markAiBgHintShown,
   getAiSourceTutorialProgress,
   markAiSourceDiaryTutorialSeen,
   markAiSourceIntroSeen,
@@ -267,6 +269,8 @@ function DiaryWritePage({
   const [aiLoading, setAiLoading] = useState(false);
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
   const [fortuneVisible, setFortuneVisible] = useState(false);
+  /** 백그라운드 생성 안내 — 처음 3회만 */
+  const [aiBgHintVisible, setAiBgHintVisible] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);
   const [activeAiLottie, setActiveAiLottie] = useState<object | null>(null);
@@ -1428,6 +1432,12 @@ function DiaryWritePage({
     setActiveAiLottie((prev) => pickRandomLottie(aiLottiePool, prev));
     setAiLottieKey((key) => key + 1);
     setAiLoading(true);
+    if (shouldShowAiBgHint()) {
+      setAiBgHintVisible(true);
+      markAiBgHintShown();
+    } else {
+      setAiBgHintVisible(false);
+    }
 
     try {
       const { preview: previousSnapshot, canvasState: previousState } =
@@ -1878,6 +1888,11 @@ function DiaryWritePage({
                 <FortuneCookie onDismiss={() => setFortuneVisible(false)} />
               </div>
             )}
+            {aiBgHintVisible && (aiLoading || fortuneVisible) && !purchaseClickShield ? (
+              <p className="diary-write__ai-bg-hint" role="status">
+                {t('write.ai.bgHint')}
+              </p>
+            ) : null}
             </div>
           </div>
         </section>

@@ -644,6 +644,7 @@
       "statusWaiting": "대기 중…",
       "statusDrawing": "그리는 중…",
       "statusFinishing": "마무리 중…",
+      "bgHint": "앱을 나가도 계속 그려져요.\n끝나면 알려드릴께요!",
       "stepWaiting": "대기",
       "stepDrawing": "그리기",
       "stepFinishing": "마무리",

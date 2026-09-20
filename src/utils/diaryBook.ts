@@ -469,13 +469,17 @@ export async function renderEntryBookPage(
   });
 }
 
+/** WebView·네이티브 브릿지 OOM 방지 — 긴 변 상한 */
+const STAMP_MAX_EDGE = 2048;
+
 /** 이미지에 바깥 여백 + @PageBy 푸터 (SNS 공유·캔버스 다운로드 공통) */
 export async function stampPageByOnImage(
   source: Blob | string,
-  options?: { type?: string; quality?: number },
+  options?: { type?: string; quality?: number; maxEdge?: number },
 ): Promise<Blob> {
   const type = options?.type ?? 'image/jpeg';
   const quality = options?.quality ?? 0.92;
+  const maxEdge = options?.maxEdge ?? STAMP_MAX_EDGE;
   const objectUrl =
     typeof source === 'string'
       ? null
@@ -485,8 +489,11 @@ export async function stampPageByOnImage(
       typeof source === 'string'
         ? await loadImageSafe(source)
         : await loadImage(objectUrl!);
-    const pw = Math.max(1, img.naturalWidth || img.width);
-    const ph = Math.max(1, img.naturalHeight || img.height);
+    const rawW = Math.max(1, img.naturalWidth || img.width);
+    const rawH = Math.max(1, img.naturalHeight || img.height);
+    const scale = Math.min(1, maxEdge / Math.max(rawW, rawH));
+    const pw = Math.max(1, Math.round(rawW * scale));
+    const ph = Math.max(1, Math.round(rawH * scale));
     const margin = Math.max(28, Math.round(Math.min(pw, ph) * 0.06));
     const footerH = Math.max(32, Math.round(ph * 0.045));
     const canvasW = pw + margin * 2;

@@ -428,12 +428,25 @@ function DiaryDetailPage({
         sourceBlob = await res.blob();
       }
 
-      const blob = await stampPageByOnImage(sourceBlob, {
-        type: 'image/jpeg',
-        quality: 0.92,
-      });
-      const filename = `diary-${entry.date}-canvas.jpg`;
+      // @PageBy 스탬프 실패(대형 이미지 OOM 등) 시 원본이라도 저장
+      let blob = sourceBlob;
+      let filename = `diary-${entry.date}-canvas.jpg`;
+      try {
+        blob = await stampPageByOnImage(sourceBlob, {
+          type: 'image/jpeg',
+          quality: 0.88,
+        });
+      } catch (stampErr) {
+        console.warn('[detail] stamp failed, saving original', stampErr);
+        const ext = sourceBlob.type.includes('png')
+          ? 'png'
+          : sourceBlob.type.includes('webp')
+            ? 'webp'
+            : 'jpg';
+        filename = `diary-${entry.date}-canvas.${ext}`;
+      }
       await downloadToDevice(blob, filename);
+      onAppToast?.(t('detail.ok.download'), 2200);
     } catch (err) {
       setFeedback({
         kind: 'info',

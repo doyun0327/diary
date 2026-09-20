@@ -119,13 +119,18 @@ export async function shareViaNative(payload: {
       payload.filename ||
       (payload.file instanceof File && payload.file.name) ||
       'share.bin';
+    const lower = filename.toLowerCase();
     const mime =
       payload.file.type ||
-      (filename.toLowerCase().endsWith('.png')
+      (lower.endsWith('.png')
         ? 'image/png'
-        : filename.toLowerCase().endsWith('.pdf')
-          ? 'application/pdf'
-          : 'application/octet-stream');
+        : lower.endsWith('.jpg') || lower.endsWith('.jpeg')
+          ? 'image/jpeg'
+          : lower.endsWith('.webp')
+            ? 'image/webp'
+            : lower.endsWith('.pdf')
+              ? 'application/pdf'
+              : 'application/octet-stream');
     diaryNative()!.postMessage(
       JSON.stringify({
         type: 'shareFile',
@@ -162,20 +167,30 @@ export async function saveFileViaNative(payload: {
     payload.filename ||
     (payload.file instanceof File && payload.file.name) ||
     'download.bin';
+  const lower = filename.toLowerCase();
   const mime =
     payload.file.type ||
-    (filename.toLowerCase().endsWith('.png')
+    (lower.endsWith('.png')
       ? 'image/png'
-      : filename.toLowerCase().endsWith('.pdf')
-        ? 'application/pdf'
-        : 'application/octet-stream');
-  diaryNative()!.postMessage(
-    JSON.stringify({
-      type: 'saveFile',
-      name: filename,
-      mime,
-      base64: await blobToBase64(payload.file),
-    }),
-  );
-  return true;
+      : lower.endsWith('.jpg') || lower.endsWith('.jpeg')
+        ? 'image/jpeg'
+        : lower.endsWith('.webp')
+          ? 'image/webp'
+          : lower.endsWith('.pdf')
+            ? 'application/pdf'
+            : 'application/octet-stream');
+  try {
+    diaryNative()!.postMessage(
+      JSON.stringify({
+        type: 'saveFile',
+        name: filename,
+        mime,
+        base64: await blobToBase64(payload.file),
+      }),
+    );
+    return true;
+  } catch (err) {
+    console.warn('[native] saveFile postMessage failed', err);
+    return false;
+  }
 }
