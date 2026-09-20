@@ -227,7 +227,7 @@
       "syncNow": "Upload now",
       "syncing": "Uploading…",
       "lastSynced": "Last uploaded · {{time}}",
-      "lastSyncedAt": "Last uploaded : {{time}}",
+      "lastSyncedAt": "Last uploaded\n{{time}}",
       "am": "AM",
       "pm": "PM",
       "never": "Never",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "Shall we write your first diary?",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "Shall we leave today as a drawing?",
+      "writeDayHint": "Tap an empty day to write your diary."
     }
   },
   "subscription": {

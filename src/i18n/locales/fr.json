@@ -224,7 +224,7 @@
       "syncNow": "Synchroniser",
       "syncing": "Synchronisation…",
       "lastSynced": "Dernière sync · {{time}}",
-      "lastSyncedAt": "Dernière mise à jour : {{time}}",
+      "lastSyncedAt": "Dernière mise à jour\n{{time}}",
       "am": "AM",
       "pm": "PM",
       "never": "Jamais",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "On écrit ton premier journal ?",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "On immortalise aujourd’hui en dessin ?",
+      "writeDayHint": "Appuie sur un jour vide pour écrire."
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

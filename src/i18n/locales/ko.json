@@ -227,7 +227,7 @@
       "syncNow": "지금 업로드",
       "syncing": "업로드 중…",
       "lastSynced": "마지막 업로드 · {{time}}",
-      "lastSyncedAt": "마지막 업로드 시간 : {{time}}",
+      "lastSyncedAt": "마지막 업로드 시간\n{{time}}",
       "am": "오전",
       "pm": "오후",
       "never": "아직 없음",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "첫 번째 일기를 쓰러 갈까요?",
-      "writeDay": "빈 날짜를 눌러 일기를 써 보세요!"
+      "writeDay": "오늘 하루, 그림으로 남겨볼까요?",
+      "writeDayHint": "빈 칸을 눌러 일기를 작성해보세요!"
     }
   },
   "subscription": {

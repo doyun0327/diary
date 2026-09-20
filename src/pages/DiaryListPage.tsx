@@ -5,10 +5,10 @@ import MoodCalendar from '../components/MoodCalendar';
 import DiaryListRow from '../components/DiaryListRow';
 import CoachBubble from '../components/CoachBubble';
 import {
-  isWriteFabCoachSeen,
-  markWriteFabCoachSeen,
+  isTodayCellCoachSeen,
+  markTodayCellCoachSeen,
 } from '../utils/onboarding';
-import { formatYearMonth } from '../utils/date';
+import { formatYearMonth, today } from '../utils/date';
 import './DiaryListPage.css';
 
 const PREVIEW_LIMIT = 3;
@@ -42,8 +42,9 @@ function DiaryListPage({
   const sectionRef = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [showCoach, setShowCoach] = useState(
-    () => entries.length === 0 && !isWriteFabCoachSeen(),
+    () => entries.length === 0 && !isTodayCellCoachSeen(),
   );
+  const todayStr = today();
 
   const monthEntries = useMemo(
     () =>
@@ -58,14 +59,29 @@ function DiaryListPage({
   }, [monthPrefix]);
 
   useEffect(() => {
-    if (entries.length > 0) setShowCoach(false);
+    if (entries.length > 0) {
+      setShowCoach(false);
+      return;
+    }
+    if (!isTodayCellCoachSeen()) setShowCoach(true);
   }, [entries.length]);
+
+  const coachVisible = showCoach && entries.length === 0;
+
+  // 코치 중에는 오늘이 보이도록 이번 달로 맞춤
+  useEffect(() => {
+    if (!coachVisible) return;
+    const [y, m] = todayStr.split('-').map(Number);
+    if (viewYear !== y || viewMonth !== m - 1) {
+      onViewChange(y, m - 1);
+    }
+  }, [coachVisible, todayStr, viewYear, viewMonth, onViewChange]);
 
   const hiddenCount = Math.max(0, monthEntries.length - PREVIEW_LIMIT);
   const visibleEntries = expanded ? monthEntries : monthEntries.slice(0, PREVIEW_LIMIT);
 
   const dismissCoach = () => {
-    markWriteFabCoachSeen();
+    markTodayCellCoachSeen();
     setShowCoach(false);
   };
 
@@ -73,6 +89,7 @@ function DiaryListPage({
     onSelectDate?.(date);
     const entry = entries.find((e) => e.date === date);
     if (entry) {
+      if (showCoach) dismissCoach();
       onSelect(entry.id);
       return;
     }
@@ -86,7 +103,6 @@ function DiaryListPage({
   };
 
   const monthLabel = formatYearMonth(monthPrefix);
-  const coachVisible = showCoach && entries.length === 0;
 
   return (
     <div className={`diary-list${entries.length === 0 ? ' diary-list--empty' : ''}`}>
@@ -97,7 +113,11 @@ function DiaryListPage({
             arrow="bottom-center"
             onDismiss={dismissCoach}
           >
-            <p>{t('diary.coach.writeDay')}</p>
+            <p>
+              {t('diary.coach.writeDay')}
+              <br />
+              {t('diary.coach.writeDayHint')}
+            </p>
           </CoachBubble>
         )}
         <MoodCalendar
@@ -109,6 +129,7 @@ function DiaryListPage({
           highlightDate={highlightDate}
           onSelectDate={handleCalendarDate}
           hideHeader
+          coachDate={coachVisible ? todayStr : null}
         />
       </div>
 

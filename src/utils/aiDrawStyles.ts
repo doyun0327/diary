@@ -209,6 +209,31 @@ export function isPhotoAiDrawStyle(styleId: AiDrawStyleId): styleId is AiPhotoDr
   return styleId === 'webtoonHero' || styleId === 'oilPastel' || styleId === 'jpRetroFilm';
 }
 
+const AI_PHOTO_STYLE_KEY = 'picture-diary-ai-photo-style';
+
+/** 사진 경로에서 마지막으로 고른 그림체 (없으면 웹툰주인공) */
+export function loadLastAiPhotoStyle(): AiPhotoDrawStyleId {
+  try {
+    if (typeof localStorage === 'undefined') return 'webtoonHero';
+    const raw = localStorage.getItem(AI_PHOTO_STYLE_KEY);
+    const id = normalizeAiDrawStyleId(raw);
+    if (isPhotoAiDrawStyle(id) && isAiDrawStyleEnabled(id)) return id;
+  } catch {
+    /* ignore */
+  }
+  return 'webtoonHero';
+}
+
+export function saveLastAiPhotoStyle(styleId: AiPhotoDrawStyleId) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (!isPhotoAiDrawStyle(styleId) || !isAiDrawStyleEnabled(styleId)) return;
+    localStorage.setItem(AI_PHOTO_STYLE_KEY, styleId);
+  } catch {
+    /* ignore */
+  }
+}
+
 /** GPT Image 2 출력(생성물) 규격 — 면적·비율 */
 export const GPT_IMAGE2_MIN_AREA = 655_360;
 export const GPT_IMAGE2_MAX_AREA = 8_294_400;

@@ -17,6 +17,8 @@ const AI_SOURCE_INTRO_KEY = 'picture-diary-onboarding-ai-source-intro';
 /** 완성 후 차감 안내 노출 횟수 (최대 3) — 구독·구매권 보유자만 */
 const AI_DEDUCT_COACH_COUNT_KEY = 'picture-diary-onboarding-ai-deduct-coach-count';
 const WRITE_FAB_COACH_KEY = 'picture-diary-onboarding-write-fab-coach';
+/** 홈 오늘 날짜 칸 코치 (문구·위치 개편) */
+const TODAY_CELL_COACH_KEY = 'picture-diary-onboarding-today-cell-coach';
 const ROOM_COMMENT_COACH_KEY = 'picture-diary-onboarding-room-comment-coach';
 const ROOM_POKE_COACH_KEY = 'picture-diary-onboarding-room-poke-coach';
 const ROOM_CREATE_COACH_KEY = 'picture-diary-onboarding-room-create-coach';
@@ -78,6 +80,12 @@ export function migrateProfileIntroFlags() {
 export function migrateWriteFabCoachFlag() {
   if (readFlag(WRITE_FAB_COACH_KEY)) return;
   if (hasStoredDiaryEntries()) writeFlag(WRITE_FAB_COACH_KEY);
+}
+
+/** 이미 일기가 있으면 오늘 칸 코치도 스킵 */
+export function migrateTodayCellCoachFlag() {
+  if (readFlag(TODAY_CELL_COACH_KEY)) return;
+  if (hasStoredDiaryEntries()) writeFlag(TODAY_CELL_COACH_KEY);
 }
 
 export function isProfileSetupDone(): boolean {
@@ -197,6 +205,17 @@ export function isWriteFabCoachSeen(): boolean {
 }
 
 export function markWriteFabCoachSeen() {
+  writeFlag(WRITE_FAB_COACH_KEY);
+}
+
+export function isTodayCellCoachSeen(): boolean {
+  migrateTodayCellCoachFlag();
+  return readFlag(TODAY_CELL_COACH_KEY);
+}
+
+export function markTodayCellCoachSeen() {
+  writeFlag(TODAY_CELL_COACH_KEY);
+  // 레거시 플래그도 같이 닫아 중복 노출 방지
   writeFlag(WRITE_FAB_COACH_KEY);
 }
 

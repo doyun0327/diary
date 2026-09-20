@@ -17,6 +17,8 @@ interface MoodCalendarProps {
   /** 방금 저장한 날짜 — 짧은 하이라이트 */
   highlightDate?: string | null;
   hideHeader?: boolean;
+  /** 온보딩 유도 — 해당 날짜 칸 펄스 */
+  coachDate?: string | null;
 }
 
 interface DayMark {
@@ -57,6 +59,7 @@ function MoodCalendar({
   selectedDate,
   highlightDate,
   hideHeader = false,
+  coachDate = null,
 }: MoodCalendarProps) {
   const { t } = useTranslation();
   const now = new Date();
@@ -181,6 +184,7 @@ function MoodCalendar({
           const isToday = dateStr === todayStr;
           const isSelected = Boolean(selectedDate) && dateStr === selectedDate;
           const isJustSaved = Boolean(highlightDate) && dateStr === highlightDate;
+          const isCoachTarget = Boolean(coachDate) && dateStr === coachDate;
           const moodLabel = sticker
             ? isMood(sticker)
               ? t(`mood.${sticker}`)
@@ -199,6 +203,7 @@ function MoodCalendar({
                 isToday ? 'today' : '',
                 isSelected ? 'selected' : '',
                 isJustSaved ? 'just-saved' : '',
+                isCoachTarget ? 'is-coach-pulse' : '',
               ].filter(Boolean).join(' ')}
               aria-pressed={isSelected || undefined}
               onClick={() => onSelectDate?.(dateStr)}

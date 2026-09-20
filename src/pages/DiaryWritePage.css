@@ -834,7 +834,8 @@
   border-radius: 16px;
   background: var(--color-surface);
   color: var(--color-text);
-  text-align: left;
+  text-align: center;
+  justify-items: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -870,9 +871,10 @@
 
 .diary-write__ai-source-title {
   font-family: var(--brand-font);
-  font-size: 0.98rem;
+  font-size: 1.08rem;
   font-weight: 800;
-  line-height: 1.3;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
   color: var(--color-text);
 }
 
@@ -889,6 +891,7 @@
   font-weight: 800;
   line-height: 1.35;
   color: var(--color-text);
+  white-space: nowrap;
 }
 
 .diary-write__ai-photo {

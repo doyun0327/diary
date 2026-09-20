@@ -224,7 +224,7 @@
       "syncNow": "Sinkronkan sekarang",
       "syncing": "Menyinkronkan…",
       "lastSynced": "Terakhir sinkron · {{time}}",
-      "lastSyncedAt": "Terakhir diperbarui : {{time}}",
+      "lastSyncedAt": "Terakhir diperbarui\n{{time}}",
       "am": "AM",
       "pm": "PM",
       "never": "Belum pernah",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "Mau tulis diary pertama?",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "Mau abadikan hari ini jadi gambar?",
+      "writeDayHint": "Ketuk hari kosong untuk menulis diary."
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

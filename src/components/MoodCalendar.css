@@ -219,6 +219,28 @@
   box-shadow: inset 0 0 0 1.5px var(--color-border);
 }
 
+.mood-cal__day.is-coach-pulse {
+  z-index: 4;
+}
+
+.mood-cal__day.is-coach-pulse .mood-cal__media {
+  border-radius: 8px;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent);
+  animation: mood-cal-coach-pulse 1.4s ease-out infinite;
+}
+
+@keyframes mood-cal-coach-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
 .mood-cal__day.selected .mood-cal__media {
   background: var(--color-accent-soft);
   box-shadow: inset 0 0 0 2px var(--color-accent);

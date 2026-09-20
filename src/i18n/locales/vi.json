@@ -224,7 +224,7 @@
       "syncNow": "Đồng bộ ngay",
       "syncing": "Đang đồng bộ…",
       "lastSynced": "Đồng bộ lần cuối · {{time}}",
-      "lastSyncedAt": "Cập nhật lần cuối : {{time}}",
+      "lastSyncedAt": "Cập nhật lần cuối\n{{time}}",
       "am": "SA",
       "pm": "CH",
       "never": "Chưa từng",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "Viết nhật ký đầu tiên nhé?",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "Hôm nay mình vẽ lại một bức nhé?",
+      "writeDayHint": "Chạm vào ngày trống để viết nhật ký."
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

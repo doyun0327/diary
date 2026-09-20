@@ -224,7 +224,7 @@
       "syncNow": "立即同步",
       "syncing": "同步中…",
       "lastSynced": "上次同步 · {{time}}",
-      "lastSyncedAt": "上次更新 : {{time}}",
+      "lastSyncedAt": "上次更新\n{{time}}",
       "am": "上午",
       "pm": "下午",
       "never": "尚未同步",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "要去写第一篇日记吗？",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "要把今天画成一幅画留下吗？",
+      "writeDayHint": "点按空白日期即可写日记。"
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

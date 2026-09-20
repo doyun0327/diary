@@ -1,0 +1,1236 @@
+{
+  "keys": [
+    "header.nyangTicket",
+    "header.nyangTicketHint",
+    "appInfo.churu.menu",
+    "appInfo.churu.title",
+    "appInfo.churu.lead",
+    "appInfo.churu.thanks",
+    "appInfo.churu.buying",
+    "appInfo.churu.appOnly",
+    "appInfo.churu.failed",
+    "appInfo.churu.noProduct",
+    "appInfo.churu.products.one",
+    "appInfo.churu.products.three",
+    "appInfo.churu.products.box",
+    "appInfo.legal.refundHeading",
+    "appInfo.legal.refundBody",
+    "appInfo.licenses.usage.mood.classic",
+    "appInfo.licenses.usage.mood.cat",
+    "appInfo.licenses.usage.mood.dog",
+    "appInfo.licenses.usage.mood.love",
+    "appInfo.licenses.usage.mood.ghost",
+    "appInfo.licenses.usage.mood.weather",
+    "appInfo.licenses.usage.mood.numbers",
+    "appInfo.licenses.usage.mood.numbers2",
+    "appInfo.licenses.usage.hair",
+    "appInfo.licenses.usage.stickers",
+    "account.genderLabel",
+    "account.ageLabel",
+    "account.demographicsSaved",
+    "account.sync.okSignedOutRooms",
+    "account.ok.profileChanged",
+    "nyangTicket.aria",
+    "nyangTicket.title",
+    "nyangTicket.lead",
+    "nyangTicket.tabsAria",
+    "nyangTicket.subscribeTitle",
+    "nyangTicket.subscribeTitleWithLeft",
+    "nyangTicket.subscribeLead",
+    "nyangTicket.subscribeCta",
+    "nyangTicket.subscribeDone",
+    "nyangTicket.restoreStarted",
+    "nyangTicket.restoreHint",
+    "nyangTicket.packsTitle",
+    "nyangTicket.packsTitleWithLeft",
+    "nyangTicket.packsRemaining",
+    "nyangTicket.packsLead",
+    "nyangTicket.buy",
+    "nyangTicket.packDone",
+    "nyangTicket.appOnly",
+    "nyangTicket.noProduct",
+    "nyangTicket.notConfigured",
+    "nyangTicket.buyTimeout",
+    "nyangTicket.buyFailed",
+    "nyangTicket.googleRequired",
+    "nyangTicket.googleLoginFailed",
+    "nyangTicket.signingIn",
+    "nyangTicket.historyTitle",
+    "nyangTicket.historyEmpty",
+    "nyangTicket.historyNeedLogin",
+    "nyangTicket.historyLoadFailed",
+    "nyangTicket.historyDone",
+    "nyangTicket.historyItemSubscription",
+    "nyangTicket.historyItemWelcome",
+    "nyangTicket.historyItemPack",
+    "rooms.emptyLoginLead",
+    "rooms.emptyLoginCta",
+    "rooms.emptyAfterLogout",
+    "rooms.retryList",
+    "rooms.shareDiaryDoneMany",
+    "rooms.pickDiaryEnd",
+    "rooms.pickDiarySearchAria",
+    "rooms.pickDiarySearchPlaceholder",
+    "rooms.pickDiarySearchEmpty",
+    "rooms.pickDiarySearchEnd",
+    "rooms.confirm.deleteComment",
+    "rooms.safety.moreAria",
+    "rooms.safety.menuTitle",
+    "rooms.safety.menuLead",
+    "rooms.safety.report",
+    "rooms.safety.block",
+    "rooms.safety.reportTitle",
+    "rooms.safety.reportLead",
+    "rooms.safety.reportSubmit",
+    "rooms.safety.reporting",
+    "rooms.safety.reasonAria",
+    "rooms.safety.reasons.spam",
+    "rooms.safety.reasons.harassment",
+    "rooms.safety.reasons.sexual",
+    "rooms.safety.reasons.hate",
+    "rooms.safety.reasons.other",
+    "rooms.safety.blockTitle",
+    "rooms.safety.blockLead",
+    "rooms.safety.blockConfirm",
+    "rooms.safety.blockedToast",
+    "rooms.safety.feedEmptyBlocked",
+    "rooms.safety.you",
+    "profileSetup.genderLabel",
+    "profileSetup.gender.female",
+    "profileSetup.gender.male",
+    "profileSetup.ageLabel",
+    "profileSetup.age.child",
+    "profileSetup.age.teens",
+    "profileSetup.age.20s",
+    "profileSetup.age.30s",
+    "profileSetup.age.40plus",
+    "profileSetup.errGender",
+    "profileSetup.errAge",
+    "appIntro.aria",
+    "appIntro.prev",
+    "appIntro.next",
+    "diary.writeDayAria",
+    "diary.list.monthTitle",
+    "diary.coach.writeDay",
+    "quota.breakdownTitle",
+    "quota.breakdownAria",
+    "quota.breakdownSub",
+    "quota.breakdownPack",
+    "quota.breakdownAd",
+    "quota.breakdownEmpty",
+    "write.drawingLoading",
+    "write.ai.statusWaiting",
+    "write.ai.statusDrawing",
+    "write.ai.statusFinishing",
+    "write.ai.stepWaiting",
+    "write.ai.stepDrawing",
+    "write.ai.stepFinishing",
+    "write.ai.sourceTitle",
+    "write.ai.sourceLead",
+    "write.ai.sourceExampleCaption",
+    "write.ai.sourceTutDiaryTitle",
+    "write.ai.sourceTutDiaryBody",
+    "write.ai.sourceTutDiaryProfileNote",
+    "write.ai.sourceTutDiaryProfileChange",
+    "write.ai.sourceTutDiaryTap",
+    "write.ai.sourceTutPhotoTitle",
+    "write.ai.sourceTutPhotoBody",
+    "write.ai.sourceTutPhotoTap",
+    "write.ai.sourceTutPhotoLocked",
+    "write.ai.sourceDiary",
+    "write.ai.sourceDiaryDesc",
+    "write.ai.sourcePhoto",
+    "write.ai.sourcePhotoDesc",
+    "write.ai.styleTitle",
+    "write.ai.styleLead",
+    "write.ai.styleConfirm",
+    "write.ai.styleSoon",
+    "write.ai.styleDisabled",
+    "write.ai.stylePreview",
+    "write.ai.stylePreviewHide",
+    "write.ai.photoHint",
+    "write.ai.photoAdd",
+    "write.ai.photoChange",
+    "write.ai.photoRemove",
+    "write.ai.photoError",
+    "write.ai.photoTooLarge",
+    "write.ai.buyExtraTicket",
+    "write.ai.chargeTitle",
+    "write.ai.goPurchase",
+    "write.ai.rewardLeadDaily",
+    "write.ai.usageNotDeductedTitle",
+    "write.ai.usageNotDeducted",
+    "write.ai.fortune.tap",
+    "write.ai.fortune.tapAria",
+    "write.ai.fortune.again",
+    "write.ai.fortune.close",
+    "write.ai.fortune.label",
+    "write.confirm.saveOnLeave",
+    "write.confirm.saveOnLeaveDiscard",
+    "write.err.aiRetry",
+    "write.err.aiNeedPhoto",
+    "write.coach.click",
+    "detail.downloadAria",
+    "detail.downloadTitle",
+    "detail.writeNewAria",
+    "detail.writeNewTitle",
+    "detail.ok.download",
+    "detail.err.download",
+    "detail.err.noImage",
+    "share.instagram",
+    "share.kakao",
+    "share.kakaoIcon",
+    "character.gender.woman",
+    "character.gender.man",
+    "character.hair.man-short",
+    "character.hair.man-perm",
+    "character.hair.woman-bob",
+    "character.hair.woman-long",
+    "character.hair.woman-perm",
+    "character.hair.woman-long-perm",
+    "character.hair.ponytail",
+    "book.savingProgress",
+    "font.gaegu",
+    "font.dongle",
+    "font.hiMelody",
+    "font.singleDay",
+    "font.cuteFont",
+    "font.jua",
+    "font.gamjaFlower",
+    "font.poorStory",
+    "font.nanumPen",
+    "font.nanumBrush",
+    "font.eastSeaDokdo",
+    "font.yeonSung",
+    "font.notoSans",
+    "font.nanumGothic",
+    "font.gowunDodum",
+    "font.gowunBatang",
+    "font.nanumMyeongjo",
+    "font.songMyung",
+    "font.doHyeon",
+    "font.ibmPlex",
+    "lock.title",
+    "lock.aria",
+    "lock.status",
+    "lock.on",
+    "lock.off",
+    "lock.turnOn",
+    "lock.turnOff",
+    "lock.changePassword",
+    "lock.enableTitle",
+    "lock.disableTitle",
+    "lock.changeTitle",
+    "lock.setHint",
+    "lock.disableHint",
+    "lock.password",
+    "lock.newPassword",
+    "lock.confirmPassword",
+    "lock.currentPassword",
+    "lock.unlock",
+    "lock.gateTitle",
+    "lock.gateHint",
+    "lock.gateAria",
+    "lock.ok.enabled",
+    "lock.ok.disabled",
+    "lock.ok.changed",
+    "lock.err.passwordRequired",
+    "lock.err.wrongPassword",
+    "lock.err.tooShort",
+    "lock.err.mismatch",
+    "lock.err.save",
+    "lock.pinTitle",
+    "lock.pinEnterHint",
+    "lock.pinConfirmHint",
+    "lock.pinRestart",
+    "lock.delete",
+    "lock.keypadAria",
+    "lock.changeVerifyHint"
+  ],
+  "pairs": {
+    "header.nyangTicket": {
+      "en": "Nyang Ticket",
+      "ko": "냥 티켓"
+    },
+    "header.nyangTicketHint": {
+      "en": "Subscribe · AI top-up",
+      "ko": "구독 · AI 그림 충전"
+    },
+    "appInfo.churu.menu": {
+      "en": "Give churu",
+      "ko": "츄르 주기"
+    },
+    "appInfo.churu.title": {
+      "en": "Give churu",
+      "ko": "츄르 주기"
+    },
+    "appInfo.churu.lead": {
+      "en": "Churu gives me energy!",
+      "ko": "츄르를 먹으면 힘이나요!🐱"
+    },
+    "appInfo.churu.thanks": {
+      "en": "Thanks! I'll enjoy the churu.",
+      "ko": "츄르 잘 먹을게요. 감사해요!🐱"
+    },
+    "appInfo.churu.buying": {
+      "en": "Preparing checkout…",
+      "ko": "결제 준비 중…"
+    },
+    "appInfo.churu.appOnly": {
+      "en": "You can give churu in the app",
+      "ko": "앱에서 츄르를 줄 수 있어요"
+    },
+    "appInfo.churu.failed": {
+      "en": "Couldn't complete the purchase. Please try again.",
+      "ko": "결제를 완료하지 못했어요. 잠시 후 다시 시도해 주세요."
+    },
+    "appInfo.churu.noProduct": {
+      "en": "Couldn't find the churu product in the store. Please try again later.",
+      "ko": "스토어에서 츄르 상품을 찾지 못했어요. 잠시 후 다시 시도해 주세요."
+    },
+    "appInfo.churu.products.one": {
+      "en": "1 churu",
+      "ko": "츄르 1개"
+    },
+    "appInfo.churu.products.three": {
+      "en": "3 churu",
+      "ko": "츄르 3개"
+    },
+    "appInfo.churu.products.box": {
+      "en": "Churu box",
+      "ko": "츄르 한 박스"
+    },
+    "appInfo.legal.refundHeading": {
+      "en": "Refund Policy",
+      "ko": "환불 정책"
+    },
+    "appInfo.legal.refundBody": {
+      "en": "Paid purchases in PageBy (subscriptions, AI drawing packs, tips, and similar items) are processed through Google Play or the App Store, and billing and refunds follow each store’s policies. You may cancel a subscription at any time; after cancellation you can keep using subscription benefits until the end of the period you already paid for. Consumable items such as AI drawing packs or tips are generally non-refundable once they have been delivered to your account. If a payment error, missing delivery, or app outage prevented you from using a purchase, please request a refund through Google Play / the App Store. Statutory cooling-off or refund rights under applicable law still apply where required.",
+      "ko": "PageBy의 유료 결제(구독, AI 그림 충전 팩, 츄르 등)는 Google Play 또는 App Store를 통해 이루어지며, 결제·환불은 각 스토어의 정책을 따릅니다. 구독은 언제든 해지할 수 있으며, 해지 후에도 이미 결제된 이용 기간이 끝날 때까지는 구독 혜택을 이용할 수 있습니다. AI 그림 충전 팩·츄르처럼 구매 후 계정에 지급되는 소모성 상품은 지급이 완료되면 원칙적으로 환불이 어렵습니다. 결제 오류, 상품 미지급, 앱 장애로 서비스를 이용하지 못한 경우에는 Google Play/App Store의 환불 요청을 이용해 주세요. 관련 법령에서 정한 청약철회·환불 권리는 해당 법령에 따릅니다."
+    },
+    "appInfo.licenses.usage.mood.classic": {
+      "en": "Mood · Classic",
+      "ko": "기분 · Classic"
+    },
+    "appInfo.licenses.usage.mood.cat": {
+      "en": "Mood · Cat",
+      "ko": "기분 · Cat"
+    },
+    "appInfo.licenses.usage.mood.dog": {
+      "en": "Mood · Dog",
+      "ko": "기분 · Dog"
+    },
+    "appInfo.licenses.usage.mood.love": {
+      "en": "Mood · Love",
+      "ko": "기분 · Love"
+    },
+    "appInfo.licenses.usage.mood.ghost": {
+      "en": "Mood · Ghost",
+      "ko": "기분 · Ghost"
+    },
+    "appInfo.licenses.usage.mood.weather": {
+      "en": "Mood · Weather",
+      "ko": "기분 · Weather"
+    },
+    "appInfo.licenses.usage.mood.numbers": {
+      "en": "Mood · Number1",
+      "ko": "기분 · Number1"
+    },
+    "appInfo.licenses.usage.mood.numbers2": {
+      "en": "Mood · Number2",
+      "ko": "기분 · Number2"
+    },
+    "appInfo.licenses.usage.hair": {
+      "en": "Character hairstyles",
+      "ko": "캐릭터 헤어"
+    },
+    "appInfo.licenses.usage.stickers": {
+      "en": "Canvas stickers (illustrations)",
+      "ko": "캔버스 스티커(일러스트)"
+    },
+    "account.genderLabel": {
+      "en": "Gender",
+      "ko": "성별"
+    },
+    "account.ageLabel": {
+      "en": "Age",
+      "ko": "나이"
+    },
+    "account.demographicsSaved": {
+      "en": "Gender and age saved",
+      "ko": "성별·나이를 저장했어요"
+    },
+    "account.sync.okSignedOutRooms": {
+      "en": "Signed out. Friend rooms stay with your Google account — sign in again to see them.",
+      "ko": "로그아웃했어요. 일기공유는 Google 계정에 연결되어 있어요. 다시 로그인하면 볼 수 있어요."
+    },
+    "account.ok.profileChanged": {
+      "en": "Profile updated.",
+      "ko": "프로필이 변경되었어요."
+    },
+    "nyangTicket.aria": {
+      "en": "Nyang Ticket",
+      "ko": "냥 티켓"
+    },
+    "nyangTicket.title": {
+      "en": "Nyang Ticket",
+      "ko": "냥 티켓"
+    },
+    "nyangTicket.lead": {
+      "en": "Subscribe or top up AI drawings.",
+      "ko": "구독하거나 AI 그림을 더 충전해요."
+    },
+    "nyangTicket.tabsAria": {
+      "en": "Nyang Ticket tabs",
+      "ko": "냥 티켓 메뉴"
+    },
+    "nyangTicket.subscribeTitle": {
+      "en": "Subscription",
+      "ko": "구독"
+    },
+    "nyangTicket.subscribeTitleWithLeft": {
+      "en": "Subscription ({{n}} left)",
+      "ko": "구독 (잔여: {{n}}장)"
+    },
+    "nyangTicket.subscribeLead": {
+      "en": "Create up to {{n}} drawings every month!",
+      "ko": "매달 {{n}}장의 그림을 생성할 수 있어요!"
+    },
+    "nyangTicket.subscribeCta": {
+      "en": "Subscribe to PRO",
+      "ko": "PRO 구독하기"
+    },
+    "nyangTicket.subscribeDone": {
+      "en": "Subscription started!",
+      "ko": "구독이 시작됐어요!"
+    },
+    "nyangTicket.restoreStarted": {
+      "en": "Restore requested.",
+      "ko": "구매 복원을 요청했어요."
+    },
+    "nyangTicket.restoreHint": {
+      "en": "If you changed devices or reinstalled the app, restore brings back your existing subscription.",
+      "ko": "기기를 바꾸거나 앱을 다시 설치했을 때, 이미 산 구독을 다시 불러와요."
+    },
+    "nyangTicket.packsTitle": {
+      "en": "AI drawing packs",
+      "ko": "AI 그림 충전"
+    },
+    "nyangTicket.packsTitleWithLeft": {
+      "en": "AI drawing packs ({{n}} left)",
+      "ko": "AI 그림 충전 (잔여: {{n}}장)"
+    },
+    "nyangTicket.packsRemaining": {
+      "en": "Left: {{n}}",
+      "ko": "잔여 : {{n}} 장"
+    },
+    "nyangTicket.packsLead": {
+      "en": "Add as many AI drawings as you want.\nNo subscription required.",
+      "ko": "원하는 만큼 AI 그림을 추가해보세요.\n구독하지 않아도 이용할 수 있어요."
+    },
+    "nyangTicket.buy": {
+      "en": "Buy",
+      "ko": "구매"
+    },
+    "nyangTicket.packDone": {
+      "en": "Purchased {{n}} drawings",
+      "ko": "{{n}}장을 구매했어요"
+    },
+    "nyangTicket.appOnly": {
+      "en": "Purchases are available in the app only",
+      "ko": "앱에서만 구매할 수 있어요"
+    },
+    "nyangTicket.noProduct": {
+      "en": "Product not found. Check store setup.",
+      "ko": "상품을 찾지 못했어요. 스토어 설정을 확인해 주세요."
+    },
+    "nyangTicket.notConfigured": {
+      "en": "Billing isn’t ready. Please restart the app.",
+      "ko": "결제 준비가 안 됐어요. 앱을 다시 실행해 주세요."
+    },
+    "nyangTicket.buyTimeout": {
+      "en": "No response from the store. Please try again.",
+      "ko": "결제 응답이 늦어요. 잠시 후 다시 시도해 주세요."
+    },
+    "nyangTicket.buyFailed": {
+      "en": "Purchase failed. Please try again later.",
+      "ko": "구매에 실패했어요. 잠시 후 다시 시도해 주세요."
+    },
+    "nyangTicket.googleRequired": {
+      "en": "Google sign-in is required to purchase",
+      "ko": "결제하려면 Google 로그인이 필요해요"
+    },
+    "nyangTicket.googleLoginFailed": {
+      "en": "Google sign-in failed. Please try again.",
+      "ko": "Google 로그인에 실패했어요. 다시 시도해 주세요."
+    },
+    "nyangTicket.signingIn": {
+      "en": "Signing in…",
+      "ko": "로그인 중…"
+    },
+    "nyangTicket.historyTitle": {
+      "en": "History",
+      "ko": "구매내역"
+    },
+    "nyangTicket.historyEmpty": {
+      "en": "No purchases yet.",
+      "ko": "아직 구매 내역이 없어요."
+    },
+    "nyangTicket.historyNeedLogin": {
+      "en": "Sign in with Google to see purchase history.",
+      "ko": "구매 내역은 Google 로그인 후 볼 수 있어요."
+    },
+    "nyangTicket.historyLoadFailed": {
+      "en": "Couldn't load purchase history.",
+      "ko": "구매 내역을 불러오지 못했어요."
+    },
+    "nyangTicket.historyDone": {
+      "en": "Done",
+      "ko": "완료"
+    },
+    "nyangTicket.historyItemSubscription": {
+      "en": "PRO subscription",
+      "ko": "PRO 구독"
+    },
+    "nyangTicket.historyItemWelcome": {
+      "en": "{{n}} draws (Welcome trial)",
+      "ko": "{{n}}회 (Welcome 체험권)"
+    },
+    "nyangTicket.historyItemPack": {
+      "en": "{{n}}",
+      "ko": "{{n}}장"
+    },
+    "rooms.emptyLoginLead": {
+      "en": "Sign in with Google to see rooms from your account.",
+      "ko": "이전에 쓰던 방은 Google 로그인 후 다시 볼 수 있어요."
+    },
+    "rooms.emptyLoginCta": {
+      "en": "Sign in with Google",
+      "ko": "Google로 로그인"
+    },
+    "rooms.emptyAfterLogout": {
+      "en": "Signed out",
+      "ko": "로그아웃했어요"
+    },
+    "rooms.retryList": {
+      "en": "Try again",
+      "ko": "다시 시도"
+    },
+    "rooms.shareDiaryDoneMany": {
+      "en": "Shared!💛",
+      "ko": "공유했어요!💛"
+    },
+    "rooms.pickDiaryEnd": {
+      "en": "That's the last diary.",
+      "ko": "마지막 일기입니다."
+    },
+    "rooms.pickDiarySearchAria": {
+      "en": "Search diaries",
+      "ko": "일기 검색"
+    },
+    "rooms.pickDiarySearchPlaceholder": {
+      "en": "Search title, text, or date",
+      "ko": "제목 · 내용 · 날짜 검색"
+    },
+    "rooms.pickDiarySearchEmpty": {
+      "en": "No matching diaries",
+      "ko": "검색 결과가 없어요"
+    },
+    "rooms.pickDiarySearchEnd": {
+      "en": "End of search results.",
+      "ko": "검색 결과의 마지막입니다."
+    },
+    "rooms.confirm.deleteComment": {
+      "en": "Delete this message?",
+      "ko": "메시지를 삭제할까요?"
+    },
+    "rooms.safety.moreAria": {
+      "en": "Block or report",
+      "ko": "차단 · 신고"
+    },
+    "rooms.safety.menuTitle": {
+      "en": "Safety",
+      "ko": "안전"
+    },
+    "rooms.safety.menuLead": {
+      "en": "Choose an action for {{name}}.",
+      "ko": "{{name}}에 대해 할 일을 골라 주세요."
+    },
+    "rooms.safety.report": {
+      "en": "Report",
+      "ko": "신고하기"
+    },
+    "rooms.safety.block": {
+      "en": "Block",
+      "ko": "차단하기"
+    },
+    "rooms.safety.reportTitle": {
+      "en": "Report",
+      "ko": "신고하기"
+    },
+    "rooms.safety.reportLead": {
+      "en": "Report content from {{name}}. We'll review it.",
+      "ko": "{{name}}의 콘텐츠를 신고합니다. 운영자가 검토해요."
+    },
+    "rooms.safety.reportSubmit": {
+      "en": "Submit report",
+      "ko": "신고 보내기"
+    },
+    "rooms.safety.reporting": {
+      "en": "Sending…",
+      "ko": "보내는 중…"
+    },
+    "rooms.safety.reasonAria": {
+      "en": "Report reason",
+      "ko": "신고 사유"
+    },
+    "rooms.safety.reasons.spam": {
+      "en": "Spam or ads",
+      "ko": "스팸 · 광고"
+    },
+    "rooms.safety.reasons.harassment": {
+      "en": "Harassment or abuse",
+      "ko": "괴롭힘 · 욕설"
+    },
+    "rooms.safety.reasons.sexual": {
+      "en": "Sexual or offensive",
+      "ko": "성적 · 불쾌한 내용"
+    },
+    "rooms.safety.reasons.hate": {
+      "en": "Hate or discrimination",
+      "ko": "혐오 · 차별"
+    },
+    "rooms.safety.reasons.other": {
+      "en": "Other",
+      "ko": "기타"
+    },
+    "rooms.safety.blockTitle": {
+      "en": "Block this person?",
+      "ko": "차단할까요?"
+    },
+    "rooms.safety.blockLead": {
+      "en": "Posts and comments from {{name}} won't appear for you.",
+      "ko": "{{name}}의 글과 댓글이 더 이상 보이지 않아요."
+    },
+    "rooms.safety.blockConfirm": {
+      "en": "Block",
+      "ko": "차단하기"
+    },
+    "rooms.safety.blockedToast": {
+      "en": "Blocked {{name}}",
+      "ko": "{{name}}님을 차단했어요"
+    },
+    "rooms.safety.feedEmptyBlocked": {
+      "en": "Nothing to show — only posts from blocked people.",
+      "ko": "차단한 사람의 글만 있어서 지금은 비어 있어요."
+    },
+    "rooms.safety.you": {
+      "en": "You",
+      "ko": "나"
+    },
+    "profileSetup.genderLabel": {
+      "en": "Gender",
+      "ko": "성별"
+    },
+    "profileSetup.gender.female": {
+      "en": "Female",
+      "ko": "여"
+    },
+    "profileSetup.gender.male": {
+      "en": "Male",
+      "ko": "남"
+    },
+    "profileSetup.ageLabel": {
+      "en": "Age",
+      "ko": "나이"
+    },
+    "profileSetup.age.child": {
+      "en": "Child",
+      "ko": "어린이"
+    },
+    "profileSetup.age.teens": {
+      "en": "Teens",
+      "ko": "10대"
+    },
+    "profileSetup.age.20s": {
+      "en": "20s",
+      "ko": "20대"
+    },
+    "profileSetup.age.30s": {
+      "en": "30s",
+      "ko": "30대"
+    },
+    "profileSetup.age.40plus": {
+      "en": "40+",
+      "ko": "40대 이상"
+    },
+    "profileSetup.errGender": {
+      "en": "Please select a gender",
+      "ko": "성별을 선택해 주세요"
+    },
+    "profileSetup.errAge": {
+      "en": "Please select an age group",
+      "ko": "나이를 선택해 주세요"
+    },
+    "appIntro.aria": {
+      "en": "App introduction",
+      "ko": "앱 소개"
+    },
+    "appIntro.prev": {
+      "en": "Back",
+      "ko": "이전"
+    },
+    "appIntro.next": {
+      "en": "Next",
+      "ko": "다음"
+    },
+    "diary.writeDayAria": {
+      "en": "Write diary for day {{day}}",
+      "ko": "{{day}}일 일기 쓰기"
+    },
+    "diary.list.monthTitle": {
+      "en": "{{month}}",
+      "ko": "{{month}} 일기"
+    },
+    "diary.coach.writeDay": {
+      "en": "Tap an empty day to write!",
+      "ko": "빈 날짜를 눌러 일기를 써 보세요!"
+    },
+    "quota.breakdownTitle": {
+      "en": "Credits left",
+      "ko": "남은 횟수"
+    },
+    "quota.breakdownAria": {
+      "en": "{{n}} credits left, show details",
+      "ko": "남은 횟수 {{n}}회, 상세 보기"
+    },
+    "quota.breakdownSub": {
+      "en": "{{n}} : Sub",
+      "ko": "{{n}} : 구독"
+    },
+    "quota.breakdownPack": {
+      "en": "{{n}} : AI pack",
+      "ko": "{{n}} : AI 그림충전"
+    },
+    "quota.breakdownAd": {
+      "en": "{{n}} : Ad",
+      "ko": "{{n}} : 광고"
+    },
+    "quota.breakdownEmpty": {
+      "en": "No credits left",
+      "ko": "남은 횟수가 없어요"
+    },
+    "write.drawingLoading": {
+      "en": "Loading!",
+      "ko": "불러오는 중!"
+    },
+    "write.ai.statusWaiting": {
+      "en": "Waiting…",
+      "ko": "대기 중…"
+    },
+    "write.ai.statusDrawing": {
+      "en": "Drawing…",
+      "ko": "그리는 중…"
+    },
+    "write.ai.statusFinishing": {
+      "en": "Finishing…",
+      "ko": "마무리 중…"
+    },
+    "write.ai.stepWaiting": {
+      "en": "Wait",
+      "ko": "대기"
+    },
+    "write.ai.stepDrawing": {
+      "en": "Draw",
+      "ko": "그리기"
+    },
+    "write.ai.stepFinishing": {
+      "en": "Done",
+      "ko": "마무리"
+    },
+    "write.ai.sourceTitle": {
+      "en": "How should we draw?",
+      "ko": "어떻게 그릴까요?"
+    },
+    "write.ai.sourceLead": {
+      "en": "Pick a way to create your drawing.",
+      "ko": "원하는 방식을 골라 주세요."
+    },
+    "write.ai.sourceExampleCaption": {
+      "en": "Your diary can turn into a drawing like this",
+      "ko": "쓴 일기가 이런 그림으로 바뀌어요"
+    },
+    "write.ai.sourceTutDiaryTitle": {
+      "en": "Draw from diary",
+      "ko": "일기로 그리기"
+    },
+    "write.ai.sourceTutDiaryBody": {
+      "en": "Just write your diary and tap — you get a drawing like this!",
+      "ko": "일기만 쓰고 버튼을 누르면 그림이 나와요!"
+    },
+    "write.ai.sourceTutDiaryProfileNote": {
+      "en": "Your gender and age from setup are used!",
+      "ko": "처음에 설정한 성별·나이대가 반영돼요!"
+    },
+    "write.ai.sourceTutDiaryProfileChange": {
+      "en": "You can change them in Menu › Account.",
+      "ko": "메뉴 › 계정에서 변경할 수 있어요.\n"
+    },
+    "write.ai.sourceTutDiaryTap": {
+      "en": "Tap to see an example",
+      "ko": "눌러서 예시 보기"
+    },
+    "write.ai.sourceTutPhotoTitle": {
+      "en": "Draw from photo",
+      "ko": "사진으로 그리기"
+    },
+    "write.ai.sourceTutPhotoBody": {
+      "en": "Upload a photo, pick 1 of these 3 styles, and it redraws your image!",
+      "ko": "사진 올리고 아래 그림체 3개 중 하나를 고르면, 그 스타일로 바꿔 줘요!"
+    },
+    "write.ai.sourceTutPhotoTap": {
+      "en": "Tap to see an example",
+      "ko": "눌러서 예시 보기"
+    },
+    "write.ai.sourceTutPhotoLocked": {
+      "en": "Tap the top option first",
+      "ko": "먼저 위를 눌러 보세요"
+    },
+    "write.ai.sourceDiary": {
+      "en": "Draw from diary",
+      "ko": "일기로 그리기"
+    },
+    "write.ai.sourceDiaryDesc": {
+      "en": "We draw a picture from what you wrote!",
+      "ko": "쓴 일기를 바탕으로 그림을 그려요!"
+    },
+    "write.ai.sourcePhoto": {
+      "en": "Draw from photo",
+      "ko": "사진으로 그리기"
+    },
+    "write.ai.sourcePhotoDesc": {
+      "en": "Turn your photo into a drawing",
+      "ko": "내 사진을 그림으로 바꿔줘요!"
+    },
+    "write.ai.styleTitle": {
+      "en": "Which style?",
+      "ko": "어떤 스타일로 그릴까요?"
+    },
+    "write.ai.styleLead": {
+      "en": "Attach a photo, pick a style, then tap Confirm.",
+      "ko": "사진을 첨부한 뒤 스타일을 고르고 확인을 눌러 주세요."
+    },
+    "write.ai.styleConfirm": {
+      "en": "Confirm",
+      "ko": "확인"
+    },
+    "write.ai.styleSoon": {
+      "en": "(Coming soon)",
+      "ko": "(준비 중)"
+    },
+    "write.ai.styleDisabled": {
+      "en": "That style isn’t available yet. Pick another style.",
+      "ko": "아직 쓸 수 없는 스타일이에요. 다른 스타일을 골라 주세요."
+    },
+    "write.ai.stylePreview": {
+      "en": "Preview",
+      "ko": "미리보기"
+    },
+    "write.ai.stylePreviewHide": {
+      "en": "Hide preview",
+      "ko": "미리보기 접기"
+    },
+    "write.ai.photoHint": {
+      "en": "AI sketches your photo like an elementary-school doodle.",
+      "ko": "올린 사진을 초등학생 낙서처럼 스케치해요."
+    },
+    "write.ai.photoAdd": {
+      "en": "Choose photo",
+      "ko": "사진 고르기"
+    },
+    "write.ai.photoChange": {
+      "en": "Change photo",
+      "ko": "사진 변경"
+    },
+    "write.ai.photoRemove": {
+      "en": "Remove photo",
+      "ko": "사진 빼기"
+    },
+    "write.ai.photoError": {
+      "en": "Couldn’t load that photo. Try another image.",
+      "ko": "사진을 불러오지 못했어요. 다른 이미지를 골라 주세요."
+    },
+    "write.ai.photoTooLarge": {
+      "en": "This image is too large. Please choose a smaller photo.",
+      "ko": "이미지가 너무 큽니다. 더 작은 사진으로 골라 주세요."
+    },
+    "write.ai.buyExtraTicket": {
+      "en": "Buy extra tickets",
+      "ko": "추가티켓 구매하기"
+    },
+    "write.ai.chargeTitle": {
+      "en": "AI drawing top-up",
+      "ko": "AI 그림 충전"
+    },
+    "write.ai.goPurchase": {
+      "en": "Go to purchase",
+      "ko": "구매하러 가기"
+    },
+    "write.ai.rewardLeadDaily": {
+      "en": "Watch the ad to unlock today’s AI drawing. (1 per day)",
+      "ko": "광고를 끝까지 보면 오늘 AI 그림을 1번 그릴 수 있어요."
+    },
+    "write.ai.usageNotDeductedTitle": {
+      "en": "Usage credit",
+      "ko": "사용권 안내"
+    },
+    "write.ai.usageNotDeducted": {
+      "en": "Your usage credit was not deducted.",
+      "ko": "사용권이 차감되지 않았습니다."
+    },
+    "write.ai.fortune.tap": {
+      "en": "Tap the fortune cookie",
+      "ko": "포춘쿠키를 눌러 보세요"
+    },
+    "write.ai.fortune.tapAria": {
+      "en": "Open fortune cookie",
+      "ko": "포춘쿠키 열기"
+    },
+    "write.ai.fortune.again": {
+      "en": "Tap again for another fortune",
+      "ko": "다시 눌러 다른 운세"
+    },
+    "write.ai.fortune.close": {
+      "en": "Close fortune",
+      "ko": "운세 닫기"
+    },
+    "write.ai.fortune.label": {
+      "en": "Today’s fortune",
+      "ko": "오늘의 운세"
+    },
+    "write.confirm.saveOnLeave": {
+      "en": "Save before leaving?",
+      "ko": "저장할까요?"
+    },
+    "write.confirm.saveOnLeaveDiscard": {
+      "en": "Don't save",
+      "ko": "저장 안 함"
+    },
+    "write.err.aiRetry": {
+      "en": "Couldn't create the drawing. Please try again in a moment",
+      "ko": "그림을 만들지 못했어요. 잠시 후 다시 시도해 주세요"
+    },
+    "write.err.aiNeedPhoto": {
+      "en": "Attach a photo first",
+      "ko": "사진을 먼저 첨부해 주세요"
+    },
+    "write.coach.click": {
+      "en": "Try tapping!",
+      "ko": "클릭해보세요!"
+    },
+    "detail.downloadAria": {
+      "en": "Download drawing",
+      "ko": "그림 다운로드"
+    },
+    "detail.downloadTitle": {
+      "en": "Save canvas drawing only",
+      "ko": "캔버스 그림만 저장"
+    },
+    "detail.writeNewAria": {
+      "en": "Write a new diary for this day",
+      "ko": "이 날짜로 새 일기 쓰기"
+    },
+    "detail.writeNewTitle": {
+      "en": "New diary same day",
+      "ko": "같은 날 새 일기"
+    },
+    "detail.ok.download": {
+      "en": "Drawing saved",
+      "ko": "그림을 저장했어요"
+    },
+    "detail.err.download": {
+      "en": "Couldn't save drawing",
+      "ko": "그림 저장에 실패했어요"
+    },
+    "detail.err.noImage": {
+      "en": "No drawing to save",
+      "ko": "저장할 그림이 없어요"
+    },
+    "share.instagram": {
+      "en": "Instagram",
+      "ko": "인스타그램"
+    },
+    "share.kakao": {
+      "en": "KakaoTalk",
+      "ko": "카카오톡"
+    },
+    "share.kakaoIcon": {
+      "en": "Kakao",
+      "ko": "카톡"
+    },
+    "character.gender.woman": {
+      "en": "Woman",
+      "ko": "여자어른"
+    },
+    "character.gender.man": {
+      "en": "Man",
+      "ko": "남자어른"
+    },
+    "character.hair.man-short": {
+      "en": "Short style",
+      "ko": "짧은 스타일"
+    },
+    "character.hair.man-perm": {
+      "en": "Perm",
+      "ko": "파마"
+    },
+    "character.hair.woman-bob": {
+      "en": "Short straight",
+      "ko": "단발 생머리"
+    },
+    "character.hair.woman-long": {
+      "en": "Long straight",
+      "ko": "장발 생머리"
+    },
+    "character.hair.woman-perm": {
+      "en": "Short perm",
+      "ko": "단발 파마"
+    },
+    "character.hair.woman-long-perm": {
+      "en": "Long perm",
+      "ko": "장발 파마"
+    },
+    "character.hair.ponytail": {
+      "en": "Ponytail",
+      "ko": "포니테일"
+    },
+    "book.savingProgress": {
+      "en": "Making your PDF… ({{current}}/{{total}})",
+      "ko": "PDF를 만들고 있어요 ({{current}}/{{total}})"
+    },
+    "font.gaegu": {
+      "en": "Gaegu",
+      "ko": "개구"
+    },
+    "font.dongle": {
+      "en": "Dongle",
+      "ko": "동글"
+    },
+    "font.hiMelody": {
+      "en": "Hi Melody",
+      "ko": "히멜로디"
+    },
+    "font.singleDay": {
+      "en": "Single Day",
+      "ko": "싱글데이"
+    },
+    "font.cuteFont": {
+      "en": "Cute Font",
+      "ko": "큐트폰트"
+    },
+    "font.jua": {
+      "en": "Jua",
+      "ko": "주아"
+    },
+    "font.gamjaFlower": {
+      "en": "Gamja Flower",
+      "ko": "감자꽃"
+    },
+    "font.poorStory": {
+      "en": "Poor Story",
+      "ko": "푸어스토리"
+    },
+    "font.nanumPen": {
+      "en": "Nanum Pen",
+      "ko": "나눔손글씨 펜"
+    },
+    "font.nanumBrush": {
+      "en": "Nanum Brush",
+      "ko": "나눔손글씨 붓"
+    },
+    "font.eastSeaDokdo": {
+      "en": "East Sea Dokdo",
+      "ko": "동해독도"
+    },
+    "font.yeonSung": {
+      "en": "Yeon Sung",
+      "ko": "연성"
+    },
+    "font.notoSans": {
+      "en": "Noto Sans",
+      "ko": "노토 산스"
+    },
+    "font.nanumGothic": {
+      "en": "Nanum Gothic",
+      "ko": "나눔고딕"
+    },
+    "font.gowunDodum": {
+      "en": "Gowun Dodum",
+      "ko": "고운돋움"
+    },
+    "font.gowunBatang": {
+      "en": "Gowun Batang",
+      "ko": "고운바탕"
+    },
+    "font.nanumMyeongjo": {
+      "en": "Nanum Myeongjo",
+      "ko": "나눔명조"
+    },
+    "font.songMyung": {
+      "en": "Song Myung",
+      "ko": "송명"
+    },
+    "font.doHyeon": {
+      "en": "Do Hyeon",
+      "ko": "도현"
+    },
+    "font.ibmPlex": {
+      "en": "IBM Plex",
+      "ko": "IBM 플렉스"
+    },
+    "lock.title": {
+      "en": "Screen lock",
+      "ko": "화면 잠금"
+    },
+    "lock.aria": {
+      "en": "Screen lock",
+      "ko": "화면 잠금"
+    },
+    "lock.status": {
+      "en": "Status",
+      "ko": "상태"
+    },
+    "lock.on": {
+      "en": "On",
+      "ko": "켜짐"
+    },
+    "lock.off": {
+      "en": "Off",
+      "ko": "꺼짐"
+    },
+    "lock.turnOn": {
+      "en": "Turn on lock",
+      "ko": "잠금 켜기"
+    },
+    "lock.turnOff": {
+      "en": "Turn off lock",
+      "ko": "잠금 끄기"
+    },
+    "lock.changePassword": {
+      "en": "Change password",
+      "ko": "비밀번호 변경"
+    },
+    "lock.enableTitle": {
+      "en": "Set password",
+      "ko": "비밀번호 설정"
+    },
+    "lock.disableTitle": {
+      "en": "Turn off lock",
+      "ko": "잠금 끄기"
+    },
+    "lock.changeTitle": {
+      "en": "Change password",
+      "ko": "비밀번호 변경"
+    },
+    "lock.setHint": {
+      "en": "Choose a password with at least {{min}} characters.",
+      "ko": "비밀번호 {{min}}자 이상으로 정해 주세요."
+    },
+    "lock.disableHint": {
+      "en": "Enter your 4-digit password to turn off the lock.",
+      "ko": "비밀번호 4자리를 입력하면 잠금이 꺼져요."
+    },
+    "lock.password": {
+      "en": "Password",
+      "ko": "비밀번호"
+    },
+    "lock.newPassword": {
+      "en": "New password",
+      "ko": "새 비밀번호"
+    },
+    "lock.confirmPassword": {
+      "en": "Confirm password",
+      "ko": "비밀번호 확인"
+    },
+    "lock.currentPassword": {
+      "en": "Current password",
+      "ko": "현재 비밀번호"
+    },
+    "lock.unlock": {
+      "en": "Unlock",
+      "ko": "잠금 해제"
+    },
+    "lock.gateTitle": {
+      "en": "Locked",
+      "ko": "잠금 중"
+    },
+    "lock.gateHint": {
+      "en": "Please enter your password",
+      "ko": "비밀번호를 입력해 주세요"
+    },
+    "lock.gateAria": {
+      "en": "Screen lock",
+      "ko": "화면 잠금"
+    },
+    "lock.ok.enabled": {
+      "en": "Screen lock turned on",
+      "ko": "화면 잠금을 켰어요"
+    },
+    "lock.ok.disabled": {
+      "en": "Screen lock turned off",
+      "ko": "화면 잠금을 껐어요"
+    },
+    "lock.ok.changed": {
+      "en": "Password updated",
+      "ko": "비밀번호를 바꿨어요"
+    },
+    "lock.err.passwordRequired": {
+      "en": "Please enter your password",
+      "ko": "비밀번호를 입력해 주세요"
+    },
+    "lock.err.wrongPassword": {
+      "en": "Incorrect password",
+      "ko": "비밀번호가 맞지 않아요"
+    },
+    "lock.err.tooShort": {
+      "en": "Password must be at least {{min}} characters",
+      "ko": "비밀번호는 {{min}}자 이상이어야 해요"
+    },
+    "lock.err.mismatch": {
+      "en": "Passwords do not match. Try again",
+      "ko": "비밀번호가 서로 달라요. 다시 입력해 주세요"
+    },
+    "lock.err.save": {
+      "en": "Could not save",
+      "ko": "저장하지 못했어요"
+    },
+    "lock.pinTitle": {
+      "en": "Enter password",
+      "ko": "비밀번호 입력"
+    },
+    "lock.pinEnterHint": {
+      "en": "Please enter a password",
+      "ko": "비밀번호를 입력해주세요"
+    },
+    "lock.pinConfirmHint": {
+      "en": "Please enter the password again",
+      "ko": "비밀번호를 한번더 입력해주세요"
+    },
+    "lock.pinRestart": {
+      "en": "Start over",
+      "ko": "처음부터 다시"
+    },
+    "lock.delete": {
+      "en": "Delete",
+      "ko": "지우기"
+    },
+    "lock.keypadAria": {
+      "en": "Number keypad",
+      "ko": "숫자 키패드"
+    },
+    "lock.changeVerifyHint": {
+      "en": "Enter your current 4-digit password.",
+      "ko": "지금 쓰는 비밀번호 4자리를 입력해 주세요."
+    }
+  }
+}

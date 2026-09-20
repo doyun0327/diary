@@ -224,7 +224,7 @@
       "syncNow": "ซิงค์เลย",
       "syncing": "กำลังซิงค์…",
       "lastSynced": "ซิงค์ล่าสุด · {{time}}",
-      "lastSyncedAt": "อัปเดตล่าสุด : {{time}}",
+      "lastSyncedAt": "อัปเดตล่าสุด\n{{time}}",
       "am": "ก่อนเที่ยง",
       "pm": "หลังเที่ยง",
       "never": "ยังไม่เคย",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "ไปเขียนไดอารี่แรกกันไหม?",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "วันนี้ ลองเก็บเป็นรูปภาพไหม?",
+      "writeDayHint": "แตะวันที่ว่างเพื่อเขียนไดอารี่"
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

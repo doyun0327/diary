@@ -224,7 +224,7 @@
       "syncNow": "今すぐ同期",
       "syncing": "同期中…",
       "lastSynced": "最終同期 · {{time}}",
-      "lastSyncedAt": "最終更新 : {{time}}",
+      "lastSyncedAt": "最終更新\n{{time}}",
       "am": "午前",
       "pm": "午後",
       "never": "まだなし",
@@ -576,7 +576,8 @@
     },
     "coach": {
       "writeFab": "最初の日記を書いてみますか？",
-      "writeDay": "Tap an empty day to write!"
+      "writeDay": "今日の一日を、絵で残してみますか？",
+      "writeDayHint": "空いている日を押して日記を書いてみましょう。"
     },
     "writeDayAria": "Write diary for day {{day}}"
   },

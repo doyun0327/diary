@@ -29,10 +29,14 @@ import {
   isAiDrawStyleEnabled,
   isAiPhotoTooLargeError,
   isAiPhotoTooLargeMessage,
+  isPhotoAiDrawStyle,
+  loadLastAiPhotoStyle,
   preloadAiStylePreviews,
+  saveLastAiPhotoStyle,
   subscribeAiStylePreviewsReady,
   TEXT_OIL_STYLE_ID,
   type AiDrawStyleId,
+  type AiPhotoDrawStyleId,
 } from '../utils/aiDrawStyles';
 import { diaryEditFontStack, defaultFontIdForLanguage, ensureDiaryFontReady, findFont, fontSizeCss, getPreferredFontId, getPreferredFontSizeId, parseFontSizeId, DEFAULT_FONT_SIZE_ID } from '../utils/fonts';
 import {
@@ -273,9 +277,9 @@ function DiaryWritePage({
   >(null);
   const [aiSourceTutProgress, setAiSourceTutProgress] =
     useState<AiSourceTutorialProgress>(() => getAiSourceTutorialProgress());
-  /** 모달에서 고른 스타일 (확인 전까지 대기) */
+  /** 모달에서 고른 스타일 (확인 전까지 대기) — 마지막 선택 유지 */
   const [aiStyleSelectedId, setAiStyleSelectedId] =
-    useState<AiDrawStyleId>('webtoonHero');
+    useState<AiDrawStyleId>(() => loadLastAiPhotoStyle());
   /** AI 그림용 참조 사진 (data URL) */
   const [aiReferenceImage, setAiReferenceImage] = useState<string | null>(null);
   const [aiPhotoError, setAiPhotoError] = useState<string | null>(null);
@@ -297,7 +301,7 @@ function DiaryWritePage({
   const [usageNoticeOpen, setUsageNoticeOpen] = useState(false);
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
-  const aiStyleRef = useRef<AiDrawStyleId>('webtoonHero');
+  const aiStyleRef = useRef<AiDrawStyleId>(loadLastAiPhotoStyle());
   /** diary = textOil(일기), photo = 사진+스타일3 */
   const aiSourceRef = useRef<'diary' | 'photo'>('photo');
   const aiReferenceImageRef = useRef<string | null>(null);
@@ -1294,9 +1298,13 @@ function DiaryWritePage({
     aiSourceRef.current = 'photo';
     setAiSourceOpen(false);
     setAiPhotoError(null);
-    setAiStyleSelectedId(
-      aiStyleRef.current === TEXT_OIL_STYLE_ID ? 'webtoonHero' : aiStyleRef.current,
-    );
+    const lastStyle: AiPhotoDrawStyleId =
+      isPhotoAiDrawStyle(aiStyleRef.current) &&
+      isAiDrawStyleEnabled(aiStyleRef.current)
+        ? aiStyleRef.current
+        : loadLastAiPhotoStyle();
+    aiStyleRef.current = lastStyle;
+    setAiStyleSelectedId(lastStyle);
     setAiStyleOpen(true);
   };
 
@@ -1309,8 +1317,13 @@ function DiaryWritePage({
       setAiPhotoError(t('write.ai.styleDisabled'));
       return;
     }
+    if (!isPhotoAiDrawStyle(styleId)) {
+      setAiPhotoError(t('write.ai.styleDisabled'));
+      return;
+    }
     aiSourceRef.current = 'photo';
     aiStyleRef.current = styleId;
+    saveLastAiPhotoStyle(styleId);
     setAiStyleOpen(false);
     beginAiDrawAfterSetup();
   };
