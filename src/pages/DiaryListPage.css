@@ -11,6 +11,7 @@
   font-family: var(--ui-font);
   /* hidden이면 앱에서 달력 하단이 잘림 */
   overflow: visible;
+  touch-action: pan-y;
 }
 
 .diary-list > * {
@@ -38,8 +39,27 @@
   bottom: auto;
   transform: none;
   z-index: 5;
-  max-width: min(280px, 92%);
+  width: max-content;
+  max-width: min(360px, calc(100vw - 28px));
   margin: 2px auto 0;
+}
+
+.diary-list__cal-coach .coach-bubble__body {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-top: 0;
+}
+
+.diary-list__cal-coach .coach-bubble__body p {
+  overflow-wrap: normal;
+  word-break: keep-all;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.diary-list__cal-coach .coach-bubble__line {
+  display: block;
+  white-space: nowrap;
 }
 
 /* 말풍선 등장 애니메이션이 translateX 를 덮어쓰지 않게 */

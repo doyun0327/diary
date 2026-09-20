@@ -83,7 +83,9 @@ function CoachBubble({
           aria-label={t('common.close')}
           onClick={onDismiss}
         >
-          ×
+          <span className="coach-bubble__dismiss-icon" aria-hidden>
+            ×
+          </span>
         </button>
       )}
     </div>

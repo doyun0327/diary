@@ -55,8 +55,8 @@
 .coach-bubble__dismiss {
   flex-shrink: 0;
   box-sizing: border-box;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   margin: 0;
   padding: 0;
   display: inline-flex;
@@ -66,12 +66,20 @@
   border-radius: 50%;
   background: var(--color-bg-muted);
   color: var(--color-text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 500;
   line-height: 1;
   cursor: pointer;
-  /* × 글리프가 원 안에서 위로 뜨는 광학적 보정 */
-  padding-top: 3px;
+}
+
+.coach-bubble__dismiss-icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+  /* 글리프 기준선을 원 기하 중심에 맞춤 */
+  transform: translateY(0.04em);
 }
 
 .coach-bubble__dismiss:active {
