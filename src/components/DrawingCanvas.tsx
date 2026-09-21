@@ -1718,6 +1718,15 @@ function DrawingCanvas({
     setActivePhotoId(layer.id);
     activePhotoIdRef.current = layer.id;
     activeStickerIdRef.current = null;
+    // 나중에 선택한 사진이 위로 오도록 맨 뒤로
+    setPhotoLayers((prev) => {
+      const idx = prev.findIndex((l) => l.id === layer.id);
+      if (idx < 0 || idx === prev.length - 1) return prev;
+      const next = [...prev];
+      const [item] = next.splice(idx, 1);
+      next.push(item);
+      return next;
+    });
 
     const live = photoLayersRef.current.find((l) => l.id === layer.id) ?? layer;
     const wrap = wrapRef.current?.getBoundingClientRect();
@@ -1758,6 +1767,15 @@ function DrawingCanvas({
     setActiveStickerId(layer.id);
     activeStickerIdRef.current = layer.id;
     activePhotoIdRef.current = null;
+    // 나중에 선택한 스티커가 위로
+    setStickerLayers((prev) => {
+      const idx = prev.findIndex((l) => l.id === layer.id);
+      if (idx < 0 || idx === prev.length - 1) return prev;
+      const next = [...prev];
+      const [item] = next.splice(idx, 1);
+      next.push(item);
+      return next;
+    });
 
     const live = stickerLayersRef.current.find((l) => l.id === layer.id) ?? layer;
     const wrap = wrapRef.current?.getBoundingClientRect();
