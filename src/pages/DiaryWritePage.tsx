@@ -260,7 +260,6 @@ function DiaryWritePage({
           (initialEntry ? DEFAULT_FONT_SIZE_ID : getPreferredFontSizeId()),
       ),
   );
-  const [canvasCollapsed, setCanvasCollapsed] = useState(false);
   /** 수정 진입 시 기존 그림 하이드레이션 중 */
   const [drawingLoading, setDrawingLoading] = useState(() =>
     Boolean(
@@ -1694,7 +1693,7 @@ function DiaryWritePage({
 
       const payload: Parameters<typeof onSave>[0] = {
         date,
-        title: title.trim(),
+        title: title.trim() || date,
         content: content.trim(),
         mood,
         moodPack: writePackId,
@@ -1794,7 +1793,7 @@ function DiaryWritePage({
 
       <div
         ref={paperRef}
-        className={`diary-write__paper${canvasCollapsed ? ' diary-write__paper--canvas-collapsed' : ''}`}
+        className="diary-write__paper"
         style={{
           ['--diary-font' as string]: diaryEditFontStack(findFont(fontId).family),
           ['--diary-font-size' as string]: fontSizeCss(fontSizeId),
@@ -1857,37 +1856,9 @@ function DiaryWritePage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onFocus={handleTitleFocus}
-              placeholder={t('write.titlePlaceholder')}
+              placeholder={date}
               maxLength={40}
             />
-            <button
-              type="button"
-              className="diary-write__canvas-fold"
-              onClick={() => {
-                setCanvasCollapsed((open) => !open);
-              }}
-              aria-expanded={!canvasCollapsed}
-              aria-label={canvasCollapsed ? t('write.expandCanvas') : t('write.collapseCanvas')}
-              title={canvasCollapsed ? t('write.expandCanvas') : t('write.collapseCanvas')}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                {canvasCollapsed ? (
-                  <polyline points="6 9 12 15 18 9" />
-                ) : (
-                  <polyline points="6 15 12 9 18 15" />
-                )}
-              </svg>
-            </button>
           </div>
 
           <div className="diary-write__draw">

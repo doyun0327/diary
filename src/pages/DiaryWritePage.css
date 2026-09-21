@@ -637,35 +637,6 @@
   align-items: stretch;
 }
 
-.diary-write__canvas-fold {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--color-border-soft);
-  border-radius: 12px;
-  background: var(--color-bg-muted);
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.diary-write__canvas-fold svg {
-  display: block;
-}
-
-.diary-write__paper--canvas-collapsed .diary-write__canvas-wrap,
-.diary-write__paper--canvas-collapsed .diary-write__section-head,
-.diary-write__paper--canvas-collapsed .diary-write__tip {
-  display: none;
-}
-
-.diary-write__paper--canvas-collapsed .diary-write__content {
-  min-height: 280px;
-}
-
 .diary-write__ai-pick {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
