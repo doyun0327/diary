@@ -1856,7 +1856,7 @@ function DiaryWritePage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onFocus={handleTitleFocus}
-              placeholder={date}
+              placeholder={t('write.titlePlaceholder')}
               maxLength={40}
             />
           </div>
