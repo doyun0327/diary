@@ -85,7 +85,7 @@ import {
   writeDraftHasContent,
 } from '../utils/writeDraft';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
-import { isFlutterApp, notifyAiDrawComplete, requestAiRewardedAd } from '../utils/nativeShare';
+import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
 import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
 import {
@@ -1460,7 +1460,7 @@ function DiaryWritePage({
         }
       }
 
-      const { imageUrl, notice, imageSource, completedInBackground } = await generateDiaryImage({
+      const { imageUrl, notice, imageSource } = await generateDiaryImage({
         title,
         content,
         style: isDiary ? TEXT_OIL_STYLE_ID : aiStyleRef.current,
@@ -1472,13 +1472,6 @@ function DiaryWritePage({
         onProgress: setAiProgress,
         onEstimatedWaitMinutes: setAiWaitMinutes,
       });
-
-      if (completedInBackground && isGoogleSignedIn()) {
-        notifyAiDrawComplete({
-          title: t('write.ai.doneNotifyTitle'),
-          body: t('write.ai.doneNotifyBody'),
-        });
-      }
 
       const quotaKind = aiQuotaKindRef.current;
       await commitAiDrawQuota();

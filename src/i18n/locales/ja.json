@@ -715,6 +715,7 @@
       "stepDrawing": "Draw",
       "stepFinishing": "Done",
       "estimatedWait": "約{{n}}分かかります",
+      "estimatedWaitBusy": "混み合っているため約{{n}}分かかります！",
       "sourceTitle": "How should we draw?",
       "sourceLead": "Pick a way to create your drawing.",
       "sourceExampleCaption": "Your diary can turn into a drawing like this",

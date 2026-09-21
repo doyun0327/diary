@@ -127,7 +127,7 @@ function humanizeAiError(message: string): string {
     return 'AI 사용 한도에 걸렸어요. 1~2분 후에 다시 시도해 주세요.';
   }
   if (lower.includes('rate limit') || lower.includes('rate-limit')) {
-    return '그림 요청이 많아요. 잠시 후 다시 시도해 주세요';
+    return '접속자가 많아요. 5분뒤 다시 시도해주세요';
   }
   if (
     lower.includes('generativelanguage.googleapis.com') ||
@@ -382,7 +382,7 @@ export async function generateDiaryImage(input: {
     if (response.status === 413) {
       message = 'photo-too-large';
     } else if (response.status === 429) {
-      message = '그림 요청이 많아요. 잠시 후 다시 시도해 주세요';
+      message = '접속자가 많아요. 5분뒤 다시 시도해주세요';
     } else if (response.status === 501) {
       message =
         'AI 그림 API가 아직 준비되지 않았어요 (501). 백엔드 SD 3.5 연동을 확인해 주세요';

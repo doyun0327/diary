@@ -715,6 +715,7 @@
       "stepDrawing": "Draw",
       "stepFinishing": "Done",
       "estimatedWait": "About {{n}} min",
+      "estimatedWaitBusy": "Busy now — about {{n}} min!",
       "sourceTitle": "How should we draw?",
       "sourceLead": "Pick a way to create your drawing.",
       "sourceExampleCaption": "Your diary can turn into a drawing like this",

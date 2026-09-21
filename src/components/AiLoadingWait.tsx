@@ -6,6 +6,8 @@ import { keywordsFromDiary } from '../utils/aiWaitKeywords';
 import './AiLoadingWait.css';
 
 const MAX_FLOATING = 4;
+/** 예상 대기 문구 표시 시간 */
+const ETA_VISIBLE_MS = 10_000;
 
 const PASTELS = [
   '#e8a99a',
@@ -141,10 +143,50 @@ export default function AiLoadingWait({
   const keywords = useMemo(() => keywordsFromDiary(sourceText), [sourceText]);
   const [floaters, setFloaters] = useState<Floater[]>([]);
   const [resumeKey, setResumeKey] = useState(0);
+  const [etaVisible, setEtaVisible] = useState(false);
   const cursorRef = useRef(0);
   const idRef = useRef(MAX_FLOATING);
+  const etaTimerRef = useRef<number | null>(null);
+  const lastEtaRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const minutes =
+      estimatedWaitMinutes != null && estimatedWaitMinutes > 0
+        ? estimatedWaitMinutes
+        : null;
+    if (minutes == null) {
+      lastEtaRef.current = null;
+      setEtaVisible(false);
+      if (etaTimerRef.current != null) {
+        window.clearTimeout(etaTimerRef.current);
+        etaTimerRef.current = null;
+      }
+      return;
+    }
+    // 같은 분이면 이미 띄운 타이머 유지
+    if (lastEtaRef.current === minutes) return;
+    lastEtaRef.current = minutes;
+    setEtaVisible(true);
+    if (etaTimerRef.current != null) window.clearTimeout(etaTimerRef.current);
+    etaTimerRef.current = window.setTimeout(() => {
+      setEtaVisible(false);
+      etaTimerRef.current = null;
+    }, ETA_VISIBLE_MS);
+  }, [estimatedWaitMinutes]);
+
+  useEffect(
+    () => () => {
+      if (etaTimerRef.current != null) {
+        window.clearTimeout(etaTimerRef.current);
+        etaTimerRef.current = null;
+      }
+    },
+    [],
+  );
+
   const showEta =
     !hideStage &&
+    etaVisible &&
     estimatedWaitMinutes != null &&
     estimatedWaitMinutes > 0 &&
     step !== 'finishing';
@@ -246,7 +288,12 @@ export default function AiLoadingWait({
       <div className="ai-loading-wait__panel">
         {showEta ? (
           <p className="ai-loading-wait__eta" role="status">
-            {t('write.ai.estimatedWait', { n: estimatedWaitMinutes })}
+            {t(
+              estimatedWaitMinutes >= 3
+                ? 'write.ai.estimatedWaitBusy'
+                : 'write.ai.estimatedWait',
+              { n: estimatedWaitMinutes },
+            )}
           </p>
         ) : null}
         {!hideStage ? (

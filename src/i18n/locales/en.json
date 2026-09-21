@@ -651,6 +651,7 @@
       "stepDrawing": "Draw",
       "stepFinishing": "Done",
       "estimatedWait": "About {{n}} min",
+      "estimatedWaitBusy": "Busy now — about {{n}} min!",
       "modeTitle": "Which mode?",
       "modeWacky": "Wacky mode",
       "modeWackyDesc": "Fast draw. Results can look a bit odd sometimes.",
