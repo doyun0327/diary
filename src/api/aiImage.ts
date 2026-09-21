@@ -289,7 +289,7 @@ async function pollDrawJob(
  * 백엔드에 AI 그림 생성 요청 (비동기 큐).
  *
  * - 사진 경로: referenceImage + webtoonHero|oilPastel|jpRetroFilm
- * - 일기 경로: diaryLine + style textOil (캐릭터·사진 없음)
+ * - 일기 경로: diaryLine + textOil|webtoonHero|oilPastel|jpRetroFilm (+ character, 사진 없음)
  *
  * POST /api/ai/draw → 202 { jobId, status: queued }
  * GET  /api/ai/draw/{jobId} → queued|running|done|failed
@@ -299,9 +299,9 @@ export async function generateDiaryImage(input: {
   content?: string;
   /** webtoonHero | oilPastel | jpRetroFilm | textOil */
   style?: AiDrawStyleId;
-  /** 사진 경로 필수. textOil 이면 생략 */
+  /** 사진 경로 필수. 일기 경로면 생략 */
   referenceImage?: string | null;
-  /** textOil 주인공 외형 (성별·연령 기반). 없으면 서버 기본 a child */
+  /** 일기 경로 주인공 외형 (성별·연령 기반). 없으면 서버 기본 a child */
   character?: string | null;
   /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
   accessToken?: string | null;
@@ -313,17 +313,16 @@ export async function generateDiaryImage(input: {
   const diaryLine = extractSceneLine(input.content ?? '') || title;
   const referenceImage = input.referenceImage?.trim() || '';
   const styleId = normalizeAiDrawStyleId(input.style);
-  const isTextOil = styleId === 'textOil';
+  const hasRef = referenceImage.startsWith('data:image/');
+  const isDiaryPath = !hasRef;
   const character = input.character?.trim() || '';
 
-  if (!isTextOil && !referenceImage.startsWith('data:image/')) {
-    throw new Error('그림을 만들려면 사진을 첨부해 주세요');
-  }
-  if (isTextOil && !diaryLine) {
+  if (isDiaryPath && !diaryLine) {
     throw new Error('일기 내용을 먼저 적어 주세요');
   }
-
-  const stylePrompt = stylePromptFor(styleId);
+  if (!isDiaryPath && styleId === 'textOil') {
+    throw new Error('그림을 만들려면 사진을 첨부해 주세요');
+  }
 
   const payload: Record<string, unknown> = {
     diaryLine: diaryLine || undefined,
@@ -331,10 +330,11 @@ export async function generateDiaryImage(input: {
     sceneMode: 'full' as const,
     style: styleId,
   };
-  // textOil: 프로필 성별·연령 → character 만 전송 (사진·stylePrompt 없음)
-  if (isTextOil) {
+  if (isDiaryPath) {
+    // 일기: character만. stylePrompt는 보내지 않음 — 서버 DEFAULT 프롬프트 사용
     if (character) payload.character = character;
   } else {
+    const stylePrompt = stylePromptFor(styleId);
     if (stylePrompt) payload.stylePrompt = stylePrompt;
     payload.referenceImage = referenceImage;
     payload.referenceImageBase64 = referenceImage;
@@ -345,7 +345,7 @@ export async function generateDiaryImage(input: {
     '[AI] body keys:',
     Object.keys(payload),
     'hasRef=',
-    !isTextOil,
+    hasRef,
     'style=',
     styleId,
   );

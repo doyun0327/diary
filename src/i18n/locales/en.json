@@ -672,7 +672,7 @@
       "sourceLead": "Pick a way to create your drawing.",
       "sourceExampleCaption": "Your diary can turn into a drawing like this",
       "sourceTutDiaryTitle": "Draw from diary",
-      "sourceTutDiaryBody": "Just write your diary and tap — you get a drawing like this!",
+      "sourceTutDiaryBody": "Write your diary, pick 1 of 4 styles, and we draw it that way!",
       "sourceTutDiaryProfileNote": "Your gender and age from setup are used!",
       "sourceTutDiaryProfileChange": "You can change them in Menu › Account.",
       "sourceTutDiaryTap": "Tap to see an example",
@@ -686,6 +686,7 @@
       "sourcePhotoDesc": "Turn your photo into a drawing",
       "styleTitle": "Which style?",
       "styleLead": "Attach a photo, pick a style, then tap Confirm.",
+      "styleLeadDiary": "Pick a style, then tap Confirm.",
       "styleConfirm": "Confirm",
       "styleSoon": "(Coming soon)",
       "styleDisabled": "That style isn’t available yet. Pick another style.",
@@ -699,6 +700,10 @@
       "photoError": "Couldn’t load that photo. Try another image.",
       "photoTooLarge": "This image is too large. Please choose a smaller photo.",
       "style": {
+        "textOil": {
+          "name": "Picture diary",
+          "desc": "Soft pastel art from your diary scene."
+        },
         "webtoonHero": {
           "name": "Webtoonherost",
           "desc": "Turns you into a protagonist who just stepped out of a comic."

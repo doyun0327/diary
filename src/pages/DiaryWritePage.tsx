@@ -23,15 +23,19 @@ import AppModal from '../components/AppModal';
 import CoachBubble from '../components/CoachBubble';
 import { formatDate, today } from '../utils/date';
 import {
+  AI_DIARY_DRAW_STYLES,
   AI_DRAW_STYLES,
   aiStylePreviewSrc,
   fileToAiReferenceDataUrl,
   isAiDrawStyleEnabled,
   isAiPhotoTooLargeError,
   isAiPhotoTooLargeMessage,
+  isDiaryAiDrawStyle,
   isPhotoAiDrawStyle,
+  loadLastAiDiaryStyle,
   loadLastAiPhotoStyle,
   preloadAiStylePreviews,
+  saveLastAiDiaryStyle,
   saveLastAiPhotoStyle,
   subscribeAiStylePreviewsReady,
   TEXT_OIL_STYLE_ID,
@@ -281,6 +285,10 @@ function DiaryWritePage({
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
   const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
+  /** 스타일 모달이 일기 경로인지 사진 경로인지 */
+  const [aiStylePickerSource, setAiStylePickerSource] = useState<
+    'diary' | 'photo'
+  >('photo');
   /** 그림 생성: 일기(textOil) vs 사진 */
   const [aiSourceOpen, setAiSourceOpen] = useState(false);
   /** 튜토리얼 중 예시 패널: diary | photo */
@@ -314,7 +322,7 @@ function DiaryWritePage({
   const [usageNotice, setUsageNotice] = useState('');
   const [usageNoticeKind, setUsageNoticeKind] = useState<'refund' | 'cdn'>('refund');
   const aiStyleRef = useRef<AiDrawStyleId>(loadLastAiPhotoStyle());
-  /** diary = textOil(일기), photo = 사진+스타일3 */
+  /** diary = 일기+그림체4, photo = 사진+스타일3 */
   const aiSourceRef = useRef<'diary' | 'photo'>('photo');
   const aiReferenceImageRef = useRef<string | null>(null);
   const aiQuotaKindRef = useRef<
@@ -1285,6 +1293,7 @@ function DiaryWritePage({
   const proceedDiaryDraw = () => {
     // 튜토리얼: 첫 클릭은 예시만 보여 줌
     if (aiSourceTutProgress === 'need-diary') {
+      preloadAiStylePreviews();
       setAiSourceTutPanel('diary');
       return;
     }
@@ -1295,9 +1304,14 @@ function DiaryWritePage({
       return;
     }
     aiSourceRef.current = 'diary';
-    aiStyleRef.current = TEXT_OIL_STYLE_ID;
     setAiSourceOpen(false);
-    beginAiDrawAfterSetup();
+    setAiPhotoError(null);
+    preloadAiStylePreviews();
+    const lastStyle = loadLastAiDiaryStyle();
+    aiStyleRef.current = lastStyle;
+    setAiStyleSelectedId(lastStyle);
+    setAiStylePickerSource('diary');
+    setAiStyleOpen(true);
   };
 
   const openPhotoStylePicker = () => {
@@ -1317,10 +1331,23 @@ function DiaryWritePage({
         : loadLastAiPhotoStyle();
     aiStyleRef.current = lastStyle;
     setAiStyleSelectedId(lastStyle);
+    setAiStylePickerSource('photo');
     setAiStyleOpen(true);
   };
 
   const proceedAfterStylePick = (styleId: AiDrawStyleId) => {
+    if (aiStylePickerSource === 'diary') {
+      if (!isDiaryAiDrawStyle(styleId) || !isAiDrawStyleEnabled(styleId)) {
+        setAiPhotoError(t('write.ai.styleDisabled'));
+        return;
+      }
+      aiSourceRef.current = 'diary';
+      aiStyleRef.current = styleId;
+      saveLastAiDiaryStyle(styleId);
+      setAiStyleOpen(false);
+      beginAiDrawAfterSetup();
+      return;
+    }
     if (!aiReferenceImageRef.current?.startsWith('data:image/')) {
       setAiPhotoError(t('write.err.aiNeedPhoto'));
       return;
@@ -1447,8 +1474,7 @@ function DiaryWritePage({
         await capturePreviousSnapshot();
       previousCanvasStateRef.current = previousState;
 
-      const isDiary = aiSourceRef.current === 'diary'
-        || aiStyleRef.current === TEXT_OIL_STYLE_ID;
+      const isDiary = aiSourceRef.current === 'diary';
       const ref = aiReferenceImageRef.current;
       if (!isDiary && !ref?.startsWith('data:image/')) {
         throw new Error(t('write.err.aiNeedPhoto'));
@@ -1460,10 +1486,15 @@ function DiaryWritePage({
         }
       }
 
+      const diaryStyle =
+        isDiary && isDiaryAiDrawStyle(aiStyleRef.current)
+          ? aiStyleRef.current
+          : TEXT_OIL_STYLE_ID;
+
       const { imageUrl, notice, imageSource } = await generateDiaryImage({
         title,
         content,
-        style: isDiary ? TEXT_OIL_STYLE_ID : aiStyleRef.current,
+        style: isDiary ? diaryStyle : aiStyleRef.current,
         referenceImage: isDiary ? null : ref,
         character: isDiary
           ? profileLookForAi(readStoredGender(), readStoredAgeGroup())
@@ -2054,12 +2085,39 @@ function DiaryWritePage({
             >
               {aiSourceTutPanel === 'diary' ? (
                 <div className="diary-write__ai-source-example">
-                  <img
-                    src="/preview/textoil.png"
-                    alt=""
-                    className="diary-write__ai-source-example-img"
-                    decoding="async"
-                  />
+                  <div className="diary-write__ai-source-styles diary-write__ai-source-styles--diary">
+                    {AI_DIARY_DRAW_STYLES.map((style) => {
+                      void aiPreviewTick;
+                      const path = style.previewSrcs[0] ?? '';
+                      const coverSrc =
+                        (path ? aiStylePreviewSrc(path) : '') || path;
+                      return (
+                        <div
+                          key={style.id}
+                          className="diary-write__ai-source-style"
+                        >
+                          <img
+                            src={coverSrc}
+                            alt=""
+                            className="diary-write__ai-source-style-img"
+                            decoding="async"
+                          />
+                          <span
+                            className={[
+                              'diary-write__ai-source-style-name',
+                              style.id === 'jpRetroFilm'
+                                ? ''
+                                : 'diary-write__ai-source-style-name--center',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')}
+                          >
+                            {t(`write.ai.style.${style.id}.name`)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                   <p className="diary-write__ai-source-example-cap">
                     {t('write.ai.sourceTutDiaryBody')}
                   </p>
@@ -2180,7 +2238,7 @@ function DiaryWritePage({
               closeAriaLabel={t('common.close')}
               primaryLabel={t('write.ai.styleConfirm')}
               onPrimary={() => {
-                if (!aiReferenceImage) {
+                if (aiStylePickerSource === 'photo' && !aiReferenceImage) {
                   setAiPhotoError(t('write.err.aiNeedPhoto'));
                   return;
                 }
@@ -2191,54 +2249,73 @@ function DiaryWritePage({
                 proceedAfterStylePick(aiStyleSelectedId);
               }}
             >
-              <div className="diary-write__ai-photo">
-                <p className="diary-write__ai-photo-label">{t('write.ai.photoLabel')}</p>
-                <input
-                  ref={aiPhotoInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="diary-write__ai-photo-input"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    e.target.value = '';
-                    void handleAiPhotoPick(file);
-                  }}
-                />
-                {aiReferenceImage ? (
-                  <div className="diary-write__ai-photo-preview-wrap">
-                    <img
-                      src={aiReferenceImage}
-                      alt=""
-                      className="diary-write__ai-photo-preview"
-                    />
-                    <div className="diary-write__ai-photo-actions">
-                      <button
-                        type="button"
-                        className="diary-write__ai-photo-btn"
-                        onClick={() => aiPhotoInputRef.current?.click()}
-                      >
-                        {t('write.ai.photoChange')}
-                      </button>
+              {aiStylePickerSource === 'photo' ? (
+                <div className="diary-write__ai-photo">
+                  <p className="diary-write__ai-photo-label">{t('write.ai.photoLabel')}</p>
+                  <input
+                    ref={aiPhotoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="diary-write__ai-photo-input"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = '';
+                      void handleAiPhotoPick(file);
+                    }}
+                  />
+                  {aiReferenceImage ? (
+                    <div className="diary-write__ai-photo-preview-wrap">
+                      <img
+                        src={aiReferenceImage}
+                        alt=""
+                        className="diary-write__ai-photo-preview"
+                      />
+                      <div className="diary-write__ai-photo-actions">
+                        <button
+                          type="button"
+                          className="diary-write__ai-photo-btn"
+                          onClick={() => aiPhotoInputRef.current?.click()}
+                        >
+                          {t('write.ai.photoChange')}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="diary-write__ai-photo-add"
-                    onClick={() => aiPhotoInputRef.current?.click()}
-                  >
-                    {t('write.ai.photoAdd')}
-                  </button>
-                )}
-                {aiPhotoError ? (
-                  <p className="diary-write__ai-error" role="alert">
-                    {aiPhotoError}
-                  </p>
-                ) : null}
-              </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="diary-write__ai-photo-add"
+                      onClick={() => aiPhotoInputRef.current?.click()}
+                    >
+                      {t('write.ai.photoAdd')}
+                    </button>
+                  )}
+                  {aiPhotoError ? (
+                    <p className="diary-write__ai-error" role="alert">
+                      {aiPhotoError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="diary-write__ai-style-lead">
+                  {t('write.ai.styleLeadDiary')}
+                </p>
+              )}
 
-              <div className="diary-write__ai-styles" role="list">
-                {AI_DRAW_STYLES.map((style) => {
+              <div
+                className={[
+                  'diary-write__ai-styles',
+                  aiStylePickerSource === 'diary'
+                    ? 'diary-write__ai-styles--diary'
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                role="list"
+              >
+                {(aiStylePickerSource === 'diary'
+                  ? AI_DIARY_DRAW_STYLES
+                  : AI_DRAW_STYLES
+                ).map((style) => {
                   const selected = aiStyleSelectedId === style.id;
                   const enabled = style.enabled !== false;
                   const coverSrc = style.previewSrcs[0]
@@ -2297,6 +2374,11 @@ function DiaryWritePage({
                   );
                 })}
               </div>
+              {aiStylePickerSource === 'diary' && aiPhotoError ? (
+                <p className="diary-write__ai-error" role="alert">
+                  {aiPhotoError}
+                </p>
+              ) : null}
             </AppModal>
           )}
           {usageNoticeOpen && (

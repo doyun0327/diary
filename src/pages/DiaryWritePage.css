@@ -816,6 +816,10 @@
   margin: 0;
 }
 
+.diary-write__ai-source-styles--diary {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .diary-write__ai-source-style {
   display: grid;
   gap: 6px;
@@ -993,6 +997,25 @@
   flex-direction: row;
   gap: 8px;
   margin: 4px 0 0;
+  text-align: left;
+}
+
+.diary-write__ai-styles--diary {
+  flex-wrap: wrap;
+}
+
+.diary-write__ai-styles--diary .diary-write__ai-style-item {
+  flex: 1 1 calc(50% - 4px);
+  max-width: calc(50% - 4px);
+}
+
+.diary-write__ai-style-lead {
+  margin: 0 0 10px;
+  font-family: var(--brand-font);
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--color-text-muted);
   text-align: left;
 }
 

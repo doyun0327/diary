@@ -1,7 +1,7 @@
 /**
  * AI 그림 스타일
  * - 사진 경로: webtoonHero | oilPastel | jpRetroFilm (GPT Image 2 + reference)
- * - 일기 텍스트 경로: textOil (예전 오일파스텔·diaryLine, 사진 없음)
+ * - 일기 경로: textOil(기존) + 위 3개 (서버 DEFAULT 프롬프트 + DAYLINE/CHARACTER, 사진·stylePrompt 없음)
  */
 
 /** 사진 첨부 생성용 — AI_DRAW_STYLES 에만 포함 */
@@ -31,10 +31,16 @@ export const JP_RETRO_FILM_STYLE_PROMPT =
   'A stylish and emotional retro Japanese anime illustration with simple yet expressive linework and soft flat coloring. A carefully balanced, artistic color palette with subtle color bleeding and slightly grainy analog texture. Dreamy, nostalgic, and cinematic atmosphere. Minimal background and character-focused composition. Vintage anime and analog illustration aesthetic. The color palette can vary freely depending on the mood of the scene while maintaining the same nostalgic, dreamy, stylish emotional atmosphere. CRITICAL: Absolutely no writing anywhere in the image — no Japanese, Chinese, Korean, English, or any other language; no kanji, hiragana, katakana, hangul, letters, numbers, signs, posters, captions, speech bubbles, watermarks, logos, or labels.';
 
 /**
- * 일기 텍스트 → 오일파스텔 스타일 id.
+ * 일기 텍스트 → 기존 오일파스텔 스타일 id.
  * 프롬프트는 서버 buildOilPastelImagePrompt 만 사용 (프론트 미전송).
  */
 export const TEXT_OIL_STYLE_ID = 'textOil' as const;
+
+export type AiStyleOption = {
+  id: AiDrawStyleId;
+  previewSrcs: string[];
+  enabled: boolean;
+};
 
 export const AI_DRAW_STYLES: {
   id: AiPhotoDrawStyleId;
@@ -58,7 +64,17 @@ export const AI_DRAW_STYLES: {
   },
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v9';
+/** 일기 경로: 기존 textOil + 사진용 그림체 3개 */
+export const AI_DIARY_DRAW_STYLES: AiStyleOption[] = [
+  {
+    id: TEXT_OIL_STYLE_ID,
+    enabled: true,
+    previewSrcs: ['/preview/textoil.png'],
+  },
+  ...AI_DRAW_STYLES,
+];
+
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v10';
 /** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
 const previewBlobUrlBySrc = new Map<string, string>();
 const previewReadyListeners = new Set<() => void>();
@@ -121,10 +137,10 @@ export function preloadAiStylePreviews() {
   if (previewWarmPromise) return previewWarmPromise;
 
   previewWarmPromise = (async () => {
-    // UI는 스타일당 대표 1장만 쓰므로 커버만 프리로드
-    const paths = AI_DRAW_STYLES.map((style) => style.previewSrcs[0]).filter(
-      Boolean,
-    ) as string[];
+    // UI는 스타일당 대표 1장만 쓰므로 커버만 프리로드 (일기 textOil 포함)
+    const paths = [
+      ...AI_DIARY_DRAW_STYLES.map((style) => style.previewSrcs[0]),
+    ].filter(Boolean) as string[];
     if (paths.length === 0) return;
 
     if (typeof caches === 'undefined') {
@@ -209,7 +225,15 @@ export function isPhotoAiDrawStyle(styleId: AiDrawStyleId): styleId is AiPhotoDr
   return styleId === 'webtoonHero' || styleId === 'oilPastel' || styleId === 'jpRetroFilm';
 }
 
+export function isDiaryAiDrawStyle(styleId: AiDrawStyleId): boolean {
+  return (
+    styleId === TEXT_OIL_STYLE_ID ||
+    AI_DIARY_DRAW_STYLES.some((s) => s.id === styleId && s.enabled !== false)
+  );
+}
+
 const AI_PHOTO_STYLE_KEY = 'picture-diary-ai-photo-style';
+const AI_DIARY_STYLE_KEY = 'picture-diary-ai-diary-style';
 
 /** 사진 경로에서 마지막으로 고른 그림체 (없으면 웹툰주인공) */
 export function loadLastAiPhotoStyle(): AiPhotoDrawStyleId {
@@ -229,6 +253,29 @@ export function saveLastAiPhotoStyle(styleId: AiPhotoDrawStyleId) {
     if (typeof localStorage === 'undefined') return;
     if (!isPhotoAiDrawStyle(styleId) || !isAiDrawStyleEnabled(styleId)) return;
     localStorage.setItem(AI_PHOTO_STYLE_KEY, styleId);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** 일기 경로에서 마지막으로 고른 그림체 (없으면 textOil) */
+export function loadLastAiDiaryStyle(): AiDrawStyleId {
+  try {
+    if (typeof localStorage === 'undefined') return TEXT_OIL_STYLE_ID;
+    const raw = localStorage.getItem(AI_DIARY_STYLE_KEY);
+    const id = normalizeAiDrawStyleId(raw);
+    if (isDiaryAiDrawStyle(id) && isAiDrawStyleEnabled(id)) return id;
+  } catch {
+    /* ignore */
+  }
+  return TEXT_OIL_STYLE_ID;
+}
+
+export function saveLastAiDiaryStyle(styleId: AiDrawStyleId) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (!isDiaryAiDrawStyle(styleId) || !isAiDrawStyleEnabled(styleId)) return;
+    localStorage.setItem(AI_DIARY_STYLE_KEY, styleId);
   } catch {
     /* ignore */
   }
