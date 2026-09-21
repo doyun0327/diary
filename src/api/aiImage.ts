@@ -225,7 +225,9 @@ async function pollDrawJob(
 
     const status = (data.status || '').toLowerCase();
     console.info('[AI] poll jobId=', jobId, 'status=', status);
-    onEstimatedWaitMinutes?.(parseEstimatedWaitMinutes(data));
+    // ETA는 값이 있을 때만 갱신 — 폴링마다 null로 지워지면 10초 표시가 깨짐
+    const etaMin = parseEstimatedWaitMinutes(data);
+    if (etaMin != null) onEstimatedWaitMinutes?.(etaMin);
 
     if (status === 'done') {
       onEstimatedWaitMinutes?.(null);

@@ -645,6 +645,7 @@
       "statusDrawing": "그리는 중…",
       "statusFinishing": "마무리 중…",
       "bgHint": "앱을 나가도 계속 그려져요.\n끝나면 알려드릴께요!",
+      "bgHintDontShow": "그만보기",
       "doneNotifyTitle": "그림이 완성되었어요!",
       "doneNotifyBody": "그림을 확인해 보세요.💛",
       "stepWaiting": "대기",

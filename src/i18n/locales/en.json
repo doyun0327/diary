@@ -645,6 +645,7 @@
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
       "bgHint": "We'll keep drawing even if you leave.\nWe'll let you know when it's done!",
+      "bgHintDontShow": "Don't show again",
       "doneNotifyTitle": "Your drawing is ready!",
       "doneNotifyBody": "Check your drawing.💛",
       "stepWaiting": "Wait",

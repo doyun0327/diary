@@ -73,7 +73,7 @@ import {
   shouldShowAiClickCoach,
   markAiCoachSeen,
   shouldShowAiBgHint,
-  markAiBgHintShown,
+  dismissAiBgHint,
   getAiSourceTutorialProgress,
   markAiSourceDiaryTutorialSeen,
   markAiSourceIntroSeen,
@@ -1463,7 +1463,6 @@ function DiaryWritePage({
     // FCM 완료 알림은 구글 로그인(+푸시 토큰) 사용자만 — 안내 문구도 동일 조건
     if (isGoogleSignedIn() && shouldShowAiBgHint()) {
       setAiBgHintVisible(true);
-      markAiBgHintShown();
     } else {
       setAiBgHintVisible(false);
     }
@@ -1896,9 +1895,20 @@ function DiaryWritePage({
               </div>
             )}
             {aiBgHintVisible && (aiLoading || fortuneVisible) && !purchaseClickShield ? (
-              <p className="diary-write__ai-bg-hint" role="status">
-                {t('write.ai.bgHint')}
-              </p>
+              <div className="diary-write__ai-bg-hint" role="status">
+                <p className="diary-write__ai-bg-hint-text">{t('write.ai.bgHint')}</p>
+                <label className="diary-write__ai-bg-hint-dismiss">
+                  <input
+                    type="checkbox"
+                    onChange={(event) => {
+                      if (!event.target.checked) return;
+                      dismissAiBgHint();
+                      setAiBgHintVisible(false);
+                    }}
+                  />
+                  <span>{t('write.ai.bgHintDontShow')}</span>
+                </label>
+              </div>
             ) : null}
             </div>
           </div>

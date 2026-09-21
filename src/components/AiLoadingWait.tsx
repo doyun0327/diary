@@ -149,27 +149,30 @@ export default function AiLoadingWait({
   const etaTimerRef = useRef<number | null>(null);
   const lastEtaRef = useRef<number | null>(null);
 
+  const [heldEtaMinutes, setHeldEtaMinutes] = useState<number | null>(null);
+
   useEffect(() => {
     const minutes =
       estimatedWaitMinutes != null && estimatedWaitMinutes > 0
         ? estimatedWaitMinutes
         : null;
     if (minutes == null) {
+      // 부모가 null을내도, 표시 타이머가 돌 중이면 10초 끝날 때까지 유지
+      if (etaTimerRef.current != null) return;
       lastEtaRef.current = null;
+      setHeldEtaMinutes(null);
       setEtaVisible(false);
-      if (etaTimerRef.current != null) {
-        window.clearTimeout(etaTimerRef.current);
-        etaTimerRef.current = null;
-      }
       return;
     }
     // 같은 분이면 이미 띄운 타이머 유지
     if (lastEtaRef.current === minutes) return;
     lastEtaRef.current = minutes;
+    setHeldEtaMinutes(minutes);
     setEtaVisible(true);
     if (etaTimerRef.current != null) window.clearTimeout(etaTimerRef.current);
     etaTimerRef.current = window.setTimeout(() => {
       setEtaVisible(false);
+      setHeldEtaMinutes(null);
       etaTimerRef.current = null;
     }, ETA_VISIBLE_MS);
   }, [estimatedWaitMinutes]);
@@ -187,8 +190,8 @@ export default function AiLoadingWait({
   const showEta =
     !hideStage &&
     etaVisible &&
-    estimatedWaitMinutes != null &&
-    estimatedWaitMinutes > 0 &&
+    heldEtaMinutes != null &&
+    heldEtaMinutes > 0 &&
     step !== 'finishing';
 
   useEffect(() => {
@@ -286,13 +289,13 @@ export default function AiLoadingWait({
         ))}
       </div>
       <div className="ai-loading-wait__panel">
-        {showEta ? (
+        {showEta && heldEtaMinutes != null ? (
           <p className="ai-loading-wait__eta" role="status">
             {t(
-              estimatedWaitMinutes >= 3
+              heldEtaMinutes >= 3
                 ? 'write.ai.estimatedWaitBusy'
                 : 'write.ai.estimatedWait',
-              { n: estimatedWaitMinutes },
+              { n: heldEtaMinutes },
             )}
           </p>
         ) : null}

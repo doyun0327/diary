@@ -16,8 +16,8 @@ const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
 const AI_SOURCE_INTRO_KEY = 'picture-diary-onboarding-ai-source-intro';
 /** 완성 후 차감 안내 노출 횟수 (최대 3) — 구독·구매권 보유자만 */
 const AI_DEDUCT_COACH_COUNT_KEY = 'picture-diary-onboarding-ai-deduct-coach-count';
-/** 그림 생성 중 백그라운드 안내 (최대 3회) */
-const AI_BG_HINT_COUNT_KEY = 'picture-diary-onboarding-ai-bg-hint-count';
+/** 그림 생성 중 백그라운드 안내 「그만보기」 */
+const AI_BG_HINT_DISMISSED_KEY = 'picture-diary-onboarding-ai-bg-hint-dismissed';
 const WRITE_FAB_COACH_KEY = 'picture-diary-onboarding-write-fab-coach';
 /** 홈 오늘 날짜 칸 코치 (문구·위치 개편) */
 const TODAY_CELL_COACH_KEY = 'picture-diary-onboarding-today-cell-coach';
@@ -201,27 +201,14 @@ export function markAiDeductCoachShown() {
   }
 }
 
-/** 앱을 나가도 그려진다는 안내 — 처음 3번 */
+/** 앱을 나가도 그려진다는 안내 — 「그만보기」 전까지 매번 */
 export function shouldShowAiBgHint(): boolean {
-  return getAiBgHintShowCount() < 3;
+  return !readFlag(AI_BG_HINT_DISMISSED_KEY);
 }
 
-export function getAiBgHintShowCount(): number {
-  try {
-    const n = Number(localStorage.getItem(AI_BG_HINT_COUNT_KEY) ?? '0');
-    return Number.isFinite(n) && n > 0 ? Math.min(3, Math.floor(n)) : 0;
-  } catch {
-    return 0;
-  }
-}
-
-export function markAiBgHintShown() {
-  try {
-    const next = Math.min(3, getAiBgHintShowCount() + 1);
-    localStorage.setItem(AI_BG_HINT_COUNT_KEY, String(next));
-  } catch {
-    // ignore
-  }
+/** 「그만보기」 — 이후 백그라운드 안내 안 띄움 */
+export function dismissAiBgHint() {
+  writeFlag(AI_BG_HINT_DISMISSED_KEY);
 }
 
 export function isWriteFabCoachSeen(): boolean {
