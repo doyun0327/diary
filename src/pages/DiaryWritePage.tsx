@@ -268,6 +268,7 @@ function DiaryWritePage({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
+  const [aiWaitMinutes, setAiWaitMinutes] = useState<number | null>(null);
   const [fortuneVisible, setFortuneVisible] = useState(false);
   /** 백그라운드 생성 안내 — 처음 3회만 */
   const [aiBgHintVisible, setAiBgHintVisible] = useState(false);
@@ -1428,6 +1429,7 @@ function DiaryWritePage({
     if (!(await reserveAiDrawQuota())) return;
 
     setAiProgress('waiting');
+    setAiWaitMinutes(null);
     setFortuneVisible(false);
     setActiveAiLottie((prev) => pickRandomLottie(aiLottiePool, prev));
     setAiLottieKey((key) => key + 1);
@@ -1468,6 +1470,7 @@ function DiaryWritePage({
           : null,
         accessToken: getAccessToken(),
         onProgress: setAiProgress,
+        onEstimatedWaitMinutes: setAiWaitMinutes,
       });
 
       if (completedInBackground && isGoogleSignedIn()) {
@@ -1887,6 +1890,7 @@ function DiaryWritePage({
                 step={aiProgress}
                 sourceText={content}
                 hideStage={fortuneVisible}
+                estimatedWaitMinutes={aiWaitMinutes}
               />
             )}
             {fortuneVisible && !purchaseClickShield && (

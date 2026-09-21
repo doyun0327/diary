@@ -650,6 +650,7 @@
       "stepWaiting": "대기",
       "stepDrawing": "그리기",
       "stepFinishing": "마무리",
+      "estimatedWait": "{{n}}분이 걸려요",
       "modeTitle": "어떤 모드로 그릴까요?",
       "modeWacky": "우당탕 모드",
       "modeWackyDesc": "빠르게 그려요. 가끔 이상하게 나올 수도 있어요.",

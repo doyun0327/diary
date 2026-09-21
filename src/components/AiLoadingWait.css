@@ -54,6 +54,20 @@
   pointer-events: none;
 }
 
+.ai-loading-wait__eta {
+  margin: 0;
+  padding: 0 10px;
+  max-width: 92%;
+  font-family: var(--diary-font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--text);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--sheet-bg) 70%, transparent);
+}
+
 .ai-loading-wait__stage {
   flex-shrink: 0;
   width: min(148px, 38vw);

@@ -47,6 +47,8 @@ type DrawPayload = {
   refundUsage?: string;
   usageRefunded?: string;
   imageSource?: string;
+  /** 분 단위 숫자 문자열 (다국어는 프론트) */
+  estimatedWaitText?: string;
 };
 
 /** 그림 job 실패 — 사용권 환불 안내 포함 가능 */
@@ -68,8 +70,8 @@ export class AiDrawJobError extends Error {
 }
 
 const POLL_INTERVAL_MS = 1500;
-/** 앱이 보이는 동안에만 카운트 (백그라운드 체류는 제외) */
-const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+/** 좀비 폴링 방지용 절대 상한만 (일반 대기에서는 타임아웃 내지 않음) */
+const POLL_ABSOLUTE_MAX_MS = 30 * 60 * 1000;
 const POLL_NETWORK_RETRY_MS = 2000;
 const POLL_MAX_NETWORK_RETRIES_IN_ROW = 40;
 
@@ -177,24 +179,26 @@ async function fetchDrawJobStatus(jobId: string): Promise<DrawPayload> {
   return (await response.json()) as DrawPayload;
 }
 
+function parseEstimatedWaitMinutes(data: DrawPayload): number | null {
+  const raw = data.estimatedWaitText?.trim();
+  if (!raw) return null;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
+}
+
 async function pollDrawJob(
   jobId: string,
   onProgress?: (step: AiProgress) => void,
+  onEstimatedWaitMinutes?: (minutes: number | null) => void,
 ): Promise<AiDrawResult> {
-  // 서버 job 는 앱과 무관하게 계속 돌아감.
-  // 폴링도 백그라운드에서 끊지 않음 — 타임아웃은 포그라운드에서만 셈.
-  // (절대 상한만 두어 좀비 폴링 방지)
-  const ABSOLUTE_MAX_MS = 30 * 60 * 1000;
-  let visibleElapsed = 0;
+  // 서버 job·폴링은 포그라운드/백그라운드 모두 계속. done|failed 까지 기다림.
+  // 5분 같은 짧은 타임아웃은 없음 — 절대 상한만 둠.
   let networkFailStreak = 0;
   const wallStart = Date.now();
   onProgress?.('waiting');
 
-  while (
-    (isDocumentHidden() || visibleElapsed < POLL_TIMEOUT_MS) &&
-    Date.now() - wallStart < ABSOLUTE_MAX_MS
-  ) {
-    const sliceStart = Date.now();
+  while (Date.now() - wallStart < POLL_ABSOLUTE_MAX_MS) {
     const wasHidden = isDocumentHidden();
 
     let data: DrawPayload;
@@ -213,9 +217,6 @@ async function pollDrawJob(
           );
         }
         console.warn('[AI] poll network retry', networkFailStreak, 'jobId=', jobId);
-        if (!isDocumentHidden()) {
-          visibleElapsed += Date.now() - sliceStart;
-        }
         await sleep(POLL_NETWORK_RETRY_MS);
         continue;
       }
@@ -224,8 +225,10 @@ async function pollDrawJob(
 
     const status = (data.status || '').toLowerCase();
     console.info('[AI] poll jobId=', jobId, 'status=', status);
+    onEstimatedWaitMinutes?.(parseEstimatedWaitMinutes(data));
 
     if (status === 'done') {
+      onEstimatedWaitMinutes?.(null);
       onProgress?.('finishing');
       await sleep(450);
       return {
@@ -234,6 +237,7 @@ async function pollDrawJob(
       };
     }
     if (status === 'failed') {
+      onEstimatedWaitMinutes?.(null);
       const refundUsage = data.refundUsage === 'true';
       const usageRefunded =
         data.usageRefunded === 'true' || data.refundUsage === 'done';
@@ -250,17 +254,15 @@ async function pollDrawJob(
       onProgress?.('waiting');
     }
 
-    if (!isDocumentHidden()) {
-      visibleElapsed += Date.now() - sliceStart;
-    }
     await sleep(POLL_INTERVAL_MS);
   }
 
-  // 타임아웃 직전 한 번 더 확인
+  // 절대 상한 직전 한 번 더 확인
   try {
     const last = await fetchDrawJobStatus(jobId);
     const status = (last.status || '').toLowerCase();
     if (status === 'done') {
+      onEstimatedWaitMinutes?.(null);
       onProgress?.('finishing');
       return {
         ...parseImageResult(last),
@@ -268,6 +270,7 @@ async function pollDrawJob(
       };
     }
     if (status === 'failed') {
+      onEstimatedWaitMinutes?.(null);
       throw new AiDrawJobError(last.message?.trim() || '그림 생성에 실패했습니다', {
         notice: last.notice,
         refundUsage: last.refundUsage === 'true',
@@ -303,6 +306,8 @@ export async function generateDiaryImage(input: {
   /** 있으면 Authorization 포함 — Runware 400 시 서버 자동 환불용 */
   accessToken?: string | null;
   onProgress?: (step: AiProgress) => void;
+  /** 서버 estimatedWaitText(분). null이면 숨김 */
+  onEstimatedWaitMinutes?: (minutes: number | null) => void;
 }): Promise<AiDrawResult> {
   const title = input.title?.trim() ?? '';
   const diaryLine = extractSceneLine(input.content ?? '') || title;
@@ -366,7 +371,7 @@ export async function generateDiaryImage(input: {
     throw new Error(
       isRemoteApi()
         ? '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요'
-        : '서버에 연결하지 못했어요. 백엔드(8080)가 켜져 있는지 확인해 주세요',
+        : '서버에 연결하지 못했어요. 백엔드가 켜져 있는지 확인해 주세요',
     );
   }
 
@@ -393,7 +398,8 @@ export async function generateDiaryImage(input: {
   const st = (data.status || '').toLowerCase();
   if (data.jobId && (response.status === 202 || st === 'queued' || st === 'running')) {
     console.info('[AI] queued jobId=', data.jobId);
-    return pollDrawJob(data.jobId, input.onProgress);
+    input.onEstimatedWaitMinutes?.(parseEstimatedWaitMinutes(data));
+    return pollDrawJob(data.jobId, input.onProgress, input.onEstimatedWaitMinutes);
   }
 
   // legacy sync 200 (이미지 바로 포함)

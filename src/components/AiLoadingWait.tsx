@@ -124,6 +124,8 @@ interface AiLoadingWaitProps {
   sourceText?: string;
   /** true면 로띠 자리 비움 (포춘쿠키가 그 자리를 씀) */
   hideStage?: boolean;
+  /** 예상 대기 분 (서버 estimatedWaitText). 있으면 로띠 위 문구 */
+  estimatedWaitMinutes?: number | null;
 }
 
 export default function AiLoadingWait({
@@ -132,6 +134,7 @@ export default function AiLoadingWait({
   step,
   sourceText = '',
   hideStage = false,
+  estimatedWaitMinutes = null,
 }: AiLoadingWaitProps) {
   const { t } = useTranslation();
   const activeIndex = AI_PROGRESS_STEPS.indexOf(step);
@@ -140,6 +143,11 @@ export default function AiLoadingWait({
   const [resumeKey, setResumeKey] = useState(0);
   const cursorRef = useRef(0);
   const idRef = useRef(MAX_FLOATING);
+  const showEta =
+    !hideStage &&
+    estimatedWaitMinutes != null &&
+    estimatedWaitMinutes > 0 &&
+    step !== 'finishing';
 
   useEffect(() => {
     let wasHidden = document.visibilityState === 'hidden';
@@ -236,6 +244,11 @@ export default function AiLoadingWait({
         ))}
       </div>
       <div className="ai-loading-wait__panel">
+        {showEta ? (
+          <p className="ai-loading-wait__eta" role="status">
+            {t('write.ai.estimatedWait', { n: estimatedWaitMinutes })}
+          </p>
+        ) : null}
         {!hideStage ? (
           <div className="ai-loading-wait__stage">
             {animationData ? (
