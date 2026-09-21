@@ -56,7 +56,6 @@ import {
   loadWriteDraft,
   requestDraftFlush,
   saveWriteDraft,
-  writeDraftHasContent,
 } from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
@@ -125,17 +124,6 @@ function markPagebyAfterSavePromptSeen(): void {
   }
 }
 
-function readResumeWrite(): { page: Page; editingId: string | null } {
-  const draft = loadWriteDraft();
-  if (draft && writeDraftHasContent(draft)) {
-    return {
-      page: "write",
-      editingId: draft.editingId?.trim() ? draft.editingId : null,
-    };
-  }
-  return { page: "home", editingId: null };
-}
-
 function App() {
   const { t } = useTranslation();
   const { entries, addEntry, updateEntry, removeEntry, clearLocalDiaries, syncWithCloud, ready } =
@@ -146,13 +134,11 @@ function App() {
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl, gender, setGender, ageGroup, setAgeGroup } =
     useClientProfile();
   const screenLock = useScreenLock();
-  const [page, setPage] = useState<Page>(() => readResumeWrite().page);
+  const [page, setPage] = useState<Page>("home");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   /** 메인 달력에서 고른 날짜 — 새 일기 작성 시 사용 */
   const [selectedDate, setSelectedDate] = useState(() => today());
-  const [editingId, setEditingId] = useState<string | null>(
-    () => readResumeWrite().editingId,
-  );
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
