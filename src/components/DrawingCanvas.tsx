@@ -453,7 +453,8 @@ function DrawingCanvas({
         wrap.style.aspectRatio = 'unset';
         // wrap 전체 2:3 (가로는 100% 유지). dock은 아래 오버레이.
         // 살짝 더 짧게 — 요청하신 ~10px
-        wrap.style.height = `${Math.max(w * 1.5 - 10, reserve + 10)}px`;
+        //wrap.style.height = `${Math.max(w * 1.5 - 10, reserve + 10)}px`;
+        wrap.style.height = `${Math.max(w * 1.5+15)}px`;
       }
     };
 
