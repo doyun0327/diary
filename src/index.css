@@ -11,9 +11,9 @@
     'Noto Sans', sans-serif;
   --diary-font-size: 1.2rem;
   --diary-ruled-lh: 2.35;
-  --diary-drawing-ratio: 2 / 3.31; /* 그림판 전체(도구줄 포함) — ≈375px·dock 58px 기준, 스테이지 2:3 */
+  --diary-drawing-ratio: 2 / 3; /* 그림판 wrap 전체 — JS가 height = width*1.5 - 10 */
   --diary-drawing-dock-reserve: 42px; /* dock 초기값 — 열리면 DrawingCanvas가 전체 높이로 갱신 */
-  --diary-drawing-stage-ratio: 2 / 3; /* 저장·상세 표시 — 그리기 영역만 */
+  --diary-drawing-stage-ratio: 2 / 3; /* 저장·상세 표시 */
   --ui-font: 'Nunito', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 
   /* Mono — white / gray / black */

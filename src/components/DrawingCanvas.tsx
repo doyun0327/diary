@@ -446,13 +446,14 @@ function DrawingCanvas({
 
     const syncDockReserve = () => {
       const barH = dockBar.getBoundingClientRect().height;
-      // 스테이지 2:3 유지, 전체 높이는 도크 여백으로 조절
       const reserve = Math.ceil(barH);
       wrap.style.setProperty('--drawing-dock-reserve', `${reserve}px`);
       const w = wrap.clientWidth;
       if (w > 0) {
         wrap.style.aspectRatio = 'unset';
-        wrap.style.height = `${w * 1.5 + reserve}px`;
+        // wrap 전체 2:3 (가로는 100% 유지). dock은 아래 오버레이.
+        // 살짝 더 짧게 — 요청하신 ~10px
+        wrap.style.height = `${Math.max(w * 1.5 - 30, reserve + 10)}px`;
       }
     };
 

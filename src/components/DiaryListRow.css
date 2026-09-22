@@ -83,7 +83,7 @@
   align-self: center;
   width: 44px;
   height: auto;
-  max-height: calc(44px * 1.5);
+  max-height: calc(44px * 1.1);
   padding: 3px;
   box-sizing: border-box;
   border-radius: 11px;
@@ -99,7 +99,7 @@
   justify-content: center;
   align-self: center;
   width: 44px;
-  height: calc(44px * 1.5);
+  height: 50px;
   flex: 0 0 auto;
   padding: 3px;
   box-sizing: border-box;
