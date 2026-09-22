@@ -273,7 +273,7 @@ function DiaryWritePage({
   const [aiProgress, setAiProgress] = useState<AiProgress>('waiting');
   const [aiWaitMinutes, setAiWaitMinutes] = useState<number | null>(null);
   const [fortuneVisible, setFortuneVisible] = useState(false);
-  /** 백그라운드 생성 안내 — 처음 3회만 */
+  /** 백그라운드 생성 안내 — × 로 닫기 전 */
   const [aiBgHintVisible, setAiBgHintVisible] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiLottiePool, setAiLottiePool] = useState<object[]>([]);

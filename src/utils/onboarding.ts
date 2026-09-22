@@ -16,8 +16,8 @@ const AI_COACH_KEY = 'picture-diary-onboarding-ai-coach';
 const AI_SOURCE_INTRO_KEY = 'picture-diary-onboarding-ai-source-intro';
 /** 완성 후 차감 안내 노출 횟수 (최대 3) — 구독·구매권 보유자만 */
 const AI_DEDUCT_COACH_COUNT_KEY = 'picture-diary-onboarding-ai-deduct-coach-count';
-/** 그림 생성 중 백그라운드 안내 「그만보기」 */
-const AI_BG_HINT_DISMISSED_KEY = 'picture-diary-onboarding-ai-bg-hint-dismissed';
+/** 백그라운드 안내 「×」로 닫음 — 키 버전 올리면 다시 노출 */
+const AI_BG_HINT_DISMISSED_KEY = 'picture-diary-onboarding-ai-bg-hint-dismissed-v3';
 const WRITE_FAB_COACH_KEY = 'picture-diary-onboarding-write-fab-coach';
 /** 홈 오늘 날짜 칸 코치 (문구·위치 개편) */
 const TODAY_CELL_COACH_KEY = 'picture-diary-onboarding-today-cell-coach';
