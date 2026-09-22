@@ -1298,8 +1298,8 @@ function DiaryWritePage({
     }
     const line = extractSceneLine(content) || title.trim();
     if (!line) {
-      setAiError(t('write.err.needContent'));
       setAiSourceOpen(false);
+      onAppToast?.(t('write.err.needContent'), 2500);
       return;
     }
     aiSourceRef.current = 'diary';
@@ -1855,7 +1855,6 @@ function DiaryWritePage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onFocus={handleTitleFocus}
-              placeholder={t('write.titlePlaceholder')}
               maxLength={40}
             />
           </div>
@@ -1982,7 +1981,6 @@ function DiaryWritePage({
             onCompositionStart={handleContentCompositionStart}
             onCompositionEnd={handleContentCompositionEnd}
             onFocus={handleContentFocus}
-            placeholder={t('write.contentPlaceholder')}
           />
           {aiError && <p className="diary-write__ai-error">{aiError}</p>}
         </section>
@@ -2083,16 +2081,7 @@ function DiaryWritePage({
                             className="diary-write__ai-source-style-img"
                             decoding="async"
                           />
-                          <span
-                            className={[
-                              'diary-write__ai-source-style-name',
-                              style.id === 'jpRetroFilm'
-                                ? ''
-                                : 'diary-write__ai-source-style-name--center',
-                            ]
-                              .filter(Boolean)
-                              .join(' ')}
-                          >
+                          <span className="diary-write__ai-source-style-name diary-write__ai-source-style-name--center">
                             {t(`write.ai.style.${style.id}.name`)}
                           </span>
                         </div>
@@ -2129,16 +2118,7 @@ function DiaryWritePage({
                             className="diary-write__ai-source-style-img"
                             decoding="async"
                           />
-                          <span
-                            className={[
-                              'diary-write__ai-source-style-name',
-                              style.id === 'jpRetroFilm'
-                                ? ''
-                                : 'diary-write__ai-source-style-name--center',
-                            ]
-                              .filter(Boolean)
-                              .join(' ')}
-                          >
+                          <span className="diary-write__ai-source-style-name diary-write__ai-source-style-name--center">
                             {t(`write.ai.style.${style.id}.name`)}
                           </span>
                         </div>
@@ -2333,16 +2313,7 @@ function DiaryWritePage({
                       ) : (
                         <span className="diary-write__ai-style-cover diary-write__ai-style-cover--empty" />
                       )}
-                      <span
-                        className={[
-                          'diary-write__ai-style-name',
-                          style.id === 'jpRetroFilm'
-                            ? ''
-                            : 'diary-write__ai-style-name--center',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                      >
+                      <span className="diary-write__ai-style-name diary-write__ai-style-name--center">
                         {t(`write.ai.style.${style.id}.name`)}
                         {!enabled ? (
                           <span className="diary-write__ai-style-soon">

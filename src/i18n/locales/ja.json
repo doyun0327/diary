@@ -696,15 +696,15 @@
       "photoLabel": "*写真添付",
       "style": {
         "webtoonHero": {
-          "name": "ウェブトゥーン主人公st",
+          "name": "ウェブトゥーン主人公風",
           "desc": "漫画から飛び出したような主人公ビジュアルに変換します。"
         },
         "oilPastel": {
-          "name": "オイルパステルst",
+          "name": "かわいいオイルパステル",
           "desc": "かわいいキャラにほっこり手描き質感をのせます。"
         },
         "jpRetroFilm": {
-          "name": "日本レトロ映画風st",
+          "name": "日本レトロ映画風",
           "desc": "淡いフィルムの色合いと90年代アニメソウルでレトロに演出します。"
         }
       },
@@ -766,7 +766,7 @@
       "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
-      "needContent": "先に日記を書いてください",
+      "needContent": "日記を書いてください！",
       "aiFailed": "絵の生成に失敗しました",
       "aiNeedContent": "生成前に日記の内容を書いてください",
       "aiHttp": "描画失敗：HTTP {{status}}",

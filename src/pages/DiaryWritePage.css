@@ -840,20 +840,19 @@
 }
 
 .diary-write__ai-source-style-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 2.6em;
+  min-height: 2.6em;
   font-family: var(--brand-font);
   font-size: 0.88rem;
   font-weight: 750;
   line-height: 1.25;
   color: var(--color-text);
-  word-break: keep-all;
-}
-
-.diary-write__ai-source-style-name--center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.4em;
   text-align: center;
+  word-break: keep-all;
 }
 
 .diary-write__ai-source-btn {
@@ -1082,8 +1081,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.5em;
-  padding: 0 6px 8px;
+  box-sizing: border-box;
+  height: 2.7em;
+  min-height: 2.7em;
+  padding: 4px 6px;
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.25;
@@ -1092,9 +1093,9 @@
   word-break: keep-all;
 }
 
-/* 웹툰·오일 등 짧은 이름 — 위·아래 패딩 맞춰 가운데 */
+/* 짧은 이름(웹툰 주인공풍 등)도 라벨 영역 세로 가운데 */
 .diary-write__ai-style-name--center {
-  padding: 8px 6px;
+  padding: 4px 6px;
 }
 
 /* 결제창 닫힌 직후 유령 터치가 AI 버튼 등으로 전달되지 않게 */

@@ -701,19 +701,19 @@
       "photoTooLarge": "This image is too large. Please choose a smaller photo.",
       "style": {
         "textOil": {
-          "name": "Picture diary",
+          "name": "Classic pastel",
           "desc": "Soft pastel art from your diary scene."
         },
         "webtoonHero": {
-          "name": "Webtoonherost",
+          "name": "Webtoon hero",
           "desc": "Turns you into a protagonist who just stepped out of a comic."
         },
         "oilPastel": {
-          "name": "Oilpastelst",
+          "name": "Cute oil pastel",
           "desc": "Adds a cozy hand-drawn texture to a cute character."
         },
         "jpRetroFilm": {
-          "name": "JPretrofilmst",
+          "name": "JP retro film",
           "desc": "Dreamy film tones and 90s anime vibes for a retro look."
         }
       },
@@ -780,7 +780,7 @@
       "saveOnLeaveDiscard": "Don't save"
     },
     "err": {
-      "needContent": "Write the diary first",
+      "needContent": "Please write your diary!",
       "aiFailed": "Failed to generate drawing",
       "aiRetry": "Couldn't create the drawing. Please try again in a moment",
       "aiNeedContent": "Write diary content before generating",
