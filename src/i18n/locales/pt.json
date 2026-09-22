@@ -711,6 +711,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "Continuamos desenhando mesmo se você sair.\nAvisaremos quando estiver pronto!",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

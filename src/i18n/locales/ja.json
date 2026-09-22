@@ -711,6 +711,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "アプリを閉じても描き続けます。\n終わったらお知らせします！",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

@@ -711,6 +711,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "即使離開應用也會繼續繪製。\n完成後會通知你！",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

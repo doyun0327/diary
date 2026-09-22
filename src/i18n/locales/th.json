@@ -711,6 +711,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "ออกจากแอปไปก็วาดต่อได้\nเสร็จแล้วจะแจ้งให้ทราบ!",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

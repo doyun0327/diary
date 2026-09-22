@@ -711,6 +711,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "Chúng tôi vẫn vẽ dù bạn rời đi.\nSẽ báo khi xong!",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

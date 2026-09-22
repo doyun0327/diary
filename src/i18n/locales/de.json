@@ -712,6 +712,7 @@
       "statusWaiting": "Waiting…",
       "statusDrawing": "Drawing…",
       "statusFinishing": "Finishing…",
+      "bgHint": "Wir zeichnen weiter, auch wenn du die App verlässt.\nWir benachrichtigen dich, wenn es fertig ist!",
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",

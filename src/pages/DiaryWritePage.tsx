@@ -1896,18 +1896,18 @@ function DiaryWritePage({
             )}
             {aiBgHintVisible && (aiLoading || fortuneVisible) && !purchaseClickShield ? (
               <div className="diary-write__ai-bg-hint" role="status">
+                <button
+                  type="button"
+                  className="diary-write__ai-bg-hint-close"
+                  aria-label={t('common.close')}
+                  onClick={() => {
+                    dismissAiBgHint();
+                    setAiBgHintVisible(false);
+                  }}
+                >
+                  <span aria-hidden>×</span>
+                </button>
                 <p className="diary-write__ai-bg-hint-text">{t('write.ai.bgHint')}</p>
-                <label className="diary-write__ai-bg-hint-dismiss">
-                  <input
-                    type="checkbox"
-                    onChange={(event) => {
-                      if (!event.target.checked) return;
-                      dismissAiBgHint();
-                      setAiBgHintVisible(false);
-                    }}
-                  />
-                  <span>{t('write.ai.bgHintDontShow')}</span>
-                </label>
               </div>
             ) : null}
             </div>
