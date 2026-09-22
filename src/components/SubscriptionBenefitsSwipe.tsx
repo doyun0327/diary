@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  nyangTicketIntroSrc,
+  preloadNyangTicketImages,
+  subscribeNyangTicketImagesReady,
+} from '../utils/nyangTicketImages';
 import './SubscriptionBenefitsSwipe.css';
 
 /** public/intro — 구독 혜택 이미지 */
@@ -9,10 +14,6 @@ const IMAGES = [
   { id: 'search', file: '검색.png', labelKey: 'nyangTicket.benefitSearch' },
   { id: 'noAds', file: '광고제거.png', labelKey: 'nyangTicket.benefitNoAds' },
 ] as const;
-
-function introSrc(file: string): string {
-  return `/intro/${encodeURIComponent(file)}`;
-}
 
 interface SubscriptionBenefitsSwipeProps {
   /** 냥 티켓 등 시트용 — 썸네일 조금 더 작게 */
@@ -25,7 +26,13 @@ export default function SubscriptionBenefitsSwipe({
 }: SubscriptionBenefitsSwipeProps = {}) {
   const { t } = useTranslation();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const [cacheTick, setCacheTick] = useState(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    preloadNyangTicketImages();
+    return subscribeNyangTicketImagesReady(() => setCacheTick((n) => n + 1));
+  }, []);
 
   useEffect(() => {
     if (previewIndex == null) return;
@@ -64,6 +71,7 @@ export default function SubscriptionBenefitsSwipe({
   };
 
   const preview = previewIndex != null ? IMAGES[previewIndex] : null;
+  void cacheTick;
 
   return (
     <div className={`sub-benefits${compact ? ' sub-benefits--compact' : ''}`}>
@@ -78,10 +86,9 @@ export default function SubscriptionBenefitsSwipe({
             >
               <img
                 className="sub-benefits__thumb-img"
-                src={introSrc(item.file)}
+                src={nyangTicketIntroSrc(item.file)}
                 alt=""
                 draggable={false}
-                loading="lazy"
                 decoding="async"
               />
             </button>
@@ -121,7 +128,7 @@ export default function SubscriptionBenefitsSwipe({
             >
               <img
                 className="sub-benefits__lightbox-img"
-                src={introSrc(preview.file)}
+                src={nyangTicketIntroSrc(preview.file)}
                 alt={t(preview.labelKey)}
                 draggable={false}
               />

@@ -375,6 +375,7 @@ function DrawingCanvas({
   const [customPickerOpen, setCustomPickerOpen] = useState(false);
   const [pickerHue, setPickerHue] = useState(350);
   const [pickerLight, setPickerLight] = useState(62);
+  const [pickerSat, setPickerSat] = useState(58);
   const [mode, setMode] = useState<ToolMode>('none');
   const [penKind, setPenKind] = useState<PenKind>('gel');
   const [stickerOpen, setStickerOpen] = useState(false);
@@ -445,13 +446,20 @@ function DrawingCanvas({
 
     const syncDockReserve = () => {
       const barH = dockBar.getBoundingClientRect().height;
-      const reserve = Math.ceil(barH + 16);
+      // 스테이지 2:3 유지, 전체 높이는 도크 여백으로 조절
+      const reserve = Math.ceil(barH);
       wrap.style.setProperty('--drawing-dock-reserve', `${reserve}px`);
+      const w = wrap.clientWidth;
+      if (w > 0) {
+        wrap.style.aspectRatio = 'unset';
+        wrap.style.height = `${w * 1.5 + reserve}px`;
+      }
     };
 
     syncDockReserve();
     const ro = new ResizeObserver(syncDockReserve);
     ro.observe(dockBar);
+    ro.observe(wrap);
     window.addEventListener('resize', syncDockReserve);
     return () => {
       ro.disconnect();
@@ -459,10 +467,11 @@ function DrawingCanvas({
     };
   }, []);
 
-  const applyPickerColor = (hue: number, light: number) => {
-    const next = hslToHex(hue, 58, light);
+  const applyPickerColor = (hue: number, light: number, sat = pickerSat) => {
+    const next = hslToHex(hue, sat, light);
     setPickerHue(hue);
     setPickerLight(light);
+    setPickerSat(sat);
     setCustomColor(next);
     setColor(next);
   };
@@ -474,12 +483,18 @@ function DrawingCanvas({
       el.setPointerCapture(e.pointerId);
     }
     const rect = el.getBoundingClientRect();
-    const dx = e.clientX - (rect.left + rect.width / 2);
-    const dy = e.clientY - (rect.top + rect.height / 2);
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
     let hue = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
     if (hue < 0) hue += 360;
     hue = Math.round(hue) % 360;
-    applyPickerColor(hue, pickerLight);
+    const radius = Math.min(rect.width, rect.height) / 2;
+    const dist = Math.min(Math.hypot(dx, dy), radius);
+    // 바깥=채도 100, 가운데=채도 0 (회색)
+    const sat = Math.round((dist / Math.max(radius, 1)) * 100);
+    applyPickerColor(hue, pickerLight, sat);
   };
   const [internalFontId, setInternalFontId] = useState(DEFAULT_FONT_ID);
   const fontId = fontIdProp ?? internalFontId;
@@ -2165,7 +2180,7 @@ function DrawingCanvas({
                       className="drawing__color-picker-wheel"
                       role="slider"
                       tabIndex={0}
-                      aria-label="hue"
+                      aria-label={t('canvas.pickColorTitle')}
                       aria-valuemin={0}
                       aria-valuemax={360}
                       aria-valuenow={pickerHue}
@@ -2189,7 +2204,10 @@ function DrawingCanvas({
                       >
                         <span
                           className="drawing__color-picker-wheel-knob"
-                          style={{ backgroundColor: hslToHex(pickerHue, 70, 55) }}
+                          style={{
+                            top: `${4 + ((100 - pickerSat) / 100) * 40}%`,
+                            backgroundColor: customColor,
+                          }}
                         />
                       </span>
                       <span
@@ -2205,16 +2223,16 @@ function DrawingCanvas({
                       <input
                         type="range"
                         className="drawing__color-picker-light"
-                        min={22}
-                        max={88}
+                        min={0}
+                        max={100}
                         value={pickerLight}
                         aria-label="lightness"
                         style={{
-                          background: `linear-gradient(90deg, #1a1a1a, ${hslToHex(pickerHue, 58, 55)}, #fffef8)`,
+                          background: `linear-gradient(90deg, #000, ${hslToHex(pickerHue, pickerSat, 50)}, #fff)`,
                         }}
                         onChange={(e) => {
                           const light = Number(e.target.value);
-                          applyPickerColor(pickerHue, light);
+                          applyPickerColor(pickerHue, light, pickerSat);
                         }}
                       />
                     </div>

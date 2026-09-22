@@ -1,5 +1,10 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  nyangTicketIntroSrc,
+  preloadNyangTicketImages,
+  subscribeNyangTicketImagesReady,
+} from '../utils/nyangTicketImages';
 import './AppIntro.css';
 
 /** public/intro 구독 혜택 이미지 */
@@ -11,10 +16,6 @@ const INTRO_IMAGES = [
 ] as const;
 const SLIDE_COUNT = INTRO_IMAGES.length;
 
-function introSrc(file: string): string {
-  return `/intro/${encodeURIComponent(file)}`;
-}
-
 type AppIntroProps = {
   onFinish: () => void;
 };
@@ -23,7 +24,13 @@ type AppIntroProps = {
 export default function AppIntro({ onFinish }: AppIntroProps) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
+  const [cacheTick, setCacheTick] = useState(0);
   const touchX = useRef<number | null>(null);
+
+  useEffect(() => {
+    preloadNyangTicketImages();
+    return subscribeNyangTicketImagesReady(() => setCacheTick((n) => n + 1));
+  }, []);
 
   const go = (next: number) => {
     if (next >= SLIDE_COUNT) {
@@ -32,6 +39,8 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
     }
     setIndex(Math.max(0, Math.min(SLIDE_COUNT - 1, next)));
   };
+
+  void cacheTick;
 
   return (
     <div className="app-intro" role="dialog" aria-label={t('appIntro.aria')}>
@@ -68,7 +77,7 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
             <section key={item.id} className="app-intro__slide" aria-hidden={i !== index}>
               <img
                 className="app-intro__image"
-                src={introSrc(item.file)}
+                src={nyangTicketIntroSrc(item.file)}
                 alt={t(item.labelKey)}
                 draggable={false}
               />

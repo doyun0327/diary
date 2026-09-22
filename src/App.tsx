@@ -63,6 +63,7 @@ import { roomsNeedGoogleLogin } from "./utils/roomsAuthGate";
 import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
 import { preloadAiStylePreviews } from "./utils/aiDrawStyles";
+import { preloadNyangTicketImages } from "./utils/nyangTicketImages";
 import {
   captureInviteFromLocation,
   isValidInviteCode,
@@ -203,6 +204,7 @@ function App() {
       preloadMoodPackIcons();
       preloadCharacterHairIcons();
       preloadAiStylePreviews();
+      preloadNyangTicketImages();
     };
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(run, { timeout: 2000 });
