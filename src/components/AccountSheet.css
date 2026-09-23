@@ -609,7 +609,9 @@
 
 .account-sheet__lang-btn {
   box-sizing: border-box;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 46px;
   min-width: 0;
@@ -620,7 +622,7 @@
   font-family: inherit;
   font-size: 0.9rem;
   font-weight: 700;
-  line-height: 43px;
+  line-height: 1.2;
   text-align: center;
   color: var(--color-text-muted);
   cursor: pointer;
