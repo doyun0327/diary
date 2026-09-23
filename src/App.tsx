@@ -869,12 +869,15 @@ function App() {
     let startX = 0;
     let startY = 0;
     let tracking = false;
+    /** 화면 왼쪽 가장자리에서만 뒤로가기 스와이프 (캔버스 사진 리사이즈와 구분) */
+    const EDGE_PX = 28;
 
     const onStart = (clientX: number, clientY: number) => {
+      if (clientX > EDGE_PX) return;
       const el = document.elementFromPoint(clientX, clientY);
       if (
         el?.closest(
-          '[data-no-swipe], input, textarea, button, a, [contenteditable="true"]',
+          '[data-no-swipe], .drawing, input, textarea, button, a, [contenteditable="true"]',
         )
       ) {
         return;
@@ -896,17 +899,10 @@ function App() {
 
     const onPointerStart = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      // touch는 pointer 이벤트로도 오므로 touch* 리스너는 두지 않음 (중복 goBack 방지)
       onStart(e.clientX, e.clientY);
     };
     const onPointerEnd = (e: PointerEvent) => onEnd(e.clientX, e.clientY);
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      onStart(e.touches[0].clientX, e.touches[0].clientY);
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (e.changedTouches.length !== 1) return;
-      onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    };
     const onCancel = () => {
       tracking = false;
     };
@@ -915,16 +911,10 @@ function App() {
     window.addEventListener("pointerdown", onPointerStart, opts);
     window.addEventListener("pointerup", onPointerEnd, opts);
     window.addEventListener("pointercancel", onCancel, opts);
-    window.addEventListener("touchstart", onTouchStart, opts);
-    window.addEventListener("touchend", onTouchEnd, opts);
-    window.addEventListener("touchcancel", onCancel, opts);
     return () => {
       window.removeEventListener("pointerdown", onPointerStart, opts);
       window.removeEventListener("pointerup", onPointerEnd, opts);
       window.removeEventListener("pointercancel", onCancel, opts);
-      window.removeEventListener("touchstart", onTouchStart, opts);
-      window.removeEventListener("touchend", onTouchEnd, opts);
-      window.removeEventListener("touchcancel", onCancel, opts);
     };
   }, []);
 

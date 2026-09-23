@@ -1980,7 +1980,7 @@ function DrawingCanvas({
     .join(' ');
 
   return (
-      <div className="drawing" data-no-swipe={!allowPageScroll || undefined} ref={rootRef}>
+      <div className="drawing" data-no-swipe="" ref={rootRef}>
       <input
         ref={fileInputRef}
         type="file"
