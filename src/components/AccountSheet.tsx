@@ -486,9 +486,15 @@ function AccountSheet({
         if (!cloudSignedIn) {
           await ensureGuestSession(clientId, name, { force: true });
         }
-        await syncProfileToRooms({ nickname: name, avatarUrl });
+        // 닉만 먼저 — avatar data URL 실패로 닉 동기화가 같이 깨지지 않게
+        await syncProfileToRooms({ nickname: name });
+        if (avatarUrl) {
+          await syncProfileToRooms({ avatarUrl }).catch(() => {
+            /* 닉은 이미 반영됨 */
+          });
+        }
       } catch {
-        await syncProfileToRooms({ nickname: name, avatarUrl });
+        await syncProfileToRooms({ nickname: name });
       }
     })();
     showToast(t('account.ok.profileChanged'));

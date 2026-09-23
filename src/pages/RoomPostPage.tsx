@@ -372,6 +372,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
 
     try {
       const created = await roomsApi.createComment(roomId, postId, body, {
+        nickname: commentNick,
         pushTitle: roomName,
         pushBody: t('rooms.commentPushBody', { name: commentNick }),
       });
@@ -423,9 +424,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       const roomName =
         getCachedRoomDetail(roomId)?.name?.trim() || t('rooms.title');
       const created = await roomsApi.createComment(roomId, postId, body, {
+        nickname: nickname.trim() || failed.authorNickname || t('common.anonymous'),
         pushTitle: roomName,
         pushBody: t('rooms.commentPushBody', {
-          name: failed.authorNickname || t('common.anonymous'),
+          name: nickname.trim() || failed.authorNickname || t('common.anonymous'),
         }),
       });
       setComments((prev) =>

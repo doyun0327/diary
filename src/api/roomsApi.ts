@@ -300,12 +300,13 @@ export function createComment(
   roomId: string,
   postId: string,
   text: string,
-  push?: { pushTitle?: string; pushBody?: string },
+  push?: { pushTitle?: string; pushBody?: string; nickname?: string },
 ): Promise<RoomComment> {
   return request<RoomComment>(`/api/rooms/${roomId}/posts/${postId}/comments`, {
     method: 'POST',
     body: JSON.stringify({
       text,
+      nickname: push?.nickname?.trim() || undefined,
       pushTitle: push?.pushTitle,
       pushBody: push?.pushBody,
     }),

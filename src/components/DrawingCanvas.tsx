@@ -597,17 +597,27 @@ function DrawingCanvas({
   const loadHtmlImage = (src: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image();
+      // http(s)는 CORS 모드로 로드해야 toDataURL 시 SecurityError(tainted) 방지
+      if (/^https?:\/\//i.test(src)) {
+        el.crossOrigin = 'anonymous';
+      }
       el.onload = () => resolve(el);
       el.onerror = () => reject(new Error(t('canvas.err.imageLoad')));
       el.src = src;
     });
 
+  /** 원격 URL은 반드시 data/blob으로 변환 — fallback 원본은 캔버스를 tainted 시킴 */
   const resolveLayerSrc = async (src: string) => {
-    try {
-      return await materializeImageSrc(src, { fallbackToOriginal: true });
-    } catch {
-      return src.trim();
+    const trimmed = src.trim();
+    if (
+      !trimmed ||
+      trimmed.startsWith('data:') ||
+      trimmed.startsWith('blob:') ||
+      trimmed.startsWith('/')
+    ) {
+      return trimmed;
     }
+    return await materializeImageSrc(trimmed, { fallbackToOriginal: false });
   };
 
   const rematerializePhotosForExport = async () => {
