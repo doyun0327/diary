@@ -11,7 +11,7 @@ export interface Env {
 
 const PLAY_STORE =
   'https://play.google.com/store/apps/details?id=com.yun.diary_app';
-const APP_HOST = 'pageby-diary.idoyun781.workers.dev';
+const APP_HOST = 'pageby.stream';
 
 function maintenanceOn(env: Env): boolean {
   const v = (env.MAINTENANCE ?? '').trim().toLowerCase();

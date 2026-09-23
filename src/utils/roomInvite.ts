@@ -20,11 +20,11 @@ export function getInviteWebOrigin(): string {
     const o = window.location.origin;
     // 로컬 dev는 프로덕션 초대 도메인으로 (공유 링크가 실제 앱과 맞도록)
     if (o.includes('localhost') || o.includes('127.0.0.1')) {
-      return 'https://pageby-diary.idoyun781.workers.dev';
+      return 'https://pageby.stream';
     }
     return o.replace(/\/$/, '');
   }
-  return 'https://pageby-diary.idoyun781.workers.dev';
+  return 'https://pageby.stream';
 }
 
 export function normalizeInviteCode(raw: string | null | undefined): string {
