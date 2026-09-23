@@ -451,6 +451,7 @@
     "backToRoomAria": "Back to room",
     "sharedDiary": "Shared diary",
     "comments": "Comments ({{n}})",
+    "commentsLoading": "Loading comments…",
     "commentPlaceholder": "Write a comment",
     "commentSubmit": "Post",
     "commentSending": "Sending…",

@@ -1117,6 +1117,7 @@ function App() {
         }
         nickname={nickname}
         avatarUrl={avatarUrl}
+        roomsUserId={session?.userId ?? ""}
         onOpenAccount={() => setAccountOpen(true)}
         onOpenLanguage={() => setLanguageOpen(true)}
         onOpenNyangTicket={() => {

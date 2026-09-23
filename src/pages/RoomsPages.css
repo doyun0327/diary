@@ -1883,6 +1883,11 @@
   font-weight: 700;
 }
 
+.rooms__comments-loading {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+}
+
 .rooms__comment-list {
   display: flex;
   flex-direction: column;

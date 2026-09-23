@@ -26,7 +26,7 @@ import {
   invalidateRoomsList,
 } from "../utils/roomCache";
 import { prefetchRoomFeed, prefetchRoomsList } from "../utils/roomPrefetch";
-import { roomHasUnreadPosts } from "../utils/roomPostSeen";
+import { roomHasUnreadPosts, syncRoomPostsSeenBaseline } from "../utils/roomPostSeen";
 import { isNetworkError, resolveNetworkErrorTitle } from "../utils/networkError";
 import {
   isRoomCreateCoachSeen,
@@ -292,7 +292,18 @@ function RoomsHubPage({
           prefetchRoomFeed(id, { page: 0, size: 10, force: true }).catch(() => {}),
         ),
       );
-      if (!cancelled) setUnreadTick((n) => n + 1);
+      if (cancelled) return;
+      // 허브만 와도 baseline — 이후 친구 새 글에 N 표시 가능
+      for (const id of ids) {
+        const feed = getCachedRoomFeed(id, 0, 10, { allowStale: true });
+        if (feed?.posts?.length) {
+          syncRoomPostsSeenBaseline(
+            id,
+            feed.posts.map((p) => p.id),
+          );
+        }
+      }
+      setUnreadTick((n) => n + 1);
     })();
     return () => {
       cancelled = true;

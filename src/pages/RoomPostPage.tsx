@@ -84,6 +84,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [comments, setComments] = useState<DisplayComment[]>([]);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(!cachedPost);
+  /** 댓글 목록 첫 로드 — 그동안 '댓글 0' 대신 불러오는 중 표시 */
+  const [commentsLoading, setCommentsLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
@@ -270,6 +272,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     } else {
       setLoading(true);
     }
+    setCommentsLoading(true);
     setError(null);
     try {
       if (fromCache) {
@@ -300,6 +303,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       setError(err instanceof Error ? err.message : t('rooms.err.loadPost'));
     } finally {
       setLoading(false);
+      setCommentsLoading(false);
     }
   }, [roomId, postId, t]);
 
@@ -505,8 +509,11 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setSafetyTarget(target);
   };
 
+  // 댓글·포스트 스냅샷 닉 우선 (멤버 목록의 Google/옛 닉으로 덮지 않음). 내 글은 로컬 닉.
   const liveAuthorNick = post
-    ? memberNickByUserId[post.authorUserId] || post.authorNickname
+    ? post.authorUserId === userId
+      ? nickname.trim() || post.authorNickname
+      : post.authorNickname || memberNickByUserId[post.authorUserId] || ''
     : '';
   const authorName = post
     ? roomAuthorLabel(liveAuthorNick, post.authorWithdrawn, t)
@@ -578,7 +585,16 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
       )}
 
       <section className="rooms__comments">
-        <h3>{t('rooms.comments', { n: visibleComments.length })}</h3>
+        <h3>
+          {commentsLoading
+            ? t('rooms.commentsLoading')
+            : t('rooms.comments', { n: visibleComments.length })}
+        </h3>
+        {commentsLoading && visibleComments.length === 0 ? (
+          <p className="rooms__muted rooms__comments-loading" aria-live="polite">
+            {t('common.loading')}
+          </p>
+        ) : null}
         <ul ref={commentListRef} className="rooms__comment-list">
           {visibleComments.map((c, i) => {
             const prev = visibleComments[i - 1];
@@ -605,7 +621,9 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   <div className="rooms__comment-head">
                     <strong className="rooms__comment-name">
                       {roomAuthorLabel(
-                        memberNickByUserId[c.authorUserId] || c.authorNickname,
+                        c.authorNickname ||
+                          memberNickByUserId[c.authorUserId] ||
+                          '',
                         c.authorWithdrawn,
                         t,
                       )}

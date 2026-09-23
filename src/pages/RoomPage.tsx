@@ -246,6 +246,21 @@ function RoomPage({
     setSeenTick((n) => n + 1);
   }, [roomId]);
 
+  // 앱 복귀·다시 보일 때 피드·N 배지 갱신
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      setSeenTick((n) => n + 1);
+      void refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [refresh]);
+
   const requestPostsPage = useCallback(
     (next: number) => {
       if (next === postsPage) return;
@@ -387,7 +402,9 @@ function RoomPage({
                       const author = room.members.find((m) => m.userId === post.authorUserId);
                       const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
                       const authorName = roomAuthorLabel(
-                        author?.nickname || post.authorNickname,
+                        post.authorUserId === userId
+                          ? nickname.trim() || post.authorNickname
+                          : post.authorNickname || author?.nickname || '',
                         withdrawn,
                         t,
                       );

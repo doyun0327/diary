@@ -451,6 +451,7 @@
     "backToRoomAria": "방으로",
     "sharedDiary": "공유 일기",
     "comments": "댓글 {{n}}",
+    "commentsLoading": "댓글 불러오는 중…",
     "commentPlaceholder": "댓글을 남겨 보세요",
     "commentSubmit": "등록",
     "commentSending": "보내는 중…",

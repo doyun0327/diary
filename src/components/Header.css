@@ -313,6 +313,34 @@
   color: var(--color-text);
 }
 
+.header-menu__label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.header-menu__new {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+  transform: rotate(10deg);
+  background: linear-gradient(145deg, #ff6b6b 0%, #ee5a24 100%);
+  box-shadow:
+    0 2px 6px color-mix(in srgb, #ee5a24 40%, transparent),
+    0 0 0 1px color-mix(in srgb, #fff 35%, transparent) inset;
+}
+
 .header-menu__hint {
   font-size: 0.78rem;
   font-weight: 500;

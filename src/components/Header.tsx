@@ -6,12 +6,21 @@ import {
   getDiaryAccessState,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
+import { getAccessToken } from '../hooks/useAuthSession';
+import { getCachedRoomFeed, getCachedRoomsList } from '../utils/roomCache';
+import { prefetchRoomFeed, prefetchRoomsList } from '../utils/roomPrefetch';
+import {
+  roomHasUnreadPosts,
+  syncRoomPostsSeenBaseline,
+} from '../utils/roomPostSeen';
 import MonthYearPicker from './MonthYearPicker';
 import './Header.css';
 
 interface HeaderProps {
   nickname?: string;
   avatarUrl?: string | null;
+  /** 친구방 새 일기 N 배지용 (세션 userId) */
+  roomsUserId?: string | null;
   onOpenAccount?: () => void;
   onOpenLanguage?: () => void;
   onOpenNyangTicket?: () => void;
@@ -211,12 +220,17 @@ function MenuItem({
   label,
   hint,
   tone = 'peach',
+  badge,
+  badgeAria,
   onClick,
 }: {
   icon: ReactNode;
   label: string;
   hint?: string;
   tone?: 'peach' | 'mint' | 'lavender' | 'cream';
+  /** 예: 친구방 새 일기 N */
+  badge?: string;
+  badgeAria?: string;
   onClick: () => void;
 }) {
   return (
@@ -228,7 +242,14 @@ function MenuItem({
       >
         <span className="header-menu__icon">{icon}</span>
         <span className="header-menu__text">
-          <span className="header-menu__label">{label}</span>
+          <span className="header-menu__label-row">
+            <span className="header-menu__label">{label}</span>
+            {badge ? (
+              <span className="header-menu__new" aria-label={badgeAria || badge}>
+                {badge}
+              </span>
+            ) : null}
+          </span>
           {hint ? <span className="header-menu__hint">{hint}</span> : null}
         </span>
       </button>
@@ -278,6 +299,7 @@ function MenuToggleItem({
 function Header({
   nickname = '',
   avatarUrl = null,
+  roomsUserId = null,
   onOpenAccount,
   onOpenLanguage,
   onOpenNyangTicket,
@@ -297,8 +319,60 @@ function Header({
   const [menuOpen, setMenuOpen] = useState(false);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
+  const [roomsHasNew, setRoomsHasNew] = useState(false);
 
   useEffect(() => subscribeDiaryAccess(() => setAccessTick((n) => n + 1)), []);
+
+  // 메뉴 열릴 때만 PageBy 새 일기 N 갱신
+  useEffect(() => {
+    if (!menuOpen || !onOpenRooms) return;
+    let cancelled = false;
+    void (async () => {
+      if (!getAccessToken()) {
+        if (!cancelled) setRoomsHasNew(false);
+        return;
+      }
+      try {
+        let list = getCachedRoomsList(0, 10);
+        if (!list) {
+          list = (await prefetchRoomsList(0, 10)) ?? null;
+        }
+        const rooms = list?.content ?? [];
+        const ids = rooms
+          .map((r) => r.id)
+          .filter(Boolean)
+          .slice(0, 5);
+        await Promise.all(
+          ids.map((id) =>
+            prefetchRoomFeed(id, { page: 0, size: 10, force: true }).catch(
+              () => {},
+            ),
+          ),
+        );
+        if (cancelled) return;
+        let has = false;
+        const me = roomsUserId?.trim() || '';
+        for (const id of ids) {
+          const feed = getCachedRoomFeed(id, 0, 10, { allowStale: true });
+          if (!feed?.posts?.length) continue;
+          syncRoomPostsSeenBaseline(
+            id,
+            feed.posts.map((p) => p.id),
+          );
+          if (roomHasUnreadPosts(id, feed.posts, me)) {
+            has = true;
+            break;
+          }
+        }
+        setRoomsHasNew(has);
+      } catch {
+        if (!cancelled) setRoomsHasNew(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [menuOpen, onOpenRooms, roomsUserId]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -441,6 +515,8 @@ function Header({
                 icon={<IconUsers />}
                 label={t('header.rooms')}
                 tone="lavender"
+                badge={roomsHasNew ? t('rooms.postNew') : undefined}
+                badgeAria={t('rooms.postNewAria')}
                 onClick={() => closeAnd(onOpenRooms)}
               />
             )}

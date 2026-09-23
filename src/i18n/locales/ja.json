@@ -419,6 +419,7 @@
     "backToRoomAria": "ルームへ",
     "sharedDiary": "共有日記",
     "comments": "コメント（{{n}}）",
+    "commentsLoading": "コメント読み込み中…",
     "commentPlaceholder": "コメントを書く",
     "commentSubmit": "投稿",
     "commentSending": "送信中…",
