@@ -332,6 +332,7 @@ function DiaryDetailPage({
       imageUrl,
       fontId: shareFontId,
       fontSize: shareFontSize,
+      nickname: shareNick,
       pushTitle: shareNick,
       pushBody: t('rooms.sharePushBody'),
     };

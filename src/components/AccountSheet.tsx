@@ -333,22 +333,18 @@ function AccountSheet({
         onCloudSyncLoadingChange?.(true);
         const next = await signInWithGoogleIdToken(idToken);
         clearRoomsNeedGoogleLogin();
-        const name = next.displayName.trim();
-        if (name && !nickNow.trim()) {
-          onNicknameChange(name);
+        const appNick = nameNow.trim() || nickNow.trim();
+        // Google 표시명은 절대 닉으로 쓰지 않음. 계정 닉·사진만 동기화.
+        if (appNick) {
           syncProfileToRooms({
-            nickname: name,
+            nickname: appNick,
             avatarUrl: next.photoUrl ?? avatarNow,
           });
+        } else if (next.photoUrl && !avatarNow) {
+          syncProfileToRooms({ avatarUrl: next.photoUrl });
         }
-        if (next.photoUrl) {
-          if (!avatarNow) {
-            onAvatarChange(next.photoUrl);
-            syncProfileToRooms({
-              nickname: name || nameNow,
-              avatarUrl: next.photoUrl,
-            });
-          }
+        if (next.photoUrl && !avatarNow) {
+          onAvatarChange(next.photoUrl);
         }
         try {
           const result = await onSyncDiaries(null, { month: syncMonth });
@@ -372,25 +368,27 @@ function AccountSheet({
     })();
   };
 
-  const applyAuthPhoto = (photoUrl: string, nameHint?: string) => {
+  const applyAuthPhoto = (photoUrl: string) => {
     onAvatarChange(photoUrl);
+    const nick = nameDraft.trim() || nickname.trim();
     syncProfileToRooms({
-      nickname: nameHint || nameDraft.trim() || nickname,
+      ...(nick ? { nickname: nick } : {}),
       avatarUrl: photoUrl,
     });
   };
 
-  /** 로그인 성공후: 빈 이름만 채우고, 사진은 없을 때만 Google 사진 시드 */
+  /** 로그인 성공 후: 계정 닉만 동기화. Google 표시명은 닉으로 쓰지 않음. 사진은 없을 때만 시드 */
   const seedProfileFromAuth = (next: AuthSession) => {
-    const name = next.displayName.trim();
-    if (name && !nickname.trim()) {
-      onNicknameChange(name);
-      setNameDraft(name);
-      syncProfileToRooms({ nickname: name, avatarUrl: next.photoUrl ?? avatarUrl });
+    const appNick = nameDraft.trim() || nickname.trim();
+    if (appNick) {
+      syncProfileToRooms({
+        nickname: appNick,
+        avatarUrl: next.photoUrl && !avatarUrl ? next.photoUrl : avatarUrl,
+      });
     }
     if (!next.photoUrl) return;
     if (!avatarUrl) {
-      applyAuthPhoto(next.photoUrl, name || nickname || nameDraft.trim());
+      applyAuthPhoto(next.photoUrl);
     }
   };
 

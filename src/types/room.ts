@@ -87,6 +87,8 @@ export interface CreateRoomPostBody {
   imageUrl?: string;
   fontId?: string;
   fontSize?: string;
+  /** 계정에서 정한 닉네임 (Google 표시명 대신) */
+  nickname?: string;
   /** 푸시 제목 — 공유한 사람 닉네임 (앱 언어) */
   pushTitle?: string;
   /** 푸시 본문 — 앱 언어 */

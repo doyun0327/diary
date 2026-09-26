@@ -297,6 +297,7 @@ function RoomDiaryPickerSheet({
         imageUrl,
         fontId,
         fontSize,
+        nickname: nick,
         pushTitle: nick,
         pushBody: t('rooms.sharePushBody'),
       });
