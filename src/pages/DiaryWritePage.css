@@ -798,7 +798,7 @@
 .diary-write__ai-source-example-note {
   margin: 4px 0 0;
   font-family: var(--brand-font);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 650;
   line-height: 1.3;
   color: var(--color-text-muted);
@@ -807,7 +807,7 @@
 .diary-write__ai-source-example-note--sub {
   margin-top: 2px;
   margin-bottom: 14px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
