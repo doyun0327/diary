@@ -1006,7 +1006,7 @@
     "stickerCatsAria": "シールカテゴリ",
     "sample": "今日の日記",
     "confirm": {
-      "clear": "絵全体を消去しますか？"
+      "clear": "写真・ステッカー・ペンの線をすべて消去しますか？"
     },
     "alert": {
       "imageOnly": "画像ファイルのみ選択できます"

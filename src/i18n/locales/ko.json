@@ -1006,7 +1006,7 @@
     "stickerCatsAria": "스티커 카테고리",
     "sample": "오늘의 diary",
     "confirm": {
-      "clear": "그림을 모두 지울까요?"
+      "clear": "사진, 스티커, 펜으로 그린 그림을 모두 지울까요?"
     },
     "alert": {
       "imageOnly": "이미지 파일만 넣을 수 있어요"

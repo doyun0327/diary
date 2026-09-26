@@ -1006,7 +1006,7 @@
     "stickerCatsAria": "Sticker categories",
     "sample": "Today's diary",
     "confirm": {
-      "clear": "Clear the whole drawing?"
+      "clear": "Clear photos, stickers, and pen drawings?"
     },
     "alert": {
       "imageOnly": "Only image files allowed"

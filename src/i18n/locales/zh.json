@@ -1005,7 +1005,7 @@
     "stickerCatsAria": "贴纸分类",
     "sample": "今天的日记",
     "confirm": {
-      "clear": "清除整幅画？"
+      "clear": "要清除照片、贴纸和笔迹吗？"
     },
     "alert": {
       "imageOnly": "只能选择图片文件"

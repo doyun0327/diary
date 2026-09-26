@@ -1005,7 +1005,7 @@
     "stickerCatsAria": "Catégories de stickers",
     "sample": "Journal du jour",
     "confirm": {
-      "clear": "Effacer tout le dessin ?"
+      "clear": "Effacer photos, stickers et traits ?"
     },
     "alert": {
       "imageOnly": "Seuls les fichiers image sont autorisés"
