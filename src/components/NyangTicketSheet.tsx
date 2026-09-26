@@ -10,9 +10,9 @@ import { purchaseAiPack } from '../utils/aiPackPurchase';
 import {
   applySubscriptionStatus,
   getActiveSubProductId,
+  getAiPackCredits,
   getDiaryAccessState,
   getProBillingPeriodEndMs,
-  getPurchasedAiPackCredits,
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
@@ -45,10 +45,6 @@ import {
   useAuthSession,
 } from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn } from '../lib/googleAuth';
-import {
-  isWelcomeAiPurchase,
-  syncWelcomeFromPurchaseHistory,
-} from '../utils/welcomeAiCredits';
 import CloseIcon from './CloseIcon';
 import './AccountSheet.css';
 import './NyangTicketSheet.css';
@@ -174,8 +170,14 @@ function NyangTicketSheet({
     setHistoryError(null);
     try {
       const data = await fetchPurchaseRecords(token);
-      const items = data.items ?? [];
-      syncWelcomeFromPurchaseHistory(items);
+      const items = (data.items ?? []).filter((row) => {
+        const id = String(row.productId ?? '').toLowerCase();
+        const kind = String(row.kind ?? '').toLowerCase();
+        // 폐지된 Welcome 무료 지급 내역은 표시하지 않음
+        if (kind === 'welcome' || kind === 'ai_welcome') return false;
+        if (id.includes('welcome') || id === 'pageby_ai_welcome') return false;
+        return true;
+      });
       setHistory(items);
     } catch (err) {
       setHistoryError(
@@ -192,8 +194,7 @@ function NyangTicketSheet({
 
   void accessTick;
   const access = getDiaryAccessState();
-  // Welcome 체험권은 구매가 아니므로 AI 그림충전 잔량에서 제외
-  const packLeft = getPurchasedAiPackCredits();
+  const packLeft = getAiPackCredits();
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
   const activeSubProductId = isPro ? getActiveSubProductId() : null;
@@ -204,10 +205,12 @@ function NyangTicketSheet({
     const token = getAccessToken();
     if (!token) return;
     try {
+      const periodEnd = getProBillingPeriodEndMs();
       await recordPurchaseRemote(token, {
         kind: 'subscription',
         productId: (productId && productId.trim()) || SUB_MONTHLY_PRODUCT_ID,
         creditsGranted: 0,
+        ...(periodEnd != null ? { billingPeriodEnd: periodEnd } : {}),
       });
       void loadHistory();
     } catch (err) {
@@ -406,11 +409,6 @@ function NyangTicketSheet({
         return t('nyangTicket.historyItemSubscriptionMonthly');
       }
       return t('nyangTicket.historyItemSubscription');
-    }
-    if (isWelcomeAiPurchase(row)) {
-      return t('nyangTicket.historyItemWelcome', {
-        n: row.creditsGranted > 0 ? row.creditsGranted : 3,
-      });
     }
     if (row.creditsGranted > 0) {
       return t('nyangTicket.historyItemPack', { n: row.creditsGranted });

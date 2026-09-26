@@ -142,10 +142,8 @@ type AccessState = {
   monthlyLimitUsed: number;
   monthKey: string | null;
   aiDrawCredits: number;
-  /** 추가 구매한 AI 그림 잔여 횟수 (월한도와 별도) — Welcome 포함 */
+  /** 추가 구매한 AI 그림 잔여 횟수 (월한도와 별도) */
   aiPackCredits: number;
-  /** Google 로그인 Welcome 체험권 잔여 (팩 잔량 중 일부). AI 그림충전 UI에서는 제외 */
-  welcomeAiCreditsRemaining: number;
   /** 미구독자 평생 무료 AI 그림 사용 횟수 */
   aiFreeDrawsUsed: number;
   /** @deprecated diarySaveCredits 사용 */
@@ -242,7 +240,6 @@ function loadAccessState(): AccessState {
         monthKey: getMonthKey(),
         aiDrawCredits: 0,
         aiPackCredits: 0,
-        welcomeAiCreditsRemaining: 0,
         aiFreeDrawsUsed: 0,
         bonusDiarySlots: 0,
         diaryDayKey: getDiaryDayKey(),
@@ -255,10 +252,6 @@ function loadAccessState(): AccessState {
       AccessState & { adRewardBalance?: number; aiDrawUsedToday?: number }
     >;
     const aiPackCredits = Math.max(0, Number(parsed.aiPackCredits ?? 0));
-    const welcomeRaw = Math.max(
-      0,
-      Number(parsed.welcomeAiCreditsRemaining ?? 0),
-    );
     return {
       premiumUntil:
         typeof parsed.premiumUntil === "number" ? parsed.premiumUntil : null,
@@ -272,7 +265,6 @@ function loadAccessState(): AccessState {
         typeof parsed.monthKey === "string" ? parsed.monthKey : getMonthKey(),
       aiDrawCredits: Math.max(0, Number(parsed.aiDrawCredits ?? 0)),
       aiPackCredits,
-      welcomeAiCreditsRemaining: Math.min(welcomeRaw, aiPackCredits),
       aiFreeDrawsUsed: readAiFreeDrawsUsed(parsed),
       bonusDiarySlots: Math.max(0, Number(parsed.bonusDiarySlots ?? 0)),
       diaryDayKey:
@@ -290,7 +282,6 @@ function loadAccessState(): AccessState {
       monthKey: getMonthKey(),
       aiDrawCredits: 0,
       aiPackCredits: 0,
-      welcomeAiCreditsRemaining: 0,
       aiFreeDrawsUsed: 0,
       bonusDiarySlots: 0,
       diaryDayKey: getDiaryDayKey(),
@@ -544,70 +535,8 @@ export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
 export function applyAiPackCreditsFromServer(credits: number) {
   const state = loadAccessState();
   state.aiPackCredits = Math.max(0, Math.floor(credits));
-  state.welcomeAiCreditsRemaining = Math.min(
-    Math.max(0, state.welcomeAiCreditsRemaining || 0),
-    state.aiPackCredits,
-  );
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-}
-
-export function setWelcomeAiCreditsRemaining(count: number) {
-  const state = loadAccessState();
-  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
-  state.welcomeAiCreditsRemaining = Math.min(
-    Math.max(0, Math.floor(count)),
-    state.aiPackCredits,
-  );
-  saveAccessState(state);
-  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-}
-
-export function getWelcomeAiCreditsRemaining() {
-  const state = loadAccessState();
-  state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
-  state.welcomeAiCreditsRemaining = Math.min(
-    Math.max(0, state.welcomeAiCreditsRemaining || 0),
-    state.aiPackCredits,
-  );
-  saveAccessState(state);
-  return state.welcomeAiCreditsRemaining;
-}
-
-/** AI 그림충전 탭용 — Welcome 제외한 실제 구매 잔량 */
-export function getPurchasedAiPackCredits() {
-  return Math.max(0, getAiPackCredits() - getWelcomeAiCreditsRemaining());
-}
-
-/**
- * 구매내역 지급량 + 현재 잔량으로 Welcome 잔여 재계산.
- * (Welcome을 팩보다 먼저 소모한다는 전제)
- */
-export function syncWelcomeRemainingFromGrants(
-  welcomeGranted: number,
-  purchasedGranted: number,
-  currentCredits = getAiPackCredits(),
-) {
-  const welcome = Math.max(0, Math.floor(welcomeGranted));
-  const purchased = Math.max(0, Math.floor(purchasedGranted));
-  const total = Math.max(0, Math.floor(currentCredits));
-  if (welcome <= 0) {
-    setWelcomeAiCreditsRemaining(0);
-    return;
-  }
-  const consumed = Math.max(0, welcome + purchased - total);
-  const welcomeLeft = Math.max(0, welcome - Math.min(consumed, welcome));
-  setWelcomeAiCreditsRemaining(Math.min(welcomeLeft, total));
-}
-
-/** 원격 팩 차감 성공 후 Welcome 잔여도 1 감소 */
-export function noteAiPackCreditConsumedPreferWelcome() {
-  const state = loadAccessState();
-  if ((state.welcomeAiCreditsRemaining || 0) > 0) {
-    state.welcomeAiCreditsRemaining -= 1;
-    saveAccessState(state);
-    window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
-  }
 }
 
 function normalizeAiCredits(state: AccessState) {
@@ -815,9 +744,6 @@ export function consumeAiPackCredit() {
   state.aiPackCredits = Math.max(0, state.aiPackCredits || 0);
   if (state.aiPackCredits <= 0) return false;
   state.aiPackCredits -= 1;
-  if ((state.welcomeAiCreditsRemaining || 0) > 0) {
-    state.welcomeAiCreditsRemaining -= 1;
-  }
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
   return true;

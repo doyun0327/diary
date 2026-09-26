@@ -331,7 +331,6 @@
     "historyLoadFailed": "Couldn't load purchase history.",
     "historyDone": "Done",
     "historyItemSubscription": "PRO subscription",
-    "historyItemWelcome": "{{n}} draws (Welcome trial)",
     "historyItemPack": "{{n}}",
     "benefitPdf": "Salvar em PDF",
     "benefitSearch": "Buscar diários",
@@ -613,7 +612,6 @@
     "breakdownTitle": "Credits left",
     "breakdownAria": "{{n}} credits left, show details",
     "breakdownSub": "{{n}} : Sub",
-    "breakdownWelcome": "{{n}} : Welcome",
     "breakdownPack": "{{n}} : AI pack",
     "breakdownAd": "{{n}} : Ad",
     "breakdownEmpty": "No credits left"

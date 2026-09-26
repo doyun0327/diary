@@ -266,6 +266,23 @@ function App() {
     syncSubscriptionFromNative();
   }, []);
 
+  // 구독 상태·결제 주기 갱신 시 구매내역에 월/년 결제 반영
+  useEffect(() => {
+    const syncHistory = () => {
+      if (!isGoogleSignedIn()) return;
+      void import("./utils/subscriptionPurchaseHistory").then((m) =>
+        m.syncSubscriptionPurchaseHistory(),
+      );
+    };
+    syncHistory();
+    window.addEventListener(SUBSCRIPTION_CHANGE_EVENT, syncHistory);
+    window.addEventListener(AUTH_CHANGE_EVENT, syncHistory);
+    return () => {
+      window.removeEventListener(SUBSCRIPTION_CHANGE_EVENT, syncHistory);
+      window.removeEventListener(AUTH_CHANGE_EVENT, syncHistory);
+    };
+  }, []);
+
   useEffect(() => {
     const onOpen = (event: Event) => {
       const detail = (event as CustomEvent<OpenNyangTicketDetail>).detail;

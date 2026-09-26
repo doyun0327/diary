@@ -334,7 +334,6 @@
     "historyItemSubscription": "PRO 구독",
     "historyItemSubscriptionMonthly": "PRO 월간 구독",
     "historyItemSubscriptionYearly": "PRO 연간 구독",
-    "historyItemWelcome": "{{n}}회 (Welcome 체험권)",
     "historyItemPack": "{{n}}장"
   },
   "credits": {
@@ -612,7 +611,6 @@
     "breakdownTitle": "남은 횟수",
     "breakdownAria": "남은 횟수 {{n}}회, 상세 보기",
     "breakdownSub": "{{n}} : 구독",
-    "breakdownWelcome": "{{n}} : Welcome",
     "breakdownPack": "{{n}} : AI 그림충전",
     "breakdownAd": "{{n}} : 광고",
     "breakdownInstallFree": "{{n}} : 첫 무료",

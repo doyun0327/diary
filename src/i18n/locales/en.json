@@ -334,7 +334,6 @@
     "historyItemSubscription": "PRO subscription",
     "historyItemSubscriptionMonthly": "PRO monthly",
     "historyItemSubscriptionYearly": "PRO yearly",
-    "historyItemWelcome": "{{n}} draws (Welcome trial)",
     "historyItemPack": "{{n}}"
   },
   "credits": {
@@ -612,7 +611,6 @@
     "breakdownTitle": "Credits left",
     "breakdownAria": "{{n}} credits left, show details",
     "breakdownSub": "{{n}} : Sub",
-    "breakdownWelcome": "{{n}} : Welcome",
     "breakdownPack": "{{n}} : AI pack",
     "breakdownAd": "{{n}} : Ad",
     "breakdownInstallFree": "{{n}} : First free",

@@ -1,6 +1,6 @@
 import {
   canUseProAiQuota,
-  getPurchasedAiPackCredits,
+  getAiPackCredits,
   isPremiumActiveNow,
 } from './diaryAccess';
 
@@ -174,7 +174,7 @@ export function markAiSourceIntroSeen() {
 
 /** 구독(Pro) 또는 AI 그림충전 구매 잔량이 있으면 true */
 function hasPaidAiQuotaForDeductCoach(): boolean {
-  return isPremiumActiveNow() || canUseProAiQuota() || getPurchasedAiPackCredits() > 0;
+  return isPremiumActiveNow() || canUseProAiQuota() || getAiPackCredits() > 0;
 }
 
 /** 완성 후 차감 — 구독·구매권 있는 사람에게만 처음 3번 */

@@ -58,13 +58,10 @@ import {
   getAiDrawsToday,
   getAiPackCredits,
   getDiaryAccessState,
-  getPurchasedAiPackCredits,
-  getWelcomeAiCreditsRemaining,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
   isProAiMonthlyLimitReached,
   needsAiAdBeforeDraw,
-  noteAiPackCreditConsumedPreferWelcome,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
 import {
@@ -932,11 +929,7 @@ function DiaryWritePage({
         lines.push({ key: 'sub', n: sub, labelKey: 'quota.breakdownSub' });
       }
     }
-    const welcome = getWelcomeAiCreditsRemaining();
-    if (welcome > 0) {
-      lines.push({ key: 'welcome', n: welcome, labelKey: 'quota.breakdownWelcome' });
-    }
-    const purchased = getPurchasedAiPackCredits();
+    const purchased = getAiPackCredits();
     if (purchased > 0) {
       lines.push({ key: 'pack', n: purchased, labelKey: 'quota.breakdownPack' });
     }
@@ -946,7 +939,6 @@ function DiaryWritePage({
     const hasCreditLine = lines.some(
       (l) =>
         l.key === 'sub' ||
-        l.key === 'welcome' ||
         l.key === 'pack' ||
         l.key === 'install-free',
     );
@@ -1069,7 +1061,6 @@ function DiaryWritePage({
       try {
         const view = await consumeAiPackCreditsRemote(token);
         applyAiPackCreditsFromServer(view.credits);
-        noteAiPackCreditConsumedPreferWelcome();
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);

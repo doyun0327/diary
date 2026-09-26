@@ -120,20 +120,6 @@ export async function grantAiPackCreditsRemote(
   return (await res.json()) as AiPackCreditsDto;
 }
 
-/** Google 연동 계정 무료 AI 3회 (계정당 1회) */
-export async function claimWelcomeAiPackCredits(
-  accessToken: string,
-): Promise<AiPackCreditsDto> {
-  const res = await fetch(apiUrl('/api/usage/ai-pack/welcome'), {
-    method: 'POST',
-    headers: authHeaders(accessToken),
-  });
-  if (!res.ok) {
-    throw new Error(await readError(res, '무료 AI 지급 실패'));
-  }
-  return (await res.json()) as AiPackCreditsDto;
-}
-
 export type PurchaseKind = 'ai_pack' | 'subscription';
 
 export type PurchaseRecordDto = {
@@ -143,6 +129,8 @@ export type PurchaseRecordDto = {
   creditsGranted: number;
   /** epoch ms */
   createdAt: number;
+  /** 구독 주기 만료 ms (월/년 갱신 구분) */
+  billingPeriodEnd?: number | null;
 };
 
 export type PurchaseRecordsDto = {
@@ -167,12 +155,21 @@ export async function recordPurchaseRemote(
     kind: PurchaseKind;
     productId: string;
     creditsGranted?: number;
+    /** 구독 주기 만료 ms — 매 갱신마다 새 내역, 같은 주기는 중복 안 됨 */
+    billingPeriodEnd?: number | null;
   },
 ): Promise<PurchaseRecordDto> {
   const res = await fetch(apiUrl('/api/usage/purchases'), {
     method: 'POST',
     headers: authHeaders(accessToken),
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      kind: body.kind,
+      productId: body.productId,
+      creditsGranted: body.creditsGranted ?? 0,
+      ...(body.billingPeriodEnd != null
+        ? { billingPeriodEnd: body.billingPeriodEnd }
+        : {}),
+    }),
   });
   if (!res.ok) {
     throw new Error(await readError(res, '구매 내역 저장 실패'));

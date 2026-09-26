@@ -31,6 +31,11 @@ function applyPayload(payload: SubscriptionStatusPayload) {
     payload.expiresAt ?? null,
     payload.productId,
   );
+  if (payload.active) {
+    void import('./subscriptionPurchaseHistory').then((m) =>
+      m.syncSubscriptionPurchaseHistory(),
+    );
+  }
 }
 
 function emitPurchaseComplete(payload: SubscriptionStatusPayload) {
