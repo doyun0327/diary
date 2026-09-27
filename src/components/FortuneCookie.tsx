@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FORTUNE_COUNT, FORTUNE_MESSAGES } from '../data/fortuneMessages';
+import { pickFortuneMessage } from '../data/fortuneMessages';
 import './FortuneCookie.css';
 
 const COOKIE_IMG = '/fortune/cookie.png';
@@ -9,12 +9,6 @@ interface FortuneCookieProps {
   className?: string;
   /** × 로 닫을 때 (부모에서 레이어 제거) */
   onDismiss?: () => void;
-}
-
-function pickFortune(lang: string): string {
-  const list =
-    lang.startsWith('ko') ? FORTUNE_MESSAGES.ko : FORTUNE_MESSAGES.en;
-  return list[Math.floor(Math.random() * FORTUNE_COUNT)] ?? list[0];
 }
 
 /** 제공 이미지 포춘쿠키 — 한 번만 열림, × 눌러야 사라짐 */
@@ -62,7 +56,7 @@ export default function FortuneCookie({
 
   const crackOpen = () => {
     if (open) return;
-    setMessage(pickFortune(i18n.language));
+    setMessage(pickFortuneMessage(i18n.language));
     setOpen(true);
   };
 
