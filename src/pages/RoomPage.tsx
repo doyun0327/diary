@@ -402,9 +402,7 @@ function RoomPage({
                       const author = room.members.find((m) => m.userId === post.authorUserId);
                       const withdrawn = Boolean(post.authorWithdrawn || author?.withdrawn);
                       const authorName = roomAuthorLabel(
-                        post.authorUserId === userId
-                          ? nickname.trim() || post.authorNickname
-                          : post.authorNickname || author?.nickname || '',
+                        post.authorNickname,
                         withdrawn,
                         t,
                       );

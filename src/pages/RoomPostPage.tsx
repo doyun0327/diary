@@ -98,10 +98,6 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [blockTick, setBlockTick] = useState(0);
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
-  /** 방 멤버 최신 닉·프사 (포스트/댓글 스냅샷보다 우선) */
-  const [memberNickByUserId, setMemberNickByUserId] = useState<
-    Record<string, string>
-  >({});
   const pageRef = useRef<HTMLDivElement>(null);
   const commentListRef = useRef<HTMLUListElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
@@ -217,11 +213,6 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     const applyMembers = (
       members: { userId: string; nickname: string; avatarUrl?: string | null; withdrawn?: boolean }[],
     ) => {
-      const nicks: Record<string, string> = {};
-      for (const m of members) {
-        if (m.nickname?.trim()) nicks[m.userId] = m.nickname.trim();
-      }
-      setMemberNickByUserId(nicks);
       if (post.authorWithdrawn) {
         setAuthorAvatarUrl('');
         return;
@@ -509,12 +500,8 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setSafetyTarget(target);
   };
 
-  // 댓글·포스트 스냅샷 닉 우선 (멤버 목록의 Google/옛 닉으로 덮지 않음). 내 글은 로컬 닉.
-  const liveAuthorNick = post
-    ? post.authorUserId === userId
-      ? nickname.trim() || post.authorNickname
-      : post.authorNickname || memberNickByUserId[post.authorUserId] || ''
-    : '';
+  // 서버가 authorUserId 기준 멤버 닉으로 맞춘 authorNickname만 사용 (로컬/멤버 맵 덮어쓰기 금지)
+  const liveAuthorNick = post?.authorNickname || '';
   const authorName = post
     ? roomAuthorLabel(liveAuthorNick, post.authorWithdrawn, t)
     : '';
@@ -621,9 +608,7 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
                   <div className="rooms__comment-head">
                     <strong className="rooms__comment-name">
                       {roomAuthorLabel(
-                        c.authorNickname ||
-                          memberNickByUserId[c.authorUserId] ||
-                          '',
+                        c.authorNickname || '',
                         c.authorWithdrawn,
                         t,
                       )}

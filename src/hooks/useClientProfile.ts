@@ -9,17 +9,38 @@ import {
 } from '../utils/profileDemographics';
 
 const CLIENT_ID_KEY = 'picture-diary-client-id';
+/** 레거시 전역 키 — 계정별 키로 이전 */
 const NICKNAME_KEY = 'picture-diary-nickname';
 const AVATAR_KEY = 'picture-diary-avatar';
 const GENDER_KEY = 'picture-diary-gender';
 const AGE_GROUP_KEY = 'picture-diary-age-group';
+/** useAuthSession SESSION_KEY — 순환 import 없이 userId만 읽음 */
+const AUTH_SESSION_KEY = 'picture-diary-auth-session';
+const AUTH_CHANGE_EVENT = 'diary-auth-changed';
+
+function readSessionUserId(): string | null {
+  try {
+    const raw = localStorage.getItem(AUTH_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { userId?: string };
+    const id = parsed.userId?.trim();
+    return id || null;
+  } catch {
+    return null;
+  }
+}
+
+function nicknameStorageKey(userId?: string | null): string {
+  const id = userId?.trim();
+  return id ? `${NICKNAME_KEY}:${id}` : NICKNAME_KEY;
+}
 
 export function readStoredClientId(): string {
   return loadClientId();
 }
 
-export function readStoredNickname(): string {
-  return loadNickname();
+export function readStoredNickname(userId?: string | null): string {
+  return loadNickname(userId ?? readSessionUserId());
 }
 
 export function readStoredGender(): ProfileGender | null {
@@ -46,9 +67,20 @@ function loadClientId(): string {
   return id;
 }
 
-function loadNickname(): string {
+function loadNickname(userId?: string | null): string {
+  const key = nicknameStorageKey(userId);
   try {
-    return localStorage.getItem(NICKNAME_KEY) ?? '';
+    const scoped = localStorage.getItem(key);
+    if (scoped != null && scoped !== '') return scoped;
+    // 계정 키가 비어 있으면 레거시 전역 닉을 한 번 이전
+    if (key !== NICKNAME_KEY) {
+      const legacy = localStorage.getItem(NICKNAME_KEY);
+      if (legacy != null && legacy !== '') {
+        localStorage.setItem(key, legacy);
+        return legacy;
+      }
+    }
+    return scoped ?? '';
   } catch {
     return '';
   }
@@ -83,7 +115,9 @@ function loadAgeGroup(): ProfileAgeGroup | null {
 /** 친구 방용 닉네임 · 프로필 사진 · 성별 · 연령 · 기기 ID */
 export function useClientProfile() {
   const [clientId] = useState(loadClientId);
-  const [nickname, setNicknameState] = useState(loadNickname);
+  const [nickname, setNicknameState] = useState(() =>
+    loadNickname(readSessionUserId()),
+  );
   const [avatarUrl, setAvatarUrlState] = useState<string | null>(loadAvatarUrl);
   const [gender, setGenderState] = useState<ProfileGender | null>(loadGender);
   const [ageGroup, setAgeGroupState] = useState<ProfileAgeGroup | null>(
@@ -93,7 +127,10 @@ export function useClientProfile() {
   const setNickname = useCallback((next: string) => {
     const trimmed = next.trim().slice(0, 20);
     setNicknameState(trimmed);
+    const key = nicknameStorageKey(readSessionUserId());
     try {
+      localStorage.setItem(key, trimmed);
+      // 레거시 키도 맞춰 두어 구코드 경로와 일치
       localStorage.setItem(NICKNAME_KEY, trimmed);
     } catch {
       // ignore
@@ -130,6 +167,16 @@ export function useClientProfile() {
     }
   }, []);
 
+  // 계정 전환 시 해당 계정 닉네임으로 교체 (다른 사람 닉으로 공유되는 문제 방지)
+  useEffect(() => {
+    const syncNick = () => {
+      setNicknameState(loadNickname(readSessionUserId()));
+    };
+    syncNick();
+    window.addEventListener(AUTH_CHANGE_EVENT, syncNick);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, syncNick);
+  }, []);
+
   useEffect(() => {
     const onAvatarChanged = (event: Event) => {
       const next = (event as CustomEvent<string>).detail;
@@ -159,7 +206,9 @@ export function useClientProfile() {
 export function getClientHeaders(): HeadersInit {
   const clientId = loadClientId();
   // fetch 헤더는 ISO-8859-1만 허용 → 한글 닉네임은 URI 인코딩
-  const nickname = encodeURIComponent(loadNickname() || '익명');
+  const nickname = encodeURIComponent(
+    loadNickname(readSessionUserId()) || '익명',
+  );
   return {
     'X-Client-Id': clientId,
     'X-Nickname': nickname,
