@@ -349,17 +349,17 @@
   top: auto;
 }
 
-/* 두 줄 안내 — 가로로 안 넘치게 */
+/* 두 줄 안내 — 긴 번역도 말풍선 안에서 감싸기 */
 .diary-write__coach--ai {
   z-index: 50;
-  max-width: min(200px, calc(100vw - 40px));
+  max-width: min(240px, calc(100vw - 40px));
   width: max-content;
 }
 
 .diary-write__coach--ai .coach-bubble__body p {
   white-space: pre-line;
-  word-break: keep-all;
-  overflow-wrap: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 /* 횟수 상세 말풍선 — 가장 긴 줄 너비에 맞춤 */

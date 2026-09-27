@@ -118,7 +118,7 @@ void i18n.use(initReactI18next).init({
     de: { translation: de },
   },
   lng: getStoredLanguage(),
-  fallbackLng: 'en',
+  fallbackLng: 'ko',
   interpolation: { escapeValue: false },
 });
 

@@ -794,12 +794,12 @@
       "adNotCompleted": "Watch the ad to the end to draw with AI.",
       "adNotCompletedWrite": "Finish the ad to save this diary",
       "adAppOnly": "Ads are available in the app only",
+      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",
+      "aiFreeLimit": "You've used today's free AI drawing allowance.",
       "aiDailyLimit": "You can generate 1 AI drawing per day with ads. Upgrade to Pro for more.",
       "aiAdDailyOnce": "Available once per day.",
       "aiMonthlyLimit": "You've used all 50 AI drawings this month. You can draw again next month.",
-      "aiMonthlyLimitAdsDone": "You've used this month's limit and today's ad draw. Try again tomorrow.",
-      "aiFreeLimit": "You've used today's free AI drawing allowance.",
-      "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요."
+      "aiMonthlyLimitAdsDone": "You've used this month's limit and today's ad draw. Try again tomorrow."
     },
     "coach": {
       "character": "Set yourself so AI can draw you",
@@ -867,6 +867,7 @@
     "sharing": "Sharing…",
     "goToRoomsAsk": "Go to the rooms list?",
     "goToRooms": "Open rooms",
+    "goCreateRoom": "Create a room",
     "pcHint": "Desktop web can't share to apps directly. Image downloaded—open on phone or upload in the app.",
     "ok": {
       "oneRoom": "Shared to “{{name}}”",
@@ -894,8 +895,7 @@
       "build": "Can't create share image",
       "convert": "Share image conversion failed",
       "imageLoad": "Couldn't load drawing"
-    },
-    "goCreateRoom": "Create a room"
+    }
   },
   "character": {
     "dialogAria": "My character settings",
@@ -1081,7 +1081,7 @@
     "pickYearAria": "Pick a year",
     "monthsAria": "Month",
     "yearsAria": "Year",
-    "yearSuffix": "",
+    "yearSuffix": "년",
     "monthShort": "{{m}}",
     "months": {
       "1": "Jan",
