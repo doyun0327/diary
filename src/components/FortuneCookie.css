@@ -54,7 +54,8 @@
 }
 
 .ai-fortune.is-open .ai-fortune__visual {
-  width: min(320px, 90vw);
+  width: min(100%, 92vw);
+  max-width: 380px;
   height: auto;
   min-height: var(--cookie-size);
   cursor: default;
@@ -104,17 +105,21 @@
 }
 
 .ai-fortune__slip {
+  --fortune-slip-w: min(260px, calc(92vw - 72px));
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  flex: 1 1 auto;
   width: 0;
-  max-width: min(220px, 62vw);
+  min-width: 0;
+  max-width: var(--fortune-slip-w);
   margin: 0;
   padding: 13px 0 11px;
-  overflow: visible;
+  box-sizing: border-box;
+  overflow: hidden;
   /* 살짝 찌그러진 직사각 — 동그라미/완벽한 네모 아님 */
   border-radius: 14px 22px 16px 20px / 18px 14px 22px 16px;
   background:
@@ -184,11 +189,17 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
+  max-width: 100%;
+  padding: 0 4px;
+  box-sizing: border-box;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #b07a3a;
-  white-space: nowrap;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .ai-fortune__slip-text {
@@ -200,9 +211,18 @@
   line-height: 1.45;
   text-align: center;
   color: var(--color-text);
-  word-break: keep-all;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
   min-height: 1.45em;
+  max-height: min(42vh, 11.5em);
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ai-fortune__caret {
@@ -250,7 +270,7 @@
     box-shadow: none;
   }
   to {
-    width: min(220px, 62vw);
+    width: var(--fortune-slip-w);
     opacity: 1;
     padding-left: 16px;
     padding-right: 18px;
