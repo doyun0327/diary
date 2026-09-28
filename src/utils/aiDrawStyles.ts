@@ -74,7 +74,7 @@ export const AI_DIARY_DRAW_STYLES: AiStyleOption[] = [
   ...AI_DRAW_STYLES,
 ];
 
-const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v10';
+const AI_STYLE_PREVIEW_CACHE = 'ai-style-previews-v11';
 /** path → blob: URL. UI는 이걸로만 표시해 네트워크 재요청을 막음 */
 const previewBlobUrlBySrc = new Map<string, string>();
 const previewReadyListeners = new Set<() => void>();
@@ -85,6 +85,20 @@ function previewRequestUrl(path: string): string {
     return new URL(path, typeof location !== 'undefined' ? location.origin : 'https://local').href;
   } catch {
     return path;
+  }
+}
+
+async function wipeStalePreviewCaches() {
+  if (typeof caches === 'undefined') return;
+  try {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((k) => k.startsWith('ai-style-previews-') && k !== AI_STYLE_PREVIEW_CACHE)
+        .map((k) => caches.delete(k)),
+    );
+  } catch {
+    /* ignore */
   }
 }
 
@@ -130,8 +144,8 @@ async function putPreviewBlob(path: string, res: Response) {
 }
 
 /**
- * 앱 최초(캐시 비어 있을 때)만 네트워크로 받아 Cache Storage에 저장.
- * 이후에는 캐시 → blob URL만 사용 (미리보기 img 재요청 없음).
+ * 앱 시작 시 네트워크로 최신 미리보기를 받아 Cache Storage에 갱신.
+ * 오프라인이면 기존 캐시 → blob URL 사용.
  */
 export function preloadAiStylePreviews() {
   if (previewWarmPromise) return previewWarmPromise;
@@ -143,11 +157,12 @@ export function preloadAiStylePreviews() {
     ].filter(Boolean) as string[];
     if (paths.length === 0) return;
 
+    await wipeStalePreviewCaches();
+
     if (typeof caches === 'undefined') {
       for (const src of paths) {
-        if (previewBlobUrlBySrc.has(src)) continue;
         try {
-          const res = await fetch(previewRequestUrl(src));
+          const res = await fetch(previewRequestUrl(src), { cache: 'no-store' });
           if (res.ok) await putPreviewBlob(src, res);
         } catch {
           /* ignore */
@@ -162,23 +177,28 @@ export function preloadAiStylePreviews() {
       await Promise.all(
         paths.map(async (path) => {
           const reqUrl = previewRequestUrl(path);
-          let res =
-            (await cache.match(reqUrl)) ||
-            (await cache.match(path)) ||
-            (await cache.match(encodeURI(path)));
+          let res: Response | undefined;
 
-          if (!res) {
-            try {
-              const fetched = await fetch(reqUrl);
-              if (!fetched.ok) return;
+          // 항상 최신 파일 우선 (textoil.png 교체 후에도 옛 캐시가 남지 않게)
+          try {
+            const fetched = await fetch(reqUrl, { cache: 'no-store' });
+            if (fetched.ok) {
               await cache.put(reqUrl, fetched.clone());
               res = fetched;
-            } catch {
-              return;
             }
+          } catch {
+            /* offline — fall through to cache */
           }
 
-          await putPreviewBlob(path, res);
+          if (!res) {
+            res =
+              (await cache.match(reqUrl)) ||
+              (await cache.match(path)) ||
+              (await cache.match(encodeURI(path))) ||
+              undefined;
+          }
+
+          if (res) await putPreviewBlob(path, res);
         }),
       );
     } catch {
