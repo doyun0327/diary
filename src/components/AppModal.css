@@ -8,6 +8,11 @@
   padding: 20px;
 }
 
+/* 배포 업데이트 오버레이(10050) 위 — AI 그림 선택 유지 */
+.app-modal--above-deploy {
+  z-index: 10100;
+}
+
 .app-modal__backdrop {
   position: absolute;
   inset: 0;

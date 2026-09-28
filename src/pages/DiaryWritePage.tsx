@@ -85,6 +85,11 @@ import {
   saveWriteDraftMedia,
   writeDraftHasContent,
 } from '../utils/writeDraft';
+import {
+  clearAiPickPending,
+  loadAiPickPending,
+  saveAiPickPending,
+} from '../utils/aiPickPending';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
 import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
@@ -435,6 +440,7 @@ function DiaryWritePage({
 
   // 엔트리 id가 바뀔 때만 원본 스냅샷 갱신 — 저장 직후 props(imageUrl/canvas) 변경으로
   // AI 선택지·캔버스가 리셋되면 수정 내용이 사라진 것처럼 깜박임
+  const aiPickEntryMountedRef = useRef(false);
   useEffect(() => {
     editOriginalImageRef.current = initialEntry?.imageUrl ?? null;
     previousCanvasStateRef.current = cloneCanvasState(initialEntry?.canvasState);
@@ -442,8 +448,42 @@ function DiaryWritePage({
     setAiPickOptions([]);
     setAiPickSelected(new Set());
     setAiPickOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount / 다른 일기 편집 시에만
+    // 다른 일기로 전환할 때만 pending 삭제 (첫 마운트는 복원용으로 유지)
+    if (aiPickEntryMountedRef.current) {
+      void clearAiPickPending();
+    }
+    aiPickEntryMountedRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount / 다른 일기 진입 시에만
   }, [initialEntry?.id]);
+
+  // 배포 새로고침 후에도 이전/새 그림 선택 창 복원
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const pending = await loadAiPickPending();
+      if (cancelled || !pending || pending.options.length === 0) return;
+      setAiGeneratedImages(pending.aiGeneratedImages);
+      setAiPickOptions(pending.options);
+      setAiPickSelected(new Set(pending.selected));
+      setAiPickOpen(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 선택 상태 변경 시 pending 갱신 (새로고침 대비)
+  useEffect(() => {
+    if (!aiPickOpen || aiPickOptions.length === 0) return;
+    const timer = window.setTimeout(() => {
+      void saveAiPickPending({
+        options: aiPickOptions,
+        selected: [...aiPickSelected],
+        aiGeneratedImages,
+      });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [aiPickOpen, aiPickOptions, aiPickSelected, aiGeneratedImages]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -1506,6 +1546,7 @@ function DiaryWritePage({
         await canvasRef.current?.loadImage(imageUrl);
         drawingTouchedRef.current = true;
         dismissAiCoach();
+        await clearAiPickPending();
       } else {
         const options = buildAiPickOptions(
           previousSnapshot,
@@ -1513,9 +1554,15 @@ function DiaryWritePage({
           priorAiCount === 0,
           previousState,
         );
+        const selectedIdx = options.map((_, index) => index);
         setAiPickOptions(options);
-        setAiPickSelected(new Set(options.map((_, index) => index)));
+        setAiPickSelected(new Set(selectedIdx));
         setAiPickOpen(true);
+        await saveAiPickPending({
+          options,
+          selected: selectedIdx,
+          aiGeneratedImages: nextHistory,
+        });
       }
       if (notice) {
         setUsageNoticeKind(imageSource === 'runware-cdn' ? 'cdn' : 'refund');
@@ -1541,6 +1588,7 @@ function DiaryWritePage({
     setAiPickOpen(false);
     setAiPickOptions([]);
     setAiPickSelected(new Set());
+    void clearAiPickPending();
   };
 
   const toggleAiPick = (index: number) => {
@@ -2465,6 +2513,7 @@ function DiaryWritePage({
           )}
           {aiPickOpen && aiPickOptions.length > 0 && (
             <AppModal
+              className="app-modal--above-deploy"
               title={t('write.ai.pickTitle')}
               lead={t('write.ai.pickLead')}
               onDismiss={dismissAiPick}

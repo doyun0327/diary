@@ -22,6 +22,8 @@ type AppModalProps = {
   onSecondary?: () => void;
   ariaLabelledBy?: string;
   closeAriaLabel?: string;
+  /** root에 추가 클래스 (배포 오버레이 위 등) */
+  className?: string;
   /** panel 추가 클래스 */
   panelClassName?: string;
 };
@@ -42,6 +44,7 @@ export default function AppModal({
   onSecondary,
   ariaLabelledBy = 'app-modal-title',
   closeAriaLabel = 'close',
+  className,
   panelClassName,
 }: AppModalProps) {
   const canClose = Boolean(onDismiss);
@@ -51,7 +54,7 @@ export default function AppModal({
 
   return (
     <div
-      className="app-modal"
+      className={['app-modal', className].filter(Boolean).join(' ')}
       role="dialog"
       aria-modal="true"
       {...(title ? { 'aria-labelledby': ariaLabelledBy } : {})}
