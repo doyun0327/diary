@@ -162,6 +162,8 @@ function App() {
   } | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [activePostId, setActivePostId] = useState<string | null>(null);
+  /** FCM으로 같은 글을 다시 열 때 RoomPostPage 강제 리마운트 */
+  const [roomPostOpenKey, setRoomPostOpenKey] = useState(0);
   /** 초대 링크로 받은 코드 — RoomsHub에서 자동 입장 후 소거 */
   const [pendingInviteCode, setPendingInviteCode] = useState<string | null>(
     null,
@@ -451,6 +453,7 @@ function App() {
       setActiveRoomId(payload.roomId);
       if (payload.postId) {
         setActivePostId(payload.postId);
+        setRoomPostOpenKey((n) => n + 1);
         setPage("room-post");
         return;
       }
@@ -1295,9 +1298,13 @@ function App() {
         )}
         {page === "room-post" && activeRoomId && activePostId && (
           <RoomPostPage
+            key={`${activeRoomId}-${activePostId}-${roomPostOpenKey}`}
             roomId={activeRoomId}
             postId={activePostId}
             userId={session?.userId ?? ""}
+            clientId={clientId}
+            nickname={nickname}
+            ensureGuestSession={ensureGuestSession}
             onBack={() => {
               setActivePostId(null);
               setPage("room");

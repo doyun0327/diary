@@ -7,6 +7,7 @@ import BackIcon from '../components/BackIcon';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomSafetyModal, { type SafetyTarget } from '../components/RoomSafetyModal';
 import { getCachedRoomDetail, getCachedRoomPost, invalidateRoomFeed, invalidateRoomsList } from '../utils/roomCache';
+import { getAccessToken, AUTH_CHANGE_EVENT } from '../hooks/useAuthSession';
 import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
 import {
@@ -18,13 +19,19 @@ import {
   isReportedPostHidden,
   subscribeHiddenReportedPosts,
 } from '../utils/hiddenReportedPosts';
-import { useClientProfile } from '../hooks/useClientProfile';
 import './RoomsPages.css';
 
 interface RoomPostPageProps {
   roomId: string;
   postId: string;
   userId: string;
+  clientId: string;
+  nickname: string;
+  ensureGuestSession: (
+    clientId: string,
+    nickname: string,
+    opts?: { force?: boolean },
+  ) => Promise<unknown>;
   onBack: () => void;
 }
 
@@ -73,9 +80,16 @@ function measureKeyboardCover(): number {
   return covered >= 40 ? covered : 0;
 }
 
-function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
+function RoomPostPage({
+  roomId,
+  postId,
+  userId,
+  clientId,
+  nickname,
+  ensureGuestSession,
+  onBack,
+}: RoomPostPageProps) {
   const { t } = useTranslation();
-  const { nickname } = useClientProfile();
   const cachedPost = useMemo(
     () => getCachedRoomPost(roomId, postId),
     [roomId, postId],
@@ -255,7 +269,10 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     [visibleComments],
   );
 
+  const refreshSeqRef = useRef(0);
+
   const refresh = useCallback(async () => {
+    const seq = ++refreshSeqRef.current;
     const fromCache = getCachedRoomPost(roomId, postId);
     if (fromCache) {
       setPost(fromCache);
@@ -266,16 +283,23 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
     setCommentsLoading(true);
     setError(null);
     try {
+      const nick = nickname.trim();
+      if (nick && clientId.trim() && !getAccessToken()) {
+        await ensureGuestSession(clientId, nick);
+      }
+      if (seq !== refreshSeqRef.current) return;
+
       if (fromCache) {
         const list = await roomsApi.listComments(roomId, postId);
-        setComments(list);
+        if (seq !== refreshSeqRef.current) return;
+        setComments((prev) => mergeServerComments(list, prev));
         try {
           const fresh = await roomsApi.getRoomPost(roomId, postId);
+          if (seq !== refreshSeqRef.current) return;
           setPost(fresh);
         } catch (err) {
-          // 서버에 없으면 캐시 글도 제거 (삭제된 글이 밑에 남는 문제)
-          setPost(null);
-          setComments([]);
+          if (seq !== refreshSeqRef.current) return;
+          // 댓글은 이미 받았으면 유지 (일시 실패로 비우지 않음)
           setError(
             err instanceof Error ? err.message : t('rooms.err.loadPost'),
           );
@@ -286,22 +310,52 @@ function RoomPostPage({ roomId, postId, userId, onBack }: RoomPostPageProps) {
         roomsApi.getRoomPost(roomId, postId),
         roomsApi.listComments(roomId, postId),
       ]);
+      if (seq !== refreshSeqRef.current) return;
       setPost(detail);
-      setComments(list);
+      setComments((prev) => mergeServerComments(list, prev));
     } catch (err) {
-      setPost(null);
-      setComments([]);
-      setError(err instanceof Error ? err.message : t('rooms.err.loadPost'));
+      if (seq !== refreshSeqRef.current) return;
+      const msg =
+        err instanceof Error ? err.message : t('rooms.err.loadPost');
+      const isAuth = /로그인|auth|token|401/i.test(msg);
+      // 인증 실패는 비우지 않음 — AUTH_CHANGE / 재시도에서 다시 로드
+      if (!isAuth) {
+        setPost(null);
+        setComments([]);
+      }
+      setError(msg);
     } finally {
-      setLoading(false);
-      setCommentsLoading(false);
+      if (seq === refreshSeqRef.current) {
+        setLoading(false);
+        setCommentsLoading(false);
+      }
     }
-  }, [roomId, postId, t]);
+  }, [roomId, postId, t, nickname, clientId, ensureGuestSession]);
 
   useEffect(() => {
     markRoomPostSeen(roomId, postId);
     void refresh();
   }, [refresh, roomId, postId]);
+
+  // FCM으로 앱 복귀·토큰 준비 후 댓글 재로드 (RoomPage와 동일)
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      void refresh();
+    };
+    const onAuth = () => {
+      if (!getAccessToken()) return;
+      void refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    window.addEventListener(AUTH_CHANGE_EVENT, onAuth);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+      window.removeEventListener(AUTH_CHANGE_EVENT, onAuth);
+    };
+  }, [refresh]);
 
   useEffect(() => {
     if (!toast) return;
