@@ -11,7 +11,7 @@ export const FREE_ENTRY_LIMIT_ENABLED = false;
 export const MONTHLY_DIARY_LIMIT = 50;
 /** Pro: 이번 달 AI 그림 생성 한도 (작성·수정 동일) */
 export const MONTHLY_AI_DRAW_LIMIT = MONTHLY_DIARY_LIMIT;
-export const MONTHLY_PRICE_KRW = 1900;
+export const MONTHLY_PRICE_KRW = 2900;
 /** 무료 회원: 광고 보고 하루 최대 AI 그림 생성 횟수 */
 export const FREE_DAILY_AI_AD_LIMIT = 1;
 /** @deprecated FREE_DAILY_AI_AD_LIMIT */
