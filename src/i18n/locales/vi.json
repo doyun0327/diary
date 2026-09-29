@@ -1029,7 +1029,8 @@
     "photoCancel": "Hủy",
     "photoConfirm": "Xong",
     "stickerPackPremiumLead": "Sticker minh họa chỉ dùng được khi đăng ký Pro.",
-    "undo": "Hoàn tác"
+    "undo": "Hoàn tác",
+    "redo": "Làm lại"
   },
   "font": {
     "dialogAria": "Chọn phông chữ",

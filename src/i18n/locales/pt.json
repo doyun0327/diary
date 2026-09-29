@@ -1029,7 +1029,8 @@
     "photoCancel": "Cancelar",
     "photoConfirm": "Concluir",
     "stickerPackPremiumLead": "Adesivos de ilustração estão disponíveis com o Pro.",
-    "undo": "Desfazer"
+    "undo": "Desfazer",
+    "redo": "Refazer"
   },
   "font": {
     "dialogAria": "Escolher fonte",

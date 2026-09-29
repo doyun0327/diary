@@ -1029,7 +1029,8 @@
     "photoCancel": "Cancel",
     "photoConfirm": "Done",
     "stickerPackPremiumLead": "Illustration stickers are available with Pro.",
-    "undo": "Undo"
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "font": {
     "dialogAria": "Choose font",

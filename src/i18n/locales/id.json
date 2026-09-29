@@ -1033,7 +1033,8 @@
     "photoCancel": "Batal",
     "photoConfirm": "Selesai",
     "stickerPackPremiumLead": "Stiker ilustrasi tersedia dengan Pro.",
-    "undo": "Urungkan"
+    "undo": "Urungkan",
+    "redo": "Ulangi"
   },
   "font": {
     "dialogAria": "Pilih font",

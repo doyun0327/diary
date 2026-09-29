@@ -1029,7 +1029,8 @@
     "photoCancel": "Abbrechen",
     "photoConfirm": "Fertig",
     "stickerPackPremiumLead": "Illustrations-Sticker sind mit Pro verfügbar.",
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "redo": "Wiederholen"
   },
   "font": {
     "dialogAria": "Schrift wählen",

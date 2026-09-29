@@ -328,6 +328,7 @@ function DrawingCanvas({
     onDirtyRef.current?.();
   };
   const undoStack = useRef<HTMLCanvasElement[]>([]);
+  const redoStack = useRef<HTMLCanvasElement[]>([]);
   const strokeSnapshotPushed = useRef(false);
   const photoImages = useRef<Map<string, HTMLImageElement>>(new Map());
   const photoLayersRef = useRef<PhotoLayer[]>([]);
@@ -511,6 +512,7 @@ function DrawingCanvas({
   activePhotoIdRef.current = activePhotoId;
   activeStickerIdRef.current = activeStickerId;
   const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const eraserWidth =
@@ -646,30 +648,26 @@ function DrawingCanvas({
 
   const clearUndoStack = () => {
     undoStack.current = [];
+    redoStack.current = [];
     setCanUndo(false);
+    setCanRedo(false);
   };
 
-  const pushUndoSnapshot = () => {
+  const snapshotCanvas = (): HTMLCanvasElement | null => {
     const canvas = canvasRef.current;
-    if (!canvas || canvas.width < 1 || canvas.height < 1) return;
+    if (!canvas || canvas.width < 1 || canvas.height < 1) return null;
     const snap = document.createElement('canvas');
     snap.width = canvas.width;
     snap.height = canvas.height;
     const sctx = snap.getContext('2d');
-    if (!sctx) return;
+    if (!sctx) return null;
     sctx.drawImage(canvas, 0, 0);
-    undoStack.current.push(snap);
-    while (undoStack.current.length > MAX_UNDO) undoStack.current.shift();
-    setCanUndo(true);
+    return snap;
   };
 
-  const handleUndo = () => {
+  const restoreCanvasSnapshot = (snap: HTMLCanvasElement) => {
     const canvas = canvasRef.current;
-    const snap = undoStack.current.pop();
-    if (!canvas || !snap) {
-      setCanUndo(false);
-      return;
-    }
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.save();
@@ -677,7 +675,50 @@ function DrawingCanvas({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(snap, 0, 0, canvas.width, canvas.height);
     ctx.restore();
+  };
+
+  const pushUndoSnapshot = () => {
+    const snap = snapshotCanvas();
+    if (!snap) return;
+    undoStack.current.push(snap);
+    while (undoStack.current.length > MAX_UNDO) undoStack.current.shift();
+    // 새 그림 → 앞으로가기 스택 무효
+    redoStack.current = [];
+    setCanUndo(true);
+    setCanRedo(false);
+  };
+
+  const handleUndo = () => {
+    const snap = undoStack.current.pop();
+    if (!snap) {
+      setCanUndo(false);
+      return;
+    }
+    const current = snapshotCanvas();
+    if (current) {
+      redoStack.current.push(current);
+      while (redoStack.current.length > MAX_UNDO) redoStack.current.shift();
+    }
+    restoreCanvasSnapshot(snap);
     setCanUndo(undoStack.current.length > 0);
+    setCanRedo(redoStack.current.length > 0);
+    notifyDirty();
+  };
+
+  const handleRedo = () => {
+    const snap = redoStack.current.pop();
+    if (!snap) {
+      setCanRedo(false);
+      return;
+    }
+    const current = snapshotCanvas();
+    if (current) {
+      undoStack.current.push(current);
+      while (undoStack.current.length > MAX_UNDO) undoStack.current.shift();
+    }
+    restoreCanvasSnapshot(snap);
+    setCanUndo(undoStack.current.length > 0);
+    setCanRedo(redoStack.current.length > 0);
     notifyDirty();
   };
 
@@ -2351,6 +2392,30 @@ function DrawingCanvas({
               >
                 <path d="M3 7v6h6" />
                 <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6.36 2.64L3 13" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="drawing__dock-btn drawing__dock-btn--icon"
+              disabled={!canRedo}
+              aria-label={t('canvas.redo')}
+              title={t('canvas.redo')}
+              onClick={handleRedo}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M21 7v6h-6" />
+                <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6.36 2.64L21 13" />
               </svg>
             </button>
             <button

@@ -1029,7 +1029,8 @@
     "photoCancel": "取消",
     "photoConfirm": "完成",
     "stickerPackPremiumLead": "插画贴纸需订阅 Pro 后使用。",
-    "undo": "撤销"
+    "undo": "撤销",
+    "redo": "重做"
   },
   "font": {
     "dialogAria": "选择字体",

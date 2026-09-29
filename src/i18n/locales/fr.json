@@ -1029,7 +1029,8 @@
     "photoCancel": "Annuler",
     "photoConfirm": "Terminé",
     "stickerPackPremiumLead": "Les stickers illustration sont disponibles avec Pro.",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "redo": "Rétablir"
   },
   "font": {
     "dialogAria": "Choisir une police",

@@ -1029,7 +1029,8 @@
     "photoCancel": "취소",
     "photoConfirm": "완료",
     "stickerPackPremiumLead": "일러스트 스티커는 Pro 구독 후 붙일 수 있어요.",
-    "undo": "뒤로"
+    "undo": "뒤로",
+    "redo": "앞으로"
   },
   "font": {
     "dialogAria": "글씨체 선택",

@@ -1029,7 +1029,8 @@
     "photoCancel": "キャンセル",
     "photoConfirm": "完了",
     "stickerPackPremiumLead": "イラストステッカーはPro加入後に使えます。",
-    "undo": "戻る"
+    "undo": "戻る",
+    "redo": "進む"
   },
   "font": {
     "dialogAria": "フォントを選ぶ",

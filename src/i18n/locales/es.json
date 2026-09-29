@@ -1029,7 +1029,8 @@
     "photoCancel": "Cancelar",
     "photoConfirm": "Listo",
     "stickerPackPremiumLead": "Los stickers de ilustración están disponibles con Pro.",
-    "undo": "Deshacer"
+    "undo": "Deshacer",
+    "redo": "Rehacer"
   },
   "font": {
     "dialogAria": "Elegir fuente",

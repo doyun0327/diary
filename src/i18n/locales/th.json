@@ -1029,7 +1029,8 @@
     "photoCancel": "ยกเลิก",
     "photoConfirm": "เสร็จ",
     "stickerPackPremiumLead": "สติกเกอร์ภาพประกอบใช้ได้เมื่อสมัคร Pro",
-    "undo": "ย้อนกลับ"
+    "undo": "ย้อนกลับ",
+    "redo": "ทำซ้ำ"
   },
   "font": {
     "dialogAria": "เลือกฟอนต์",
