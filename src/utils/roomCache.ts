@@ -29,6 +29,38 @@ type RoomsListCache = {
 const feedByKey = new Map<string, RoomFeedEntry>();
 let roomsList: RoomsListCache | null = null;
 
+const ROOM_FEED_PAGE_KEY = 'picture-diary-room-feed-page';
+
+/** 글 상세 들어갔다 나와도 같은 피드 페이지 유지 */
+export function getRememberedRoomFeedPage(roomId: string): number {
+  const id = roomId.trim();
+  if (!id) return 0;
+  try {
+    const raw = sessionStorage.getItem(ROOM_FEED_PAGE_KEY);
+    if (!raw) return 0;
+    const map = JSON.parse(raw) as Record<string, number>;
+    const n = map[id];
+    return typeof n === 'number' && Number.isFinite(n) && n >= 0
+      ? Math.floor(n)
+      : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function rememberRoomFeedPage(roomId: string, page: number): void {
+  const id = roomId.trim();
+  if (!id) return;
+  try {
+    const raw = sessionStorage.getItem(ROOM_FEED_PAGE_KEY);
+    const map = (raw ? JSON.parse(raw) : {}) as Record<string, number>;
+    map[id] = Math.max(0, Math.floor(page));
+    sessionStorage.setItem(ROOM_FEED_PAGE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
 function feedKey(roomId: string, page: number, size: number) {
   return `${roomId}:${page}:${size}`;
 }

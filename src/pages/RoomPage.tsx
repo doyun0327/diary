@@ -17,6 +17,8 @@ import {
 } from '../utils/onboarding';
 import {
   getCachedRoomFeed,
+  getRememberedRoomFeedPage,
+  rememberRoomFeedPage,
 } from '../utils/roomCache';
 import { prefetchRoomFeed } from '../utils/roomPrefetch';
 import { getAccessToken } from '../hooks/useAuthSession';
@@ -81,7 +83,9 @@ function RoomPage({
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
   const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
   const [showShareCoach, setShowShareCoach] = useState(true);
-  const [postsPage, setPostsPage] = useState(0);
+  const [postsPage, setPostsPage] = useState(() =>
+    getRememberedRoomFeedPage(roomId),
+  );
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -157,9 +161,10 @@ function RoomPage({
   }, [visibleFeedPosts, roomId, seenTick]);
 
   useEffect(() => {
-    setPostsPage(0);
+    const savedPage = getRememberedRoomFeedPage(roomId);
+    setPostsPage(savedPage);
     setPickerOpen(false);
-    const warm = getCachedRoomFeed(roomId, 0, ROOM_POSTS_PAGE_SIZE, {
+    const warm = getCachedRoomFeed(roomId, savedPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
     if (warm) {
@@ -177,6 +182,10 @@ function RoomPage({
       setLoading(true);
     }
   }, [roomId]);
+
+  useEffect(() => {
+    rememberRoomFeedPage(roomId, postsPage);
+  }, [roomId, postsPage]);
 
   useEffect(() => {
     if (postsPage > postsPageCount - 1) {
