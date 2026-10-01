@@ -104,20 +104,16 @@ function RoomMemberAvatars({
 
     setPokingId(member.userId);
     try {
-      const pokerName =
-        activeMembers.find((m) => m.userId === currentUserId)?.nickname.trim() ||
-        t('common.anonymous');
+      const targetName =
+        member.nickname.trim() || t('common.anonymous');
+      const pushTitle = t('rooms.pokePushTitle', { name: targetName });
       await roomsApi.pokeMember(roomId, member.userId, {
-        title: t('rooms.pokePushTitle', { name: pokerName }),
+        title: pushTitle,
         body: t('rooms.pokePushBody'),
       });
       lastPokeAt.current.set(member.userId, Date.now());
       onDismissPokeCoach?.();
-      showToast(
-        t('rooms.pokeSent', {
-          name: member.nickname.trim() || t('common.anonymous'),
-        }),
-      );
+      showToast(pushTitle);
     } catch (err) {
       showToast(err instanceof Error ? err.message : t('rooms.pokeFail'));
     } finally {
