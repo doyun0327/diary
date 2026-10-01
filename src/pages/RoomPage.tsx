@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomDetail, RoomPost } from '../types/room';
@@ -40,6 +40,10 @@ import {
 import './RoomsPages.css';
 
 export const ROOM_POSTS_PAGE_SIZE = 10;
+
+function pageCountFromTotal(total: number): number {
+  return Math.max(1, Math.ceil(Math.max(0, total) / ROOM_POSTS_PAGE_SIZE) || 1);
+}
 
 interface RoomPageProps {
   roomId: string;
@@ -89,12 +93,13 @@ function RoomPage({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [sparkleDiaryId, setSparkleDiaryId] = useState<string | null>(null);
-  const touchStartXRef = useRef<number | null>(null);
   const sparkleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sparkleArmedRef = useRef<string | null>(null);
   const postsPageRef = useRef(postsPage);
-  postsPageRef.current = postsPage;
   const refreshSeqRef = useRef(0);
+  const roomIdRef = useRef(roomId);
+  const totalElementsRef = useRef(totalElements);
+  totalElementsRef.current = totalElements;
   const ensureGuestSessionRef = useRef(ensureGuestSession);
   ensureGuestSessionRef.current = ensureGuestSession;
   const nicknameRef = useRef(nickname);
@@ -151,10 +156,10 @@ function RoomPage({
     [],
   );
 
-  // 페이지 수는 totalElements로만 계산 — 페이지마다 totalPages가 흔들리지 않게
+  // 페이지 수: totalElements 기준. 보고 있는 페이지가 페이저에서 안 사라지게 하한 유지
   const postsPageCount = Math.max(
-    1,
-    Math.ceil(totalElements / ROOM_POSTS_PAGE_SIZE) || 1,
+    pageCountFromTotal(totalElements),
+    postsPage + 1,
   );
 
   const feedSharedDiaryIds = useMemo(() => {
@@ -171,31 +176,71 @@ function RoomPage({
     );
   }, [visibleFeedPosts, roomId, seenTick]);
 
+  const applyTotalElements = useCallback((page: number, nextTotal: number) => {
+    const n = Number(nextTotal);
+    if (!Number.isFinite(n) || n < 0) return;
+    setTotalElements((prev) => {
+      // 0페이지만 줄일 수 있음. 다른 페이지 응답이 total을 깎아 1페이지로 붕괴·튕김 방지
+      if (page === 0) return n;
+      if (n > 0) return Math.max(prev, n);
+      return prev;
+    });
+  }, []);
+
   const applyFeed = useCallback(
     (cached: NonNullable<ReturnType<typeof getCachedRoomFeed>>) => {
-      // 다른 페이지 응답은 무시
       if (cached.page !== postsPageRef.current) return;
-
       const nextPosts = Array.isArray(cached.posts) ? cached.posts : [];
       setRoom(cached.room);
       setPosts(nextPosts);
-      // totalElements: 0페이지이거나 양수일 때만 갱신 (빈 끝페이지가 0으로 덮어쓰지 않게)
-      if (cached.page === 0 || cached.totalElements > 0) {
-        setTotalElements(Math.max(0, cached.totalElements));
-      }
+      applyTotalElements(cached.page, cached.totalElements);
       syncRoomPostsSeenBaseline(
         roomId,
         nextPosts.map((p) => p.id),
       );
       setSeenTick((n) => n + 1);
     },
-    [roomId],
+    [roomId, applyTotalElements],
+  );
+
+  const goToPostsPage = useCallback(
+    (next: number) => {
+      const count = Math.max(
+        pageCountFromTotal(totalElementsRef.current),
+        postsPageRef.current + 1,
+      );
+      if (next < 0 || next >= count) return;
+      if (next === postsPageRef.current) return;
+      // 진행 중 요청 무효화 — 이전 페이지 응답이 덮어쓰지 않게
+      refreshSeqRef.current += 1;
+      rememberRoomFeedPage(roomId, next);
+      postsPageRef.current = next;
+      setPostsPage(next);
+
+      const warm = getCachedRoomFeed(roomId, next, ROOM_POSTS_PAGE_SIZE, {
+        allowStale: true,
+      });
+      if (warm) {
+        applyFeed(warm);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    },
+    [roomId, applyFeed],
   );
 
   useEffect(() => {
+    const roomChanged = roomIdRef.current !== roomId;
+    roomIdRef.current = roomId;
     const startPage = getRememberedRoomFeedPage(roomId);
-    setPostsPage(startPage);
+    if (roomChanged || postsPageRef.current !== startPage) {
+      postsPageRef.current = startPage;
+      setPostsPage(startPage);
+    }
     setPickerOpen(false);
+    refreshSeqRef.current += 1;
+
     const warm = getCachedRoomFeed(roomId, startPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
@@ -203,29 +248,22 @@ function RoomPage({
       const nextPosts = Array.isArray(warm.posts) ? warm.posts : [];
       setRoom(warm.room);
       setPosts(nextPosts);
-      if (warm.page === 0 || warm.totalElements > 0) {
-        setTotalElements(Math.max(0, warm.totalElements));
-      }
+      applyTotalElements(warm.page, warm.totalElements);
       setLoading(false);
     } else {
-      // 다른 페이지 캐시에서 totalElements만 가져오기
       const page0 = getCachedRoomFeed(roomId, 0, ROOM_POSTS_PAGE_SIZE, {
         allowStale: true,
       });
       setRoom(page0?.room ?? null);
       setPosts([]);
-      if (page0 && page0.totalElements > 0) {
-        setTotalElements(page0.totalElements);
-      } else {
-        setTotalElements(0);
-      }
+      if (page0) applyTotalElements(0, page0.totalElements);
       setLoading(true);
     }
-  }, [roomId]);
+  }, [roomId, applyTotalElements]);
 
   const refresh = useCallback(async () => {
     const seq = ++refreshSeqRef.current;
-    const page = postsPage;
+    const page = postsPageRef.current;
     const cached = getCachedRoomFeed(roomId, page, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
@@ -245,7 +283,6 @@ function RoomPage({
       }
       if (seq !== refreshSeqRef.current) return;
 
-      // 캐시가 신선하면 강제 재요청 생략 — 왓다갔다 시 레이스·깜빡임 감소
       const needForce = !cached || Boolean(cached.stale);
       await prefetchRoomFeed(roomId, {
         page,
@@ -295,44 +332,10 @@ function RoomPage({
   const requestPostsPage = useCallback(
     (next: number) => {
       if (loading) return;
-      if (next === postsPage) return;
-      if (next < 0 || next >= postsPageCount) return;
-      rememberRoomFeedPage(roomId, next);
-      const warm = getCachedRoomFeed(roomId, next, ROOM_POSTS_PAGE_SIZE, {
-        allowStale: true,
-      });
-      if (warm) {
-        // 캐시 있으면 즉시 표시 — 로딩 깜빡임 없이 전환
-        setPostsPage(next);
-        postsPageRef.current = next;
-        applyFeed(warm);
-        setLoading(false);
-      } else {
-        setLoading(true);
-        setPosts([]);
-        setPostsPage(next);
-        postsPageRef.current = next;
-      }
+      goToPostsPage(next);
     },
-    [loading, postsPage, postsPageCount, roomId, applyFeed],
+    [loading, goToPostsPage],
   );
-
-  const onFeedTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
-    if (loading) return;
-    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
-  };
-
-  const onFeedTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
-    if (loading) return;
-    const startX = touchStartXRef.current;
-    touchStartXRef.current = null;
-    if (startX == null) return;
-    const endX = e.changedTouches[0]?.clientX ?? startX;
-    const dx = endX - startX;
-    if (Math.abs(dx) < 48) return;
-    if (dx < 0) requestPostsPage(postsPage + 1);
-    else requestPostsPage(postsPage - 1);
-  };
 
   const dismissCoach = () => {
     markRoomCommentCoachSeen();
@@ -445,12 +448,7 @@ function RoomPage({
                   <p>{t('rooms.coach.comment')}</p>
                 </CoachBubble>
               )}
-              <div
-                className="rooms__feed-stage"
-                data-no-swipe
-                onTouchStart={onFeedTouchStart}
-                onTouchEnd={onFeedTouchEnd}
-              >
+              <div className="rooms__feed-stage" data-no-swipe>
                 <div className="rooms__feed-page">
                   <ul className="rooms__gallery">
                     {visibleFeedPosts.map((post) => {
@@ -542,8 +540,7 @@ function RoomPage({
             if (postsPage === 0) {
               void refresh();
             } else {
-              rememberRoomFeedPage(roomId, 0);
-              setPostsPage(0);
+              goToPostsPage(0);
             }
           }}
         />
