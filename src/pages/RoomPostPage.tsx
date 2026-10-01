@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FocusEvent, type TouchEvent as ReactTouchEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RoomComment, RoomPost } from '../types/room';
 import * as roomsApi from '../api/roomsApi';
@@ -113,6 +113,7 @@ function RoomPostPage({
   const [blockTick, setBlockTick] = useState(0);
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState('');
   const pageRef = useRef<HTMLDivElement>(null);
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
   const commentListRef = useRef<HTMLUListElement>(null);
   const commentFormRef = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
@@ -562,8 +563,43 @@ function RoomPostPage({
   const postAvatarUrl = post?.authorWithdrawn ? '' : authorAvatarUrl;
   const authorInitial = (authorName || '?').slice(0, 1).toUpperCase();
 
+  const overlaysBlockingSwipe =
+    confirmDelete ||
+    Boolean(confirmDeleteCommentId) ||
+    Boolean(safetyTarget) ||
+    Boolean(commentMenuId);
+
+  const onBackSwipeStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+    if (overlaysBlockingSwipe) {
+      swipeStartRef.current = null;
+      return;
+    }
+    const t0 = e.changedTouches[0];
+    if (!t0) return;
+    swipeStartRef.current = { x: t0.clientX, y: t0.clientY };
+  };
+
+  const onBackSwipeEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start || overlaysBlockingSwipe) return;
+    const t0 = e.changedTouches[0];
+    if (!t0) return;
+    const dx = t0.clientX - start.x;
+    const dy = t0.clientY - start.y;
+    // 오른쪽 스와이프 → 방 목록(피드)으로
+    if (dx < 56 || Math.abs(dy) > 110 || dx <= Math.abs(dy) * 1.15) return;
+    onBack();
+  };
+
   return (
-    <div ref={pageRef} className="rooms rooms--post">
+    <div
+      ref={pageRef}
+      className="rooms rooms--post"
+      data-no-swipe
+      onTouchStart={onBackSwipeStart}
+      onTouchEnd={onBackSwipeEnd}
+    >
       <div className="rooms__toolbar">
         <button
           type="button"
