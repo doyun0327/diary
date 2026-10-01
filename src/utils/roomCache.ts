@@ -30,31 +30,63 @@ const feedByKey = new Map<string, RoomFeedEntry>();
 let roomsList: RoomsListCache | null = null;
 
 const ROOM_FEED_PAGE_KEY = 'picture-diary-room-feed-page';
+const roomFeedPageMem = new Map<string, number>();
 
 /** 글 상세 들어갔다 나와도 같은 피드 페이지 유지 */
 export function getRememberedRoomFeedPage(roomId: string): number {
   const id = roomId.trim();
   if (!id) return 0;
+  const mem = roomFeedPageMem.get(id);
+  if (typeof mem === 'number' && mem >= 0) return mem;
   try {
     const raw = sessionStorage.getItem(ROOM_FEED_PAGE_KEY);
     if (!raw) return 0;
     const map = JSON.parse(raw) as Record<string, number>;
     const n = map[id];
-    return typeof n === 'number' && Number.isFinite(n) && n >= 0
-      ? Math.floor(n)
-      : 0;
+    if (typeof n === 'number' && Number.isFinite(n) && n >= 0) {
+      const page = Math.floor(n);
+      roomFeedPageMem.set(id, page);
+      return page;
+    }
   } catch {
-    return 0;
+    /* ignore */
   }
+  return 0;
 }
 
 export function rememberRoomFeedPage(roomId: string, page: number): void {
   const id = roomId.trim();
   if (!id) return;
+  const next = Math.max(0, Math.floor(page));
+  roomFeedPageMem.set(id, next);
   try {
     const raw = sessionStorage.getItem(ROOM_FEED_PAGE_KEY);
     const map = (raw ? JSON.parse(raw) : {}) as Record<string, number>;
-    map[id] = Math.max(0, Math.floor(page));
+    map[id] = next;
+    sessionStorage.setItem(ROOM_FEED_PAGE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** 방 목록·다른 메뉴로 나갈 때 — 다음에 들어오면 1페이지부터 */
+export function clearRememberedRoomFeedPage(roomId?: string | null): void {
+  const id = roomId?.trim();
+  if (!id) {
+    roomFeedPageMem.clear();
+    try {
+      sessionStorage.removeItem(ROOM_FEED_PAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
+  roomFeedPageMem.delete(id);
+  try {
+    const raw = sessionStorage.getItem(ROOM_FEED_PAGE_KEY);
+    if (!raw) return;
+    const map = JSON.parse(raw) as Record<string, number>;
+    delete map[id];
     sessionStorage.setItem(ROOM_FEED_PAGE_KEY, JSON.stringify(map));
   } catch {
     /* ignore */
@@ -95,19 +127,24 @@ export function setCachedRoomFeed(
   const content = Array.isArray(postsPage.content) ? postsPage.content : [];
   const page = typeof postsPage.page === 'number' ? postsPage.page : 0;
   const size = typeof postsPage.size === 'number' ? postsPage.size : 10;
+  const totalElements =
+    typeof postsPage.totalElements === 'number'
+      ? postsPage.totalElements
+      : content.length;
+  let totalPages =
+    typeof postsPage.totalPages === 'number' && postsPage.totalPages >= 1
+      ? postsPage.totalPages
+      : Math.max(1, Math.ceil(totalElements / size) || 1);
+  if (content.length > 0) {
+    totalPages = Math.max(totalPages, page + 1);
+  }
   feedByKey.set(feedKey(roomId, page, size), {
     room,
     page,
     size,
     posts: content,
-    totalElements:
-      typeof postsPage.totalElements === 'number'
-        ? postsPage.totalElements
-        : content.length,
-    totalPages: Math.max(
-      1,
-      typeof postsPage.totalPages === 'number' ? postsPage.totalPages : 1,
-    ),
+    totalElements,
+    totalPages,
     at: Date.now(),
   });
 }

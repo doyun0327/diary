@@ -1118,12 +1118,8 @@ function DiaryWritePage({
       return true;
     }
 
-    // Pro: 팩 잔량 먼저 → 그다음 구독 월 한도 → 광고
+    // Pro: 구독 월 한도 먼저 → 그다음 그림충전 팩 → 광고
     if (canUseProAiQuota()) {
-      if (await reserveAiPack()) {
-        aiQuotaKindRef.current = 'ai-pack';
-        return true;
-      }
       if (!isProAiMonthlyLimitReached()) {
         const token = getAccessToken();
         if (token) {

@@ -243,17 +243,49 @@ export async function listRoomPosts(
       totalPages,
     };
   }
-  const content = Array.isArray(raw?.content) ? raw.content : [];
+  const rawRec = raw as RoomPostPage & {
+    posts?: RoomPost[];
+    size?: unknown;
+    totalElements?: unknown;
+    totalPages?: unknown;
+  };
+  const content = Array.isArray(rawRec.content)
+    ? rawRec.content
+    : Array.isArray(rawRec.posts)
+      ? rawRec.posts
+      : [];
+  const parsedSize = Number(rawRec.size);
+  const parsedTotalElements = Number(rawRec.totalElements);
+  const parsedTotalPages = Number(rawRec.totalPages);
+  const resolvedSize = Number.isFinite(parsedSize) && parsedSize > 0 ? parsedSize : size;
+  const resolvedTotalElements = Number.isFinite(parsedTotalElements)
+    ? parsedTotalElements
+    : content.length;
+  // Spring 빈 페이지 totalPages=0 방지 + 숫자가 문자열로 온 경우 대비
+  let resolvedTotalPages = Number.isFinite(parsedTotalPages)
+    ? parsedTotalPages
+    : Math.ceil(resolvedTotalElements / resolvedSize) || 1;
+  if (resolvedTotalPages < 1) {
+    resolvedTotalPages = Math.max(1, Math.ceil(resolvedTotalElements / resolvedSize) || 1);
+  }
+  // totalElements가 있으면 그걸로 페이지 수를 재확인
+  if (resolvedTotalElements > 0) {
+    resolvedTotalPages = Math.max(
+      resolvedTotalPages,
+      Math.ceil(resolvedTotalElements / resolvedSize) || 1,
+    );
+  }
+  // 현재 페이지에 글이 있으면 최소 page+1 페이지는 있다고 본다
+  if (content.length > 0) {
+    resolvedTotalPages = Math.max(resolvedTotalPages, page + 1);
+  }
   return {
     content: enrichRoomPostsFont(content),
-    page: typeof raw?.page === 'number' ? raw.page : page,
-    size: typeof raw?.size === 'number' ? raw.size : size,
-    totalElements:
-      typeof raw?.totalElements === 'number' ? raw.totalElements : content.length,
-    totalPages: Math.max(
-      1,
-      typeof raw?.totalPages === 'number' ? raw.totalPages : 1,
-    ),
+    // 캐시 키·페이지 일치: 응답 page/number 필드가 어긋나도 요청 페이지를 신뢰
+    page,
+    size: resolvedSize,
+    totalElements: resolvedTotalElements,
+    totalPages: resolvedTotalPages,
   };
 }
 

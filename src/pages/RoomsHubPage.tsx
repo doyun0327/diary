@@ -12,6 +12,7 @@ import CloseIcon from "../components/CloseIcon";
 import AppModal from "../components/AppModal";
 import CoachBubble from "../components/CoachBubble";
 import PagePager from "../components/PagePager";
+import DotsLoading from "../components/DotsLoading";
 import { shareViaNative } from "../utils/nativeShare";
 import {
   coverClassName,
@@ -796,7 +797,11 @@ function RoomsHubPage({
             <p className="rooms__error">{error}</p>
           )}
 
-          {loading && <p className="rooms__muted">{t("common.loading")}</p>}
+          {loading && (
+            <div className="rooms__dots-loading">
+              <DotsLoading label={t("common.loading")} />
+            </div>
+          )}
 
           <ul className="rooms__list rooms__list--polaroid">
             {rooms.map((room, index) => {

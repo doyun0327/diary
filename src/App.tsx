@@ -59,6 +59,7 @@ import {
 } from "./utils/writeDraft";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
+import { clearRememberedRoomFeedPage } from "./utils/roomCache";
 import { roomsNeedGoogleLogin } from "./utils/roomsAuthGate";
 import { preloadMoodPackIcons } from "./utils/moodPack";
 import { preloadCharacterHairIcons } from "./types/character";
@@ -835,7 +836,9 @@ function App() {
       return true;
     }
     if (page === "room") {
+      clearRememberedRoomFeedPage(activeRoomId);
       setActivePostId(null);
+      setActiveRoomId(null);
       setPage("rooms");
       return true;
     }
@@ -854,6 +857,7 @@ function App() {
     return false;
   }, [
     accountOpen,
+    activeRoomId,
     googleLoginForProOpen,
     appInfoOpen,
     bookEntries,
@@ -947,6 +951,7 @@ function App() {
 
   const openRooms = () => {
     void prefetchRoomsList();
+    clearRememberedRoomFeedPage(activeRoomId);
     setActiveRoomId(null);
     setActivePostId(null);
     setPage("rooms");
@@ -1238,11 +1243,13 @@ function App() {
             hasPrevDay={detailAdjacent.prev != null}
             hasNextDay={detailAdjacent.next != null}
             onOpenRooms={() => {
+              clearRememberedRoomFeedPage(activeRoomId);
               setActiveRoomId(null);
               setActivePostId(null);
               setPage("rooms");
             }}
             onOpenRoom={(roomId, opts) => {
+              clearRememberedRoomFeedPage(roomId);
               void prefetchRoomFeed(roomId, { force: true });
               setRoomHighlightDiaryId(opts?.highlightDiaryId ?? null);
               setActiveRoomId(roomId);
@@ -1267,6 +1274,7 @@ function App() {
               setPendingInviteCode(null);
             }}
             onOpenRoom={(roomId) => {
+              clearRememberedRoomFeedPage(roomId);
               void prefetchRoomFeed(roomId, { force: true });
               setRoomHighlightDiaryId(null);
               setActiveRoomId(roomId);
@@ -1275,26 +1283,33 @@ function App() {
             }}
           />
         )}
-        {page === "room" && activeRoomId && (
-          <RoomPage
-            roomId={activeRoomId}
-            userId={session?.userId ?? ""}
-            entries={entries}
-            nickname={nickname}
-            clientId={clientId}
-            ensureGuestSession={ensureGuestSession}
-            onPullMonthDiaries={pullMonthDiaries}
-            onBack={() => {
-              setActivePostId(null);
-              setPage("rooms");
-            }}
-            onOpenPost={(postId) => {
-              setActivePostId(postId);
-              setPage("room-post");
-            }}
-            highlightDiaryId={roomHighlightDiaryId}
-            onHighlightConsumed={() => setRoomHighlightDiaryId(null)}
-          />
+        {activeRoomId && (
+          <div
+            hidden={page !== "room"}
+            aria-hidden={page !== "room"}
+          >
+            <RoomPage
+              roomId={activeRoomId}
+              userId={session?.userId ?? ""}
+              entries={entries}
+              nickname={nickname}
+              clientId={clientId}
+              ensureGuestSession={ensureGuestSession}
+              onPullMonthDiaries={pullMonthDiaries}
+              onBack={() => {
+                clearRememberedRoomFeedPage(activeRoomId);
+                setActivePostId(null);
+                setActiveRoomId(null);
+                setPage("rooms");
+              }}
+              onOpenPost={(postId) => {
+                setActivePostId(postId);
+                setPage("room-post");
+              }}
+              highlightDiaryId={roomHighlightDiaryId}
+              onHighlightConsumed={() => setRoomHighlightDiaryId(null)}
+            />
+          </div>
         )}
         {page === "room-post" && activeRoomId && activePostId && (
           <RoomPostPage
@@ -1332,6 +1347,7 @@ function App() {
             }}
             onClearLocalDiaries={clearLocalDiaries}
             onCloudSessionEnded={() => {
+              clearRememberedRoomFeedPage(activeRoomId);
               setActiveRoomId(null);
               setActivePostId(null);
               if (page === "room" || page === "room-post" || page === "rooms") {

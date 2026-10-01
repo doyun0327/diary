@@ -5,6 +5,7 @@ import type { RoomDetail, RoomPost } from '../types/room';
 import BackIcon from '../components/BackIcon';
 import CoachBubble from '../components/CoachBubble';
 import PagePager from '../components/PagePager';
+import DotsLoading from '../components/DotsLoading';
 import RoomDiaryPaper from '../components/RoomDiaryPaper';
 import RoomDiaryPickerSheet from '../components/RoomDiaryPickerSheet';
 import RoomMemberAvatars from '../components/RoomMemberAvatars';
@@ -83,9 +84,7 @@ function RoomPage({
   const [showCoach, setShowCoach] = useState(() => !isRoomCommentCoachSeen());
   const [showPokeCoach, setShowPokeCoach] = useState(() => !isRoomPokeCoachSeen());
   const [showShareCoach, setShowShareCoach] = useState(true);
-  const [postsPage, setPostsPage] = useState(() =>
-    getRememberedRoomFeedPage(roomId),
-  );
+  const [postsPage, setPostsPage] = useState(() => getRememberedRoomFeedPage(roomId));
   const [seenTick, setSeenTick] = useState(0);
   const [blockTick, setBlockTick] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -161,10 +160,11 @@ function RoomPage({
   }, [visibleFeedPosts, roomId, seenTick]);
 
   useEffect(() => {
-    const savedPage = getRememberedRoomFeedPage(roomId);
-    setPostsPage(savedPage);
+    // 글 상세 후 리마운트돼도 기억한 페이지 복원 (방 목록 재진입 시엔 clear됨)
+    const startPage = getRememberedRoomFeedPage(roomId);
+    setPostsPage(startPage);
     setPickerOpen(false);
-    const warm = getCachedRoomFeed(roomId, savedPage, ROOM_POSTS_PAGE_SIZE, {
+    const warm = getCachedRoomFeed(roomId, startPage, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
     if (warm) {
@@ -172,34 +172,45 @@ function RoomPage({
       setRoom(warm.room);
       setPosts(nextPosts);
       setTotalElements(warm.totalElements);
-      setTotalPages(Math.max(1, warm.totalPages));
+      setTotalPages(
+        Math.max(1, warm.totalPages, nextPosts.length > 0 ? startPage + 1 : 1),
+      );
       setLoading(false);
     } else {
       setRoom(null);
       setPosts([]);
       setTotalElements(0);
-      setTotalPages(1);
+      setTotalPages(Math.max(1, startPage + 1));
       setLoading(true);
     }
   }, [roomId]);
 
-  useEffect(() => {
-    rememberRoomFeedPage(roomId, postsPage);
-  }, [roomId, postsPage]);
-
-  useEffect(() => {
-    if (postsPage > postsPageCount - 1) {
-      setPostsPage(Math.max(0, postsPageCount - 1));
-    }
-  }, [postsPage, postsPageCount]);
+  const postsPageRef = useRef(postsPage);
+  postsPageRef.current = postsPage;
+  const refreshSeqRef = useRef(0);
 
   const applyFeed = useCallback(
     (cached: NonNullable<ReturnType<typeof getCachedRoomFeed>>) => {
+      // 다른 페이지 응답은 무시 (마지막↔1페이지 교차 덮어쓰기 방지)
+      if (cached.page !== postsPageRef.current) return;
+
       const nextPosts = Array.isArray(cached.posts) ? cached.posts : [];
+      const size = Math.max(1, cached.size || ROOM_POSTS_PAGE_SIZE);
+      const fromElements =
+        cached.totalElements > 0
+          ? Math.ceil(cached.totalElements / size)
+          : 0;
+      let pages = Math.max(1, cached.totalPages || 0, fromElements || 0);
+      if (nextPosts.length > 0) {
+        pages = Math.max(pages, cached.page + 1);
+      }
+      // 현재 보고 있는 페이지가 페이저에서 사라지지 않게 (1페이지로 자동 이동 방지)
+      pages = Math.max(pages, postsPageRef.current + 1);
+
       setRoom(cached.room);
       setPosts(nextPosts);
       setTotalElements(cached.totalElements);
-      setTotalPages(Math.max(1, cached.totalPages));
+      setTotalPages(pages);
       syncRoomPostsSeenBaseline(
         roomId,
         nextPosts.map((p) => p.id),
@@ -209,17 +220,16 @@ function RoomPage({
     [roomId],
   );
 
-  const roomRef = useRef(room);
-  roomRef.current = room;
-
   const refresh = useCallback(async () => {
-    const cached = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
+    const seq = ++refreshSeqRef.current;
+    const page = postsPage;
+    const cached = getCachedRoomFeed(roomId, page, ROOM_POSTS_PAGE_SIZE, {
       allowStale: true,
     });
     if (cached) {
       applyFeed(cached);
-      setLoading(false);
-    } else if (!roomRef.current) {
+      if (seq === refreshSeqRef.current) setLoading(false);
+    } else if (seq === refreshSeqRef.current) {
       setLoading(true);
     }
 
@@ -229,21 +239,32 @@ function RoomPage({
       if (nick && clientId.trim() && !getAccessToken()) {
         await ensureGuestSession(clientId, nick);
       }
+      if (seq !== refreshSeqRef.current) return;
+
       await prefetchRoomFeed(roomId, {
-        page: postsPage,
+        page,
         size: ROOM_POSTS_PAGE_SIZE,
         force: true,
       });
-      const fresh = getCachedRoomFeed(roomId, postsPage, ROOM_POSTS_PAGE_SIZE, {
+      if (seq !== refreshSeqRef.current) return;
+
+      // 다른 페이지로 이미 넘어갔으면 결과 무시
+      if (postsPageRef.current !== page) return;
+
+      const fresh = getCachedRoomFeed(roomId, page, ROOM_POSTS_PAGE_SIZE, {
         allowStale: true,
       });
       if (fresh) applyFeed(fresh);
     } catch (err) {
+      if (seq !== refreshSeqRef.current) return;
+      if (postsPageRef.current !== page) return;
       if (!cached) {
         setError(err instanceof Error ? err.message : t('rooms.err.load'));
       }
     } finally {
-      setLoading(false);
+      if (seq === refreshSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, [roomId, postsPage, applyFeed, t, nickname, clientId, ensureGuestSession]);
 
@@ -255,7 +276,7 @@ function RoomPage({
     setSeenTick((n) => n + 1);
   }, [roomId]);
 
-  // 앱 복귀·다시 보일 때 피드·N 배지 갱신
+  // 앱이 다시 보일 때만 피드·N 배지 갱신 (click focus로 페이지 갱신 재진입 방지)
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
@@ -263,27 +284,31 @@ function RoomPage({
       void refresh();
     };
     document.addEventListener('visibilitychange', onVisible);
-    window.addEventListener('focus', onVisible);
     return () => {
       document.removeEventListener('visibilitychange', onVisible);
-      window.removeEventListener('focus', onVisible);
     };
   }, [refresh]);
 
   const requestPostsPage = useCallback(
     (next: number) => {
+      if (loading) return;
       if (next === postsPage) return;
       if (next < 0 || next >= postsPageCount) return;
+      rememberRoomFeedPage(roomId, next);
+      // 페이지 전환 즉시 로딩 — 연속 탭/스와이프로 다시 1페이지 가는 것 방지
+      setLoading(true);
       setPostsPage(next);
     },
-    [postsPage, postsPageCount],
+    [loading, postsPage, postsPageCount, roomId],
   );
 
   const onFeedTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+    if (loading) return;
     touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
   };
 
   const onFeedTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
+    if (loading) return;
     const startX = touchStartXRef.current;
     touchStartXRef.current = null;
     if (startX == null) return;
@@ -359,7 +384,11 @@ function RoomPage({
       </div>
 
       {error && <p className="rooms__error">{error}</p>}
-      {loading && !room && <p className="rooms__muted">{t('common.loading')}</p>}
+      {loading && !room && (
+        <div className="rooms__dots-loading">
+          <DotsLoading label={t('common.loading')} />
+        </div>
+      )}
 
       {room && (
         <section className="rooms__list-wrap">
@@ -377,7 +406,9 @@ function RoomPage({
             />
           </div>
           {loading && (
-            <p className="rooms__muted">{t('common.loading')}</p>
+            <div className="rooms__dots-loading">
+              <DotsLoading label={t('common.loading')} />
+            </div>
           )}
           {!loading && visibleFeedPosts.length === 0 && (
             <div className="rooms__empty rooms__empty--share-cta">
@@ -465,14 +496,15 @@ function RoomPage({
                   </ul>
                 </div>
               </div>
-              {postsPageCount > 1 && (
-                <PagePager
-                  page={postsPage}
-                  pageCount={postsPageCount}
-                  onPageChange={requestPostsPage}
-                />
-              )}
             </div>
+          )}
+          {postsPageCount > 1 && (
+            <PagePager
+              page={postsPage}
+              pageCount={postsPageCount}
+              onPageChange={requestPostsPage}
+              disabled={loading}
+            />
           )}
         </section>
       )}
@@ -495,6 +527,7 @@ function RoomPage({
             if (postsPage === 0) {
               void refresh();
             } else {
+              rememberRoomFeedPage(roomId, 0);
               setPostsPage(0);
             }
           }}

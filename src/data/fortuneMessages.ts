@@ -78,5 +78,8 @@ export function fortuneMessagesFor(lang?: string | null): readonly string[] {
 export function pickFortuneMessage(lang?: string | null): string {
   const list = fortuneMessagesFor(lang);
   const n = list.length || FORTUNE_COUNT;
-  return list[Math.floor(Math.random() * n)] ?? list[0] ?? FORTUNE_MESSAGES.ko[0];
+  const raw =
+    list[Math.floor(Math.random() * n)] ?? list[0] ?? FORTUNE_MESSAGES.ko[0];
+  // 번역 잔여 선행 쉼표 제거
+  return String(raw ?? '').replace(/^[\s,，、]+/, '').trim() || String(raw ?? '');
 }
