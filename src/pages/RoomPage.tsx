@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiaryEntry } from '../types/diary';
 import type { RoomDetail, RoomPost } from '../types/room';
@@ -93,6 +93,7 @@ function RoomPage({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [sparkleDiaryId, setSparkleDiaryId] = useState<string | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
   const sparkleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sparkleArmedRef = useRef<string | null>(null);
   const postsPageRef = useRef(postsPage);
@@ -337,6 +338,24 @@ function RoomPage({
     [loading, goToPostsPage],
   );
 
+  const onFeedTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
+    if (loading) return;
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+  };
+
+  const onFeedTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
+    if (loading) return;
+    const startX = touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (startX == null) return;
+    const endX = e.changedTouches[0]?.clientX ?? startX;
+    const dx = endX - startX;
+    // 의도적인 가로 스와이프만 (세로 스크롤과 구분)
+    if (Math.abs(dx) < 56) return;
+    if (dx < 0) requestPostsPage(postsPageRef.current + 1);
+    else requestPostsPage(postsPageRef.current - 1);
+  };
+
   const dismissCoach = () => {
     markRoomCommentCoachSeen();
     setShowCoach(false);
@@ -448,7 +467,12 @@ function RoomPage({
                   <p>{t('rooms.coach.comment')}</p>
                 </CoachBubble>
               )}
-              <div className="rooms__feed-stage" data-no-swipe>
+              <div
+                className="rooms__feed-stage"
+                data-no-swipe
+                onTouchStart={onFeedTouchStart}
+                onTouchEnd={onFeedTouchEnd}
+              >
                 <div className="rooms__feed-page">
                   <ul className="rooms__gallery">
                     {visibleFeedPosts.map((post) => {
