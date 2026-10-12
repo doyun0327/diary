@@ -98,7 +98,10 @@ function RoomPage({
   const sparkleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sparkleArmedRef = useRef<string | null>(null);
   const postsPageRef = useRef(postsPage);
+  postsPageRef.current = postsPage;
   const refreshSeqRef = useRef(0);
+  /** setPostsPage 로 refresh effect 가 돌 때, 삭제 후 재로드와 레이스 나지 않게 스킵 */
+  const skipNextRefreshRef = useRef(false);
   const roomIdRef = useRef(roomId);
   const totalElementsRef = useRef(totalElements);
   totalElementsRef.current = totalElements;
@@ -312,32 +315,106 @@ function RoomPage({
   }, [roomId, postsPage, applyFeed, t]);
 
   useEffect(() => {
+    if (skipNextRefreshRef.current) {
+      skipNextRefreshRef.current = false;
+      return;
+    }
     void refresh();
   }, [refresh]);
+
+  /** 삭제 후: 현재 페이지를 서버에서 다시 받아 슬롯 채움. total 은 서버 값 신뢰 */
+  const reloadAfterDelete = useCallback(
+    async (removedPostId: string) => {
+      const roomIdNow = roomIdRef.current;
+      setPosts((prev) => prev.filter((p) => p.id !== removedPostId));
+
+      const seq = ++refreshSeqRef.current;
+      setLoading(true);
+      setError(null);
+      try {
+        let page = postsPageRef.current;
+        await prefetchRoomFeed(roomIdNow, {
+          page,
+          size: ROOM_POSTS_PAGE_SIZE,
+          force: true,
+        });
+        if (seq !== refreshSeqRef.current || roomIdRef.current !== roomIdNow) return;
+
+        let fresh = getCachedRoomFeed(roomIdNow, page, ROOM_POSTS_PAGE_SIZE, {
+          allowStale: true,
+        });
+        const total =
+          typeof fresh?.totalElements === 'number'
+            ? fresh.totalElements
+            : Math.max(0, totalElementsRef.current - 1);
+        const lastPage = Math.max(0, pageCountFromTotal(total) - 1);
+
+        if (page > lastPage) {
+          page = lastPage;
+          postsPageRef.current = page;
+          rememberRoomFeedPage(roomIdNow, page);
+          // postsPage 변경 → refresh effect 가 한 번 더 돌지 않게
+          skipNextRefreshRef.current = true;
+          setPostsPage(page);
+          await prefetchRoomFeed(roomIdNow, {
+            page,
+            size: ROOM_POSTS_PAGE_SIZE,
+            force: true,
+          });
+          if (seq !== refreshSeqRef.current || roomIdRef.current !== roomIdNow) return;
+          fresh = getCachedRoomFeed(roomIdNow, page, ROOM_POSTS_PAGE_SIZE, {
+            allowStale: true,
+          });
+        }
+
+        if (!fresh || postsPageRef.current !== fresh.page) return;
+        const nextPosts = Array.isArray(fresh.posts) ? fresh.posts : [];
+        setRoom(fresh.room);
+        setPosts(nextPosts);
+        // 삭제 후에는 0페이지가 아니어도 total 을 깎을 수 있어야 함
+        setTotalElements(fresh.totalElements);
+        syncRoomPostsSeenBaseline(
+          roomIdNow,
+          nextPosts.map((p) => p.id),
+        );
+        setSeenTick((n) => n + 1);
+      } catch (err) {
+        if (seq === refreshSeqRef.current) {
+          setError(err instanceof Error ? err.message : t('rooms.err.load'));
+        }
+      } finally {
+        if (seq === refreshSeqRef.current) setLoading(false);
+      }
+    },
+    [t],
+  );
+
+  const reloadAfterDeleteRef = useRef(reloadAfterDelete);
+  reloadAfterDeleteRef.current = reloadAfterDelete;
+  const applyFeedRef = useRef(applyFeed);
+  applyFeedRef.current = applyFeed;
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
 
   // 상세에서 삭제·공유 등으로 피드 캐시가 바뀌면 keep-mounted 상태에서도 즉시 반영
   useEffect(() => {
     return subscribeRoomFeedChanges((detail) => {
       if (detail.roomId !== roomIdRef.current) return;
       if (detail.removedPostId) {
-        const removedId = detail.removedPostId;
-        setPosts((prev) => prev.filter((p) => p.id !== removedId));
-        setTotalElements((prev) => Math.max(0, prev - 1));
+        void reloadAfterDeleteRef.current(detail.removedPostId);
+        return;
       }
       const page = postsPageRef.current;
       const cached = getCachedRoomFeed(roomIdRef.current, page, ROOM_POSTS_PAGE_SIZE, {
         allowStale: true,
       });
       if (cached) {
-        applyFeed(cached);
-        if (typeof cached.totalElements === 'number') {
-          setTotalElements(cached.totalElements);
-        }
+        applyFeedRef.current(cached);
         return;
       }
-      void refresh();
+      void refreshRef.current();
     });
-  }, [applyFeed, refresh]);
+  }, []);
 
   useEffect(() => {
     setSeenTick((n) => n + 1);

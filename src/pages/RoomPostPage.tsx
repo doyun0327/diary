@@ -12,7 +12,6 @@ import {
   invalidateRoomsList,
   removePostFromRoomFeed,
 } from '../utils/roomCache';
-import { prefetchRoomFeed } from '../utils/roomPrefetch';
 import { getAccessToken, AUTH_CHANGE_EVENT } from '../hooks/useAuthSession';
 import { markRoomPostSeen } from '../utils/roomPostSeen';
 import { roomAuthorLabel } from '../utils/roomDisplay';
@@ -509,7 +508,6 @@ function RoomPostPage({
       await roomsApi.deleteRoomPost(roomId, postId);
       removePostFromRoomFeed(roomId, postId);
       invalidateRoomsList();
-      void prefetchRoomFeed(roomId, { force: true });
       setConfirmDelete(false);
       setPost(null);
       onAppToast?.(t('rooms.postDeleted'), 2200);

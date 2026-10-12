@@ -216,20 +216,17 @@ export function invalidateRoomFeed(roomId: string): void {
   notifyRoomFeedChange({ roomId: id });
 }
 
-/** 게시글 삭제 직후 — 캐시에서 빼고 구독 중인 방 화면에 즉시 반영 */
+/**
+ * 게시글 삭제 직후 — 방 피드 캐시 전부 버리고 알림.
+ * (페이지에서 한 칸만 빼면 빈 슬롯이 남으므로, 리스너가 현재 페이지를 다시 받아야 함)
+ */
 export function removePostFromRoomFeed(roomId: string, postId: string): void {
   const id = roomId.trim();
   const pid = postId.trim();
   if (!id || !pid) return;
   const prefix = `${id}:`;
-  for (const [key, entry] of [...feedByKey.entries()]) {
-    if (!key.startsWith(prefix)) continue;
-    feedByKey.set(key, {
-      ...entry,
-      posts: entry.posts.filter((p) => p.id !== pid),
-      totalElements: Math.max(0, entry.totalElements - 1),
-      at: Date.now(),
-    });
+  for (const key of [...feedByKey.keys()]) {
+    if (key.startsWith(prefix)) feedByKey.delete(key);
   }
   notifyRoomFeedChange({ roomId: id, removedPostId: pid });
 }
