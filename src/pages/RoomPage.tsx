@@ -20,6 +20,7 @@ import {
   getCachedRoomFeed,
   getRememberedRoomFeedPage,
   rememberRoomFeedPage,
+  subscribeRoomFeedChanges,
 } from '../utils/roomCache';
 import { prefetchRoomFeed } from '../utils/roomPrefetch';
 import { getAccessToken } from '../hooks/useAuthSession';
@@ -313,6 +314,30 @@ function RoomPage({
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // 상세에서 삭제·공유 등으로 피드 캐시가 바뀌면 keep-mounted 상태에서도 즉시 반영
+  useEffect(() => {
+    return subscribeRoomFeedChanges((detail) => {
+      if (detail.roomId !== roomIdRef.current) return;
+      if (detail.removedPostId) {
+        const removedId = detail.removedPostId;
+        setPosts((prev) => prev.filter((p) => p.id !== removedId));
+        setTotalElements((prev) => Math.max(0, prev - 1));
+      }
+      const page = postsPageRef.current;
+      const cached = getCachedRoomFeed(roomIdRef.current, page, ROOM_POSTS_PAGE_SIZE, {
+        allowStale: true,
+      });
+      if (cached) {
+        applyFeed(cached);
+        if (typeof cached.totalElements === 'number') {
+          setTotalElements(cached.totalElements);
+        }
+        return;
+      }
+      void refresh();
+    });
+  }, [applyFeed, refresh]);
 
   useEffect(() => {
     setSeenTick((n) => n + 1);

@@ -40,6 +40,40 @@ export function prefetchRoomsList(
 
 const DEFAULT_POSTS_PAGE_SIZE = 10;
 
+async function fetchAndCacheRoomFeed(
+  roomId: string,
+  page: number,
+  size: number,
+): Promise<void> {
+  const cachedRoom = getCachedRoomDetail(roomId, { allowStale: true });
+  if (cachedRoom) {
+    const feed = await roomsApi.listRoomPosts(roomId, { page, size });
+    setCachedRoomFeed(roomId, cachedRoom, feed);
+    // 멤버/방 정보는 백그라운드로 최신화
+    void roomsApi
+      .getRoom(roomId)
+      .then((detail) => {
+        const latest = getCachedRoomFeed(roomId, page, size, { allowStale: true });
+        if (latest) {
+          setCachedRoomFeed(roomId, detail, {
+            content: latest.posts,
+            page: latest.page,
+            size: latest.size,
+            totalElements: latest.totalElements,
+            totalPages: latest.totalPages,
+          });
+        }
+      })
+      .catch(() => {});
+    return;
+  }
+  const [detail, feed] = await Promise.all([
+    roomsApi.getRoom(roomId),
+    roomsApi.listRoomPosts(roomId, { page, size }),
+  ]);
+  setCachedRoomFeed(roomId, detail, feed);
+}
+
 /** 방 상세 + 공유 일기(해당 페이지만) — 캐시·진행 중 요청이 있으면 재사용 */
 export function prefetchRoomFeed(
   roomId: string,
@@ -49,38 +83,26 @@ export function prefetchRoomFeed(
 
   const page = opts?.page ?? 0;
   const size = opts?.size ?? DEFAULT_POSTS_PAGE_SIZE;
+  const key = `room-feed:${roomId}:${page}:${size}`;
 
   if (!opts?.force && getCachedRoomFeed(roomId, page, size)) {
     return Promise.resolve();
   }
 
-  return once(`room-feed:${roomId}:${page}:${size}`, async () => {
-    const cachedRoom = getCachedRoomDetail(roomId, { allowStale: true });
-    if (cachedRoom) {
-      const feed = await roomsApi.listRoomPosts(roomId, { page, size });
-      setCachedRoomFeed(roomId, cachedRoom, feed);
-      // 멤버/방 정보는 백그라운드로 최신화
-      void roomsApi
-        .getRoom(roomId)
-        .then((detail) => {
-          const latest = getCachedRoomFeed(roomId, page, size, { allowStale: true });
-          if (latest) setCachedRoomFeed(roomId, detail, {
-            content: latest.posts,
-            page: latest.page,
-            size: latest.size,
-            totalElements: latest.totalElements,
-            totalPages: latest.totalPages,
-          });
-        })
-        .catch(() => {});
-      return;
-    }
-    const [detail, feed] = await Promise.all([
-      roomsApi.getRoom(roomId),
-      roomsApi.listRoomPosts(roomId, { page, size }),
-    ]);
-    setCachedRoomFeed(roomId, detail, feed);
-  });
+  // force: 진행 중 요청이 예전(삭제 전) 데이터를 다시 캐시하지 않게 끝난 뒤 재요청
+  if (opts?.force) {
+    const prev = inflight.get(key);
+    const promise = (async () => {
+      if (prev) await prev.catch(() => {});
+      await fetchAndCacheRoomFeed(roomId, page, size);
+    })().finally(() => {
+      if (inflight.get(key) === promise) inflight.delete(key);
+    });
+    inflight.set(key, promise);
+    return promise;
+  }
+
+  return once(key, () => fetchAndCacheRoomFeed(roomId, page, size));
 }
 
 /** 허브에서 보이는 방 피드 미리 받아 두기 */

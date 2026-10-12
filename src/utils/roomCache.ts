@@ -179,11 +179,59 @@ export function getCachedRoomPost(roomId: string, postId: string): RoomPost | nu
   return null;
 }
 
+export const ROOM_FEED_CHANGE_EVENT = 'picture-diary-room-feed-change';
+
+export type RoomFeedChangeDetail = {
+  roomId: string;
+  /** 삭제된 게시글 — 리스너가 즉시 UI에서 제거 */
+  removedPostId?: string;
+};
+
+function notifyRoomFeedChange(detail: RoomFeedChangeDetail): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(
+    new CustomEvent<RoomFeedChangeDetail>(ROOM_FEED_CHANGE_EVENT, { detail }),
+  );
+}
+
+export function subscribeRoomFeedChanges(
+  listener: (detail: RoomFeedChangeDetail) => void,
+): () => void {
+  const onEvent = (event: Event) => {
+    const detail = (event as CustomEvent<RoomFeedChangeDetail>).detail;
+    if (!detail?.roomId) return;
+    listener(detail);
+  };
+  window.addEventListener(ROOM_FEED_CHANGE_EVENT, onEvent);
+  return () => window.removeEventListener(ROOM_FEED_CHANGE_EVENT, onEvent);
+}
+
 export function invalidateRoomFeed(roomId: string): void {
-  const prefix = `${roomId}:`;
+  const id = roomId.trim();
+  if (!id) return;
+  const prefix = `${id}:`;
   for (const key of [...feedByKey.keys()]) {
     if (key.startsWith(prefix)) feedByKey.delete(key);
   }
+  notifyRoomFeedChange({ roomId: id });
+}
+
+/** 게시글 삭제 직후 — 캐시에서 빼고 구독 중인 방 화면에 즉시 반영 */
+export function removePostFromRoomFeed(roomId: string, postId: string): void {
+  const id = roomId.trim();
+  const pid = postId.trim();
+  if (!id || !pid) return;
+  const prefix = `${id}:`;
+  for (const [key, entry] of [...feedByKey.entries()]) {
+    if (!key.startsWith(prefix)) continue;
+    feedByKey.set(key, {
+      ...entry,
+      posts: entry.posts.filter((p) => p.id !== pid),
+      totalElements: Math.max(0, entry.totalElements - 1),
+      at: Date.now(),
+    });
+  }
+  notifyRoomFeedChange({ roomId: id, removedPostId: pid });
 }
 
 export function getCachedRoomsList(
