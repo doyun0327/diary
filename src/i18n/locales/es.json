@@ -427,6 +427,7 @@
     "shareDiary": "Compartir diario",
     "shareDiaryDone": "Compartido en la sala",
     "shareDiaryDoneMany": "¡Lo compartí!💛",
+    "postDeleted": "¡Eliminado!",
     "pickDiaryTitle": "¿Qué diario compartir?",
     "pickDiaryHint": "Elige un diario para {{name}}",
     "pickDiaryAria": "Elegir diario para {{name}}",

@@ -427,6 +427,7 @@
     "shareDiary": "分享日记",
     "shareDiaryDone": "已分享到房间",
     "shareDiaryDoneMany": "已分享！💛",
+    "postDeleted": "已删除",
     "pickDiaryTitle": "要分享哪篇日记？",
     "pickDiaryHint": "选择要发到 {{name}} 的日记",
     "pickDiaryAria": "选择要分享到 {{name}} 的日记",

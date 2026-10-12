@@ -1320,6 +1320,7 @@ function App() {
             clientId={clientId}
             nickname={nickname}
             ensureGuestSession={ensureGuestSession}
+            onAppToast={showAppToast}
             onBack={() => {
               setActivePostId(null);
               setPage("room");

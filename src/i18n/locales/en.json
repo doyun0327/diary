@@ -427,6 +427,7 @@
     "shareDiary": "Share diary",
     "shareDiaryDone": "{{name}} - Shared!💛",
     "shareDiaryDoneMany": "Shared!💛",
+    "postDeleted": "Deleted!",
     "pickDiaryTitle": "Which diary to share?",
     "pickDiaryHint": "Pick a diary to post in {{name}}",
     "pickDiaryAria": "Pick a diary to share in {{name}}",

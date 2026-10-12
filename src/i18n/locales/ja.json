@@ -427,6 +427,7 @@
     "shareDiary": "日記を共有",
     "shareDiaryDone": "ルームに共有しました",
     "shareDiaryDoneMany": "シェアしました！💛",
+    "postDeleted": "削除しました",
     "pickDiaryTitle": "どの日記を共有しますか？",
     "pickDiaryHint": "{{name}}に載せる日記を選んでください",
     "pickDiaryAria": "{{name}}に共有する日記を選択",

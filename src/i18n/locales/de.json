@@ -427,6 +427,7 @@
     "shareDiary": "Tagebuch teilen",
     "shareDiaryDone": "Im Raum geteilt",
     "shareDiaryDoneMany": "Ich habe es geteilt!💛",
+    "postDeleted": "Gelöscht!",
     "pickDiaryTitle": "Welches Tagebuch teilen?",
     "pickDiaryHint": "Wähle ein Tagebuch für {{name}}",
     "pickDiaryAria": "Tagebuch für {{name}} auswählen",

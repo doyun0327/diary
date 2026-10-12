@@ -427,6 +427,7 @@
     "shareDiary": "일기 공유",
     "shareDiaryDone": "{{name}} - 공유했어요!💛",
     "shareDiaryDoneMany": "공유했어요!💛",
+    "postDeleted": "삭제되었어요!",
     "pickDiaryTitle": "어떤 일기를 공유할까요?",
     "pickDiaryHint": "{{name}}에 올릴 일기를 골라 주세요",
     "pickDiaryAria": "{{name}}에 공유할 일기 선택",

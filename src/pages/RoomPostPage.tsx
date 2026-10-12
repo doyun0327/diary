@@ -39,6 +39,7 @@ interface RoomPostPageProps {
     opts?: { force?: boolean },
   ) => Promise<unknown>;
   onBack: () => void;
+  onAppToast?: (message: string, durationMs?: number) => void;
 }
 
 type CommentSendStatus = 'sending' | 'failed';
@@ -94,6 +95,7 @@ function RoomPostPage({
   nickname,
   ensureGuestSession,
   onBack,
+  onAppToast,
 }: RoomPostPageProps) {
   const { t } = useTranslation();
   const cachedPost = useMemo(
@@ -510,6 +512,7 @@ function RoomPostPage({
       void prefetchRoomFeed(roomId, { force: true });
       setConfirmDelete(false);
       setPost(null);
+      onAppToast?.(t('rooms.postDeleted'), 2200);
       onBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : t('rooms.err.delete'));
