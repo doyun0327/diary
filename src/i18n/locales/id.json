@@ -654,6 +654,7 @@
       "stepWaiting": "Tunggu",
       "stepDrawing": "Gambar",
       "stepFinishing": "Selesai",
+      "etaWhenDone": "Kami beri tahu kalau gambarnya sudah selesai!",
       "estimatedWait": "Ini akan memakan waktu sekitar {{n}} menit.",
       "estimatedWaitBusy": "Ada banyak orang yang menunggu sehingga memerlukan waktu sekitar {{n}} menit!",
       "modeTitle": "Mode apa?",

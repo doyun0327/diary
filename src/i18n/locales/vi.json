@@ -650,6 +650,7 @@
       "stepWaiting": "Chờ",
       "stepDrawing": "Vẽ",
       "stepFinishing": "Xong",
+      "etaWhenDone": "Chúng tôi sẽ báo khi hình vẽ xong!",
       "estimatedWait": "Sẽ mất khoảng {{n}} phút.",
       "estimatedWaitBusy": "Có rất nhiều người đang đợi nên mất khoảng {{n}} phút!",
       "modeTitle": "Chọn chế độ nào?",

@@ -650,6 +650,7 @@
       "stepWaiting": "待機",
       "stepDrawing": "描画",
       "stepFinishing": "完了",
+      "etaWhenDone": "絵が完成したらお知らせします！",
       "estimatedWait": "約{{n}}分かかります",
       "estimatedWaitBusy": "混み合っているため約{{n}}分かかります！",
       "modeTitle": "どのモードで描きますか？",

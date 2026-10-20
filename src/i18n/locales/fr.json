@@ -650,6 +650,7 @@
       "stepWaiting": "atmosphère",
       "stepDrawing": "dessiner",
       "stepFinishing": "finition",
+      "etaWhenDone": "On vous préviendra quand le dessin sera prêt !",
       "estimatedWait": "Cela prendra environ {{n}} minutes.",
       "estimatedWaitBusy": "Il y a beaucoup de monde qui attend, cela prend donc environ {{n}} minutes !",
       "modeTitle": "Quel mode ?",

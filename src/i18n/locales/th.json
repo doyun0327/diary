@@ -650,6 +650,7 @@
       "stepWaiting": "รอ",
       "stepDrawing": "วาด",
       "stepFinishing": "เสร็จ",
+      "etaWhenDone": "วาดเสร็จแล้วจะแจ้งให้ทราบ!",
       "estimatedWait": "จะใช้เวลาประมาณ {{n}} นาที",
       "estimatedWaitBusy": "มีผู้คนจำนวนมากรออยู่ ดังนั้นจะใช้เวลาประมาณ {{n}} นาที!",
       "modeTitle": "โหมดไหนดี?",

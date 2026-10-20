@@ -650,6 +650,7 @@
       "stepWaiting": "Wait",
       "stepDrawing": "Draw",
       "stepFinishing": "Done",
+      "etaWhenDone": "I'll let you know when the drawing is ready!",
       "estimatedWait": "About {{n}} min",
       "estimatedWaitBusy": "Busy now — about {{n}} min!",
       "modeTitle": "Which mode?",

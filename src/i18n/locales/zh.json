@@ -650,6 +650,7 @@
       "stepWaiting": "等待",
       "stepDrawing": "绘制",
       "stepFinishing": "完成",
+      "etaWhenDone": "画好了会通知你！",
       "estimatedWait": "大约需要 {{n}} 分钟。",
       "estimatedWaitBusy": "等待的人很多，大约需要{{n}}分钟！",
       "modeTitle": "要用哪种模式？",

@@ -650,6 +650,7 @@
       "stepWaiting": "Atmosphäre",
       "stepDrawing": "ziehen",
       "stepFinishing": "beenden",
+      "etaWhenDone": "Wir benachrichtigen dich, wenn das Bild fertig ist!",
       "estimatedWait": "Es dauert etwa {{n}} Minuten.",
       "estimatedWaitBusy": "Da viele Leute warten, dauert es etwa {{n}} Minuten!",
       "modeTitle": "Welcher Modus?",

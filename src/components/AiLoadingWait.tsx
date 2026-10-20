@@ -6,8 +6,8 @@ import { keywordsFromDiary } from '../utils/aiWaitKeywords';
 import './AiLoadingWait.css';
 
 const MAX_FLOATING = 4;
-/** 예상 대기 문구 표시 시간 */
-const ETA_VISIBLE_MS = 10_000;
+/** 완성 알림 안내 문구 표시 시간 */
+const ETA_VISIBLE_MS = 6_000;
 
 const PASTELS = [
   '#e8a99a',
@@ -157,15 +157,15 @@ export default function AiLoadingWait({
         ? estimatedWaitMinutes
         : null;
     if (minutes == null) {
-      // 부모가 null을내도, 표시 타이머가 돌 중이면 10초 끝날 때까지 유지
+      // 부모가 null을내도, 표시 타이머가 돌 중이면 끝날 때까지 유지
       if (etaTimerRef.current != null) return;
       lastEtaRef.current = null;
       setHeldEtaMinutes(null);
       setEtaVisible(false);
       return;
     }
-    // 같은 분이면 이미 띄운 타이머 유지
-    if (lastEtaRef.current === minutes) return;
+    // 이미 한 번 띄웠으면 유지 (분 숫자 바뀌어도 재표시하지 않음)
+    if (lastEtaRef.current != null) return;
     lastEtaRef.current = minutes;
     setHeldEtaMinutes(minutes);
     setEtaVisible(true);
@@ -289,14 +289,9 @@ export default function AiLoadingWait({
         ))}
       </div>
       <div className="ai-loading-wait__panel">
-        {showEta && heldEtaMinutes != null ? (
+        {showEta ? (
           <p className="ai-loading-wait__eta" role="status">
-            {t(
-              heldEtaMinutes >= 3
-                ? 'write.ai.estimatedWaitBusy'
-                : 'write.ai.estimatedWait',
-              { n: heldEtaMinutes },
-            )}
+            {t('write.ai.etaWhenDone')}
           </p>
         ) : null}
         {!hideStage ? (
