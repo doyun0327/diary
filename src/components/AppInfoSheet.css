@@ -7,6 +7,11 @@
   justify-content: center;
 }
 
+/* 냥티켓(구독) 시트(z-index 90) 위에서 약관 열 때 */
+.app-info--above-sheets {
+  z-index: 95;
+}
+
 .app-info__backdrop {
   position: absolute;
   inset: 0;

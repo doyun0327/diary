@@ -24,17 +24,38 @@ export function requestTipPurchase(productId: TipProductId | string): boolean {
   return true;
 }
 
+type StoreProductsPayload = {
+  products?: Array<{
+    productId?: string;
+    priceString?: string;
+    currencyCode?: string;
+    price?: string;
+  }>;
+};
+
+export type StorePriceInfo = {
+  /** 표시용 현지 가격 (예: "₩3,600", "$2.99") */
+  prices: Record<string, string>;
+  /** 숫자 가격 (현지 통화). 할인율 계산용 */
+  amounts: Record<string, number>;
+};
+
 /** 스토어 현지 가격 조회 (앱이 아니면 빈 맵) */
 export function fetchTipStorePrices(timeoutMs = 8_000): Promise<
   Record<string, string>
 > {
+  return fetchStorePriceInfo(timeoutMs).then((info) => info.prices);
+}
+
+/** 스토어 현지 가격 + 숫자 가격 조회 (앱이 아니면 빈 값) */
+export function fetchStorePriceInfo(timeoutMs = 8_000): Promise<StorePriceInfo> {
   if (!isFlutterApp()) {
-    return Promise.resolve({});
+    return Promise.resolve({ prices: {}, amounts: {} });
   }
 
   return new Promise((resolve) => {
     let settled = false;
-    const finish = (prices: Record<string, string>) => {
+    const finish = (info: StorePriceInfo) => {
       if (settled) return;
       settled = true;
       window.clearTimeout(timer);
@@ -42,32 +63,24 @@ export function fetchTipStorePrices(timeoutMs = 8_000): Promise<
       if (window.__onDiaryTipProducts === onBridge) {
         window.__onDiaryTipProducts = undefined;
       }
-      resolve(prices);
+      resolve(info);
     };
 
-    const parse = (payload: {
-      products?: Array<{
-        productId?: string;
-        priceString?: string;
-        currencyCode?: string;
-      }>;
-    } | null | undefined) => {
-      const map: Record<string, string> = {};
+    const parse = (payload: StoreProductsPayload | null | undefined) => {
+      const prices: Record<string, string> = {};
+      const amounts: Record<string, number> = {};
       for (const row of payload?.products ?? []) {
         const id = row.productId?.trim();
         const price = row.priceString?.trim();
-        if (id && price) map[id] = price;
+        if (id && price) prices[id] = price;
+        // 구버전 앱은 price 를 보내지 않음 → 할인율만 숨김
+        const amount = Number(row.price);
+        if (id && Number.isFinite(amount) && amount > 0) amounts[id] = amount;
       }
-      finish(map);
+      finish({ prices, amounts });
     };
 
-    const onBridge = (payload: {
-      products?: Array<{
-        productId?: string;
-        priceString?: string;
-        currencyCode?: string;
-      }>;
-    }) => parse(payload);
+    const onBridge = (payload: StoreProductsPayload) => parse(payload);
 
     const onEvent = (event: Event) => {
       parse((event as CustomEvent<{ products?: TipStorePrice[] }>).detail);
@@ -82,7 +95,7 @@ export function fetchTipStorePrices(timeoutMs = 8_000): Promise<
 
     postDiaryNative({ type: 'tipProducts' });
 
-    const timer = window.setTimeout(() => finish({}), timeoutMs);
+    const timer = window.setTimeout(() => finish({ prices: {}, amounts: {} }), timeoutMs);
   });
 }
 

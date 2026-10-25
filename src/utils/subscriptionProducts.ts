@@ -6,14 +6,13 @@ export type SubProductId =
   | typeof SUB_MONTHLY_PRODUCT_ID
   | typeof SUB_YEARLY_PRODUCT_ID;
 
-export const SUB_PRODUCTS: {
-  id: SubProductId;
-  /** 스토어 가격 없을 때 UI 폴백 (KRW) */
-  fallbackPriceKrw: number;
-}[] = [
-  { id: SUB_MONTHLY_PRODUCT_ID, fallbackPriceKrw: 2900 },
-  /** 월 2,900 × 12 = 34,800 → 연간 ₩29,800 */
-  { id: SUB_YEARLY_PRODUCT_ID, fallbackPriceKrw: 29800 },
+/**
+ * 가격은 코드에 두지 않음 — 스토어(App Store / Play)가 사용자 스토어 국가별로
+ * 내려주는 가격만 표시한다. 못 받으면 가격 대신 "구매"만 보여줌.
+ */
+export const SUB_PRODUCTS: { id: SubProductId }[] = [
+  { id: SUB_MONTHLY_PRODUCT_ID },
+  { id: SUB_YEARLY_PRODUCT_ID },
 ];
 
 export function isSubProductId(id: string | null | undefined): id is SubProductId {
@@ -44,26 +43,16 @@ export function matchSubProductId(
   return null;
 }
 
-/** 월간×12 대비 연간 할인율 (반올림 %) */
-export function yearlyDiscountPercent(): number {
-  const monthly = SUB_PRODUCTS.find((p) => p.id === SUB_MONTHLY_PRODUCT_ID)
-    ?.fallbackPriceKrw;
-  const yearly = SUB_PRODUCTS.find((p) => p.id === SUB_YEARLY_PRODUCT_ID)
-    ?.fallbackPriceKrw;
-  if (!monthly || !yearly || monthly <= 0) return 0;
+/**
+ * 월간×12 대비 연간 할인율 (반올림 %). 스토어 숫자 가격(같은 통화) 기준.
+ * 가격이 없거나 할인이 아니면 0 → 배지 숨김
+ */
+export function yearlyDiscountPercent(
+  monthly: number | null | undefined,
+  yearly: number | null | undefined,
+): number {
+  if (!monthly || !yearly || monthly <= 0 || yearly <= 0) return 0;
   const fullYear = monthly * 12;
   if (fullYear <= yearly) return 0;
   return Math.round(((fullYear - yearly) / fullYear) * 100);
-}
-
-export function formatSubFallbackPrice(krw: number, locale: string): string {
-  try {
-    return new Intl.NumberFormat(locale.startsWith('ko') ? 'ko-KR' : locale, {
-      style: 'currency',
-      currency: 'KRW',
-      maximumFractionDigits: 0,
-    }).format(krw);
-  } catch {
-    return `₩${krw.toLocaleString('ko-KR')}`;
-  }
 }

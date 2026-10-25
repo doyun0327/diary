@@ -30,14 +30,13 @@ import {
 } from '../utils/pendingNyangPurchase';
 import SubscriptionBenefitsSwipe from './SubscriptionBenefitsSwipe';
 import {
-  formatSubFallbackPrice,
   SUB_MONTHLY_PRODUCT_ID,
   SUB_PRODUCTS,
   SUB_YEARLY_PRODUCT_ID,
   yearlyDiscountPercent,
   type SubProductId,
 } from '../utils/subscriptionProducts';
-import { fetchTipStorePrices } from '../utils/tipPurchase';
+import { fetchStorePriceInfo } from '../utils/tipPurchase';
 import {
   getAccessToken,
   getAuthSession,
@@ -104,6 +103,8 @@ function NyangTicketSheet({
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [storePrices, setStorePrices] = useState<Record<string, string>>({});
+  /** 숫자 가격 (연간 할인율 계산용) */
+  const [storeAmounts, setStoreAmounts] = useState<Record<string, number>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
 
   useEffect(() => {
@@ -132,9 +133,11 @@ function NyangTicketSheet({
     if (!isFlutterApp()) return;
     let cancelled = false;
     setPricesLoading(true);
-    void fetchTipStorePrices()
-      .then((prices) => {
-        if (!cancelled) setStorePrices(prices);
+    void fetchStorePriceInfo()
+      .then(({ prices, amounts }) => {
+        if (cancelled) return;
+        setStorePrices(prices);
+        setStoreAmounts(amounts);
       })
       .finally(() => {
         if (!cancelled) setPricesLoading(false);
@@ -154,13 +157,23 @@ function NyangTicketSheet({
     return null;
   };
 
-  const subPriceLabel = (productId: SubProductId) => {
-    const store = priceFor(productId);
-    if (store) return store;
-    const fallback = SUB_PRODUCTS.find((p) => p.id === productId)?.fallbackPriceKrw;
-    if (fallback == null) return null;
-    return formatSubFallbackPrice(fallback, i18n.language);
+  /** 스토어 가격만 표시 (나라·통화별). 못 받으면 null → "구매" */
+  const subPriceLabel = (productId: SubProductId) => priceFor(productId);
+
+  /** Android 구독은 `pageby_monthly:base-plan` 처럼 올 수 있음 */
+  const amountFor = (productId: string): number | null => {
+    const exact = storeAmounts[productId];
+    if (exact) return exact;
+    for (const [id, amount] of Object.entries(storeAmounts)) {
+      if (id.startsWith(`${productId}:`) && amount) return amount;
+    }
+    return null;
   };
+
+  const yearlyPercent = yearlyDiscountPercent(
+    amountFor(SUB_MONTHLY_PRODUCT_ID),
+    amountFor(SUB_YEARLY_PRODUCT_ID),
+  );
 
   const loadHistory = useCallback(async () => {
     const token = getAccessToken();
@@ -529,10 +542,10 @@ function NyangTicketSheet({
                               ? t('nyangTicket.subscribeYearly')
                               : t('nyangTicket.subscribeMonthly')}
                           </span>
-                          {isYearly ? (
+                          {isYearly && yearlyPercent > 0 ? (
                             <span className="nyang-ticket__discount-badge">
                               {t('nyangTicket.subscribeYearlyBadge', {
-                                percent: yearlyDiscountPercent(),
+                                percent: yearlyPercent,
                               })}
                             </span>
                           ) : null}
@@ -556,8 +569,8 @@ function NyangTicketSheet({
                 );
               })}
             </ul>
-            <div className="nyang-ticket__sub-footer">
-              {isFlutterApp() ? (
+            {isFlutterApp() ? (
+              <div className="nyang-ticket__sub-footer">
                 <button
                   type="button"
                   className="nyang-ticket__restore-btn"
@@ -566,19 +579,8 @@ function NyangTicketSheet({
                 >
                   {t('subscription.restore')}
                 </button>
-              ) : null}
-              {onOpenLegal ? (
-                <p className="nyang-ticket__legal-links">
-                  <button type="button" onClick={onOpenLegal}>
-                    {t('appInfo.legal.termsHeading')}
-                  </button>
-                  <span aria-hidden>·</span>
-                  <button type="button" onClick={onOpenLegal}>
-                    {t('appInfo.legal.privacyHeading')}
-                  </button>
-                </p>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </section>
         )}
 
@@ -665,6 +667,18 @@ function NyangTicketSheet({
             {error}
           </p>
         )}
+        {/* 시트 맨 아래 고정 (모든 탭). 시트 바닥 = 광고 배너 바로 위, 구독자는 화면 맨 아래 */}
+        {onOpenLegal ? (
+          <p className="nyang-ticket__legal-links">
+            <button type="button" onClick={onOpenLegal}>
+              {t('appInfo.legal.termsHeading')}
+            </button>
+            <span aria-hidden>·</span>
+            <button type="button" onClick={onOpenLegal}>
+              {t('appInfo.legal.privacyHeading')}
+            </button>
+          </p>
+        ) : null}
       </div>
     </div>
   );

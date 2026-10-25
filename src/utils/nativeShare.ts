@@ -31,6 +31,8 @@ declare global {
         productId?: string;
         priceString?: string;
         currencyCode?: string;
+        /** 숫자 가격 문자열 (현지 통화, 예: "3600.0") */
+        price?: string;
       }>;
     }) => void;
   }

@@ -318,11 +318,14 @@
   cursor: default;
 }
 
+/* 시트 맨 아래 (탭 내용이 스크롤돼도 고정) */
 .nyang-ticket__legal-links {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin: 0;
+  margin: 10px 0 0;
   font-size: 0.8rem;
   color: var(--color-text-muted);
 }
