@@ -47,6 +47,13 @@ export function isFlutterApp(): boolean {
   return typeof diaryNative()?.postMessage === 'function';
 }
 
+/** iOS Flutter 앱 (WKWebView). Apple 로그인 버튼 노출 등 iOS 전용 분기에 사용 */
+export function isIOSApp(): boolean {
+  if (!isFlutterApp()) return false;
+  if (typeof navigator === 'undefined') return false;
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 export function postDiaryNative(data: Record<string, unknown>) {
   const native = diaryNative();
   if (!native) return;

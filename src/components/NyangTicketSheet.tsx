@@ -16,7 +16,7 @@ import {
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
-import { isFlutterApp } from '../utils/nativeShare';
+import { isFlutterApp, isIOSApp } from '../utils/nativeShare';
 import {
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
@@ -218,13 +218,14 @@ function NyangTicketSheet({
     }
   };
 
-  /** 비회원 → Google 회원 만든 뒤 true. 웹은 계정 시트로 보냄 */
+  /** 비회원 → Google/Apple 회원 만든 뒤 true. 웹·iOS 앱은 계정 시트로 보냄 */
   const ensureGoogleMember = async (
     pending: PendingNyangPurchase,
   ): Promise<boolean> => {
     if (isGoogleSignedIn()) return true;
 
-    if (!isFlutterApp()) {
+    // iOS 앱: Apple/Google 중 고를 수 있게 계정 시트로 (가이드라인 4.8)
+    if (!isFlutterApp() || isIOSApp()) {
       setPendingNyangPurchase(pending);
       setError(t('nyangTicket.googleRequired'));
       window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
