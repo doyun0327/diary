@@ -156,6 +156,8 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [decorateOpen, setDecorateOpen] = useState(false);
   const [appInfoOpen, setAppInfoOpen] = useState(false);
+  /** 구독 화면 약관 링크로 열면 'legal' 부터 */
+  const [appInfoInitialView, setAppInfoInitialView] = useState<"main" | "legal">("main");
   const [bookEntries, setBookEntries] = useState<DiaryEntry[] | null>(null);
   const [bookRange, setBookRange] = useState<{
     start: string;
@@ -788,6 +790,7 @@ function App() {
     }
     if (appInfoOpen) {
       setAppInfoOpen(false);
+      setAppInfoInitialView("main");
       return true;
     }
     if (decorateOpen) {
@@ -1384,6 +1387,11 @@ function App() {
             autoPurchase={nyangAutoPurchase}
             onAutoPurchaseConsumed={() => setNyangAutoPurchase(null)}
             onAppToast={showAppToast}
+            onOpenLegal={() => {
+              // 앱 정보 시트가 구독 시트 위에 뜸 → 닫으면 구독 화면으로 돌아옴
+              setAppInfoInitialView("legal");
+              setAppInfoOpen(true);
+            }}
             onClose={() => {
               setNyangTicketOpen(false);
               setNyangAutoPurchase(null);
@@ -1450,7 +1458,13 @@ function App() {
         )}
       {appInfoOpen &&
         createPortal(
-          <AppInfoSheet onClose={() => setAppInfoOpen(false)} />,
+          <AppInfoSheet
+            initialView={appInfoInitialView}
+            onClose={() => {
+              setAppInfoOpen(false);
+              setAppInfoInitialView("main");
+            }}
+          />,
           document.getElementById("root") ?? document.body,
         )}
       {characterOpen &&

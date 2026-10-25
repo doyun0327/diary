@@ -61,6 +61,8 @@ interface NyangTicketSheetProps {
   onAutoPurchaseConsumed?: () => void;
   /** 저장 토스트와 동일한 하단 안내 */
   onAppToast?: (message: string, durationMs?: number) => void;
+  /** 구독 탭의 이용약관·개인정보처리방침 링크 → 앱 정보 > 약관 화면 */
+  onOpenLegal?: () => void;
 }
 
 function formatPurchaseDate(ms: number, locale: string) {
@@ -89,6 +91,7 @@ function NyangTicketSheet({
   autoPurchase = null,
   onAutoPurchaseConsumed,
   onAppToast,
+  onOpenLegal,
 }: NyangTicketSheetProps) {
   const { t, i18n } = useTranslation();
   const { signInWithGoogleIdToken } = useAuthSession();
@@ -351,8 +354,8 @@ function NyangTicketSheet({
     await runSubscribe(productId);
   };
 
-  /** 숨김: 제목 길게 누르기 → 수동 복원 */
-  const handleHiddenRestore = () => {
+  /** 구독 탭 "구매 복원" 버튼 (App Store 심사 3.1.1) */
+  const handleRestore = () => {
     if (!isFlutterApp() || busy) return;
     requestSubscriptionRestore();
     setMessage(t('nyangTicket.restoreStarted'));
@@ -443,28 +446,7 @@ function NyangTicketSheet({
       >
         <header className="account-sheet__head nyang-ticket__head">
           <div className="nyang-ticket__head-text">
-            <h2
-              onContextMenu={(e) => {
-                e.preventDefault();
-                handleHiddenRestore();
-              }}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-                  const timer = window.setTimeout(() => {
-                    handleHiddenRestore();
-                  }, 900);
-                  const clear = () => {
-                    window.clearTimeout(timer);
-                    window.removeEventListener('pointerup', clear);
-                    window.removeEventListener('pointercancel', clear);
-                  };
-                  window.addEventListener('pointerup', clear);
-                  window.addEventListener('pointercancel', clear);
-                }
-              }}
-            >
-              {t('nyangTicket.title')}
-            </h2>
+            <h2>{t('nyangTicket.title')}</h2>
           </div>
           <button
             type="button"
@@ -574,6 +556,29 @@ function NyangTicketSheet({
                 );
               })}
             </ul>
+            <div className="nyang-ticket__sub-footer">
+              {isFlutterApp() ? (
+                <button
+                  type="button"
+                  className="nyang-ticket__restore-btn"
+                  disabled={busy != null}
+                  onClick={handleRestore}
+                >
+                  {t('subscription.restore')}
+                </button>
+              ) : null}
+              {onOpenLegal ? (
+                <p className="nyang-ticket__legal-links">
+                  <button type="button" onClick={onOpenLegal}>
+                    {t('appInfo.legal.termsHeading')}
+                  </button>
+                  <span aria-hidden>·</span>
+                  <button type="button" onClick={onOpenLegal}>
+                    {t('appInfo.legal.privacyHeading')}
+                  </button>
+                </p>
+              ) : null}
+            </div>
           </section>
         )}
 

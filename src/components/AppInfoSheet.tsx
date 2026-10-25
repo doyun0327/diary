@@ -10,13 +10,15 @@ import './AppInfoSheet.css';
 
 interface AppInfoSheetProps {
   onClose: () => void;
+  /** 처음 보여줄 화면 (구독 화면의 약관 링크는 'legal') */
+  initialView?: 'main' | 'legal';
 }
 
 type View = 'main' | 'legal' | 'licenses' | 'churu';
 
-function AppInfoSheet({ onClose }: AppInfoSheetProps) {
+function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   const { t } = useTranslation();
-  const [view, setView] = useState<View>('main');
+  const [view, setView] = useState<View>(initialView);
   const [buyingId, setBuyingId] = useState<TipProductId | null>(null);
   const [tipMessage, setTipMessage] = useState<string | null>(null);
   const [tipError, setTipError] = useState<string | null>(null);
