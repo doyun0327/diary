@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../constants/app';
 import { ALL_FLATICON_CREDITS } from '../utils/flaticonCredits';
 import { isFlutterApp } from '../utils/nativeShare';
-import { getInviteWebOrigin } from '../utils/roomInvite';
+import { privacyPolicyArticleHtml, privacyPolicyLang } from '../utils/privacyPolicyHtml';
 import { TIP_PRODUCTS, type TipProductId } from '../utils/tipProducts';
 import { fetchTipStorePrices, waitForTipPurchase } from '../utils/tipPurchase';
 import CloseIcon from './CloseIcon';
@@ -15,7 +15,7 @@ interface AppInfoSheetProps {
   initialView?: 'main' | 'legal';
 }
 
-type View = 'main' | 'legal' | 'licenses' | 'churu';
+type View = 'main' | 'legal' | 'privacy' | 'licenses' | 'churu';
 
 function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   const { t, i18n } = useTranslation();
@@ -25,10 +25,15 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   const [tipError, setTipError] = useState<string | null>(null);
   const [storePrices, setStorePrices] = useState<Record<string, string>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   /** 구독 화면 약관 링크로 열렸으면 뒤로 = 닫기 (구독 화면으로 복귀) */
   const openedForLegal = initialView === 'legal';
   const goBack = () => {
+    if (view === 'privacy') {
+      setView('legal');
+      return;
+    }
     if (openedForLegal) onClose();
     else setView('main');
   };
@@ -36,12 +41,17 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      if (view !== 'main' && !openedForLegal) setView('main');
+      if (view === 'privacy') setView('legal');
+      else if (view !== 'main' && !openedForLegal) setView('main');
       else onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose, openedForLegal, view]);
+
+  useEffect(() => {
+    panelRef.current?.scrollTo({ top: 0 });
+  }, [view]);
 
   useEffect(() => {
     if (view !== 'churu') {
@@ -67,7 +77,9 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   }, [view]);
 
   const title =
-    view === 'legal'
+    view === 'privacy'
+      ? t('appInfo.legal.privacyHeading')
+      : view === 'legal'
       ? t('appInfo.legal.title')
       : view === 'licenses'
         ? t('appInfo.licenses.title')
@@ -122,7 +134,7 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
       aria-label={t('appInfo.aria')}
     >
       <div className="app-info__backdrop" onClick={onClose} />
-      <div className="app-info__panel">
+      <div className="app-info__panel" ref={panelRef}>
         <header className="app-info__head">
           {view !== 'main' ? (
             <button type="button" className="app-info__back" onClick={goBack}>
@@ -231,10 +243,10 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
                 i18nKey="appInfo.legal.privacyBody"
                 components={{
                   privacyLink: (
-                    <a
-                      href={`${getInviteWebOrigin()}/privacy.html?lang=${encodeURIComponent(i18n.resolvedLanguage || i18n.language || 'ko')}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      type="button"
+                      className="app-info__text-link"
+                      onClick={() => setView('privacy')}
                     />
                   ),
                 }}
@@ -243,6 +255,23 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
             <h3>{t('appInfo.legal.refundHeading')}</h3>
             <p>{t('appInfo.legal.refundBody')}</p>
           </div>
+        )}
+
+        {view === 'privacy' && (
+          <div
+            className="app-info__privacy"
+            lang={privacyPolicyLang(i18n.resolvedLanguage || i18n.language)}
+            onClick={(e) => {
+              const anchor = (e.target as HTMLElement).closest('a');
+              if (!anchor) return;
+              const href = anchor.getAttribute('href') ?? '';
+              if (href.startsWith('http://') || href.startsWith('https://')) return;
+              e.preventDefault();
+            }}
+            dangerouslySetInnerHTML={{
+              __html: privacyPolicyArticleHtml(i18n.resolvedLanguage || i18n.language || 'ko'),
+            }}
+          />
         )}
 
         {view === 'licenses' && (
