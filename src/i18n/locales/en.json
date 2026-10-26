@@ -532,7 +532,6 @@
     },
     "ageLabel": "Age",
     "age": {
-      "child": "Child",
       "teens": "Teens",
       "20s": "20s",
       "30s": "30s",

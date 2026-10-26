@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { APP_VERSION } from '../constants/app';
 import { ALL_FLATICON_CREDITS } from '../utils/flaticonCredits';
 import { isFlutterApp } from '../utils/nativeShare';
+import { getInviteWebOrigin } from '../utils/roomInvite';
 import { TIP_PRODUCTS, type TipProductId } from '../utils/tipProducts';
 import { fetchTipStorePrices, waitForTipPurchase } from '../utils/tipPurchase';
 import CloseIcon from './CloseIcon';
@@ -225,7 +226,20 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
             <h3>{t('appInfo.legal.termsHeading')}</h3>
             <p>{t('appInfo.legal.termsBody')}</p>
             <h3>{t('appInfo.legal.privacyHeading')}</h3>
-            <p>{t('appInfo.legal.privacyBody')}</p>
+            <p>
+              <Trans
+                i18nKey="appInfo.legal.privacyBody"
+                components={{
+                  privacyLink: (
+                    <a
+                      href={`${getInviteWebOrigin()}/privacy.html`}
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  ),
+                }}
+              />
+            </p>
             <h3>{t('appInfo.legal.refundHeading')}</h3>
             <p>{t('appInfo.legal.refundBody')}</p>
           </div>

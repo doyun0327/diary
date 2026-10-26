@@ -1,16 +1,10 @@
 /** 프로필 성별 · 연령대 (기기 계정) */
 
 export type ProfileGender = 'female' | 'male';
-export type ProfileAgeGroup =
-  | 'child'
-  | 'teens'
-  | '20s'
-  | '30s'
-  | '40plus';
+export type ProfileAgeGroup = 'teens' | '20s' | '30s' | '40plus';
 
 export const PROFILE_GENDERS: ProfileGender[] = ['female', 'male'];
 export const PROFILE_AGE_GROUPS: ProfileAgeGroup[] = [
-  'child',
   'teens',
   '20s',
   '30s',
@@ -22,13 +16,7 @@ export function isProfileGender(v: unknown): v is ProfileGender {
 }
 
 export function isProfileAgeGroup(v: unknown): v is ProfileAgeGroup {
-  return (
-    v === 'child' ||
-    v === 'teens' ||
-    v === '20s' ||
-    v === '30s' ||
-    v === '40plus'
-  );
+  return v === 'teens' || v === '20s' || v === '30s' || v === '40plus';
 }
 
 /**
@@ -42,10 +30,6 @@ export function profileLookForAi(
   if (!gender || !ageGroup) return null;
   const girl = gender === 'female';
   switch (ageGroup) {
-    case 'child':
-      return girl
-        ? 'an elementary-school girl about 9–10 years old'
-        : 'an elementary-school boy about 9–10 years old';
     case 'teens':
       return girl ? 'a teenage girl' : 'a teenage boy';
     case '20s':

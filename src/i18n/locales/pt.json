@@ -532,7 +532,6 @@
     },
     "ageLabel": "idade",
     "age": {
-      "child": "crianças",
       "teens": "adolescente",
       "20s": "20 anos",
       "30s": "30 anos",
