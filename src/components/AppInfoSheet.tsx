@@ -18,7 +18,7 @@ interface AppInfoSheetProps {
 type View = 'main' | 'legal' | 'licenses' | 'churu';
 
 function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [view, setView] = useState<View>(initialView);
   const [buyingId, setBuyingId] = useState<TipProductId | null>(null);
   const [tipMessage, setTipMessage] = useState<string | null>(null);
@@ -232,7 +232,7 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
                 components={{
                   privacyLink: (
                     <a
-                      href={`${getInviteWebOrigin()}/privacy.html`}
+                      href={`${getInviteWebOrigin()}/privacy.html?lang=${encodeURIComponent(i18n.resolvedLanguage || i18n.language || 'ko')}`}
                       target="_blank"
                       rel="noreferrer"
                     />

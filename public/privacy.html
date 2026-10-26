@@ -29,11 +29,46 @@
       li { margin: 0.3rem 0; }
       small { color: #6b7280; }
       a { color: #0f766e; }
-      .en { margin-top: 40px; padding-top: 8px; border-top: 1px dashed #d1d5db; }
+      .langbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 18px;
+      }
+      .langbar button {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.82rem;
+        cursor: pointer;
+      }
+      .langbar button[aria-pressed="true"] {
+        background: #0f766e;
+        border-color: #0f766e;
+        color: #fff;
+      }
+      article[hidden] { display: none; }
     </style>
   </head>
   <body>
     <main>
+      <nav class="langbar" aria-label="Language">
+        <button type="button" data-lang="ko">한국어</button>
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="ja">日本語</button>
+        <button type="button" data-lang="zh">中文</button>
+        <button type="button" data-lang="zh-TW">繁體中文</button>
+        <button type="button" data-lang="es">Español</button>
+        <button type="button" data-lang="pt">Português</button>
+        <button type="button" data-lang="fr">Français</button>
+        <button type="button" data-lang="de">Deutsch</button>
+        <button type="button" data-lang="vi">Tiếng Việt</button>
+        <button type="button" data-lang="th">ไทย</button>
+        <button type="button" data-lang="id">Indonesia</button>
+      </nav>
+      <article lang="ko" data-lang="ko">
       <h1>개인정보처리방침</h1>
       <small>최종 업데이트: 2026-10-26 · PageBy (그림일기)</small>
       <p>
@@ -263,8 +298,9 @@
           본인 확인을 위해 로그인에 사용한 Google 계정 이메일이 필요합니다.
         </p>
       </section>
+      </article>
 
-      <div class="en">
+      <article lang="en" data-lang="en" hidden>
         <h1>Privacy Policy</h1>
         <small>Last updated: 2026-10-26 · PageBy</small>
         <p>
@@ -454,7 +490,748 @@
             email you used to sign in.
           </p>
         </section>
-      </div>
+      </article>
+
+      <article lang="ja" data-lang="ja" hidden>
+        <h1>プライバシーポリシー</h1>
+        <small>最終更新: 2026-10-26 · PageBy</small>
+        <p>PageByは13歳以上向けの絵日記アプリです。端末への保存、Googleアカウントでの同期、フレンドルームでの共有、AIイラスト生成を提供します。このページは、アプリと pageby.stream での個人情報の取扱いを説明します。</p>
+        <section>
+          <h2>1. 問い合わせ先</h2>
+          <p>プライバシーの質問と削除依頼は、Google PlayのPageBy掲載ページにある開発者連絡先へ送ってください。ログインに使ったGoogleアカウントのメールアドレスを添えてください。</p>
+        </section>
+        <section>
+          <h2>2. 取り扱う情報</h2>
+          <ul>
+            <li><strong>Googleアカウント:</strong> メール、名前、プロフィール写真URL、アカウントID。</li>
+            <li><strong>プロフィール:</strong> ニックネーム、写真、性別、年代（10代、20代、30代、40代以上）。13歳未満の選択肢はありません。</li>
+            <li><strong>日記:</strong> タイトル、本文、日付、気分、手描き、写真、AI画像、フォント設定。</li>
+            <li><strong>フレンドルーム:</strong> 部屋名、招待コード、メンバー、共有した日記、コメント、通知用の名前。</li>
+            <li><strong>AIリクエスト:</strong> 送った文章、スタイル、参考写真、生成画像、処理状態。</li>
+            <li><strong>通報:</strong> 投稿・コメント・AI画像の通報理由。AI通報には日記文の一部が含まれることがあります。</li>
+            <li><strong>ブロック:</strong> ブロックしたユーザーの識別子（端末内）。</li>
+            <li><strong>購入:</strong> ストアの商品ID、期間、権利。カード番号は保存しません。</li>
+            <li><strong>広告:</strong> バナーとリワード広告のため、AdMobなどのSDKが広告IDや視聴完了を処理する場合があります。</li>
+            <li><strong>通知:</strong> 許可した場合のプッシュトークン。</li>
+            <li><strong>技術情報:</strong> サービス運営に必要なIPアドレス、アプリ版、エラーログ、認証トークン。</li>
+          </ul>
+          <p>同期・共有・AI生成をしない日記は端末内だけに残ります。</p>
+        </section>
+        <section>
+          <h2>3. 取得方法</h2>
+          <p>入力・描画・写真選択、Googleログインでの同意、ルームへの投稿、AI生成ボタン、広告やストアからの結果、サーバー通信時のログです。</p>
+        </section>
+        <section>
+          <h2>4. 利用目的</h2>
+          <p>ログイン、日記の保存と同期、フレンドルームと通知、依頼されたAI画像の生成、回数管理、サブスクリプションとチャージの付与、バナー広告とリワード広告、通報の確認、不具合対応です。日記本文を販売したり広告素材には使いません。</p>
+        </section>
+        <section>
+          <h2>5. AIイラスト</h2>
+          <p>文章、スタイル、参考写真はPageByのサーバーを経由し、画像生成事業者へ、その画像を作るためだけに送られます。フレンドルームに共有するまで他のメンバーには見えません。</p>
+          <p>日記画面の「AIイラストを報告」は常に表示され、生成が始まると押せます。報告するとその画像は画面から消え、運営が理由を確認します。すでに共有した投稿はルーム内の通報から別に報告できます。</p>
+        </section>
+        <section>
+          <h2>6. 広告</h2>
+          <p>無料利用中はバナーが出ることがあります。追加のAI生成のためのリワード広告は、ユーザーが再生したときだけ始まります。広告はAdMobなどGoogleの広告SDKで配信され、広告IDを使うことがあります。端末設定でパーソナライズを制限できます。13歳未満を対象にした広告は行いません。サブスクリプションなど広告非表示の特典があるアカウントでは、バナーが出ないことがあります。</p>
+        </section>
+        <section>
+          <h2>7. 支払い</h2>
+          <p>サブスクリプションとAIチャージはGoogle PlayまたはApp Storeのアプリ内課金だけです。返金は各ストアの手順に従います。PageByが保存するのは商品IDと付与状況だけで、カード番号は見ません。</p>
+        </section>
+        <section>
+          <h2>8. 委託先</h2>
+          <p>個人情報は販売しません。</p>
+          <ul>
+            <li><strong>Google:</strong> ログイン、Play決済、プッシュ通知（FCM）、広告。</li>
+            <li><strong>画像生成事業者:</strong> AI依頼の文章と参考画像。</li>
+            <li><strong>クラウド:</strong> アカウント、同期した日記、ルーム、通報の保存。</li>
+          </ul>
+          <p>ルームに投稿した内容は、そのメンバーに表示されます。法令に基づく請求や、生命・身体の急な危険を防ぐために必要な範囲で開示することがあります。</p>
+        </section>
+        <section>
+          <h2>9. 処理場所</h2>
+          <p>Googleのサービス、画像生成、アプリサーバーは、利用者の国の外で処理されることがあります。利用目的はこのポリシーの範囲を超えません。</p>
+        </section>
+        <section>
+          <h2>10. ルーム、通報、ブロック</h2>
+          <p>共有した日記とコメントは同じ部屋のメンバーが見られます。投稿やコメントの通報、ユーザーのブロックができます。通報した投稿は通報した人の一覧から隠れ、運営が理由を確認します。ブロックは自分の端末を基準にし、相手には通知しません。</p>
+        </section>
+        <section>
+          <h2>11. 保管期間</h2>
+          <ul>
+            <li>端末内の日記: 自分で消すか、アプリデータを消すまで。</li>
+            <li>クラウドの日記・アカウント・ルーム: アカウントがある間。退会後は削除の節に従います。</li>
+            <li>AIジョブと通報: 画像の受け渡し、回数の精算、通報の確認に必要な期間。確認後は削除するか、識別できないようにします。</li>
+            <li>購入記録: 付与、返金、紛争、ストアの方針に必要な期間。</li>
+            <li>プッシュトークン: 通知を切るかアプリを消すまで、またはトークンが無効になった後。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>12. 削除</h2>
+          <p>Googleでログインしたアカウントは、アプリのアカウントメニューから退会できます。退会後およそ1か月の猶予があり、その間に同じアカウントで再ログインすると復元できます。猶予後は、そのアカウントのクラウド日記とルームデータは提供されません。端末だけにある日記は、アプリの削除かストレージの消去で消えます。アプリを開けない場合はPlayの開発者連絡先へ依頼してください。手順は<a href="./account-deletion.html">アカウントとデータの削除</a>にあります。</p>
+        </section>
+        <section>
+          <h2>13. 選択できること</h2>
+          <ul>
+            <li>Googleログインをしなければ、日記を端末内だけに保てます。</li>
+            <li>ルームに上げなければ、他のユーザーには見えません。</li>
+            <li>AI画像はボタンを押したときだけ生成されます。</li>
+            <li>通知は端末設定で止められます。</li>
+            <li>広告IDは端末設定で制限できます。リワード広告を見なければ、その追加回数は付与されません。</li>
+            <li>投稿、コメント、AI画像の通報と、ユーザーのブロックはアプリ内でできます。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>14. 安全対策</h2>
+          <p>ログイン後のAPIはアカウントトークンで区別します。通信はHTTPSです。日記画像とアカウントデータはアクセスを限った環境に保存します。完全な安全を保証することはできません。</p>
+        </section>
+        <section>
+          <h2>15. 子ども</h2>
+          <p>PageByは13歳未満を対象にしておらず、プロフィールに13歳未満の年代はありません。13歳未満の個人情報を収集したと分かった場合は、そのアカウント情報を削除します。保護者はPlayの開発者連絡先から知らせてください。</p>
+        </section>
+        <section>
+          <h2>16. 端末の権限</h2>
+          <p>写真やカメラは、プロフィール写真や参考写真を選ぶときだけ求めます。通知はプッシュを受けるときだけです。拒否しても日記を書く基本機能は使えます。日記のために位置情報は集めません。</p>
+        </section>
+        <section>
+          <h2>17. 変更</h2>
+          <p>収集項目や目的が変わるときは、このページと更新日を変えます。変更後もアプリを使い続けると、新しいポリシーが適用されます。</p>
+        </section>
+        <section>
+          <h2>18. 連絡</h2>
+          <p>開示、訂正、削除、AI画像の通報に関する質問は、Google PlayのPageByページにある開発者連絡先へ、ログインに使ったGoogleアカウントのメールとともに送ってください。</p>
+        </section>
+      </article>
+
+      <article lang="zh" data-lang="zh" hidden>
+        <h1>隐私政策</h1>
+        <small>最后更新：2026-10-26 · PageBy</small>
+        <p>PageBy 是面向 13 岁及以上用户的图画日记应用。你可以在设备上写日记，用 Google 账号同步，在好友房间分享，并生成 AI 图画。本页说明应用和 pageby.stream 如何处理个人信息。</p>
+        <section>
+          <h2>1. 联系方式</h2>
+          <p>隐私问题和删除请求请发给 Google Play 上 PageBy 页面所示的开发者联系方式，并附上登录所用的 Google 账号邮箱。</p>
+        </section>
+        <section>
+          <h2>2. 我们处理的信息</h2>
+          <ul>
+            <li><strong>Google 账号：</strong>邮箱、姓名、头像网址、账号标识。</li>
+            <li><strong>资料：</strong>昵称、照片、性别、年龄段（十几岁、20 多岁、30 多岁、40 岁以上）。没有 13 岁以下选项。</li>
+            <li><strong>日记：</strong>标题、正文、日期、心情、手绘、照片、AI 图片、字体设置。</li>
+            <li><strong>好友房间：</strong>房间名、邀请码、成员、分享的日记、评论、通知中使用的名字。</li>
+            <li><strong>AI 请求：</strong>你提交的文字、风格、参考照片、生成结果和任务状态。</li>
+            <li><strong>举报：</strong>举报帖子、评论或 AI 图画的原因。AI 举报可能包含日记文字片段。</li>
+            <li><strong>屏蔽：</strong>你屏蔽的用户标识，保存在设备上。</li>
+            <li><strong>付款：</strong>商店商品编号和权益。我们不保存卡号。</li>
+            <li><strong>广告：</strong>横幅和激励广告可能由 AdMob 等 SDK 处理广告 ID 和是否看完。</li>
+            <li><strong>通知：</strong>你允许推送时的推送令牌。</li>
+            <li><strong>技术信息：</strong>运行服务所需的 IP、应用版本、错误日志和登录令牌。</li>
+          </ul>
+          <p>从未同步、分享或发给 AI 的日记只留在你的设备上。</p>
+        </section>
+        <section>
+          <h2>3. 如何取得</h2>
+          <p>来自你的输入、绘画和选图，Google 登录授权，发到房间或请求 AI 时附带的内容，以及广告或商店返回的结果。应用与服务器通信时会产生令牌和错误日志。</p>
+        </section>
+        <section>
+          <h2>4. 用途</h2>
+          <p>用于登录、保存和同步日记、好友房间和通知、按你的请求生成 AI 图画、计算次数、发放订阅和充值、展示横幅和激励广告、审核安全举报、修复错误。我们不出售日记内容，也不把它当作广告素材。</p>
+        </section>
+        <section>
+          <h2>5. AI 图画</h2>
+          <p>文字、风格和参考照片会送到 PageBy 服务器，再交给图像生成服务，且只为生成该图片。在你分享到好友房间之前，其他成员看不到。</p>
+          <p>写日记的画面始终有「举报 AI 图画」。生成开始后可以点击。举报后该图会从画面移除，并由运营者查看原因。已经分享到房间的内容，请在房间里另行举报。</p>
+        </section>
+        <section>
+          <h2>6. 广告</h2>
+          <p>免费使用时可能出现底部横幅。额外的 AI 次数需要你主动播放激励广告。广告通过 AdMob 等 Google 广告 SDK 提供，可能使用广告 ID。你可以在系统设置中限制个性化广告。PageBy 不对 13 岁以下儿童投放广告。享有去广告权益的订阅账号可能不显示横幅。</p>
+        </section>
+        <section>
+          <h2>7. 付款</h2>
+          <p>订阅和 AI 充值只通过 Google Play 或 App Store 应用内购买。退款遵循商店规则。我们只保存商品编号和权益，看不到卡号。</p>
+        </section>
+        <section>
+          <h2>8. 受托处理方</h2>
+          <p>我们不出售个人信息。</p>
+          <ul>
+            <li><strong>Google：</strong>登录、Play 付款、推送（FCM）、广告。</li>
+            <li><strong>图像生成服务：</strong>AI 请求中的文字和参考图。</li>
+            <li><strong>云托管：</strong>账号、已同步日记、房间和举报的存储。</li>
+          </ul>
+          <p>你分享到房间的内容会显示给该房间成员。法律要求或为防止严重伤害时，我们可能在必要范围内披露信息。</p>
+        </section>
+        <section>
+          <h2>9. 处理地点</h2>
+          <p>Google 服务、图像生成和应用服务器可能在你所在国家以外处理数据。使用范围仍限于本政策所述目的。</p>
+        </section>
+        <section>
+          <h2>10. 房间、举报和屏蔽</h2>
+          <p>分享的日记和评论对该房间成员可见。你可以举报帖子或评论，也可以屏蔽用户。被你举报的帖子会从你的列表中隐藏，运营者会查看原因。屏蔽以你的设备为准，不会通知对方。</p>
+        </section>
+        <section>
+          <h2>11. 保存期限</h2>
+          <ul>
+            <li>设备上的日记：直到你删除或清除应用数据。</li>
+            <li>云端日记、账号和房间：账号存续期间。注销后按删除一节处理。</li>
+            <li>AI 任务和举报：保留到交付图片、结算次数并完成审核所需的时间，之后删除或去标识。</li>
+            <li>购买记录：按发放、退款、争议和商店规则所需的时间。</li>
+            <li>推送令牌：直到你关闭通知、卸载应用或令牌失效。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>12. 删除</h2>
+          <p>用 Google 登录的账号可在应用的账号菜单中注销。注销后约有一个月宽限期，期间用同一账号再次登录可以恢复。宽限期结束后，不再提供该账号的云端日记和房间数据。只存在设备上的日记会在卸载应用或清除存储时删除。无法打开应用时，请通过 Play 上的开发者联系方式申请。步骤见<a href="./account-deletion.html">账号与数据删除</a>。</p>
+        </section>
+        <section>
+          <h2>13. 你可以做的选择</h2>
+          <ul>
+            <li>不登录 Google，日记可以只留在设备上。</li>
+            <li>不分享到房间，其他人就看不到。</li>
+            <li>只有你按下按钮才会生成 AI 图画。</li>
+            <li>可以在系统设置中关闭通知。</li>
+            <li>可以在系统设置中限制广告 ID。不看激励广告就不会获得那一次额外次数。</li>
+            <li>可以在应用内举报帖子、评论和 AI 图画，并屏蔽用户。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>14. 安全</h2>
+          <p>登录后的接口使用账号令牌。传输使用 HTTPS。日记图片和账号数据保存在限制访问的环境中。没有任何方式能保证绝对安全。</p>
+        </section>
+        <section>
+          <h2>15. 儿童</h2>
+          <p>PageBy 不以 13 岁以下儿童为对象，资料里也没有 13 岁以下年龄段。如果我们发现收集了 13 岁以下儿童的个人信息，将删除该账号数据。监护人可通过 Play 上的开发者联系方式告知我们。</p>
+        </section>
+        <section>
+          <h2>16. 设备权限</h2>
+          <p>只有在选择头像或参考照片时才会请求照片或相机。只有在接收推送时才请求通知。拒绝权限不影响写日记的基本功能。PageBy 不为日记功能收集位置信息。</p>
+        </section>
+        <section>
+          <h2>17. 变更</h2>
+          <p>如果收集内容或用途发生变化，我们会更新本页和日期。变更后继续使用应用，即适用新政策。</p>
+        </section>
+        <section>
+          <h2>18. 联系</h2>
+          <p>如需访问、更正、删除，或询问 AI 图画举报，请通过 Google Play 上 PageBy 页面的开发者联系方式联系我们，并提供登录所用的 Google 账号邮箱。</p>
+        </section>
+      </article>
+
+      <article lang="zh-Hant" data-lang="zh-TW" hidden>
+        <h1>隱私權政策</h1>
+        <small>最後更新：2026-10-26 · PageBy</small>
+        <p>PageBy 是面向 13 歲及以上使用者的圖畫日記應用。你可以在裝置上寫日記，用 Google 帳號同步，在好友房間分享，並產生 AI 圖畫。本頁說明應用程式與 pageby.stream 如何處理個人資訊。</p>
+        <section>
+          <h2>1. 聯絡方式</h2>
+          <p>隱私問題與刪除請求，請寄到 Google Play 上 PageBy 頁面所示的開發者聯絡方式，並附上登入所用的 Google 帳號電子郵件。</p>
+        </section>
+        <section>
+          <h2>2. 我們處理的資訊</h2>
+          <ul>
+            <li><strong>Google 帳號：</strong>電子郵件、姓名、頭像網址、帳號識別碼。</li>
+            <li><strong>個人資料：</strong>暱稱、照片、性別、年齡層（十幾歲、20 多歲、30 多歲、40 歲以上）。沒有 13 歲以下選項。</li>
+            <li><strong>日記：</strong>標題、內文、日期、心情、手繪、照片、AI 圖片、字型設定。</li>
+            <li><strong>好友房間：</strong>房間名稱、邀請碼、成員、分享的日記、留言、通知中使用的名字。</li>
+            <li><strong>AI 請求：</strong>你送出的文字、風格、參考照片、產生結果與工作狀態。</li>
+            <li><strong>檢舉：</strong>檢舉貼文、留言或 AI 圖畫的原因。AI 檢舉可能包含日記文字片段。</li>
+            <li><strong>封鎖：</strong>你封鎖的使用者識別碼，存在裝置上。</li>
+            <li><strong>付款：</strong>商店商品編號與權益。我們不保存卡號。</li>
+            <li><strong>廣告：</strong>橫幅與獎勵廣告可能由 AdMob 等 SDK 處理廣告 ID 與是否看完。</li>
+            <li><strong>通知：</strong>你允許推播時的推播權杖。</li>
+            <li><strong>技術資訊：</strong>營運服務所需的 IP、應用程式版本、錯誤紀錄與登入權杖。</li>
+          </ul>
+          <p>從未同步、分享或送給 AI 的日記只留在你的裝置上。</p>
+        </section>
+        <section>
+          <h2>3. 如何取得</h2>
+          <p>來自我們收到的輸入、繪圖與選圖、Google 登入授權、發到房間或請求 AI 時附帶的內容，以及廣告或商店回傳的結果。應用程式與伺服器通訊時會產生權杖與錯誤紀錄。</p>
+        </section>
+        <section>
+          <h2>4. 用途</h2>
+          <p>用於登入、保存與同步日記、好友房間與通知、依你的請求產生 AI 圖畫、計算次數、發放訂閱與加值、顯示橫幅與獎勵廣告、審核安全檢舉、修復錯誤。我們不出售日記內容，也不把它當作廣告素材。</p>
+        </section>
+        <section>
+          <h2>5. AI 圖畫</h2>
+          <p>文字、風格與參考照片會送到 PageBy 伺服器，再交給圖像產生服務，且只為產生該圖片。在你分享到好友房間之前，其他成員看不到。</p>
+          <p>寫日記的畫面始終有「檢舉 AI 圖畫」。產生開始後可以點選。檢舉後該圖會從畫面移除，並由營運者查看原因。已經分享到房間的內容，請在房間裡另行檢舉。</p>
+        </section>
+        <section>
+          <h2>6. 廣告</h2>
+          <p>免費使用時可能出現底部橫幅。額外的 AI 次數需要你主動播放獎勵廣告。廣告透過 AdMob 等 Google 廣告 SDK 提供，可能使用廣告 ID。你可以在系統設定中限制個人化廣告。PageBy 不對 13 歲以下兒童投放廣告。享有移除廣告權益的訂閱帳號可能不顯示橫幅。</p>
+        </section>
+        <section>
+          <h2>7. 付款</h2>
+          <p>訂閱與 AI 加值只透過 Google Play 或 App Store 應用程式內購買。退款遵循商店規則。我們只保存商品編號與權益，看不到卡號。</p>
+        </section>
+        <section>
+          <h2>8. 受託處理方</h2>
+          <p>我們不出售個人資訊。</p>
+          <ul>
+            <li><strong>Google：</strong>登入、Play 付款、推播（FCM）、廣告。</li>
+            <li><strong>圖像產生服務：</strong>AI 請求中的文字與參考圖。</li>
+            <li><strong>雲端託管：</strong>帳號、已同步日記、房間與檢舉的儲存。</li>
+          </ul>
+          <p>你分享到房間的內容會顯示給該房間成員。法律要求或為防止嚴重傷害時，我們可能在必要範圍內揭露資訊。</p>
+        </section>
+        <section>
+          <h2>9. 處理地點</h2>
+          <p>Google 服務、圖像產生與應用程式伺服器可能在你所在國家以外處理資料。使用範圍仍限於本政策所述目的。</p>
+        </section>
+        <section>
+          <h2>10. 房間、檢舉與封鎖</h2>
+          <p>分享的日記與留言對該房間成員可見。你可以檢舉貼文或留言，也可以封鎖使用者。被你檢舉的貼文會從你的清單中隱藏，營運者會查看原因。封鎖以你的裝置為準，不會通知對方。</p>
+        </section>
+        <section>
+          <h2>11. 保存期限</h2>
+          <ul>
+            <li>裝置上的日記：直到你刪除或清除應用程式資料。</li>
+            <li>雲端日記、帳號與房間：帳號存續期間。登出後按刪除一節處理。</li>
+            <li>AI 工作與檢舉：保留到交付圖片、結算次數並完成審核所需的時間，之後刪除或去識別。</li>
+            <li>購買紀錄：按發放、退款、爭議與商店規則所需的時間。</li>
+            <li>推播權杖：直到你關閉通知、解除安裝或權杖失效。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>12. 刪除</h2>
+          <p>用 Google 登入的帳號可在應用程式的帳號選單中登出刪除。刪除後約有一個月寬限期，期間用同一帳號再次登入可以復原。寬限期結束後，不再提供該帳號的雲端日記與房間資料。只存在裝置上的日記會在解除安裝或清除儲存空間時刪除。無法開啟應用程式時，請透過 Play 上的開發者聯絡方式申請。步驟見<a href="./account-deletion.html">帳號與資料刪除</a>。</p>
+        </section>
+        <section>
+          <h2>13. 你可以做的選擇</h2>
+          <ul>
+            <li>不登入 Google，日記可以只留在裝置上。</li>
+            <li>不分享到房間，其他人就看不到。</li>
+            <li>只有你按下按鈕才會產生 AI 圖畫。</li>
+            <li>可以在系統設定中關閉通知。</li>
+            <li>可以在系統設定中限制廣告 ID。不看獎勵廣告就不會獲得那一次額外次數。</li>
+            <li>可以在應用程式內檢舉貼文、留言與 AI 圖畫，並封鎖使用者。</li>
+          </ul>
+        </section>
+        <section>
+          <h2>14. 安全</h2>
+          <p>登入後的介面使用帳號權杖。傳輸使用 HTTPS。日記圖片與帳號資料保存在限制存取的環境中。沒有任何方式能保證絕對安全。</p>
+        </section>
+        <section>
+          <h2>15. 兒童</h2>
+          <p>PageBy 不以 13 歲以下兒童為對象，資料裡也沒有 13 歲以下年齡層。如果我們發現蒐集了 13 歲以下兒童的個人資訊，將刪除該帳號資料。監護人可透過 Play 上的開發者聯絡方式告知我們。</p>
+        </section>
+        <section>
+          <h2>16. 裝置權限</h2>
+          <p>只有在選擇頭像或參考照片時才會請求照片或相機。只有在接收推播時才請求通知。拒絕權限不影響寫日記的基本功能。PageBy 不為日記功能蒐集位置資訊。</p>
+        </section>
+        <section>
+          <h2>17. 變更</h2>
+          <p>如果蒐集內容或用途發生變化，我們會更新本頁與日期。變更後繼續使用應用程式，即適用新政策。</p>
+        </section>
+        <section>
+          <h2>18. 聯絡</h2>
+          <p>如需存取、更正、刪除，或詢問 AI 圖畫檢舉，請透過 Google Play 上 PageBy 頁面的開發者聯絡方式與我們聯絡，並提供登入所用的 Google 帳號電子郵件。</p>
+        </section>
+      </article>
+
+      <article lang="es" data-lang="es" hidden>
+        <h1>Política de privacidad</h1>
+        <small>Última actualización: 2026-10-26 · PageBy</small>
+        <p>PageBy es una app de diario ilustrado para personas de 13 años o más. Puedes guardar diarios en el dispositivo, sincronizarlos con Google, compartirlos en una sala de amigos y generar un dibujo con IA. Esta página explica cómo la app y pageby.stream tratan los datos personales.</p>
+        <section><h2>1. Contacto</h2><p>Las consultas de privacidad y las solicitudes de eliminación se envían al contacto del desarrollador que aparece en la ficha de PageBy en Google Play. Incluye el correo de la cuenta de Google con la que inicias sesión.</p></section>
+        <section><h2>2. Datos que tratamos</h2><ul>
+          <li><strong>Cuenta de Google:</strong> correo, nombre, URL de la foto y identificador.</li>
+          <li><strong>Perfil:</strong> apodo, foto, sexo y franja de edad (adolescentes, 20, 30 o 40+). No hay opción de menores de 13 años.</li>
+          <li><strong>Diarios:</strong> título, texto, fecha, ánimo, dibujos, fotos, imágenes de IA y tipografía.</li>
+          <li><strong>Salas:</strong> nombre, código de invitación, miembros, diarios compartidos, comentarios y nombres de las notificaciones.</li>
+          <li><strong>IA:</strong> texto, estilo, foto de referencia, imagen resultante y estado del trabajo.</li>
+          <li><strong>Denuncias:</strong> motivo al denunciar una publicación, un comentario o un dibujo de IA. La denuncia de IA puede incluir un fragmento del diario.</li>
+          <li><strong>Bloqueos:</strong> identificadores guardados en el dispositivo.</li>
+          <li><strong>Pagos:</strong> id del producto y derecho de uso. No guardamos el número de tarjeta.</li>
+          <li><strong>Anuncios:</strong> un SDK como AdMob puede tratar el ID de publicidad y si viste el anuncio recompensado.</li>
+          <li><strong>Avisos:</strong> token de push si los permites.</li>
+          <li><strong>Datos técnicos:</strong> IP, versión de la app, registros de error y tokens de acceso necesarios para el servicio.</li>
+        </ul><p>Un diario que no sincronizas, no compartes y no envías a la IA se queda en el dispositivo.</p></section>
+        <section><h2>3. Cómo los obtenemos</h2><p>Los escribes, dibujas o eliges; los autorizas al iniciar sesión con Google; los adjuntas al compartir o al pedir una imagen de IA; o llegan como resultado de un anuncio o de la tienda. Los tokens y los registros de error se crean cuando la app habla con el servidor.</p></section>
+        <section><h2>4. Para qué los usamos</h2><p>Para iniciar sesión, guardar y sincronizar diarios, gestionar salas y notificaciones, generar el dibujo de IA que pediste, contar usos, entregar suscripciones y paquetes, mostrar anuncios de banner y recompensados, revisar denuncias y corregir errores. No vendemos el contenido del diario ni lo usamos como creatividad publicitaria.</p></section>
+        <section><h2>5. Dibujos de IA</h2><p>El texto, el estilo y la foto de referencia se envían a los servidores de PageBy y después al proveedor de imágenes, solo para crear esa imagen. Los demás miembros no la ven hasta que la compartes en una sala.</p><p>La pantalla de escritura siempre muestra «Denunciar dibujo de IA». Se activa cuando empieza la generación. Al denunciar, la imagen sale de la pantalla y el operador revisa el motivo. Lo ya compartido en una sala se denuncia aparte dentro de la sala.</p></section>
+        <section><h2>6. Anuncios</h2><p>El uso gratuito puede incluir un banner. El anuncio recompensado es opcional y solo empieza si tú lo reproduces para conseguir un dibujo extra. Los anuncios usan SDK de Google, como AdMob, y pueden usar el ID de publicidad. Puedes limitar la personalización en el sistema. PageBy no dirige anuncios a menores de 13 años. Las cuentas con una suscripción que quite anuncios pueden no ver el banner.</p></section>
+        <section><h2>7. Pagos</h2><p>Las suscripciones y los paquetes de IA se cobran solo en Google Play o en el App Store. Los reembolsos siguen la tienda. Guardamos el id del producto y el derecho de uso. No vemos el número de tarjeta.</p></section>
+        <section><h2>8. Encargados</h2><p>No vendemos datos personales.</p><ul>
+          <li><strong>Google:</strong> inicio de sesión, pagos de Play, notificaciones (FCM) y anuncios.</li>
+          <li><strong>Proveedor de imágenes:</strong> el texto y la imagen de referencia de una petición de IA.</li>
+          <li><strong>Alojamiento en la nube:</strong> cuentas, diarios sincronizados, salas y denuncias.</li>
+        </ul><p>Los miembros de la sala ven lo que decides compartir. Podemos revelar información si la ley lo exige o para evitar un daño grave.</p></section>
+        <section><h2>9. Dónde se trata</h2><p>Los servicios de Google, la generación de imágenes y los servidores de la app pueden tratar datos fuera de tu país. El uso sigue limitado a los fines de esta política.</p></section>
+        <section><h2>10. Salas, denuncias y bloqueo</h2><p>El diario y los comentarios compartidos los ven los miembros de esa sala. Puedes denunciar una publicación o un comentario y bloquear a un usuario. La publicación denunciada se oculta en tu lista y el operador revisa el motivo. El bloqueo vale en tu dispositivo y no se avisa a la otra persona.</p></section>
+        <section><h2>11. Conservación</h2><ul>
+          <li>Diarios del dispositivo: hasta que los borres o borres los datos de la app.</li>
+          <li>Diarios en la nube, cuenta y salas: mientras la cuenta exista. Después, según la sección de eliminación.</li>
+          <li>Trabajos de IA y denuncias: el tiempo necesario para entregar la imagen, ajustar usos y revisar la denuncia; luego se borran o se desidentifican.</li>
+          <li>Compras: el tiempo que la tienda necesite para reembolsos y disputas.</li>
+          <li>Token de push: hasta que desactives los avisos, desinstales la app o el token caduque.</li>
+        </ul></section>
+        <section><h2>12. Eliminación</h2><p>Puedes eliminar una cuenta vinculada a Google desde el menú de cuenta de la app. Hay un plazo de gracia de aproximadamente un mes; si vuelves a entrar en ese plazo, la cuenta se puede restaurar. Después, los diarios en la nube y los datos de salas de esa cuenta dejan de ofrecerse. Los diarios solo locales se eliminan al desinstalar la app o borrar su almacenamiento. Si no puedes abrir la app, usa el contacto de Play. Detalles: <a href="./account-deletion.html">eliminación de la cuenta y los datos</a>.</p></section>
+        <section><h2>13. Tus opciones</h2><ul>
+          <li>Sin iniciar sesión en Google, el diario puede quedarse en el dispositivo.</li>
+          <li>Si no lo compartes en una sala, los demás no lo ven.</li>
+          <li>La IA solo se ejecuta cuando tú la inicias.</li>
+          <li>Puedes desactivar las notificaciones en el sistema.</li>
+          <li>Puedes limitar el ID de publicidad. Si no ves el anuncio recompensado, no recibes ese uso extra.</li>
+          <li>Puedes denunciar publicaciones, comentarios y dibujos de IA, y bloquear usuarios, dentro de la app.</li>
+        </ul></section>
+        <section><h2>14. Seguridad</h2><p>Tras iniciar sesión, las llamadas usan un token de cuenta. El tráfico va por HTTPS. Las imágenes y los datos de la cuenta se guardan en sistemas con acceso limitado. Ningún método es perfectamente seguro.</p></section>
+        <section><h2>15. Menores</h2><p>PageBy no se dirige a menores de 13 años y el perfil no ofrece esa franja. Si sabemos que hemos recogido datos de un menor de 13 años, eliminaremos esos datos de la cuenta. Los padres pueden avisarnos por el contacto de Play.</p></section>
+        <section><h2>16. Permisos</h2><p>Fotos o cámara solo se piden al elegir una foto de perfil o de referencia. Las notificaciones solo se piden para el push. Rechazar un permiso no impide escribir el diario. PageBy no recoge la ubicación para el diario.</p></section>
+        <section><h2>17. Cambios</h2><p>Si cambia lo que recogemos o por qué, actualizaremos esta página y la fecha. Seguir usando la app después del cambio significa que se aplica la nueva política.</p></section>
+        <section><h2>18. Contacto</h2><p>Para acceso, rectificación, eliminación o preguntas sobre una denuncia de un dibujo de IA, usa el contacto del desarrollador en la ficha de PageBy en Google Play e incluye el correo de la cuenta de Google.</p></section>
+      </article>
+
+      <article lang="pt" data-lang="pt" hidden>
+        <h1>Política de privacidade</h1>
+        <small>Última atualização: 2026-10-26 · PageBy</small>
+        <p>O PageBy é um diário ilustrado para pessoas com 13 anos ou mais. Você pode guardar diários no aparelho, sincronizar com o Google, compartilhar numa sala de amigos e gerar um desenho com IA. Esta página explica como o app e o pageby.stream tratam dados pessoais.</p>
+        <section><h2>1. Contato</h2><p>Dúvidas de privacidade e pedidos de exclusão vão para o contato do desenvolvedor na ficha do PageBy na Google Play. Inclua o e-mail da conta Google usada para entrar.</p></section>
+        <section><h2>2. Dados que tratamos</h2><ul>
+          <li><strong>Conta Google:</strong> e-mail, nome, URL da foto e identificador.</li>
+          <li><strong>Perfil:</strong> apelido, foto, gênero e faixa etária (adolescente, 20, 30 ou 40+). Não há opção para menores de 13 anos.</li>
+          <li><strong>Diários:</strong> título, texto, data, humor, desenhos, fotos, imagens de IA e fonte.</li>
+          <li><strong>Salas:</strong> nome, código de convite, membros, diários compartilhados, comentários e nomes das notificações.</li>
+          <li><strong>IA:</strong> texto, estilo, foto de referência, imagem gerada e status do trabalho.</li>
+          <li><strong>Denúncias:</strong> motivo ao denunciar publicação, comentário ou desenho de IA. A denúncia de IA pode incluir um trecho do diário.</li>
+          <li><strong>Bloqueios:</strong> identificadores salvos no aparelho.</li>
+          <li><strong>Pagamentos:</strong> id do produto e direito de uso. Não guardamos o número do cartão.</li>
+          <li><strong>Anúncios:</strong> um SDK como o AdMob pode tratar o ID de publicidade e se o anúncio premiado foi visto até o fim.</li>
+          <li><strong>Notificações:</strong> token de push, se você permitir.</li>
+          <li><strong>Dados técnicos:</strong> IP, versão do app, logs de erro e tokens de acesso necessários ao serviço.</li>
+        </ul><p>Um diário que você não sincroniza, não compartilha e não envia à IA fica só no aparelho.</p></section>
+        <section><h2>3. Como obtemos</h2><p>Você digita, desenha ou escolhe; autoriza no login do Google; anexa ao compartilhar ou pedir uma imagem de IA; ou o resultado vem de um anúncio ou da loja. Tokens e logs surgem quando o app fala com o servidor.</p></section>
+        <section><h2>4. Para que usamos</h2><p>Para entrar na conta, guardar e sincronizar diários, operar salas e notificações, gerar o desenho de IA pedido, contar usos, entregar assinaturas e pacotes, mostrar banners e anúncios premiados, analisar denúncias e corrigir erros. Não vendemos o conteúdo do diário nem o usamos como criativo de anúncio.</p></section>
+        <section><h2>5. Desenhos de IA</h2><p>Texto, estilo e foto de referência vão aos servidores do PageBy e depois ao provedor de imagens, só para criar aquela imagem. Os outros membros não a veem até você compartilhar na sala.</p><p>A tela de escrita sempre mostra «Denunciar desenho de IA». O controle fica ativo quando a geração começa. A denúncia tira a imagem da tela e o operador analisa o motivo. O que já foi compartilhado na sala é denunciado à parte, dentro da sala.</p></section>
+        <section><h2>6. Anúncios</h2><p>O uso gratuito pode incluir um banner. O anúncio premiado é opcional e só começa se você o reproduzir para ganhar um desenho extra. Os anúncios usam SDKs do Google, como o AdMob, e podem usar o ID de publicidade. Dá para limitar a personalização no sistema. O PageBy não direciona anúncios a menores de 13 anos. Contas com assinatura que remove anúncios podem não ver o banner.</p></section>
+        <section><h2>7. Pagamentos</h2><p>Assinaturas e pacotes de IA são cobrados só na Google Play ou na App Store. Reembolsos seguem a loja. Guardamos o id do produto e o direito de uso. Não vemos o número do cartão.</p></section>
+        <section><h2>8. Operadores</h2><p>Não vendemos dados pessoais.</p><ul>
+          <li><strong>Google:</strong> login, pagamento Play, notificações (FCM) e anúncios.</li>
+          <li><strong>Provedor de imagens:</strong> texto e imagem de referência de um pedido de IA.</li>
+          <li><strong>Hospedagem em nuvem:</strong> contas, diários sincronizados, salas e denúncias.</li>
+        </ul><p>Os membros da sala veem o que você escolhe compartilhar. Podemos divulgar informações se a lei exigir ou para evitar um dano grave.</p></section>
+        <section><h2>9. Onde o tratamento ocorre</h2><p>Serviços do Google, geração de imagens e servidores do app podem tratar dados fora do seu país. O uso continua limitado aos fins desta política.</p></section>
+        <section><h2>10. Salas, denúncias e bloqueio</h2><p>O diário e os comentários compartilhados são vistos pelos membros daquela sala. Você pode denunciar uma publicação ou comentário e bloquear um usuário. A publicação denunciada some da sua lista e o operador analisa o motivo. O bloqueio vale no seu aparelho e a outra pessoa não é avisada.</p></section>
+        <section><h2>11. Por quanto tempo</h2><ul>
+          <li>Diários no aparelho: até você apagar ou limpar os dados do app.</li>
+          <li>Diários na nuvem, conta e salas: enquanto a conta existir. Depois, conforme a seção de exclusão.</li>
+          <li>Tarefas de IA e denúncias: o tempo para entregar a imagem, acertar usos e analisar a denúncia; depois apagamos ou desidentificamos.</li>
+          <li>Compras: o tempo que a loja precisar para reembolsos e disputas.</li>
+          <li>Token de push: até você desligar avisos, desinstalar o app ou o token vencer.</li>
+        </ul></section>
+        <section><h2>12. Exclusão</h2><p>Uma conta ligada ao Google pode ser excluída no menu de conta do app. Há um prazo de cerca de um mês; entrar de novo nesse período pode restaurar a conta. Depois disso, diários na nuvem e dados de salas dessa conta deixam de ser fornecidos. Diários só locais saem ao desinstalar o app ou limpar o armazenamento. Se não conseguir abrir o app, use o contato da Play. Detalhes: <a href="./account-deletion.html">exclusão da conta e dos dados</a>.</p></section>
+        <section><h2>13. Suas escolhas</h2><ul>
+          <li>Sem login do Google, o diário pode ficar no aparelho.</li>
+          <li>Se não compartilhar na sala, os outros não veem.</li>
+          <li>A IA só roda quando você inicia.</li>
+          <li>Dá para desligar notificações no sistema.</li>
+          <li>Dá para limitar o ID de publicidade. Sem ver o anúncio premiado, você não recebe aquele uso extra.</li>
+          <li>Dá para denunciar publicações, comentários e desenhos de IA, e bloquear usuários, dentro do app.</li>
+        </ul></section>
+        <section><h2>14. Segurança</h2><p>Depois do login, as chamadas usam um token da conta. O tráfego usa HTTPS. Imagens e dados da conta ficam em sistemas com acesso limitado. Nenhum método é perfeitamente seguro.</p></section>
+        <section><h2>15. Crianças</h2><p>O PageBy não se destina a menores de 13 anos e o perfil não oferece essa faixa. Se soubermos que coletamos dados de uma criança menor de 13 anos, apagaremos esses dados da conta. Pais podem avisar pelo contato da Play.</p></section>
+        <section><h2>16. Permissões</h2><p>Fotos ou câmera só são pedidas ao escolher foto de perfil ou de referência. Notificações só são pedidas para push. Recusar uma permissão não impede escrever o diário. O PageBy não coleta localização para o diário.</p></section>
+        <section><h2>17. Alterações</h2><p>Se o que coletamos ou o motivo mudar, atualizaremos esta página e a data. Continuar usando o app depois da mudança significa que a nova política se aplica.</p></section>
+        <section><h2>18. Contato</h2><p>Para acesso, correção, exclusão ou dúvidas sobre uma denúncia de desenho de IA, use o contato do desenvolvedor na ficha do PageBy na Google Play e inclua o e-mail da conta Google.</p></section>
+      </article>
+
+      <article lang="fr" data-lang="fr" hidden>
+        <h1>Politique de confidentialité</h1>
+        <small>Dernière mise à jour : 2026-10-26 · PageBy</small>
+        <p>PageBy est une application de journal illustré pour les personnes de 13 ans et plus. Vous pouvez garder un journal sur l’appareil, le synchroniser avec Google, le partager dans une salle d’amis et générer un dessin par IA. Cette page explique comment l’application et pageby.stream traitent les données personnelles.</p>
+        <section><h2>1. Contact</h2><p>Les questions de confidentialité et les demandes de suppression vont au contact du développeur indiqué sur la fiche PageBy dans Google Play. Indiquez l’adresse Gmail utilisée pour vous connecter.</p></section>
+        <section><h2>2. Données traitées</h2><ul>
+          <li><strong>Compte Google :</strong> e-mail, nom, URL de la photo et identifiant.</li>
+          <li><strong>Profil :</strong> pseudo, photo, sexe et tranche d’âge (ados, 20, 30 ou 40 ans et plus). Il n’y a pas d’option moins de 13 ans.</li>
+          <li><strong>Journaux :</strong> titre, texte, date, humeur, dessins, photos, images IA et police.</li>
+          <li><strong>Salles :</strong> nom, code d’invitation, membres, journaux partagés, commentaires et noms des notifications.</li>
+          <li><strong>IA :</strong> texte, style, photo de référence, image produite et état de la tâche.</li>
+          <li><strong>Signalements :</strong> motif pour un message, un commentaire ou un dessin IA. Un signalement IA peut contenir un extrait du journal.</li>
+          <li><strong>Blocages :</strong> identifiants enregistrés sur l’appareil.</li>
+          <li><strong>Achats :</strong> identifiant du produit et droit d’usage. Nous ne stockons pas le numéro de carte.</li>
+          <li><strong>Publicités :</strong> un SDK tel qu’AdMob peut traiter l’identifiant publicitaire et le visionnage complet d’une annonce récompensée.</li>
+          <li><strong>Notifications :</strong> jeton push si vous les autorisez.</li>
+          <li><strong>Données techniques :</strong> adresse IP, version de l’app, journaux d’erreur et jetons d’accès nécessaires au service.</li>
+        </ul><p>Un journal que vous ne synchronisez pas, ne partagez pas et n’envoyez pas à l’IA reste sur l’appareil.</p></section>
+        <section><h2>3. Comment nous les obtenons</h2><p>Vous les saisissez, dessinez ou choisissez ; vous les autorisez lors de la connexion Google ; vous les joignez en partageant ou en demandant une image IA ; ou un magasin ou un SDK publicitaire renvoie un résultat. Les jetons et les erreurs sont créés lorsque l’app parle au serveur.</p></section>
+        <section><h2>4. Pourquoi</h2><p>Pour vous connecter, enregistrer et synchroniser les journaux, faire fonctionner les salles et les notifications, générer le dessin IA demandé, compter les utilisations, fournir abonnements et recharges, afficher bannières et annonces récompensées, examiner les signalements et corriger les erreurs. Nous ne vendons pas le contenu du journal et ne l’utilisons pas comme support publicitaire.</p></section>
+        <section><h2>5. Dessins IA</h2><p>Le texte, le style et la photo de référence sont envoyés aux serveurs de PageBy puis au fournisseur d’images, uniquement pour créer cette image. Les autres membres ne la voient pas tant que vous ne la partagez pas dans une salle.</p><p>L’écran d’écriture affiche toujours « Signaler le dessin IA ». Le bouton devient actif quand la génération commence. Le signalement retire l’image de l’écran et l’opérateur examine le motif. Un contenu déjà partagé se signale séparément dans la salle.</p></section>
+        <section><h2>6. Publicité</h2><p>L’usage gratuit peut inclure une bannière. L’annonce récompensée est facultative et ne démarre que si vous la lancez pour obtenir un dessin en plus. Les annonces passent par des SDK Google tels qu’AdMob et peuvent utiliser l’identifiant publicitaire. Vous pouvez limiter la personnalisation dans le système. PageBy ne cible pas les moins de 13 ans. Un compte avec un abonnement qui retire les annonces peut ne plus voir la bannière.</p></section>
+        <section><h2>7. Paiements</h2><p>Les abonnements et les recharges IA sont facturés uniquement par Google Play ou l’App Store. Les remboursements suivent la boutique. Nous conservons l’identifiant du produit et le droit d’usage. Nous ne voyons pas le numéro de carte.</p></section>
+        <section><h2>8. Sous-traitants</h2><p>Nous ne vendons pas les données personnelles.</p><ul>
+          <li><strong>Google :</strong> connexion, paiement Play, notifications (FCM) et publicités.</li>
+          <li><strong>Fournisseur d’images :</strong> texte et image de référence d’une demande IA.</li>
+          <li><strong>Hébergement cloud :</strong> comptes, journaux synchronisés, salles et signalements.</li>
+        </ul><p>Les membres de la salle voient ce que vous choisissez de partager. Nous pouvons divulguer des informations si la loi l’exige ou pour éviter un danger grave.</p></section>
+        <section><h2>9. Lieu du traitement</h2><p>Les services Google, la génération d’images et les serveurs de l’app peuvent traiter des données hors de votre pays. L’usage reste limité aux finalités de cette politique.</p></section>
+        <section><h2>10. Salles, signalements et blocage</h2><p>Le journal et les commentaires partagés sont visibles par les membres de cette salle. Vous pouvez signaler une publication ou un commentaire et bloquer un utilisateur. La publication signalée disparaît de votre liste et l’opérateur examine le motif. Le blocage vaut sur votre appareil et l’autre personne n’est pas prévenue.</p></section>
+        <section><h2>11. Durée</h2><ul>
+          <li>Journaux sur l’appareil : jusqu’à ce que vous les supprimiez ou effaciez les données de l’app.</li>
+          <li>Journaux cloud, compte et salles : tant que le compte existe. Ensuite, voir la suppression.</li>
+          <li>Tâches IA et signalements : le temps nécessaire pour livrer l’image, ajuster les usages et examiner le signalement, puis suppression ou anonymisation.</li>
+          <li>Achats : le temps exigé par la boutique pour remboursements et litiges.</li>
+          <li>Jeton push : jusqu’à ce que vous coupiez les notifications, désinstalliez l’app ou que le jeton expire.</li>
+        </ul></section>
+        <section><h2>12. Suppression</h2><p>Un compte lié à Google se supprime dans le menu Compte de l’app. Il y a un délai d’environ un mois ; une reconnexion pendant ce délai peut restaurer le compte. Ensuite, les journaux cloud et les données de salles de ce compte ne sont plus fournis. Les journaux uniquement locaux partent avec la désinstallation ou l’effacement du stockage. Si vous ne pouvez pas ouvrir l’app, utilisez le contact Play. Détails : <a href="./account-deletion.html">suppression du compte et des données</a>.</p></section>
+        <section><h2>13. Vos choix</h2><ul>
+          <li>Sans connexion Google, le journal peut rester sur l’appareil.</li>
+          <li>Sans partage dans une salle, les autres ne le voient pas.</li>
+          <li>L’IA ne s’exécute que lorsque vous la lancez.</li>
+          <li>Vous pouvez couper les notifications dans le système.</li>
+          <li>Vous pouvez limiter l’identifiant publicitaire. Sans annonce récompensée, vous ne recevez pas cet usage en plus.</li>
+          <li>Vous pouvez signaler publications, commentaires et dessins IA, et bloquer des utilisateurs, dans l’app.</li>
+        </ul></section>
+        <section><h2>14. Sécurité</h2><p>Après connexion, les appels utilisent un jeton de compte. Le trafic passe en HTTPS. Images et données de compte sont stockées dans des systèmes à accès limité. Aucune méthode n’est parfaitement sûre.</p></section>
+        <section><h2>15. Enfants</h2><p>PageBy ne s’adresse pas aux moins de 13 ans et le profil ne propose pas cette tranche. Si nous apprenons avoir collecté des données d’un enfant de moins de 13 ans, nous supprimerons ces données de compte. Les parents peuvent nous écrire via le contact Play.</p></section>
+        <section><h2>16. Autorisations</h2><p>Photos ou appareil photo ne sont demandés que pour choisir une photo de profil ou de référence. Les notifications ne sont demandées que pour le push. Refuser une autorisation n’empêche pas d’écrire le journal. PageBy ne collecte pas la position pour le journal.</p></section>
+        <section><h2>17. Modifications</h2><p>Si ce que nous collectons ou pourquoi change, nous mettrons à jour cette page et la date. Continuer à utiliser l’app après le changement signifie que la nouvelle politique s’applique.</p></section>
+        <section><h2>18. Contact</h2><p>Pour un accès, une rectification, une suppression ou une question sur un signalement de dessin IA, utilisez le contact développeur sur la fiche PageBy de Google Play et indiquez l’e-mail du compte Google.</p></section>
+      </article>
+
+      <article lang="de" data-lang="de" hidden>
+        <h1>Datenschutzerklärung</h1>
+        <small>Zuletzt aktualisiert: 2026-10-26 · PageBy</small>
+        <p>PageBy ist eine Bildtagebuch-App für Personen ab 13 Jahren. Du kannst Tagebücher auf dem Gerät behalten, sie mit Google synchronisieren, in einem Freundesraum teilen und ein KI-Bild erzeugen lassen. Diese Seite beschreibt, wie die App und pageby.stream personenbezogene Daten verarbeiten.</p>
+        <section><h2>1. Kontakt</h2><p>Fragen zum Datenschutz und Löschanfragen gehen an den Entwicklerkontakt auf der PageBy-Seite in Google Play. Nenne die E-Mail-Adresse des Google-Kontos, mit dem du dich anmeldest.</p></section>
+        <section><h2>2. Welche Daten</h2><ul>
+          <li><strong>Google-Konto:</strong> E-Mail, Name, Foto-URL und Konto-ID.</li>
+          <li><strong>Profil:</strong> Spitzname, Foto, Geschlecht und Altersgruppe (Teenager, 20, 30 oder 40+). Es gibt keine Option unter 13.</li>
+          <li><strong>Tagebücher:</strong> Titel, Text, Datum, Stimmung, Zeichnungen, Fotos, KI-Bilder und Schrift.</li>
+          <li><strong>Räume:</strong> Name, Einladungscode, Mitglieder, geteilte Tagebücher, Kommentare und Namen in Benachrichtigungen.</li>
+          <li><strong>KI:</strong> Text, Stil, Referenzfoto, erzeugtes Bild und Auftragsstatus.</li>
+          <li><strong>Meldungen:</strong> Grund für die Meldung eines Beitrags, Kommentars oder KI-Bildes. Eine KI-Meldung kann einen Textausschnitt enthalten.</li>
+          <li><strong>Blockierungen:</strong> Kennungen, die auf dem Gerät gespeichert werden.</li>
+          <li><strong>Käufe:</strong> Produkt-ID und Nutzungsrecht. Kartennummern speichern wir nicht.</li>
+          <li><strong>Werbung:</strong> ein SDK wie AdMob kann die Werbe-ID und das vollständige Ansehen einer belohnten Anzeige verarbeiten.</li>
+          <li><strong>Mitteilungen:</strong> Push-Token, wenn du sie erlaubst.</li>
+          <li><strong>Technische Daten:</strong> IP-Adresse, App-Version, Fehlerprotokolle und Zugangs-Tokens, soweit für den Dienst nötig.</li>
+        </ul><p>Ein Tagebuch, das du nicht synchronisierst, nicht teilst und nicht an die KI sendest, bleibt auf dem Gerät.</p></section>
+        <section><h2>3. Wie wir sie erhalten</h2><p>Du gibst sie ein, zeichnest oder wählst sie; du erlaubst sie bei der Google-Anmeldung; du hängst sie an, wenn du teilst oder ein KI-Bild anforderst; oder ein Store oder Werbe-SDK liefert ein Ergebnis. Tokens und Fehlerprotokolle entstehen, wenn die App mit dem Server spricht.</p></section>
+        <section><h2>4. Wofür</h2><p>Zum Anmelden, Speichern und Synchronisieren von Tagebüchern, für Räume und Benachrichtigungen, zum Erzeugen des angeforderten KI-Bildes, zum Zählen der Nutzungen, zum Bereitstellen von Abos und Paketen, zum Anzeigen von Bannern und belohnten Anzeigen, zum Prüfen von Meldungen und zum Beheben von Fehlern. Wir verkaufen Tagebuchinhalte nicht und nutzen sie nicht als Werbemittel.</p></section>
+        <section><h2>5. KI-Bilder</h2><p>Text, Stil und Referenzfoto gehen an die Server von PageBy und danach an den Bildanbieter, nur um dieses Bild zu erzeugen. Andere Mitglieder sehen es erst, wenn du es in einem Raum teilst.</p><p>Der Schreibbildschirm zeigt immer „KI-Bild melden“. Der Schalter wird aktiv, sobald die Erzeugung startet. Die Meldung entfernt das Bild vom Bildschirm, und der Betreiber prüft den Grund. Bereits geteilte Beiträge meldest du getrennt im Raum.</p></section>
+        <section><h2>6. Werbung</h2><p>Die kostenlose Nutzung kann ein Banner enthalten. Eine belohnte Anzeige ist freiwillig und startet nur, wenn du sie abspielst, um ein zusätzliches Bild zu erhalten. Anzeigen laufen über Google-SDKs wie AdMob und können die Werbe-ID nutzen. Personalisierung lässt sich in den Systemeinstellungen einschränken. PageBy richtet keine Werbung an unter 13-Jährige. Konten mit einem Abo, das Werbung entfernt, sehen das Banner möglicherweise nicht.</p></section>
+        <section><h2>7. Zahlungen</h2><p>Abos und KI-Pakete werden nur über Google Play oder den App Store abgerechnet. Erstattungen folgen dem Store. Wir speichern Produkt-ID und Nutzungsrecht. Die Kartennummer sehen wir nicht.</p></section>
+        <section><h2>8. Auftragsverarbeiter</h2><p>Wir verkaufen keine personenbezogenen Daten.</p><ul>
+          <li><strong>Google:</strong> Anmeldung, Play-Zahlung, Push (FCM) und Werbung.</li>
+          <li><strong>Bildanbieter:</strong> Text und Referenzbild einer KI-Anfrage.</li>
+          <li><strong>Cloud-Hosting:</strong> Konten, synchronisierte Tagebücher, Räume und Meldungen.</li>
+        </ul><p>Raummitglieder sehen, was du teilst. Wir können Angaben offenlegen, wenn das Gesetz es verlangt oder um schweren Schaden abzuwenden.</p></section>
+        <section><h2>9. Ort der Verarbeitung</h2><p>Google-Dienste, Bilderzeugung und App-Server können Daten außerhalb deines Landes verarbeiten. Die Nutzung bleibt auf die Zwecke dieser Erklärung beschränkt.</p></section>
+        <section><h2>10. Räume, Meldungen, Blockieren</h2><p>Geteilte Tagebücher und Kommentare sehen die Mitglieder dieses Raums. Du kannst einen Beitrag oder Kommentar melden und eine Person blockieren. Der gemeldete Beitrag verschwindet aus deiner Liste, und der Betreiber prüft den Grund. Die Blockierung gilt auf deinem Gerät und wird der anderen Person nicht mitgeteilt.</p></section>
+        <section><h2>11. Speicherdauer</h2><ul>
+          <li>Tagebücher auf dem Gerät: bis du sie löschst oder die App-Daten löschst.</li>
+          <li>Cloud-Tagebücher, Konto und Räume: solange das Konto besteht. Danach gilt der Abschnitt Löschung.</li>
+          <li>KI-Aufträge und Meldungen: so lange wie nötig, um das Bild zu liefern, Nutzungen abzurechnen und die Meldung zu prüfen; danach Löschung oder Entfernung der Zuordnung.</li>
+          <li>Käufe: so lange, wie der Store es für Erstattungen und Streitfälle braucht.</li>
+          <li>Push-Token: bis du Mitteilungen ausschaltest, die App entfernst oder der Token ungültig wird.</li>
+        </ul></section>
+        <section><h2>12. Löschung</h2><p>Ein mit Google verknüpftes Konto löschst du im Kontomenü der App. Es gibt eine Frist von etwa einem Monat; eine erneute Anmeldung in dieser Zeit kann das Konto wiederherstellen. Danach werden Cloud-Tagebücher und Raumdaten dieses Kontos nicht mehr bereitgestellt. Nur lokale Tagebücher verschwinden beim Deinstallieren oder Leeren des Speichers. Wenn du die App nicht öffnen kannst, nutze den Play-Kontakt. Details: <a href="./account-deletion.html">Konto- und Datenlöschung</a>.</p></section>
+        <section><h2>13. Deine Wahl</h2><ul>
+          <li>Ohne Google-Anmeldung kann das Tagebuch auf dem Gerät bleiben.</li>
+          <li>Ohne Teilen im Raum sehen es andere nicht.</li>
+          <li>Die KI läuft nur, wenn du sie startest.</li>
+          <li>Mitteilungen kannst du im System ausschalten.</li>
+          <li>Die Werbe-ID kannst du im System einschränken. Ohne belohnte Anzeige gibt es diese Extra-Nutzung nicht.</li>
+          <li>Beiträge, Kommentare und KI-Bilder kannst du in der App melden und Personen blockieren.</li>
+        </ul></section>
+        <section><h2>14. Sicherheit</h2><p>Nach der Anmeldung nutzen Aufrufe ein Konto-Token. Der Verkehr läuft über HTTPS. Bilder und Kontodaten liegen in Systemen mit beschränktem Zugriff. Keine Methode ist vollkommen sicher.</p></section>
+        <section><h2>15. Kinder</h2><p>PageBy richtet sich nicht an unter 13-Jährige, und das Profil bietet diese Gruppe nicht an. Wenn wir erfahren, dass wir Daten eines Kindes unter 13 erhoben haben, löschen wir diese Kontodaten. Eltern erreichen uns über den Play-Kontakt.</p></section>
+        <section><h2>16. Berechtigungen</h2><p>Fotos oder Kamera werden nur beim Auswählen eines Profil- oder Referenzfotos verlangt. Mitteilungen nur für Push. Eine Ablehnung verhindert das Schreiben des Tagebuchs nicht. PageBy erhebt für das Tagebuch keinen Standort.</p></section>
+        <section><h2>17. Änderungen</h2><p>Wenn sich ändert, was wir erheben oder warum, aktualisieren wir diese Seite und das Datum. Die weitere Nutzung der App danach bedeutet, dass die neue Erklärung gilt.</p></section>
+        <section><h2>18. Kontakt</h2><p>Für Auskunft, Berichtigung, Löschung oder Fragen zu einer KI-Bild-Meldung nutze den Entwicklerkontakt auf der PageBy-Seite in Google Play und nenne die E-Mail des Google-Kontos.</p></section>
+      </article>
+
+      <article lang="vi" data-lang="vi" hidden>
+        <h1>Chính sách quyền riêng tư</h1>
+        <small>Cập nhật lần cuối: 2026-10-26 · PageBy</small>
+        <p>PageBy là ứng dụng nhật ký tranh dành cho người từ 13 tuổi trở lên. Bạn có thể giữ nhật ký trên máy, đồng bộ bằng tài khoản Google, chia sẻ trong phòng bạn bè và tạo tranh bằng AI. Trang này giải thích cách ứng dụng và pageby.stream xử lý dữ liệu cá nhân.</p>
+        <section><h2>1. Liên hệ</h2><p>Câu hỏi về quyền riêng tư và yêu cầu xóa gửi tới liên hệ nhà phát triển trên trang PageBy ở Google Play. Hãy kèm email tài khoản Google dùng để đăng nhập.</p></section>
+        <section><h2>2. Dữ liệu chúng tôi xử lý</h2><ul>
+          <li><strong>Tài khoản Google:</strong> email, tên, URL ảnh và mã tài khoản.</li>
+          <li><strong>Hồ sơ:</strong> biệt danh, ảnh, giới tính và nhóm tuổi (thiếu niên, 20, 30 hoặc 40+). Không có lựa chọn dưới 13 tuổi.</li>
+          <li><strong>Nhật ký:</strong> tiêu đề, nội dung, ngày, tâm trạng, tranh vẽ, ảnh, ảnh AI và phông chữ.</li>
+          <li><strong>Phòng:</strong> tên phòng, mã mời, thành viên, nhật ký đã chia sẻ, bình luận và tên trong thông báo.</li>
+          <li><strong>AI:</strong> văn bản, phong cách, ảnh tham chiếu, ảnh kết quả và trạng thái việc.</li>
+          <li><strong>Báo cáo:</strong> lý do báo cáo bài, bình luận hoặc tranh AI. Báo cáo AI có thể kèm một đoạn nhật ký.</li>
+          <li><strong>Chặn:</strong> mã người dùng bị chặn, lưu trên máy.</li>
+          <li><strong>Thanh toán:</strong> mã sản phẩm và quyền sử dụng. Chúng tôi không lưu số thẻ.</li>
+          <li><strong>Quảng cáo:</strong> SDK như AdMob có thể xử lý ID quảng cáo và việc xem hết quảng cáo có thưởng.</li>
+          <li><strong>Thông báo:</strong> token đẩy nếu bạn cho phép.</li>
+          <li><strong>Dữ liệu kỹ thuật:</strong> IP, phiên bản ứng dụng, nhật ký lỗi và token đăng nhập cần cho dịch vụ.</li>
+        </ul><p>Nhật ký không đồng bộ, không chia sẻ và không gửi cho AI chỉ nằm trên máy bạn.</p></section>
+        <section><h2>3. Cách thu thập</h2><p>Bạn nhập, vẽ hoặc chọn; bạn cấp khi đăng nhập Google; bạn đính kèm khi chia sẻ hoặc yêu cầu ảnh AI; hoặc cửa hàng và SDK quảng cáo trả kết quả. Token và nhật ký lỗi được tạo khi ứng dụng nói chuyện với máy chủ.</p></section>
+        <section><h2>4. Mục đích</h2><p>Để đăng nhập, lưu và đồng bộ nhật ký, chạy phòng và thông báo, tạo tranh AI bạn yêu cầu, đếm lượt, cấp gói đăng ký và gói nạp, hiện quảng cáo banner và có thưởng, xem báo cáo an toàn và sửa lỗi. Chúng tôi không bán nội dung nhật ký và không dùng nó làm tư liệu quảng cáo.</p></section>
+        <section><h2>5. Tranh AI</h2><p>Văn bản, phong cách và ảnh tham chiếu được gửi tới máy chủ PageBy rồi tới nhà cung cấp ảnh, chỉ để tạo bức ảnh đó. Thành viên khác không thấy cho đến khi bạn chia sẻ vào phòng.</p><p>Màn hình viết luôn có «Báo cáo tranh AI». Nút hoạt động khi quá trình tạo bắt đầu. Báo cáo sẽ gỡ ảnh khỏi màn hình và người vận hành xem lý do. Nội dung đã chia sẻ vào phòng được báo cáo riêng trong phòng.</p></section>
+        <section><h2>6. Quảng cáo</h2><p>Dùng miễn phí có thể có banner. Quảng cáo có thưởng là tùy chọn và chỉ chạy khi bạn phát để nhận thêm một lần vẽ. Quảng cáo qua SDK của Google như AdMob và có thể dùng ID quảng cáo. Bạn có thể hạn chế cá nhân hóa trong cài đặt hệ thống. PageBy không nhắm quảng cáo tới trẻ dưới 13 tuổi. Tài khoản có gói bỏ quảng cáo có thể không thấy banner.</p></section>
+        <section><h2>7. Thanh toán</h2><p>Gói đăng ký và gói nạp AI chỉ thanh toán qua Google Play hoặc App Store. Hoàn tiền theo cửa hàng. Chúng tôi lưu mã sản phẩm và quyền sử dụng. Chúng tôi không thấy số thẻ.</p></section>
+        <section><h2>8. Bên xử lý</h2><p>Chúng tôi không bán dữ liệu cá nhân.</p><ul>
+          <li><strong>Google:</strong> đăng nhập, thanh toán Play, thông báo (FCM) và quảng cáo.</li>
+          <li><strong>Nhà cung cấp ảnh:</strong> văn bản và ảnh tham chiếu của yêu cầu AI.</li>
+          <li><strong>Lưu trữ đám mây:</strong> tài khoản, nhật ký đã đồng bộ, phòng và báo cáo.</li>
+        </ul><p>Thành viên phòng thấy những gì bạn chọn chia sẻ. Chúng tôi có thể tiết lộ thông tin khi luật yêu cầu hoặc để ngăn tổn hại nghiêm trọng.</p></section>
+        <section><h2>9. Nơi xử lý</h2><p>Dịch vụ Google, tạo ảnh và máy chủ ứng dụng có thể xử lý dữ liệu ngoài quốc gia của bạn. Việc dùng vẫn nằm trong mục đích của chính sách này.</p></section>
+        <section><h2>10. Phòng, báo cáo và chặn</h2><p>Nhật ký và bình luận đã chia sẻ được thành viên phòng đó nhìn thấy. Bạn có thể báo cáo bài hoặc bình luận và chặn người dùng. Bài đã báo cáo biến khỏi danh sách của bạn và người vận hành xem lý do. Việc chặn áp dụng trên máy bạn và không báo cho người kia.</p></section>
+        <section><h2>11. Thời gian lưu</h2><ul>
+          <li>Nhật ký trên máy: cho đến khi bạn xóa hoặc xóa dữ liệu ứng dụng.</li>
+          <li>Nhật ký đám mây, tài khoản và phòng: khi tài khoản còn. Sau đó theo mục xóa.</li>
+          <li>Việc AI và báo cáo: đủ lâu để giao ảnh, chốt lượt và xem báo cáo; sau đó xóa hoặc bỏ nhận dạng.</li>
+          <li>Giao dịch: theo thời gian cửa hàng cần cho hoàn tiền và tranh chấp.</li>
+          <li>Token đẩy: đến khi bạn tắt thông báo, gỡ ứng dụng hoặc token hết hạn.</li>
+        </ul></section>
+        <section><h2>12. Xóa</h2><p>Tài khoản liên kết Google có thể xóa trong menu tài khoản của ứng dụng. Có khoảng một tháng gia hạn; đăng nhập lại trong thời gian đó có thể khôi phục. Sau đó, nhật ký đám mây và dữ liệu phòng của tài khoản không còn được cung cấp. Nhật ký chỉ trên máy sẽ mất khi gỡ ứng dụng hoặc xóa bộ nhớ. Nếu không mở được ứng dụng, hãy dùng liên hệ trên Play. Chi tiết: <a href="./account-deletion.html">xóa tài khoản và dữ liệu</a>.</p></section>
+        <section><h2>13. Lựa chọn của bạn</h2><ul>
+          <li>Không đăng nhập Google thì nhật ký có thể chỉ ở trên máy.</li>
+          <li>Không chia sẻ vào phòng thì người khác không thấy.</li>
+          <li>AI chỉ chạy khi bạn bắt đầu.</li>
+          <li>Có thể tắt thông báo trong hệ thống.</li>
+          <li>Có thể giới hạn ID quảng cáo. Không xem quảng cáo có thưởng thì không nhận lượt thêm đó.</li>
+          <li>Có thể báo cáo bài, bình luận và tranh AI, và chặn người dùng, trong ứng dụng.</li>
+        </ul></section>
+        <section><h2>14. Bảo mật</h2><p>Sau khi đăng nhập, lệnh gọi dùng token tài khoản. Dữ liệu truyền qua HTTPS. Ảnh nhật ký và dữ liệu tài khoản nằm ở hệ thống hạn chế truy cập. Không có cách nào an toàn tuyệt đối.</p></section>
+        <section><h2>15. Trẻ em</h2><p>PageBy không hướng tới trẻ dưới 13 tuổi và hồ sơ không có nhóm tuổi đó. Nếu biết đã thu thập dữ liệu của trẻ dưới 13 tuổi, chúng tôi sẽ xóa dữ liệu tài khoản đó. Phụ huynh có thể báo qua liên hệ trên Play.</p></section>
+        <section><h2>16. Quyền thiết bị</h2><p>Ảnh hoặc camera chỉ được xin khi bạn chọn ảnh hồ sơ hoặc ảnh tham chiếu. Thông báo chỉ được xin cho đẩy. Từ chối quyền không chặn việc viết nhật ký. PageBy không thu thập vị trí cho nhật ký.</p></section>
+        <section><h2>17. Thay đổi</h2><p>Nếu nội dung thu thập hoặc mục đích đổi, chúng tôi sẽ cập nhật trang này và ngày. Tiếp tục dùng ứng dụng sau khi đổi nghĩa là chính sách mới được áp dụng.</p></section>
+        <section><h2>18. Liên hệ</h2><p>Để truy cập, sửa, xóa hoặc hỏi về báo cáo tranh AI, hãy dùng liên hệ nhà phát triển trên trang PageBy ở Google Play và kèm email tài khoản Google.</p></section>
+      </article>
+
+      <article lang="th" data-lang="th" hidden>
+        <h1>นโยบายความเป็นส่วนตัว</h1>
+        <small>อัปเดตล่าสุด: 2026-10-26 · PageBy</small>
+        <p>PageBy เป็นแอปไดอารี่ภาพสำหรับผู้ที่มีอายุ 13 ปีขึ้นไป คุณเก็บบันทึกไว้ในเครื่อง ซิงค์ด้วยบัญชี Google แชร์ในห้องเพื่อน และให้ AI วาดรูปได้ หน้านี้ อธิบายว่าแอปและ pageby.stream จัดการข้อมูลส่วนตัวอย่างไร</p>
+        <section><h2>1. ช่องทางติดต่อ</h2><p>คำถามด้านความเป็นส่วนตัวและคำขอลบข้อมูล ส่งไปที่ช่องทางติดต่อผู้พัฒนาบนหน้ารายการ PageBy ใน Google Play พร้อมอีเมลบัญชี Google ที่ใช้เข้าสู่ระบบ</p></section>
+        <section><h2>2. ข้อมูลที่เราประมวลผล</h2><ul>
+          <li><strong>บัญชี Google:</strong> อีเมล ชื่อ URL รูป และรหัสบัญชี</li>
+          <li><strong>โปรไฟล์:</strong> ชื่อเล่น รูป เพศ และช่วงอายุ (วัยรุ่น 20 30 หรือ 40+) ไม่มีตัวเลือกต่ำกว่า 13 ปี</li>
+          <li><strong>ไดอารี่:</strong> ชื่อเรื่อง ข้อความ วันที่ อารมณ์ ภาพวาด รูปถ่าย ภาพ AI และการตั้งค่าฟอนต์</li>
+          <li><strong>ห้อง:</strong> ชื่อห้อง รหัสเชิญ สมาชิก ไดอารี่ที่แชร์ ความคิดเห็น และชื่อในประกาศ</li>
+          <li><strong>AI:</strong> ข้อความ สไตล์ รูปอ้างอิง ภาพที่ได้ และสถานะงาน</li>
+          <li><strong>การรายงาน:</strong> เหตุผลที่รายงานโพสต์ ความคิดเห็น หรือภาพ AI การรายงาน AI อาจมีข้อความไดอารี่บางส่วน</li>
+          <li><strong>การบล็อก:</strong> รหัสผู้ใช้ที่บล็อก เก็บในเครื่อง</li>
+          <li><strong>การชำระเงิน:</strong> รหัสสินค้าและสิทธิ์การใช้งาน เราไม่เก็บบัตร</li>
+          <li><strong>โฆษณา:</strong> SDK เช่น AdMob อาจประมวลผลรหัสโฆษณาและการดูโฆษณาแบบมีรางวัลจนจบ</li>
+          <li><strong>การแจ้งเตือน:</strong> โทเคนพุช หากคุณอนุญาต</li>
+          <li><strong>ข้อมูลทางเทคนิค:</strong> IP เวอร์ชันแอป บันทึกข้อผิดพลาด และโทเคนเข้าสู่ระบบเท่าที่บริการจำเป็น</li>
+        </ul><p>ไดอารี่ที่ไม่ได้ซิงค์ ไม่ได้แชร์ และไม่ได้ส่งให้ AI จะอยู่แค่ในเครื่อง</p></section>
+        <section><h2>3. ได้มาอย่างไร</h2><p>คุณพิมพ์ วาด หรือเลือก คุณอนุญาตตอนเข้า Google คุณแนบเมื่อแชร์หรือขอภาพ AI หรือร้านค้าและ SDK โฆษณาส่งผลกลับมา โทเคนและบันทึกข้อผิดพลาดเกิดเมื่อแอปคุยกับเซิร์ฟเวอร์</p></section>
+        <section><h2>4. ใช้เพื่ออะไร</h2><p>เพื่อเข้าสู่ระบบ เก็บและซิงค์ไดอารี่ ดำเนินห้องและการแจ้งเตือน สร้างภาพ AI ที่คุณขอ นับจำนวนครั้ง ให้การสมัครสมาชิกและแพ็ก แสดงแบนเนอร์และโฆษณามีรางวัล ตรวจรายงานด้านความปลอดภัย และแก้ข้อผิดพลาด เราไม่ขายเนื้อหาไดอารี่และไม่ใช้เป็นสื่อโฆษณา</p></section>
+        <section><h2>5. ภาพ AI</h2><p>ข้อความ สไตล์ และรูปอ้างอิงถูกส่งไปยังเซิร์ฟเวอร์ PageBy แล้วไปยังผู้ให้บริการสร้างภาพ เฉพาะเพื่อสร้างภาพนั้น สมาชิกคนอื่นไม่เห็นจนกว่าคุณจะแชร์เข้าห้อง</p><p>หน้าเขียนไดอารี่มี «รายงานภาพ AI» เสมอ และกดได้เมื่อการสร้างเริ่มแล้ว การรายงานจะเอารูปออกจากหน้าจอ และผู้ดูแลตรวจเหตุผล สิ่งที่แชร์เข้าห้องแล้วให้รายงานแยกในห้อง</p></section>
+        <section><h2>6. โฆษณา</h2><p>การใช้ฟรีอาจมีแบนเนอร์ โฆษณามีรางวัลเป็นทางเลือก และเริ่มเมื่อคุณเล่นเองเพื่อรับภาพเพิ่ม โฆษณาใช้ SDK ของ Google เช่น AdMob และอาจใช้รหัสโฆษณา คุณจำกัดการปรับแต่งได้ในการตั้งค่าเครื่อง PageBy ไม่ยิงโฆษณาไปที่เด็กต่ำกว่า 13 ปี บัญชีที่มีสิทธิ์ปิดโฆษณาอาจไม่เห็นแบนเนอร์</p></section>
+        <section><h2>7. การชำระเงิน</h2><p>การสมัครสมาชิกและแพ็ก AI เรียกเก็บผ่าน Google Play หรือ App Store เท่านั้น การคืนเงินเป็นไปตามร้าน เราเก็บรหัสสินค้าและสิทธิ์การใช้งาน เราไม่เห็นเลขบัตร</p></section>
+        <section><h2>8. ผู้ประมวลผล</h2><p>เราไม่ขายข้อมูลส่วนบุคคล</p><ul>
+          <li><strong>Google:</strong> เข้าสู่ระบบ การชำระ Play การแจ้งเตือน (FCM) และโฆษณา</li>
+          <li><strong>ผู้สร้างภาพ:</strong> ข้อความและรูปอ้างอิงของคำขอ AI</li>
+          <li><strong>โฮสติ้งคลาวด์:</strong> บัญชี ไดอารี่ที่ซิงค์ ห้อง และรายงาน</li>
+        </ul><p>สมาชิกห้องเห็นสิ่งที่คุณเลือกแชร์ เราอาจเปิดเผยข้อมูลเมื่อกฎหมายกำหนดหรือเพื่อป้องกันอันตรายร้ายแรง</p></section>
+        <section><h2>9. สถานที่ประมวลผล</h2><p>บริการของ Google การสร้างภาพ และเซิร์ฟเวอร์แอปอาจประมวลผลข้อมูลนอกประเทศของคุณ การใช้ยังจำกัดอยู่ที่วัตถุประสงค์ในนโยบายนี้</p></section>
+        <section><h2>10. ห้อง การรายงาน และการบล็อก</h2><p>ไดอารี่และความคิดเห็นที่แชร์ สมาชิกห้องนั้นมองเห็น คุณรายงานโพสต์หรือความคิดเห็นและบล็อกผู้ใช้ได้ โพสต์ที่รายงานจะหายจากรายการของคุณ และผู้ดูแลตรวจเหตุผล การบล็อกใช้กับเครื่องของคุณและไม่แจ้งอีกฝ่าย</p></section>
+        <section><h2>11. ระยะเวลาเก็บ</h2><ul>
+          <li>ไดอารี่ในเครื่อง: จนกว่าคุณจะลบหรือล้างข้อมูลแอป</li>
+          <li>ไดอารี่คลาวด์ บัญชี และห้อง: ขณะบัญชียังอยู่ หลังจากนั้นตามหัวข้อการลบ</li>
+          <li>งาน AI และรายงาน: นานพอที่จะส่งภาพ ปรับจำนวนครั้ง และตรวจรายงาน แล้วจึงลบหรือทำให้ระบุตัวตนไม่ได้</li>
+          <li>การซื้อ: ตามระยะที่ร้านต้องใช้เพื่อคืนเงินและข้อพิพาท</li>
+          <li>โทเคนพุช: จนกว่าคุณจะปิดประกาศ ถอนการติดตั้ง หรือโทเคนใช้ไม่ได้</li>
+        </ul></section>
+        <section><h2>12. การลบ</h2><p>บัญชีที่ผูก Google ลบได้จากเมนูบัญชีในแอป มีระยะผ่อนผันประมาณหนึ่งเดือน การเข้าสู่ระบบอีกครั้งในช่วงนั้นอาจกู้บัญชีได้ หลังจากนั้นไดอารี่คลาวด์และข้อมูลห้องของบัญชีนั้นจะไม่ให้บริการอีก ไดอารี่ที่อยู่แค่ในเครื่องจะหายเมื่อถอนการติดตั้งหรือล้างที่เก็บ หากเปิดแอปไม่ได้ ให้ใช้ช่องทางติดต่อบน Play รายละเอียด: <a href="./account-deletion.html">การลบบัญชีและข้อมูล</a></p></section>
+        <section><h2>13. สิ่งที่คุณเลือกได้</h2><ul>
+          <li>ไม่เข้า Google ไดอารี่อยู่ได้แค่ในเครื่อง</li>
+          <li>ไม่แชร์เข้าห้อง คนอื่นจะไม่เห็น</li>
+          <li>AI ทำงานเมื่อคุณเป็นคนเริ่ม</li>
+          <li>ปิดการแจ้งเตือนได้ในการตั้งค่าระบบ</li>
+          <li>จำกัดรหัสโฆษณาได้ในการตั้งค่าระบบ ไม่ดูโฆษณามีรางวัลก็ไม่ได้รับครั้งเพิ่มนั้น</li>
+          <li>รายงานโพสต์ ความคิดเห็น และภาพ AI และบล็อกผู้ใช้ได้ในแอป</li>
+        </ul></section>
+        <section><h2>14. ความปลอดภัย</h2><p>หลังเข้าสู่ระบบ การเรียกใช้โทเคนบัญชี การส่งใช้ HTTPS รูปไดอารี่และข้อมูลบัญชีอยู่ในระบบที่จำกัดการเข้าถึง ไม่มีวิธีใดปลอดภัยสมบูรณ์</p></section>
+        <section><h2>15. เด็ก</h2><p>PageBy ไม่ได้มุ่งที่เด็กต่ำกว่า 13 ปี และโปรไฟล์ไม่มีช่วงอายุนั้น หากทราบว่าเก็บข้อมูลของเด็กต่ำกว่า 13 ปี เราจะลบข้อมูลบัญชีนั้น ผู้ปกครองแจ้งได้ทางช่องทางติดต่อบน Play</p></section>
+        <section><h2>16. สิทธิ์เครื่อง</h2><p>รูปหรือกล้องจะขอเฉพาะตอนเลือกภาพโปรไฟล์หรือภาพอ้างอิง การแจ้งเตือนขอเฉพาะพุช การปฏิเสธสิทธิ์ไม่ขัดขวางการเขียนไดอารี่ PageBy ไม่เก็บตำแหน่งเพื่อไดอารี่</p></section>
+        <section><h2>17. การเปลี่ยนแปลง</h2><p>หากสิ่งที่เก็บหรือเหตุผลเปลี่ยน เราจะอัปเดตหน้านี้และวันที่ การใช้แอปต่อหลังการเปลี่ยนหมายความว่านโยบายใหม่มีผล</p></section>
+        <section><h2>18. ติดต่อ</h2><p>หากต้องการเข้าถึง แก้ไข ลบ หรือถามเรื่องรายงานภาพ AI ให้ใช้ช่องทางติดต่อผู้พัฒนาบนหน้า PageBy ใน Google Play พร้อมอีเมลบัญชี Google</p></section>
+      </article>
+
+      <article lang="id" data-lang="id" hidden>
+        <h1>Kebijakan privasi</h1>
+        <small>Terakhir diperbarui: 2026-10-26 · PageBy</small>
+        <p>PageBy adalah aplikasi buku harian bergambar untuk usia 13 tahun ke atas. Kamu bisa menyimpan buku harian di perangkat, menyinkronkannya dengan Google, membagikannya di ruang teman, dan membuat gambar AI. Halaman ini menjelaskan bagaimana aplikasi dan pageby.stream menangani data pribadi.</p>
+        <section><h2>1. Kontak</h2><p>Pertanyaan privasi dan permintaan penghapusan dikirim ke kontak pengembang di halaman PageBy di Google Play. Sertakan email akun Google yang dipakai untuk masuk.</p></section>
+        <section><h2>2. Data yang kami proses</h2><ul>
+          <li><strong>Akun Google:</strong> email, nama, URL foto, dan id akun.</li>
+          <li><strong>Profil:</strong> nama panggilan, foto, jenis kelamin, dan kelompok usia (remaja, 20-an, 30-an, atau 40+). Tidak ada pilihan di bawah 13 tahun.</li>
+          <li><strong>Buku harian:</strong> judul, teks, tanggal, suasana hati, gambar, foto, gambar AI, dan font.</li>
+          <li><strong>Ruang:</strong> nama ruang, kode undangan, anggota, buku harian yang dibagikan, komentar, dan nama di notifikasi.</li>
+          <li><strong>AI:</strong> teks, gaya, foto referensi, gambar hasil, dan status pekerjaan.</li>
+          <li><strong>Laporan:</strong> alasan melaporkan kiriman, komentar, atau gambar AI. Laporan AI dapat memuat cuplikan teks buku harian.</li>
+          <li><strong>Blokir:</strong> pengenal pengguna yang diblokir, tersimpan di perangkat.</li>
+          <li><strong>Pembayaran:</strong> id produk dan hak pakai. Kami tidak menyimpan nomor kartu.</li>
+          <li><strong>Iklan:</strong> SDK seperti AdMob dapat memproses ID iklan dan apakah iklan berhadiah ditonton sampai selesai.</li>
+          <li><strong>Notifikasi:</strong> token push jika kamu mengizinkan.</li>
+          <li><strong>Data teknis:</strong> IP, versi aplikasi, log kesalahan, dan token masuk yang diperlukan layanan.</li>
+        </ul><p>Buku harian yang tidak disinkronkan, tidak dibagikan, dan tidak dikirim ke AI tetap di perangkat.</p></section>
+        <section><h2>3. Cara kami mendapatkannya</h2><p>Kamu mengetik, menggambar, atau memilihnya; kamu mengizinkannya saat masuk Google; kamu melampirkannya saat berbagi atau meminta gambar AI; atau toko dan SDK iklan mengembalikan hasil. Token dan log kesalahan dibuat saat aplikasi berbicara dengan server.</p></section>
+        <section><h2>4. Untuk apa</h2><p>Untuk masuk, menyimpan dan menyinkronkan buku harian, menjalankan ruang dan notifikasi, membuat gambar AI yang kamu minta, menghitung pemakaian, memberikan langganan dan paket, menampilkan banner dan iklan berhadiah, meninjau laporan keamanan, dan memperbaiki kesalahan. Kami tidak menjual isi buku harian dan tidak memakainya sebagai materi iklan.</p></section>
+        <section><h2>5. Gambar AI</h2><p>Teks, gaya, dan foto referensi dikirim ke server PageBy lalu ke penyedia gambar, hanya untuk membuat gambar itu. Anggota lain tidak melihatnya sampai kamu membagikannya ke ruang.</p><p>Layar menulis selalu menampilkan «Laporkan gambar AI». Tombol aktif setelah pembuatan dimulai. Melaporkan akan menghapus gambar dari layar dan operator meninjau alasannya. Konten yang sudah dibagikan dilaporkan terpisah di dalam ruang.</p></section>
+        <section><h2>6. Iklan</h2><p>Pemakaian gratis dapat menyertakan banner. Iklan berhadiah bersifat pilihan dan hanya mulai jika kamu memutarnya untuk mendapat satu gambar tambahan. Iklan lewat SDK Google seperti AdMob dan dapat memakai ID iklan. Personalisasi bisa dibatasi di pengaturan sistem. PageBy tidak menargetkan iklan ke anak di bawah 13 tahun. Akun dengan langganan yang menghapus iklan mungkin tidak melihat banner.</p></section>
+        <section><h2>7. Pembayaran</h2><p>Langganan dan paket AI hanya ditagih lewat Google Play atau App Store. Pengembalian dana mengikuti toko. Kami menyimpan id produk dan hak pakai. Kami tidak melihat nomor kartu.</p></section>
+        <section><h2>8. Pemroses</h2><p>Kami tidak menjual data pribadi.</p><ul>
+          <li><strong>Google:</strong> masuk, pembayaran Play, notifikasi (FCM), dan iklan.</li>
+          <li><strong>Penyedia gambar:</strong> teks dan gambar referensi permintaan AI.</li>
+          <li><strong>Hosting awan:</strong> akun, buku harian tersinkron, ruang, dan laporan.</li>
+        </ul><p>Anggota ruang melihat apa yang kamu pilih untuk dibagikan. Kami dapat mengungkapkan informasi jika hukum mewajibkan atau untuk mencegah bahaya serius.</p></section>
+        <section><h2>9. Lokasi pemrosesan</h2><p>Layanan Google, pembuatan gambar, dan server aplikasi dapat memproses data di luar negaramu. Pemakaian tetap terbatas pada tujuan dalam kebijakan ini.</p></section>
+        <section><h2>10. Ruang, laporan, dan blokir</h2><p>Buku harian dan komentar yang dibagikan dilihat anggota ruang itu. Kamu dapat melaporkan kiriman atau komentar dan memblokir pengguna. Kiriman yang dilaporkan hilang dari daftarmu dan operator meninjau alasannya. Pemblokiran berlaku di perangkatmu dan orang lain tidak diberi tahu.</p></section>
+        <section><h2>11. Berapa lama</h2><ul>
+          <li>Buku harian di perangkat: sampai kamu menghapusnya atau menghapus data aplikasi.</li>
+          <li>Buku harian awan, akun, dan ruang: selama akun ada. Setelah itu ikuti bagian penghapusan.</li>
+          <li>Pekerjaan AI dan laporan: cukup lama untuk mengirim gambar, menyesuaikan pemakaian, dan meninjau laporan; lalu dihapus atau dihilangkan identitasnya.</li>
+          <li>Pembelian: selama toko membutuhkannya untuk pengembalian dana dan sengketa.</li>
+          <li>Token push: sampai kamu mematikan notifikasi, menghapus aplikasi, atau token tidak berlaku.</li>
+        </ul></section>
+        <section><h2>12. Penghapusan</h2><p>Akun yang terhubung ke Google dapat dihapus dari menu akun di aplikasi. Ada masa tenggang sekitar satu bulan; masuk lagi pada masa itu dapat memulihkan akun. Setelah itu, buku harian awan dan data ruang akun itu tidak lagi disediakan. Buku harian yang hanya di perangkat hilang saat aplikasi dihapus atau penyimpanannya dikosongkan. Jika aplikasi tidak bisa dibuka, gunakan kontak Play. Rincian: <a href="./account-deletion.html">penghapusan akun dan data</a>.</p></section>
+        <section><h2>13. Pilihanmu</h2><ul>
+          <li>Tanpa masuk Google, buku harian bisa tetap di perangkat.</li>
+          <li>Jika tidak dibagikan ke ruang, orang lain tidak melihatnya.</li>
+          <li>AI hanya berjalan saat kamu memulainya.</li>
+          <li>Notifikasi bisa dimatikan di sistem.</li>
+          <li>ID iklan bisa dibatasi di sistem. Tanpa menonton iklan berhadiah, kamu tidak mendapat pemakaian tambahan itu.</li>
+          <li>Kamu dapat melaporkan kiriman, komentar, dan gambar AI, serta memblokir pengguna, di dalam aplikasi.</li>
+        </ul></section>
+        <section><h2>14. Keamanan</h2><p>Setelah masuk, panggilan memakai token akun. Lalu lintas memakai HTTPS. Gambar dan data akun disimpan di sistem dengan akses terbatas. Tidak ada metode yang sepenuhnya aman.</p></section>
+        <section><h2>15. Anak</h2><p>PageBy tidak ditujukan untuk anak di bawah 13 tahun, dan profil tidak menawarkan kelompok usia itu. Jika kami mengetahui telah mengumpulkan data anak di bawah 13 tahun, data akun itu akan dihapus. Orang tua dapat menghubungi lewat kontak Play.</p></section>
+        <section><h2>16. Izin perangkat</h2><p>Foto atau kamera hanya diminta saat memilih foto profil atau foto referensi. Notifikasi hanya diminta untuk push. Menolak izin tidak menghalangi menulis buku harian. PageBy tidak mengumpulkan lokasi untuk buku harian.</p></section>
+        <section><h2>17. Perubahan</h2><p>Jika apa yang kami kumpulkan atau alasannya berubah, kami akan memperbarui halaman ini dan tanggalnya. Terus memakai aplikasi setelah perubahan berarti kebijakan baru berlaku.</p></section>
+        <section><h2>18. Kontak</h2><p>Untuk akses, perbaikan, penghapusan, atau pertanyaan tentang laporan gambar AI, gunakan kontak pengembang di halaman PageBy di Google Play dan sertakan email akun Google.</p></section>
+      </article>
     </main>
+    <script>
+      (function () {
+        var langs = ["ko","en","ja","zh","zh-TW","es","pt","fr","de","vi","th","id"];
+        function normalize(raw) {
+          var v = (raw || "").trim();
+          if (!v) return "";
+          var lower = v.toLowerCase().replace("_", "-");
+          if (lower === "zh-tw" || lower === "zh-hant" || lower.indexOf("zh-tw") === 0 || lower.indexOf("zh-hant") === 0) return "zh-TW";
+          if (lower.indexOf("zh") === 0) return "zh";
+          for (var i = 0; i < langs.length; i++) {
+            if (lower === langs[i].toLowerCase() || lower.indexOf(langs[i].toLowerCase() + "-") === 0) return langs[i];
+          }
+          return "";
+        }
+        function show(lang) {
+          if (langs.indexOf(lang) < 0) lang = "en";
+          document.documentElement.lang = lang;
+          document.querySelectorAll("article[data-lang]").forEach(function (el) {
+            el.hidden = el.getAttribute("data-lang") !== lang;
+          });
+          document.querySelectorAll(".langbar button").forEach(function (btn) {
+            btn.setAttribute("aria-pressed", btn.getAttribute("data-lang") === lang ? "true" : "false");
+          });
+          var url = new URL(location.href);
+          url.searchParams.set("lang", lang);
+          history.replaceState(null, "", url.pathname + url.search);
+        }
+        var fromQuery = normalize(new URLSearchParams(location.search).get("lang"));
+        var fromNav = normalize(navigator.language || "");
+        show(fromQuery || fromNav || "ko");
+        document.querySelectorAll(".langbar button").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            show(btn.getAttribute("data-lang"));
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
