@@ -7,9 +7,11 @@ import {
   useAuthSession,
   type AuthSession,
   getAccessToken,
+  isCloudProvider,
 } from '../hooks/useAuthSession';
 import { requestNativeGoogleSignIn, nativeGoogleSignOut } from '../lib/googleAuth';
-import { isFlutterApp } from '../utils/nativeShare';
+import { requestNativeAppleSignIn } from '../lib/appleAuth';
+import { isFlutterApp, isIOSApp } from '../utils/nativeShare';
 import { invalidateAllRoomCaches } from '../utils/roomCache';
 import {
   clearRoomsNeedGoogleLogin,
@@ -144,14 +146,21 @@ function AccountSheet({
   onCloudSyncLoadingChange,
 }: AccountSheetProps) {
   const { t } = useTranslation();
-  const { session, signInWithGoogleIdToken, signOut, deleteAccount, markSynced, ensureGuestSession } =
-    useAuthSession();
+  const {
+    session,
+    signInWithGoogleIdToken,
+    signInWithAppleCredential,
+    signOut,
+    deleteAccount,
+    markSynced,
+    ensureGuestSession,
+  } = useAuthSession();
   const fileRef = useRef<HTMLInputElement>(null);
   const googleHostRef = useRef<HTMLDivElement>(null);
   const onGoogleTokenRef = useRef<(idToken: string) => void>(() => {});
   const [nameDraft, setNameDraft] = useState(nickname);
   const [busy, setBusy] = useState(false);
-  const [authBusy, setAuthBusy] = useState<'google' | 'sync' | 'signOut' | null>(null);
+  const [authBusy, setAuthBusy] = useState<'google' | 'apple' | 'sync' | 'signOut' | null>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
@@ -162,8 +171,10 @@ function AccountSheet({
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const avatarWrapRef = useRef<HTMLDivElement>(null);
 
-  /** Google 클라우드만 “로그인됨”으로 취급 (게스트는 친구 방용) */
-  const cloudSignedIn = session?.provider === 'google';
+  /** Google/Apple 클라우드만 “로그인됨”으로 취급 (게스트는 친구 방용) */
+  const cloudSignedIn = isCloudProvider(session?.provider);
+  /** Sign in with Apple 은 iOS 앱에서만 (가이드라인 4.8) */
+  const appleAvailable = flutterNative && isIOSApp();
 
   useEffect(() => {
     setNameDraft(nickname);
@@ -313,6 +324,72 @@ function AccountSheet({
     return t('account.sync.errGoogleNative');
   };
 
+  /** 네이티브(Google/Apple) 로그인 성공 후: 프로필 동기화 + 일기 동기화 */
+  const afterNativeSignIn = async (
+    next: AuthSession,
+    nameNow: string,
+    nickNow: string,
+    avatarNow: string | null,
+  ) => {
+    clearRoomsNeedGoogleLogin();
+    const appNick = nameNow.trim() || nickNow.trim();
+    // 계정 표시명은 절대 닉으로 쓰지 않음. 계정 닉·사진만 동기화.
+    if (appNick) {
+      syncProfileToRooms({
+        nickname: appNick,
+        avatarUrl: next.photoUrl ?? avatarNow,
+      });
+    } else if (next.photoUrl && !avatarNow) {
+      syncProfileToRooms({ avatarUrl: next.photoUrl });
+    }
+    if (next.photoUrl && !avatarNow) {
+      onAvatarChange(next.photoUrl);
+    }
+    try {
+      const result = await onSyncDiaries(null, { month: syncMonth });
+      markSynced(result.serverTime);
+      onMonthSynced?.(syncMonth);
+    } catch {
+      // 로컬 로그인만 된 경우
+    }
+    onCloudSyncLoadingChange?.(false);
+  };
+
+  const handleNativeApple = () => {
+    if (authBusy) return;
+    const nickNow = nickname;
+    const avatarNow = avatarUrl;
+    const nameNow = nameDraft.trim() || nickNow;
+    setAuthError(null);
+    setAuthBusy('apple');
+
+    // 클릭 제스처 안에서 즉시 네이티브 호출
+    const signInPromise = requestNativeAppleSignIn();
+    // 네이티브 Apple 시트가 보이도록 시트만 닫기
+    onClose();
+
+    void (async () => {
+      try {
+        const credential = await signInPromise;
+        onCloudSyncLoadingChange?.(true);
+        const next = await signInWithAppleCredential(
+          credential.identityToken,
+          credential.authorizationCode,
+        );
+        await afterNativeSignIn(next, nameNow, nickNow, avatarNow);
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : '';
+        if (reason !== 'cancelled') {
+          window.alert(t('account.sync.errAppleNative'));
+        }
+        console.warn('[apple] native sign-in failed', err);
+        onCloudSyncLoadingChange?.(false);
+      } finally {
+        setAuthBusy(null);
+      }
+    })();
+  };
+
   const handleNativeGoogle = () => {
     if (authBusy) return;
     // 최신 프로필 값 (시트 닫힌 뒤 클로저용)
@@ -332,28 +409,7 @@ function AccountSheet({
         const idToken = await signInPromise;
         onCloudSyncLoadingChange?.(true);
         const next = await signInWithGoogleIdToken(idToken);
-        clearRoomsNeedGoogleLogin();
-        const appNick = nameNow.trim() || nickNow.trim();
-        // Google 표시명은 절대 닉으로 쓰지 않음. 계정 닉·사진만 동기화.
-        if (appNick) {
-          syncProfileToRooms({
-            nickname: appNick,
-            avatarUrl: next.photoUrl ?? avatarNow,
-          });
-        } else if (next.photoUrl && !avatarNow) {
-          syncProfileToRooms({ avatarUrl: next.photoUrl });
-        }
-        if (next.photoUrl && !avatarNow) {
-          onAvatarChange(next.photoUrl);
-        }
-        try {
-          const result = await onSyncDiaries(null, { month: syncMonth });
-          markSynced(result.serverTime);
-          onMonthSynced?.(syncMonth);
-        } catch {
-          // 로컬 로그인만 된 경우
-        }
-        onCloudSyncLoadingChange?.(false);
+        await afterNativeSignIn(next, nameNow, nickNow, avatarNow);
       } catch (err) {
         const reason = err instanceof Error ? err.message : '';
         const message = googleErrorMessage(reason);
@@ -468,7 +524,7 @@ function AccountSheet({
     }
   };
 
-  const useAccountPhoto = () => {
+  const applyAccountPhoto = () => {
     if (!session?.photoUrl) return;
     applyAuthPhoto(session.photoUrl);
     showToast(t('account.ok.profileChanged'));
@@ -586,7 +642,7 @@ function AccountSheet({
                   role="menuitem"
                   disabled={busy}
                   onClick={() => {
-                    useAccountPhoto();
+                    applyAccountPhoto();
                     setPhotoMenuOpen(false);
                   }}
                 >
@@ -795,6 +851,28 @@ function AccountSheet({
                 </p>
               </div>
               <div className="account-sheet__oauth">
+                {appleAvailable ? (
+                  <button
+                    type="button"
+                    className="account-sheet__oauth-btn account-sheet__oauth-btn--apple"
+                    disabled={authBusy !== null}
+                    onClick={handleNativeApple}
+                  >
+                    <span className="account-sheet__oauth-logo">
+                      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                        <path
+                          fill="currentColor"
+                          d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.47.83-.72 0-1.82-.81-2.99-.79-1.54.02-2.96.9-3.75 2.27-1.6 2.78-.41 6.89 1.15 9.14.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.39-.92-2.41-3.66zM14.1 5.85c.63-.77 1.06-1.83.94-2.89-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.28z"
+                        />
+                      </svg>
+                    </span>
+                    <span>
+                      {authBusy === 'apple'
+                        ? t('account.sync.signingIn')
+                        : t('account.sync.continueApple')}
+                    </span>
+                  </button>
+                ) : null}
                 <div
                   className={`account-sheet__google-slot${authBusy === 'google' ? ' is-busy' : ''}${!googleReady ? ' is-loading' : ''}${flutterNative ? ' is-native' : ''}`}
                 >

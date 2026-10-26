@@ -16,7 +16,7 @@ import {
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
-import { isFlutterApp } from '../utils/nativeShare';
+import { isFlutterApp, isIOSApp } from '../utils/nativeShare';
 import {
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
@@ -30,14 +30,13 @@ import {
 } from '../utils/pendingNyangPurchase';
 import SubscriptionBenefitsSwipe from './SubscriptionBenefitsSwipe';
 import {
-  formatSubFallbackPrice,
   SUB_MONTHLY_PRODUCT_ID,
   SUB_PRODUCTS,
   SUB_YEARLY_PRODUCT_ID,
   yearlyDiscountPercent,
   type SubProductId,
 } from '../utils/subscriptionProducts';
-import { fetchTipStorePrices } from '../utils/tipPurchase';
+import { fetchStorePriceInfo } from '../utils/tipPurchase';
 import {
   getAccessToken,
   getAuthSession,
@@ -61,6 +60,8 @@ interface NyangTicketSheetProps {
   onAutoPurchaseConsumed?: () => void;
   /** 저장 토스트와 동일한 하단 안내 */
   onAppToast?: (message: string, durationMs?: number) => void;
+  /** 구독 탭의 이용약관·개인정보처리방침 링크 → 앱 정보 > 약관 화면 */
+  onOpenLegal?: () => void;
 }
 
 function formatPurchaseDate(ms: number, locale: string) {
@@ -89,6 +90,7 @@ function NyangTicketSheet({
   autoPurchase = null,
   onAutoPurchaseConsumed,
   onAppToast,
+  onOpenLegal,
 }: NyangTicketSheetProps) {
   const { t, i18n } = useTranslation();
   const { signInWithGoogleIdToken } = useAuthSession();
@@ -101,6 +103,8 @@ function NyangTicketSheet({
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [storePrices, setStorePrices] = useState<Record<string, string>>({});
+  /** 숫자 가격 (연간 할인율 계산용) */
+  const [storeAmounts, setStoreAmounts] = useState<Record<string, number>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
 
   useEffect(() => {
@@ -129,9 +133,11 @@ function NyangTicketSheet({
     if (!isFlutterApp()) return;
     let cancelled = false;
     setPricesLoading(true);
-    void fetchTipStorePrices()
-      .then((prices) => {
-        if (!cancelled) setStorePrices(prices);
+    void fetchStorePriceInfo()
+      .then(({ prices, amounts }) => {
+        if (cancelled) return;
+        setStorePrices(prices);
+        setStoreAmounts(amounts);
       })
       .finally(() => {
         if (!cancelled) setPricesLoading(false);
@@ -151,13 +157,23 @@ function NyangTicketSheet({
     return null;
   };
 
-  const subPriceLabel = (productId: SubProductId) => {
-    const store = priceFor(productId);
-    if (store) return store;
-    const fallback = SUB_PRODUCTS.find((p) => p.id === productId)?.fallbackPriceKrw;
-    if (fallback == null) return null;
-    return formatSubFallbackPrice(fallback, i18n.language);
+  /** 스토어 가격만 표시 (나라·통화별). 못 받으면 null → "구매" */
+  const subPriceLabel = (productId: SubProductId) => priceFor(productId);
+
+  /** Android 구독은 `pageby_monthly:base-plan` 처럼 올 수 있음 */
+  const amountFor = (productId: string): number | null => {
+    const exact = storeAmounts[productId];
+    if (exact) return exact;
+    for (const [id, amount] of Object.entries(storeAmounts)) {
+      if (id.startsWith(`${productId}:`) && amount) return amount;
+    }
+    return null;
   };
+
+  const yearlyPercent = yearlyDiscountPercent(
+    amountFor(SUB_MONTHLY_PRODUCT_ID),
+    amountFor(SUB_YEARLY_PRODUCT_ID),
+  );
 
   const loadHistory = useCallback(async () => {
     const token = getAccessToken();
@@ -218,13 +234,14 @@ function NyangTicketSheet({
     }
   };
 
-  /** 비회원 → Google 회원 만든 뒤 true. 웹은 계정 시트로 보냄 */
+  /** 비회원 → Google/Apple 회원 만든 뒤 true. 웹·iOS 앱은 계정 시트로 보냄 */
   const ensureGoogleMember = async (
     pending: PendingNyangPurchase,
   ): Promise<boolean> => {
     if (isGoogleSignedIn()) return true;
 
-    if (!isFlutterApp()) {
+    // iOS 앱: Apple/Google 중 고를 수 있게 계정 시트로 (가이드라인 4.8)
+    if (!isFlutterApp() || isIOSApp()) {
       setPendingNyangPurchase(pending);
       setError(t('nyangTicket.googleRequired'));
       window.dispatchEvent(new Event(REQUIRE_GOOGLE_FOR_PRO_EVENT));
@@ -350,8 +367,8 @@ function NyangTicketSheet({
     await runSubscribe(productId);
   };
 
-  /** 숨김: 제목 길게 누르기 → 수동 복원 */
-  const handleHiddenRestore = () => {
+  /** 구독 탭 "구매 복원" 버튼 (App Store 심사 3.1.1) */
+  const handleRestore = () => {
     if (!isFlutterApp() || busy) return;
     requestSubscriptionRestore();
     setMessage(t('nyangTicket.restoreStarted'));
@@ -442,28 +459,7 @@ function NyangTicketSheet({
       >
         <header className="account-sheet__head nyang-ticket__head">
           <div className="nyang-ticket__head-text">
-            <h2
-              onContextMenu={(e) => {
-                e.preventDefault();
-                handleHiddenRestore();
-              }}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-                  const timer = window.setTimeout(() => {
-                    handleHiddenRestore();
-                  }, 900);
-                  const clear = () => {
-                    window.clearTimeout(timer);
-                    window.removeEventListener('pointerup', clear);
-                    window.removeEventListener('pointercancel', clear);
-                  };
-                  window.addEventListener('pointerup', clear);
-                  window.addEventListener('pointercancel', clear);
-                }
-              }}
-            >
-              {t('nyangTicket.title')}
-            </h2>
+            <h2>{t('nyangTicket.title')}</h2>
           </div>
           <button
             type="button"
@@ -546,10 +542,10 @@ function NyangTicketSheet({
                               ? t('nyangTicket.subscribeYearly')
                               : t('nyangTicket.subscribeMonthly')}
                           </span>
-                          {isYearly ? (
+                          {isYearly && yearlyPercent > 0 ? (
                             <span className="nyang-ticket__discount-badge">
                               {t('nyangTicket.subscribeYearlyBadge', {
-                                percent: yearlyDiscountPercent(),
+                                percent: yearlyPercent,
                               })}
                             </span>
                           ) : null}
@@ -573,6 +569,18 @@ function NyangTicketSheet({
                 );
               })}
             </ul>
+            {isFlutterApp() ? (
+              <div className="nyang-ticket__sub-footer">
+                <button
+                  type="button"
+                  className="nyang-ticket__restore-btn"
+                  disabled={busy != null}
+                  onClick={handleRestore}
+                >
+                  {t('subscription.restore')}
+                </button>
+              </div>
+            ) : null}
           </section>
         )}
 
@@ -659,6 +667,18 @@ function NyangTicketSheet({
             {error}
           </p>
         )}
+        {/* 시트 맨 아래 고정 (모든 탭). 시트 바닥 = 광고 배너 바로 위, 구독자는 화면 맨 아래 */}
+        {onOpenLegal ? (
+          <p className="nyang-ticket__legal-links">
+            <button type="button" onClick={onOpenLegal}>
+              {t('appInfo.legal.termsHeading')}
+            </button>
+            <span aria-hidden>·</span>
+            <button type="button" onClick={onOpenLegal}>
+              {t('appInfo.legal.privacyHeading')}
+            </button>
+          </p>
+        ) : null}
       </div>
     </div>
   );

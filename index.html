@@ -29,9 +29,15 @@
             }
           }
           if (code.length !== 8) code = '';
-          var store =
-            'https://play.google.com/store/apps/details?id=com.yun.diary_app' +
-            (code ? '?referrer=' + encodeURIComponent('invite_code=' + code) : '');
+          var ua = navigator.userAgent || '';
+          var isIOS =
+            /iphone|ipad|ipod/i.test(ua) ||
+            (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform));
+          // iPhone/iPad → App Store, 그 외 → Play 스토어
+          var store = isIOS
+            ? 'https://apps.apple.com/app/id6826569891'
+            : 'https://play.google.com/store/apps/details?id=com.yun.diary_app' +
+              (code ? '?referrer=' + encodeURIComponent('invite_code=' + code) : '');
           var host = location.host;
           var path = 'join?code=' + encodeURIComponent(code);
           var intent =
@@ -49,10 +55,9 @@
             '<p>초대 링크는 웹 브라우저로 들어갈 수 없어요.</p>' +
             (code ? '<div class="code">' + code + '</div>' : '') +
             '<p><a href="' + store + '">앱 열기 / 설치하기</a></p></div></body>';
-          var ua = navigator.userAgent || '';
           if (/android/i.test(ua) && code) {
             location.replace(intent);
-          } else if (/iphone|ipad|ipod/i.test(ua) && code) {
+          } else if (isIOS && code) {
             location.href = 'pageby://' + path;
             setTimeout(function () { location.href = store; }, 1400);
           } else {

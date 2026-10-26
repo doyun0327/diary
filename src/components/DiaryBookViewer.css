@@ -88,8 +88,11 @@
   flex-shrink: 0;
 }
 
-.diary-book__icon-btn:hover {
-  background: var(--color-bg-muted);
+/* 터치 기기는 탭 후 :hover 가 계속 남아 눌린 것처럼 보임 → 마우스 기기에서만 */
+@media (hover: hover) {
+  .diary-book__icon-btn:hover {
+    background: var(--color-bg-muted);
+  }
 }
 
 .diary-book__icon-btn:disabled {

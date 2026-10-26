@@ -53,6 +53,44 @@ export async function loginWithGoogleIdToken(
   return (await res.json()) as AuthResponseDto;
 }
 
+/** iOS Sign in with Apple. 게스트 JWT 를 같이 보내면 같은 users.id 로 Apple 승격 */
+export async function loginWithAppleCredential(
+  identityToken: string,
+  authorizationCode: string | null,
+  guestAccessToken?: string | null,
+): Promise<AuthResponseDto> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  };
+  if (guestAccessToken) {
+    headers.Authorization = `Bearer ${guestAccessToken}`;
+  }
+
+  const res = await fetchWithTimeout(
+    apiUrl('/api/auth/apple'),
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ identityToken, authorizationCode }),
+    },
+    API_UI_TIMEOUT_MS,
+  );
+
+  if (!res.ok) {
+    let message = `로그인 실패 (HTTP ${res.status})`;
+    try {
+      const err = (await res.json()) as { message?: string };
+      if (err.message) message = err.message;
+    } catch {
+      // ignore
+    }
+    throw new Error(message);
+  }
+
+  return (await res.json()) as AuthResponseDto;
+}
+
 /** 닉네임·기기 ID로 친구 방용 게스트 JWT */
 export async function loginAsGuest(
   clientId: string,

@@ -10,28 +10,37 @@ import './AppInfoSheet.css';
 
 interface AppInfoSheetProps {
   onClose: () => void;
+  /** 처음 보여줄 화면 (구독 화면의 약관 링크는 'legal') */
+  initialView?: 'main' | 'legal';
 }
 
 type View = 'main' | 'legal' | 'licenses' | 'churu';
 
-function AppInfoSheet({ onClose }: AppInfoSheetProps) {
+function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
   const { t } = useTranslation();
-  const [view, setView] = useState<View>('main');
+  const [view, setView] = useState<View>(initialView);
   const [buyingId, setBuyingId] = useState<TipProductId | null>(null);
   const [tipMessage, setTipMessage] = useState<string | null>(null);
   const [tipError, setTipError] = useState<string | null>(null);
   const [storePrices, setStorePrices] = useState<Record<string, string>>({});
   const [pricesLoading, setPricesLoading] = useState(false);
 
+  /** 구독 화면 약관 링크로 열렸으면 뒤로 = 닫기 (구독 화면으로 복귀) */
+  const openedForLegal = initialView === 'legal';
+  const goBack = () => {
+    if (openedForLegal) onClose();
+    else setView('main');
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      if (view !== 'main') setView('main');
+      if (view !== 'main' && !openedForLegal) setView('main');
       else onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose, view]);
+  }, [onClose, openedForLegal, view]);
 
   useEffect(() => {
     if (view !== 'churu') {
@@ -106,12 +115,16 @@ function AppInfoSheet({ onClose }: AppInfoSheetProps) {
   };
 
   return (
-    <div className="app-info" role="dialog" aria-label={t('appInfo.aria')}>
+    <div
+      className={`app-info${openedForLegal ? ' app-info--above-sheets' : ''}`}
+      role="dialog"
+      aria-label={t('appInfo.aria')}
+    >
       <div className="app-info__backdrop" onClick={onClose} />
       <div className="app-info__panel">
         <header className="app-info__head">
           {view !== 'main' ? (
-            <button type="button" className="app-info__back" onClick={() => setView('main')}>
+            <button type="button" className="app-info__back" onClick={goBack}>
               {t('appInfo.back')}
             </button>
           ) : (

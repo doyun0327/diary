@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { registerPushToken } from '../api/pushApi';
 import { getAccessToken } from './useAuthSession';
-import { isFlutterApp, postDiaryNative } from '../utils/nativeShare';
+import { isFlutterApp, isIOSApp, postDiaryNative } from '../utils/nativeShare';
 
 declare global {
   interface Window {
@@ -28,7 +28,8 @@ function syncPushTokenToServer(reason: string) {
     }
     return;
   }
-  void registerPushToken(token, 'android')
+  // 서버가 iOS 토큰에는 그림 완성 알림을 일반 알림으로 보냄 (data-only 는 iOS에서 누락)
+  void registerPushToken(token, isIOSApp() ? 'ios' : 'android')
     .then(() => console.debug('[push] registered', reason))
     .catch((err) => {
       console.warn('[push] register failed', reason, err);

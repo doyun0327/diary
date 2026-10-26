@@ -187,6 +187,13 @@
   color: var(--color-text);
 }
 
+/* Sign in with Apple: Apple HIG 검정 버튼 스타일 */
+.account-sheet__oauth-btn--apple {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
 .account-sheet__sync {
   display: flex;
   flex-direction: column;

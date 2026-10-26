@@ -2,8 +2,24 @@ import { isFlutterApp } from './nativeShare';
 
 const PENDING_INVITE_KEY = 'picture-diary-pending-room-invite';
 
-/** Play 스토어 (미설치 시) */
+/** App Store (Apple ID 6826569891) */
+const IOS_APP_STORE_URL = 'https://apps.apple.com/app/id6826569891';
+
+function isIOSDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return true;
+  // iPadOS 13+ Safari 는 Mac 으로 보임
+  return navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform);
+}
+
+/** 미설치 시 스토어: iPhone/iPad → App Store, 그 외(Android·PC) → Play 스토어 */
 export function getAppInstallUrl(inviteCode?: string): string {
+  if (isIOSDevice()) {
+    return (
+      (import.meta.env.VITE_APP_IOS_SHARE_URL as string | undefined)?.trim() ||
+      IOS_APP_STORE_URL
+    );
+  }
   const base =
     (import.meta.env.VITE_APP_SHARE_URL as string | undefined)?.trim() ||
     'https://play.google.com/store/apps/details?id=com.yun.diary_app';

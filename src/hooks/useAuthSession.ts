@@ -3,6 +3,7 @@ import {
   fetchMe,
   loginAsGuest,
   loginWithGoogleIdToken,
+  loginWithAppleCredential,
   logoutRemote,
   deleteAccountRemote,
 } from '../api/authApi';
@@ -130,10 +131,25 @@ export function getAuthSession(): AuthSession | null {
   return loadSession();
 }
 
-/** Google 계정으로 로그인된 상태 (유효한 JWT 필요) */
+/** 클라우드 동기화 계정(Google·Apple). 게스트가 아닌 정식 로그인 */
+export function isCloudProvider(provider: AuthProvider | null | undefined): boolean {
+  return provider === 'google' || provider === 'apple';
+}
+
+/**
+ * Google 또는 Apple 계정으로 로그인된 상태 (유효한 JWT 필요).
+ * 이름은 기존 호출부 호환을 위해 유지 — Apple 도 Google 과 같은 권한.
+ */
 export function isGoogleSignedIn(): boolean {
   const session = loadSession();
-  return session?.provider === 'google' && isAccessTokenUsable(loadToken());
+  return isCloudProvider(session?.provider) && isAccessTokenUsable(loadToken());
+}
+
+/** 서버가 이메일을 주지 않을 때 (Apple 은 첫 로그인 이후 이메일 생략 가능) */
+function fallbackEmail(provider: AuthProvider): string {
+  if (provider === 'guest') return '';
+  if (provider === 'apple') return 'unknown@privaterelay.appleid.com';
+  return 'unknown@gmail.com';
 }
 
 function sessionFromAuth(
@@ -144,7 +160,7 @@ function sessionFromAuth(
   return {
     provider,
     userId: auth.user.id,
-    email: auth.user.email || (provider === 'guest' ? '' : 'unknown@gmail.com'),
+    email: auth.user.email || fallbackEmail(provider),
     displayName: auth.user.name || auth.user.email || 'User',
     photoUrl: auth.user.photoUrl,
     lastSyncedAt: prevSynced,
@@ -164,7 +180,7 @@ function providerFromAuthUser(provider: string | null | undefined): AuthProvider
  */
 export function clearGoogleSessionIfInvalid(): boolean {
   const session = loadSession();
-  if (session?.provider !== 'google') return false;
+  if (!isCloudProvider(session?.provider)) return false;
   if (isAccessTokenUsable(loadToken())) return false;
   saveToken(null);
   saveSession(null);
@@ -183,7 +199,7 @@ export async function tryRecoverGoogleSession(
   nickname: string,
 ): Promise<'ok' | 'restored' | 'need-reauth'> {
   const session = loadSession();
-  if (session?.provider !== 'google') return 'ok';
+  if (!session || !isCloudProvider(session.provider)) return 'ok';
   if (isAccessTokenUsable(loadToken())) return 'ok';
 
   const prevSynced = session.lastSyncedAt;
@@ -201,7 +217,7 @@ export async function tryRecoverGoogleSession(
     const next = sessionFromAuth(provider, auth, prevSynced);
     saveToken(auth.accessToken);
     saveSession(next);
-    if (provider === 'google') {
+    if (isCloudProvider(provider)) {
       return 'restored';
     }
     notifyGoogleReauth();
@@ -215,9 +231,49 @@ export async function tryRecoverGoogleSession(
 }
 
 /**
+ * 게스트 → Google/Apple 은 같은 users.id 로 승격.
+ * 토큰이 만료됐어도 같은 clientId 로 게스트 JWT를 다시 받아
+ * Authorization 에 실어 무조건 승격 시도.
+ * @returns 승격용 게스트 JWT. 이미 같은 provider 로 로그인돼 있거나 게스트가 없으면 null
+ */
+async function resolveGuestLinkToken(target: 'google' | 'apple'): Promise<string | null> {
+  const current = loadSession();
+  const currentToken = loadToken();
+  if (current?.provider === target && isAccessTokenUsable(currentToken)) {
+    return null;
+  }
+  if (
+    current?.provider === 'guest' &&
+    isAccessTokenUsable(currentToken) &&
+    currentToken
+  ) {
+    return currentToken;
+  }
+  const clientId = readStoredClientId().trim();
+  const nick = readStoredNickname().trim() || 'User';
+  if (!clientId) {
+    return current?.provider === 'guest' && currentToken ? currentToken : null;
+  }
+  try {
+    const guestAuth = await loginAsGuest(clientId, nick);
+    // provider 가 이미 google/apple 로 복구된 경우(기기 연동)엔 승격 헤더 불필요
+    if (
+      providerFromAuthUser(guestAuth.user.provider) === 'guest' &&
+      guestAuth.accessToken
+    ) {
+      return guestAuth.accessToken;
+    }
+    return null;
+  } catch {
+    // 재발급 실패 시 만료된 게스트 토큰이라도 보내 서버 승격 시도
+    return current?.provider === 'guest' && currentToken ? currentToken : null;
+  }
+}
+
+/**
  * Google: 일기 클라우드 동기화
+ * Apple: iOS 앱 전용. Google 과 같은 클라우드 동기화
  * Guest: 닉네임·기기 ID로 친구 방
- * Apple: 미연동
  */
 export function useAuthSession() {
   const [session, setSession] = useState<AuthSession | null>(loadSession);
@@ -229,51 +285,8 @@ export function useAuthSession() {
   }, []);
 
   const signInWithGoogleIdToken = useCallback(async (idToken: string) => {
-    const current = loadSession();
-    const currentToken = loadToken();
-    const prevSynced = current?.lastSyncedAt ?? null;
-
-    /**
-     * 게스트 → Google 은 같은 users.id 로 승격.
-     * 토큰이 만료됐어도 같은 clientId 로 게스트 JWT를 다시 받아
-     * Authorization 에 실어 무조건 승격 시도.
-     */
-    let guestToken: string | null = null;
-    const alreadyGoogle =
-      current?.provider === 'google' && isAccessTokenUsable(currentToken);
-
-    if (!alreadyGoogle) {
-      if (
-        current?.provider === 'guest' &&
-        isAccessTokenUsable(currentToken) &&
-        currentToken
-      ) {
-        guestToken = currentToken;
-      } else {
-        const clientId = readStoredClientId().trim();
-        const nick = readStoredNickname().trim() || 'User';
-        if (clientId) {
-          try {
-            const guestAuth = await loginAsGuest(clientId, nick);
-            // provider 가 이미 google 로 복구된 경우(기기 연동)엔 승격 헤더 불필요
-            if (
-              providerFromAuthUser(guestAuth.user.provider) === 'guest' &&
-              guestAuth.accessToken
-            ) {
-              guestToken = guestAuth.accessToken;
-            }
-          } catch {
-            // 재발급 실패 시 만료된 게스트 토큰이라도 보내 서버 승격 시도
-            if (current?.provider === 'guest' && currentToken) {
-              guestToken = currentToken;
-            }
-          }
-        } else if (current?.provider === 'guest' && currentToken) {
-          guestToken = currentToken;
-        }
-      }
-    }
-
+    const prevSynced = loadSession()?.lastSyncedAt ?? null;
+    const guestToken = await resolveGuestLinkToken('google');
     const auth = await loginWithGoogleIdToken(idToken, guestToken);
     const next = sessionFromAuth('google', auth, prevSynced);
     saveToken(auth.accessToken);
@@ -281,6 +294,25 @@ export function useAuthSession() {
     setSession(next);
     return next;
   }, []);
+
+  /** iOS 네이티브 Sign in with Apple 결과로 로그인 (게스트면 같은 users.id 로 승격) */
+  const signInWithAppleCredential = useCallback(
+    async (identityToken: string, authorizationCode: string | null) => {
+      const prevSynced = loadSession()?.lastSyncedAt ?? null;
+      const guestToken = await resolveGuestLinkToken('apple');
+      const auth = await loginWithAppleCredential(
+        identityToken,
+        authorizationCode,
+        guestToken,
+      );
+      const next = sessionFromAuth('apple', auth, prevSynced);
+      saveToken(auth.accessToken);
+      saveSession(next);
+      setSession(next);
+      return next;
+    },
+    [],
+  );
 
   /** 닉네임·프사 있는 기기의 친구 방용 게스트 세션 확보 */
   const ensureGuestSession = useCallback(
@@ -295,12 +327,12 @@ export function useAuthSession() {
       throw new Error('닉네임이 필요해요');
     }
     const current = loadSession();
-    // Google로 클라우드 동기화 중인 세션은 유지 (방은 Google 계정으로도 가능)
-    if (current?.provider === 'google' && isAccessTokenUsable(loadToken())) {
+    // Google/Apple로 클라우드 동기화 중인 세션은 유지 (방은 계정으로도 가능)
+    if (current && isCloudProvider(current.provider) && isAccessTokenUsable(loadToken())) {
       return current;
     }
-    // 만료된 Google 잔여 세션이면 비우고 게스트로 (재로그인 유도 이벤트는 내지 않음)
-    if (current?.provider === 'google') {
+    // 만료된 Google/Apple 잔여 세션이면 비우고 게스트로 (재로그인 유도 이벤트는 내지 않음)
+    if (current && isCloudProvider(current.provider)) {
       saveToken(null);
       saveSession(null);
     }
@@ -362,7 +394,7 @@ export function useAuthSession() {
 
   const signIn = useCallback(async (provider: AuthProvider) => {
     if (provider === 'apple') {
-      throw new Error('Apple 로그인은 아직 준비 중이에요');
+      throw new Error('Apple 로그인은 계정 화면의 Apple 버튼을 눌러 주세요');
     }
     if (provider === 'guest') {
       throw new Error('게스트는 ensureGuestSession을 사용하세요');
@@ -403,11 +435,11 @@ export function useAuthSession() {
     const token = loadToken();
     if (!token) return null;
     if (!isAccessTokenUsable(token)) {
-      const wasGoogle = loadSession()?.provider === 'google';
+      const wasCloud = isCloudProvider(loadSession()?.provider);
       saveToken(null);
       saveSession(null);
       setSession(null);
-      if (wasGoogle) notifyGoogleReauth();
+      if (wasCloud) notifyGoogleReauth();
       return null;
     }
     try {
@@ -417,7 +449,7 @@ export function useAuthSession() {
       const next: AuthSession = {
         provider,
         userId: me.id,
-        email: me.email || (provider === 'guest' ? '' : 'unknown@gmail.com'),
+        email: me.email || fallbackEmail(provider),
         displayName: me.name || me.email || 'User',
         photoUrl: me.photoUrl,
         lastSyncedAt: loadSession()?.lastSyncedAt ?? null,
@@ -426,11 +458,11 @@ export function useAuthSession() {
       setSession(next);
       return next;
     } catch {
-      const wasGoogle = loadSession()?.provider === 'google';
+      const wasCloud = isCloudProvider(loadSession()?.provider);
       saveToken(null);
       saveSession(null);
       setSession(null);
-      if (wasGoogle) notifyGoogleReauth();
+      if (wasCloud) notifyGoogleReauth();
       return null;
     }
   }, []);
@@ -439,6 +471,7 @@ export function useAuthSession() {
     session,
     signIn,
     signInWithGoogleIdToken,
+    signInWithAppleCredential,
     ensureGuestSession,
     signOut,
     deleteAccount,
