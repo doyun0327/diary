@@ -19,6 +19,8 @@ import DrawingCanvas from '../components/DrawingCanvas';
 import type { DrawingCanvasHandle } from '../components/DrawingCanvas';
 import MoodIcon from '../components/MoodIcon';
 import { extractSceneLine, generateDiaryImage, type AiProgress } from '../api/aiImage';
+import { submitAiContentReport } from '../utils/aiContentReport';
+import { REPORT_REASON_IDS, type ReportReasonId } from '../utils/ugcReport';
 import AppModal from '../components/AppModal';
 import CoachBubble from '../components/CoachBubble';
 import { formatDate, today } from '../utils/date';
@@ -107,6 +109,7 @@ import {
   fetchMonthlyUsage,
 } from '../api/usageApi';
 import './DiaryWritePage.css';
+import '../components/RoomSafetyModal.css';
 
 const AI_LOTTIE_URLS = ['/lottie/ai-loading.json', '/lottie/ai-loading-cat.json'] as const;
 
@@ -333,6 +336,13 @@ function DiaryWritePage({
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
+  /** AI 그림이 캔버스에 올라가 있으면 신고 버튼 표시 */
+  const [aiReportVisible, setAiReportVisible] = useState(false);
+  const [aiReportTarget, setAiReportTarget] = useState<
+    { where: 'canvas' } | { where: 'pick'; index: number } | null
+  >(null);
+  const [aiReportReason, setAiReportReason] = useState<ReportReasonId>('sexual');
+  const [aiReportBusy, setAiReportBusy] = useState(false);
   const [accessTick, setAccessTick] = useState(0);
   const [aiPreviewTick, setAiPreviewTick] = useState(0);
   const [purchaseClickShield, setPurchaseClickShield] = useState(false);
@@ -1541,6 +1551,7 @@ function DiaryWritePage({
       if (nextHistory.length === 1 && !previousSnapshot) {
         await canvasRef.current?.loadImage(imageUrl);
         drawingTouchedRef.current = true;
+        setAiReportVisible(true);
         dismissAiCoach();
         await clearAiPickPending();
       } else {
@@ -1622,6 +1633,7 @@ function DiaryWritePage({
     try {
       // 이전 그림만 선택 → 캔버스는 AI 생성 전 상태 그대로 (재로드/합성 PNG 금지)
       if (canvasOption && aiSrcs.length === 0) {
+        setAiReportVisible(false);
         dismissAiCoach();
         return;
       }
@@ -1648,10 +1660,61 @@ function DiaryWritePage({
       }
 
       drawingTouchedRef.current = true;
+      if (aiSrcs.length > 0) setAiReportVisible(true);
       dismissAiCoach();
     } catch {
       showAiRetryToast();
     }
+  };
+
+  const openAiReport = (target: { where: 'canvas' } | { where: 'pick'; index: number }) => {
+    setAiReportReason('sexual');
+    setAiReportTarget(target);
+  };
+
+  const dropReportedPick = (index: number) => {
+    setAiPickOptions((prev) => {
+      const removed = prev[index];
+      const next = prev.filter((_, i) => i !== index);
+      if (removed?.kind === 'ai' && removed.src) {
+        setAiGeneratedImages((imgs) => imgs.filter((src) => src !== removed.src));
+      }
+      setAiPickSelected((selected) => {
+        const nextSelected = new Set<number>();
+        next.forEach((option, nextIndex) => {
+          const oldIndex = prev.indexOf(option);
+          if (selected.has(oldIndex)) nextSelected.add(nextIndex);
+        });
+        return nextSelected;
+      });
+      if (next.length === 0) {
+        setAiPickOpen(false);
+        void clearAiPickPending();
+      }
+      return next;
+    });
+  };
+
+  const submitAiReport = async () => {
+    if (!aiReportTarget || aiReportBusy) return;
+    setAiReportBusy(true);
+    const snippet = [title.trim(), extractSceneLine(content)].filter(Boolean).join(' ').slice(0, 500);
+    await submitAiContentReport({
+      reason: aiReportReason,
+      source: aiSourceRef.current,
+      promptSnippet: snippet,
+    });
+    if (aiReportTarget.where === 'canvas') {
+      canvasRef.current?.clear();
+      drawingClearedRef.current = true;
+      setAiGeneratedImages([]);
+      setAiReportVisible(false);
+    } else {
+      dropReportedPick(aiReportTarget.index);
+    }
+    setAiReportTarget(null);
+    setAiReportBusy(false);
+    onAppToast?.(t('write.ai.reportedToast'), 2200);
   };
 
   const handleWatchAd = async () => {
@@ -1909,6 +1972,7 @@ function DiaryWritePage({
               onFontSizeChange={setFontSizeId}
               onCleared={() => {
                 drawingClearedRef.current = true;
+                setAiReportVisible(false);
               }}
             />
             {aiLoading && !purchaseClickShield && (
@@ -1943,6 +2007,15 @@ function DiaryWritePage({
                 </button>
                 <p className="diary-write__ai-bg-hint-text">{t('write.ai.bgHint')}</p>
               </div>
+            ) : null}
+            {aiReportVisible && !aiLoading ? (
+              <button
+                type="button"
+                className="diary-write__ai-report"
+                onClick={() => openAiReport({ where: 'canvas' })}
+              >
+                {t('write.ai.report')}
+              </button>
             ) : null}
             </div>
           </div>
@@ -2522,20 +2595,63 @@ function DiaryWritePage({
                 {aiPickOptions.map((option, index) => {
                   const checked = aiPickSelected.has(index);
                   return (
-                    <button
+                    <div
                       key={`${option.kind}-${index}-${option.src.slice(0, 32)}`}
-                      type="button"
                       className={`diary-write__ai-pick-item${checked ? ' diary-write__ai-pick-item--selected' : ''}`}
-                      aria-pressed={checked}
-                      onClick={() => toggleAiPick(index)}
                     >
-                      <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
-                      <span className="diary-write__ai-pick-check" aria-hidden="true">
-                        {checked ? '✓' : ''}
-                      </span>
-                    </button>
+                      <button
+                        type="button"
+                        className="diary-write__ai-pick-choose"
+                        aria-pressed={checked}
+                        onClick={() => toggleAiPick(index)}
+                      >
+                        <img src={option.src} alt="" className="diary-write__ai-pick-thumb" />
+                        <span className="diary-write__ai-pick-check" aria-hidden="true">
+                          {checked ? '✓' : ''}
+                        </span>
+                      </button>
+                      {option.kind === 'ai' ? (
+                        <button
+                          type="button"
+                          className="diary-write__ai-pick-report"
+                          onClick={() => openAiReport({ where: 'pick', index })}
+                        >
+                          {t('write.ai.report')}
+                        </button>
+                      ) : null}
+                    </div>
                   );
                 })}
+              </div>
+            </AppModal>
+          )}
+          {aiReportTarget && (
+            <AppModal
+              className="app-modal--above-deploy"
+              title={t('write.ai.reportTitle')}
+              lead={t('write.ai.reportLead')}
+              onDismiss={aiReportBusy ? undefined : () => setAiReportTarget(null)}
+              showClose={!aiReportBusy}
+              closeAriaLabel={t('common.close')}
+              primaryLabel={aiReportBusy ? t('rooms.safety.reporting') : t('rooms.safety.reportSubmit')}
+              onPrimary={() => {
+                if (!aiReportBusy) void submitAiReport();
+              }}
+            >
+              <div className="room-safety__reasons" role="radiogroup" aria-label={t('rooms.safety.reasonAria')}>
+                {REPORT_REASON_IDS.map((id) => (
+                  <label key={id} className="room-safety__reason">
+                    <input
+                      type="radio"
+                      name="ai-content-report-reason"
+                      value={id}
+                      checked={aiReportReason === id}
+                      disabled={aiReportBusy}
+                      onChange={() => setAiReportReason(id)}
+                    />
+                    <span>{t(`rooms.safety.reasons.${id}`)}</span>
+                  </label>
+                ))}
               </div>
             </AppModal>
           )}
