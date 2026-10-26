@@ -676,18 +676,23 @@
 }
 
 .diary-write__ai-report {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  z-index: 8;
-  padding: 6px 10px;
-  border: 1px solid color-mix(in srgb, #b42318 35%, transparent);
-  border-radius: 999px;
-  background: #fff;
-  color: #b42318;
-  font-size: 0.78rem;
-  font-weight: 700;
+  align-self: flex-end;
+  margin: 2px 4px 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
   line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.diary-write__ai-report:disabled {
+  opacity: 0.45;
+  text-decoration: none;
+  cursor: default;
 }
 
 .diary-write__ai-pick-item {
@@ -715,11 +720,13 @@
 .diary-write__ai-pick-report {
   border: none;
   background: transparent;
-  color: #b42318;
-  font-size: 0.75rem;
-  font-weight: 700;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
   cursor: pointer;
   padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .diary-write__ai-pick-item--selected {

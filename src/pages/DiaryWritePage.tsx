@@ -336,8 +336,9 @@ function DiaryWritePage({
   const [aiGeneratedImages, setAiGeneratedImages] = useState<string[]>([]);
   const [aiPickOptions, setAiPickOptions] = useState<AiPickOption[]>([]);
   const [aiPickSelected, setAiPickSelected] = useState<Set<number>>(() => new Set());
-  /** AI 그림이 캔버스에 올라가 있으면 신고 버튼 표시 */
-  const [aiReportVisible, setAiReportVisible] = useState(false);
+  /** AI 그림 생성이 시작된 뒤에만 신고 가능 */
+  const [aiReportReady, setAiReportReady] = useState(false);
+  const aiImageOnCanvasRef = useRef(false);
   const [aiReportTarget, setAiReportTarget] = useState<
     { where: 'canvas' } | { where: 'pick'; index: number } | null
   >(null);
@@ -1491,6 +1492,7 @@ function DiaryWritePage({
     setAiError(null);
     if (!(await reserveAiDrawQuota())) return;
 
+    setAiReportReady(true);
     setAiProgress('waiting');
     setAiWaitMinutes(null);
     setFortuneVisible(false);
@@ -1551,7 +1553,7 @@ function DiaryWritePage({
       if (nextHistory.length === 1 && !previousSnapshot) {
         await canvasRef.current?.loadImage(imageUrl);
         drawingTouchedRef.current = true;
-        setAiReportVisible(true);
+        aiImageOnCanvasRef.current = true;
         dismissAiCoach();
         await clearAiPickPending();
       } else {
@@ -1633,7 +1635,6 @@ function DiaryWritePage({
     try {
       // 이전 그림만 선택 → 캔버스는 AI 생성 전 상태 그대로 (재로드/합성 PNG 금지)
       if (canvasOption && aiSrcs.length === 0) {
-        setAiReportVisible(false);
         dismissAiCoach();
         return;
       }
@@ -1660,7 +1661,7 @@ function DiaryWritePage({
       }
 
       drawingTouchedRef.current = true;
-      if (aiSrcs.length > 0) setAiReportVisible(true);
+      if (aiSrcs.length > 0) aiImageOnCanvasRef.current = true;
       dismissAiCoach();
     } catch {
       showAiRetryToast();
@@ -1705,10 +1706,13 @@ function DiaryWritePage({
       promptSnippet: snippet,
     });
     if (aiReportTarget.where === 'canvas') {
-      canvasRef.current?.clear();
-      drawingClearedRef.current = true;
-      setAiGeneratedImages([]);
-      setAiReportVisible(false);
+      if (aiImageOnCanvasRef.current) {
+        canvasRef.current?.clear();
+        drawingClearedRef.current = true;
+        setAiGeneratedImages([]);
+        aiImageOnCanvasRef.current = false;
+        setAiReportReady(false);
+      }
     } else {
       dropReportedPick(aiReportTarget.index);
     }
@@ -1972,7 +1976,8 @@ function DiaryWritePage({
               onFontSizeChange={setFontSizeId}
               onCleared={() => {
                 drawingClearedRef.current = true;
-                setAiReportVisible(false);
+                aiImageOnCanvasRef.current = false;
+                setAiReportReady(false);
               }}
             />
             {aiLoading && !purchaseClickShield && (
@@ -2008,16 +2013,18 @@ function DiaryWritePage({
                 <p className="diary-write__ai-bg-hint-text">{t('write.ai.bgHint')}</p>
               </div>
             ) : null}
-            {aiReportVisible && !aiLoading ? (
-              <button
-                type="button"
-                className="diary-write__ai-report"
-                onClick={() => openAiReport({ where: 'canvas' })}
-              >
-                {t('write.ai.report')}
-              </button>
-            ) : null}
             </div>
+            <button
+              type="button"
+              className="diary-write__ai-report"
+              disabled={!aiReportReady}
+              onClick={() => {
+                if (!aiReportReady) return;
+                openAiReport({ where: 'canvas' });
+              }}
+            >
+              {t('write.ai.report')}
+            </button>
           </div>
         </section>
 
