@@ -600,7 +600,8 @@
     "appOnly": "請在 App 內訂閱",
     "restore": "恢復購買",
     "freeGrant": "免費：{{n}} 篇日記",
-    "freeRemaining": "免費剩餘：{{n}}"
+    "freeRemaining": "免費剩餘：{{n}}",
+    "autoRenewTerms": "Payment is charged to your Apple ID or Google account and the subscription renews automatically. It renews unless you cancel at least 24 hours before the end of the current period. Manage or cancel in Settings > Apple ID > Subscriptions (or Google Play subscriptions)."
   },
   "quota": {
     "fraction": "{{used}}/{{limit}}",

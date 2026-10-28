@@ -569,6 +569,9 @@ function NyangTicketSheet({
                 );
               })}
             </ul>
+            <p className="nyang-ticket__auto-renew-terms">
+              {t('subscription.autoRenewTerms')}
+            </p>
             {isFlutterApp() ? (
               <div className="nyang-ticket__sub-footer">
                 <button
