@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "4QWTJ85RPZ.com.yun.pageby",
+        "paths": ["*", "/invite/*", "/r/*"]
+      }
+    ]
+  }
+}

@@ -602,7 +602,8 @@
     "appOnly": "สมัครในแอป",
     "restore": "กู้คืนการซื้อ",
     "freeGrant": "ฟรี: ไดอารี่ {{n}} หน้า",
-    "freeRemaining": "ฟรีเหลือ: {{n}}"
+    "freeRemaining": "ฟรีเหลือ: {{n}}",
+    "autoRenewTerms": "Payment is charged to your Apple ID or Google account and the subscription renews automatically. It renews unless you cancel at least 24 hours before the end of the current period. Manage or cancel in Settings > Apple ID > Subscriptions (or Google Play subscriptions)."
   },
   "quota": {
     "fraction": "{{used}}/{{limit}}",

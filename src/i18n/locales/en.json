@@ -128,7 +128,7 @@
       "termsHeading": "Terms of Service",
       "termsBody": "PageBy is a personal diary app. Please follow applicable laws while using the service. You are responsible for your account, nickname, and diary content. Posting or sharing content that infringes others' rights is not allowed. Features may change without notice.",
       "privacyHeading": "Privacy Policy",
-      "privacyBody": "Diary entries, drawings, and profile data are stored on your device, and may also be stored on the app server when you sign in with Google, use a friend room, or sync. When you create an AI drawing, the diary text and attached photo are sent to the server to generate the image. Banner and rewarded ads, and Google Play purchases (subscriptions and drawing packs), may appear. You can report room posts, comments, and AI drawings in the app, and you can block users. We do not sell personal data. For details, see the <privacyLink>privacy policy page</privacyLink>. You can delete your account from the account menu in the app.",
+      "privacyBody": "Diary entries, drawings, and profile data are stored on your device, and may also be stored on the app server when you sign in with Google or Apple, use a friend room, or sync. When you create an AI drawing, diary text and attached photos are sent to the server to generate the image. Ads (rewarded and banner) and App Store / Google Play purchases (subscriptions and drawing packs) may appear. You can report posts, comments, and AI drawings in the app and block users. We do not sell personal data. For details, see the <privacyLink>privacy policy page</privacyLink>. You can delete your account from the account menu; after a 30-day grace period your account and personal data are permanently deleted.",
       "accountDeletionHeading": "Account deletion",
       "accountDeletionBody": "You can delete your account from the in-app Account menu. If you cannot open the app, see the <deletionLink>account and data deletion page</deletionLink> or contact the developer via Google Play.",
       "refundHeading": "Refund Policy",
@@ -202,7 +202,7 @@
     "withdraw": {
       "button": "Delete account",
       "title": "Are you sure you want to delete your account?",
-      "lead": "Sign back in within one month to keep your data. After that you are treated as withdrawn and previous data stays hidden.",
+      "lead": "You will be signed out right away. Sign back in within 30 days to restore your account. After 30 days, your account and personal data (including cloud diaries) are permanently deleted.",
       "confirm": "Delete"
     },
     "removePhoto": "Remove",
@@ -602,7 +602,8 @@
     "appOnly": "Subscribe in the app",
     "restore": "Restore purchases",
     "freeGrant": "Free: {{n}} diary entries",
-    "freeRemaining": "Free remaining: {{n}}"
+    "freeRemaining": "Free remaining: {{n}}",
+    "autoRenewTerms": "Payment is charged to your Apple ID or Google account and the subscription renews automatically. It renews unless you cancel at least 24 hours before the end of the current period. Manage or cancel in Settings > Apple ID > Subscriptions (or Google Play subscriptions)."
   },
   "quota": {
     "fraction": "{{used}}/{{limit}}",
