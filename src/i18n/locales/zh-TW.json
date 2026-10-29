@@ -194,6 +194,7 @@
     "pickPhoto": "選擇照片",
     "editPhoto": "編輯",
     "useAccountPhoto": "使用賬號照片",
+    "appleHiddenEmail": "已透過 Apple 登入（電子郵件已隱藏）",
     "replacePhoto": {
       "title": "要換成 Google 照片嗎？",
       "lead": "可以用 Google 賬號照片替換當前頭像。",

@@ -175,6 +175,15 @@ function AccountSheet({
   const cloudSignedIn = isCloudProvider(session?.provider);
   /** Sign in with Apple 은 iOS 앱에서만 (가이드라인 4.8) */
   const appleAvailable = flutterNative && isIOSApp();
+  /** Apple "나의 이메일 가리기" 중계 주소·이메일 없을 때 넣는 unknown@ 주소는 그대로 보여 주지 않음 */
+  const accountEmail = session?.email?.trim() ?? '';
+  const accountEmailLabel = /^unknown@/i.test(accountEmail)
+    ? session?.provider === 'apple'
+      ? t('account.appleHiddenEmail')
+      : ''
+    : /@privaterelay\.appleid\.com$/i.test(accountEmail)
+      ? t('account.appleHiddenEmail')
+      : accountEmail;
 
   useEffect(() => {
     setNameDraft(nickname);
@@ -656,8 +665,8 @@ function AccountSheet({
         </div>
         {cloudSignedIn ? (
           <div className="account-sheet__avatar-actions">
-            {session?.email ? (
-              <p className="account-sheet__account-email">{session.email}</p>
+            {accountEmailLabel ? (
+              <p className="account-sheet__account-email">{accountEmailLabel}</p>
             ) : null}
             <div className="account-sheet__synced-row">
               <p className="account-sheet__account-synced">

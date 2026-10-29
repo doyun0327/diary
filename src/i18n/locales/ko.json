@@ -194,6 +194,7 @@
     "pickPhoto": "사진 선택",
     "editPhoto": "수정",
     "useAccountPhoto": "계정 사진 쓰기",
+    "appleHiddenEmail": "Apple 계정으로 로그인됨 (이메일 비공개)",
     "replacePhoto": {
       "title": "Google 사진으로 바꿀까요?",
       "lead": "지금 쓰는 프로필 사진 대신 Google 계정 사진을 쓸 수 있어요.",

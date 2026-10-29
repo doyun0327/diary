@@ -194,6 +194,7 @@
     "pickPhoto": "选择照片",
     "editPhoto": "编辑",
     "useAccountPhoto": "使用账号照片",
+    "appleHiddenEmail": "已通过 Apple 登录（邮箱已隐藏）",
     "replacePhoto": {
       "title": "要换成 Google 照片吗？",
       "lead": "可以用 Google 账号照片替换当前头像。",

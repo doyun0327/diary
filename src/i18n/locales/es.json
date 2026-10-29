@@ -194,6 +194,7 @@
     "pickPhoto": "Elegir foto",
     "editPhoto": "Editar",
     "useAccountPhoto": "Usar foto de la cuenta",
+    "appleHiddenEmail": "Sesión iniciada con Apple (correo oculto)",
     "replacePhoto": {
       "title": "¿Usar tu foto de Google?",
       "lead": "Puedes reemplazar tu foto actual por la de tu cuenta de Google.",

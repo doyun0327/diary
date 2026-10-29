@@ -194,6 +194,7 @@
     "pickPhoto": "เลือกรูป",
     "editPhoto": "แก้ไข",
     "useAccountPhoto": "ใช้รูปจากบัญชี",
+    "appleHiddenEmail": "ลงชื่อเข้าใช้ด้วย Apple (ซ่อนอีเมล)",
     "replacePhoto": {
       "title": "ใช้รูป Google ไหม?",
       "lead": "คุณสามารถเปลี่ยนรูปโปรไฟล์ปัจจุบันเป็นรูปจากบัญชี Google ได้",
