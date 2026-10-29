@@ -21,6 +21,7 @@ import {
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
   requestSubscriptionRestore,
+  requestSubscriptionRestoreAndWait,
   waitForRestoredPremiumAfterLogin,
 } from '../utils/subscription';
 import {
@@ -49,7 +50,7 @@ import './AccountSheet.css';
 import './NyangTicketSheet.css';
 
 type TabId = 'subscribe' | 'packs' | 'history';
-type BusyState = 'google' | SubProductId | AiPackProductId | null;
+type BusyState = 'google' | 'restore' | SubProductId | AiPackProductId | null;
 
 interface NyangTicketSheetProps {
   onClose: () => void;
@@ -367,11 +368,37 @@ function NyangTicketSheet({
     await runSubscribe(productId);
   };
 
+  const restoreFailMessage = (error?: string | null) => {
+    const reason = (error ?? '').trim();
+    if (reason === 'not_configured') return t('nyangTicket.notConfigured');
+    if (reason === 'timeout') return t('nyangTicket.restoreTimeout');
+    if (reason === 'app_only') return t('nyangTicket.appOnly');
+    if (!reason || reason === 'restore_failed') {
+      return t('nyangTicket.restoreFailed');
+    }
+    return t('nyangTicket.restoreFailedWithReason', { reason });
+  };
+
   /** 구독 탭 "구매 복원" 버튼 (App Store 심사 3.1.1) */
-  const handleRestore = () => {
+  const handleRestore = async () => {
     if (!isFlutterApp() || busy) return;
-    requestSubscriptionRestore();
-    setMessage(t('nyangTicket.restoreStarted'));
+    setMessage(null);
+    setError(null);
+    setBusy('restore');
+    try {
+      const result = await requestSubscriptionRestoreAndWait();
+      if (!result.ok) {
+        setError(restoreFailMessage(result.error));
+        return;
+      }
+      if (result.active) {
+        setMessage(t('nyangTicket.restoreDone'));
+        return;
+      }
+      setMessage(t('nyangTicket.restoreEmpty'));
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleBuyPack = async (productId: AiPackProductId) => {
@@ -569,18 +596,22 @@ function NyangTicketSheet({
                 );
               })}
             </ul>
-            <p className="nyang-ticket__auto-renew-terms">
-              {t('subscription.autoRenewTerms')}
-            </p>
+            {isIOSApp() ? (
+              <p className="nyang-ticket__auto-renew-terms">
+                {t('subscription.autoRenewTermsIos')}
+              </p>
+            ) : null}
             {isFlutterApp() ? (
               <div className="nyang-ticket__sub-footer">
                 <button
                   type="button"
                   className="nyang-ticket__restore-btn"
                   disabled={busy != null}
-                  onClick={handleRestore}
+                  onClick={() => void handleRestore()}
                 >
-                  {t('subscription.restore')}
+                  {busy === 'restore'
+                    ? t('common.processing')
+                    : t('subscription.restore')}
                 </button>
               </div>
             ) : null}

@@ -337,7 +337,12 @@
     "historyItemSubscription": "Suscripción PRO",
     "historyItemSubscriptionMonthly": "PRO mensual",
     "historyItemSubscriptionYearly": "PRO anual",
-    "historyItemPack": "Capítulo {{n}}"
+    "historyItemPack": "Capítulo {{n}}",
+    "restoreDone": "Subscription restored!",
+    "restoreEmpty": "No subscription to restore.",
+    "restoreFailed": "Could not restore. Please try again.",
+    "restoreFailedWithReason": "Could not restore. ({{reason}})",
+    "restoreTimeout": "Restore is taking too long. Please try again."
   },
   "credits": {
     "moodIcons": "Iconos de ánimo: designed by {{author}} from Flaticon",
@@ -603,7 +608,7 @@
     "restore": "Restaurar compras",
     "freeGrant": "Gratis: {{n}} entradas",
     "freeRemaining": "Gratis restantes: {{n}}",
-    "autoRenewTerms": "Payment is charged to your Apple ID or Google account and the subscription renews automatically. It renews unless you cancel at least 24 hours before the end of the current period. Manage or cancel in Settings > Apple ID > Subscriptions (or Google Play subscriptions)."
+    "autoRenewTermsIos": "Subscriptions renew automatically for the selected period, and you will be charged unless you cancel. You can cancel anytime in iPhone Settings > Apple Account > Subscriptions."
   },
   "quota": {
     "fraction": "{{used}}/{{limit}}",

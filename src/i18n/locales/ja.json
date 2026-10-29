@@ -337,7 +337,12 @@
     "historyItemSubscription": "Proサブスクリプション",
     "historyItemSubscriptionMonthly": "PRO 月間",
     "historyItemSubscriptionYearly": "PRO 年間",
-    "historyItemPack": "{{n}}枚"
+    "historyItemPack": "{{n}}枚",
+    "restoreDone": "サブスクリプションを復元しました！",
+    "restoreEmpty": "復元できるサブスクリプションがありません。",
+    "restoreFailed": "復元に失敗しました。しばらくしてからもう一度お試しください。",
+    "restoreFailedWithReason": "復元に失敗しました。（{{reason}}）",
+    "restoreTimeout": "復元の応答が遅いです。しばらくしてからもう一度お試しください。"
   },
   "credits": {
     "moodIcons": "気分アイコン：designed by {{author}} from Flaticon",
@@ -603,7 +608,7 @@
     "restore": "購入を復元",
     "freeGrant": "無料：日記{{n}}枚",
     "freeRemaining": "無料残り：{{n}}",
-    "autoRenewTerms": "Payment is charged to your Apple ID or Google account and the subscription renews automatically. It renews unless you cancel at least 24 hours before the end of the current period. Manage or cancel in Settings > Apple ID > Subscriptions (or Google Play subscriptions)."
+    "autoRenewTermsIos": "選択した期間ごとに自動更新され、解約しない限り料金が自動請求されます。iPhoneの設定 > Appleアカウント > サブスクリプションからいつでも解約できます。"
   },
   "quota": {
     "fraction": "{{used}}/{{limit}}",

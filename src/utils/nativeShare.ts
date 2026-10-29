@@ -21,6 +21,12 @@ declare global {
       expiresAt: number | null;
       productId?: string | null;
     }) => void;
+    /** 구매 복원 결과 */
+    __onDiarySubscriptionRestore?: (payload: {
+      ok: boolean;
+      active: boolean;
+      error?: string | null;
+    }) => void;
     __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
     __onDiaryTipPurchaseComplete?: (payload: {
       ok: boolean;

@@ -175,6 +175,67 @@ export function requestSubscriptionRestore() {
   return true;
 }
 
+export type SubscriptionRestoreResult = {
+  ok: boolean;
+  active: boolean;
+  error?: string | null;
+};
+
+export const SUBSCRIPTION_RESTORE_EVENT = 'diary-subscription-restore';
+
+/** 구매 복원 요청 후 네이티브 결과 대기 */
+export function requestSubscriptionRestoreAndWait(
+  timeoutMs = 45_000,
+): Promise<SubscriptionRestoreResult> {
+  if (!isFlutterApp()) {
+    return Promise.resolve({ ok: false, active: false, error: 'app_only' });
+  }
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const prev = window.__onDiarySubscriptionRestore;
+
+    const finish = (result: SubscriptionRestoreResult) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      window.removeEventListener(SUBSCRIPTION_RESTORE_EVENT, onEvent);
+      if (window.__onDiarySubscriptionRestore === wrapped) {
+        window.__onDiarySubscriptionRestore = prev;
+      }
+      resolve(result);
+    };
+
+    const handle = (payload: SubscriptionRestoreResult | undefined) => {
+      if (!payload) return;
+      finish({
+        ok: Boolean(payload.ok),
+        active: Boolean(payload.active),
+        error: payload.error ?? null,
+      });
+    };
+
+    const wrapped = (payload: SubscriptionRestoreResult) => {
+      prev?.(payload);
+      handle(payload);
+    };
+    const onEvent = (event: Event) => {
+      handle(
+        (event as CustomEvent<SubscriptionRestoreResult>).detail,
+      );
+    };
+
+    window.__onDiarySubscriptionRestore = wrapped;
+    window.addEventListener(SUBSCRIPTION_RESTORE_EVENT, onEvent);
+    requestSubscriptionRestore();
+
+    const timer = window.setTimeout(
+      () => finish({ ok: false, active: false, error: 'timeout' }),
+      timeoutMs,
+    );
+  });
+}
+
 /**
  * Google 재로그인·계정 전환 직후 — RevenueCat identify + 복원 + 동기화.
  * 냥티켓 "구독 중" UI가 다시 맞게 표시되도록 함.
