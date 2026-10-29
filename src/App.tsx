@@ -86,6 +86,7 @@ import {
   fetchAiPackCredits,
   fetchMonthlyUsage,
 } from "./api/usageApi";
+import { syncInstallFreeQuota } from "./utils/installFreeSync";
 import {
   identifySubscriptionUser,
   installSubscriptionBridge,
@@ -358,6 +359,9 @@ function App() {
         .catch(() => {
           fetchedAiPackUserRef.current = null;
         });
+      if (isFlutterApp()) {
+        void syncInstallFreeQuota();
+      }
     }
 
     if (!canUseProAiQuota()) {
@@ -1083,9 +1087,15 @@ function App() {
     };
 
     syncNativeHeader();
-    window.addEventListener("diary-flutter-ready", syncNativeHeader);
+    const onFlutterReady = () => {
+      syncNativeHeader();
+      if (getAccessToken()) void syncInstallFreeQuota();
+    };
+    window.addEventListener("diary-flutter-ready", onFlutterReady);
+    window.addEventListener("diary-native-device-key", onFlutterReady);
     return () => {
-      window.removeEventListener("diary-flutter-ready", syncNativeHeader);
+      window.removeEventListener("diary-flutter-ready", onFlutterReady);
+      window.removeEventListener("diary-native-device-key", onFlutterReady);
     };
   }, [
     page,

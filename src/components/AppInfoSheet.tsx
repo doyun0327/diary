@@ -4,10 +4,27 @@ import { APP_VERSION } from '../constants/app';
 import { ALL_FLATICON_CREDITS } from '../utils/flaticonCredits';
 import { isFlutterApp } from '../utils/nativeShare';
 import { privacyPolicyArticleHtml, privacyPolicyLang } from '../utils/privacyPolicyHtml';
+import { getInviteWebOrigin } from '../utils/roomInvite';
 import { TIP_PRODUCTS, type TipProductId } from '../utils/tipProducts';
 import { fetchTipStorePrices, waitForTipPurchase } from '../utils/tipPurchase';
 import CloseIcon from './CloseIcon';
 import './AppInfoSheet.css';
+
+const ACCOUNT_DELETION_PATH = '/account-deletion.html';
+
+function accountDeletionUrl(): string {
+  return `${getInviteWebOrigin()}${ACCOUNT_DELETION_PATH}`;
+}
+
+/** privacy.html 의 ./account-deletion.html 등 상대 링크를 공개 URL로 */
+function resolveLegalHref(href: string): string {
+  const raw = href.trim();
+  if (!raw || raw.startsWith('#') || raw.startsWith('mailto:')) return raw;
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+  if (raw.startsWith('./')) return `${getInviteWebOrigin()}/${raw.slice(2)}`;
+  if (raw.startsWith('/')) return `${getInviteWebOrigin()}${raw}`;
+  return `${getInviteWebOrigin()}/${raw}`;
+}
 
 interface AppInfoSheetProps {
   onClose: () => void;
@@ -252,6 +269,22 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
                 }}
               />
             </p>
+            <h3>{t('appInfo.legal.accountDeletionHeading')}</h3>
+            <p>
+              <Trans
+                i18nKey="appInfo.legal.accountDeletionBody"
+                components={{
+                  deletionLink: (
+                    <a
+                      className="app-info__text-link"
+                      href={accountDeletionUrl()}
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  ),
+                }}
+              />
+            </p>
             <h3>{t('appInfo.legal.refundHeading')}</h3>
             <p>{t('appInfo.legal.refundBody')}</p>
           </div>
@@ -267,6 +300,10 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
               const href = anchor.getAttribute('href') ?? '';
               if (href.startsWith('http://') || href.startsWith('https://')) return;
               e.preventDefault();
+              const resolved = resolveLegalHref(href);
+              if (resolved.startsWith('http')) {
+                window.open(resolved, '_blank', 'noopener,noreferrer');
+              }
             }}
             dangerouslySetInnerHTML={{
               __html: privacyPolicyArticleHtml(i18n.resolvedLanguage || i18n.language || 'ko'),

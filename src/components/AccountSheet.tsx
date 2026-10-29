@@ -511,6 +511,8 @@ function AccountSheet({
     setAuthBusy('google');
     try {
       await deleteAccount();
+      // Play 계정 삭제 정책: 서버 탈퇴 후 기기 Google 세션·로컬 데이터도 정리
+      nativeGoogleSignOut();
       onClearLocalDiaries?.();
       invalidateAllRoomCaches();
       setWithdrawOpen(false);

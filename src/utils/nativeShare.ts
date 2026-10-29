@@ -2,6 +2,8 @@ declare global {
   interface Window {
     DiaryNative?: { postMessage: (message: string) => void };
     __DIARY_FLUTTER__?: boolean;
+    /** Flutter 주입 — 재설치에도 유지되는 기기 키 (설치 무료 AI) */
+    __DIARY_NATIVE_DEVICE_KEY__?: string;
     /** true면 Flutter AppBar를 숨겨야 함 (친구방·상세 등) */
     __diaryHideNativeChrome?: boolean;
     __onDiaryGoogleIdToken?: (idToken: string) => void;
@@ -47,6 +49,15 @@ export function isFlutterApp(): boolean {
   if (typeof window === 'undefined') return false;
   if (window.__DIARY_FLUTTER__ === true) return true;
   return typeof diaryNative()?.postMessage === 'function';
+}
+
+/** Flutter가 주입한 설치 기기 키 (없으면 null) */
+export function getNativeInstallDeviceKey(): string | null {
+  if (typeof window === 'undefined') return null;
+  const key = window.__DIARY_NATIVE_DEVICE_KEY__;
+  if (typeof key !== 'string') return null;
+  const trimmed = key.trim();
+  return trimmed ? trimmed : null;
 }
 
 /** iOS Flutter 앱 (WKWebView). Apple 로그인 버튼 노출 등 iOS 전용 분기에 사용 */

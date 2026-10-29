@@ -17,12 +17,12 @@ export const FREE_DAILY_AI_AD_LIMIT = 1;
 export const FREE_DAILY_DIARY_AD_LIMIT = FREE_DAILY_AI_AD_LIMIT;
 /** @deprecated 일기 저장 광고 — AI 생성 시 차감 */
 export const DIARY_REWARD_AD_ENABLED = false;
-/** @deprecated 설치 1회 무료는 DEVICE_AI_INSTALL_FREE_USED_KEY 사용 */
-export const FREE_AI_DRAWS_TOTAL = 1;
+/** @deprecated 설치 무료는 DEVICE_AI_INSTALL_FREE_REMAINING_KEY 사용 */
+export const FREE_AI_DRAWS_TOTAL = 2;
 /** @deprecated FREE_AI_DRAWS_TOTAL */
 export const FREE_AI_DRAWS_PER_DAY = FREE_AI_DRAWS_TOTAL;
-/** 앱 설치 후 기기당 AI 그림 무료 1회 (계정·게스트 공통) */
-export const INSTALL_FREE_AI_DRAWS = 1;
+/** 앱 설치 후 기기당 AI 그림 무료 횟수 (계정·게스트 공통) */
+export const INSTALL_FREE_AI_DRAWS = 2;
 /** 광고 보고 AI 그림 1회 (Flutter AdMob 리워드) */
 export const AI_REWARD_AD_ENABLED = true;
 /** 설치 후 검색·보내기 무료 체험 기간 */
@@ -33,7 +33,10 @@ const FEATURE_TRIAL_START_KEY = "picture-diary-search-export-trial-start-v2";
 const STORAGE_KEY = "picture-diary-access-v1";
 /** 계정 키와 무관 — 이 기기에서 확인된 Pro 만료 (재로그인·게스트 전환 대비) */
 const DEVICE_PREMIUM_UNTIL_KEY = "picture-diary-device-premium-until-v1";
-/** 계정 키와 무관 — 이 기기 설치 후 AI 무료 1회 ("1"=사용함, "0"=남음, 없음=미판정) */
+/** 계정 키와 무관 — 이 기기 설치 후 AI 무료 남은 횟수 (숫자 문자열) */
+const DEVICE_AI_INSTALL_FREE_REMAINING_KEY =
+  "picture-diary-ai-install-free-remaining-v2";
+/** 구버전: "1"=사용함, "0"=남음 */
 const DEVICE_AI_INSTALL_FREE_USED_KEY = "picture-diary-ai-install-free-used-v1";
 const ENTRIES_KEY = "picture-diary-entries";
 
@@ -538,6 +541,17 @@ export function applyAiPackCreditsFromServer(credits: number) {
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
 }
 
+/** 서버 device_install_free.remaining → 로컬 캐시 (재설치 복구 방지) */
+export function applyInstallFreeRemainingFromServer(remaining: number) {
+  migrateInstallFreeRemainingIfNeeded();
+  try {
+    writeInstallFreeRemaining(remaining);
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
+}
+
 function normalizeAiCredits(state: AccessState) {
   state.aiDrawCredits = Math.max(0, state.aiDrawCredits);
   state.aiFreeDrawsUsed = Math.max(0, state.aiFreeDrawsUsed);
@@ -620,34 +634,63 @@ function hasAnyPriorAiQuotaUseOnDevice() {
   return false;
 }
 
-/** 기존 기기(업데이트)는 설치 무료 대상이 아님 — 한 번만 판정 */
-function migrateInstallFreeFlagIfNeeded() {
+function writeInstallFreeRemaining(n: number) {
+  const next = Math.max(0, Math.min(INSTALL_FREE_AI_DRAWS, Math.floor(n)));
+  localStorage.setItem(DEVICE_AI_INSTALL_FREE_REMAINING_KEY, String(next));
+}
+
+/**
+ * 설치 무료 남은 횟수 마이그레이션.
+ * 기존 기기(일기·AI 사용 이력)는 0, 신규는 INSTALL_FREE_AI_DRAWS.
+ * 구버전 used 플래그("1"/"0")도 남은 횟수로 옮긴다.
+ */
+function migrateInstallFreeRemainingIfNeeded() {
   try {
-    const cur = localStorage.getItem(DEVICE_AI_INSTALL_FREE_USED_KEY);
-    if (cur === "0" || cur === "1") return;
+    const cur = localStorage.getItem(DEVICE_AI_INSTALL_FREE_REMAINING_KEY);
+    if (cur != null && cur !== "") {
+      const n = Number(cur);
+      if (Number.isFinite(n) && n >= 0) return;
+    }
+    const legacyUsed = localStorage.getItem(DEVICE_AI_INSTALL_FREE_USED_KEY);
+    if (legacyUsed === "1") {
+      writeInstallFreeRemaining(0);
+      return;
+    }
+    if (legacyUsed === "0") {
+      writeInstallFreeRemaining(INSTALL_FREE_AI_DRAWS);
+      return;
+    }
     const legacy =
       hasAnyDiaryEntryOnDevice() || hasAnyPriorAiQuotaUseOnDevice();
-    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, legacy ? "1" : "0");
+    writeInstallFreeRemaining(legacy ? 0 : INSTALL_FREE_AI_DRAWS);
   } catch {
     // ignore
   }
 }
 
-/** 이 기기에서 설치 무료 AI 1회를 아직 쓸 수 있음 */
-export function canUseInstallFreeAiDraw() {
-  migrateInstallFreeFlagIfNeeded();
+/** 이 기기 설치 무료 AI 남은 횟수 */
+export function getInstallFreeAiDrawsRemaining() {
+  migrateInstallFreeRemainingIfNeeded();
   try {
-    return localStorage.getItem(DEVICE_AI_INSTALL_FREE_USED_KEY) !== "1";
+    const n = Number(localStorage.getItem(DEVICE_AI_INSTALL_FREE_REMAINING_KEY));
+    if (!Number.isFinite(n) || n < 0) return 0;
+    return Math.min(INSTALL_FREE_AI_DRAWS, Math.floor(n));
   } catch {
-    return true;
+    return INSTALL_FREE_AI_DRAWS;
   }
 }
 
-/** 설치 무료 AI 1회 소모 (성공 시에만 호출). 이미 썼으면 false */
+/** 이 기기에서 설치 무료 AI를 아직 쓸 수 있음 */
+export function canUseInstallFreeAiDraw() {
+  return getInstallFreeAiDrawsRemaining() > 0;
+}
+
+/** 설치 무료 AI 1회 소모 (성공 시에만 호출). 남은 횟수 없으면 false */
 export function consumeInstallFreeAiDraw() {
-  if (!canUseInstallFreeAiDraw()) return false;
+  const left = getInstallFreeAiDrawsRemaining();
+  if (left <= 0) return false;
   try {
-    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, "1");
+    writeInstallFreeRemaining(left - 1);
   } catch {
     // ignore
   }
@@ -655,10 +698,11 @@ export function consumeInstallFreeAiDraw() {
   return true;
 }
 
-/** 생성 실패 등으로 설치 무료 슬롯 환불 */
+/** 생성 실패 등으로 설치 무료 슬롯 1회 환불 */
 export function refundInstallFreeAiDraw() {
+  const left = getInstallFreeAiDrawsRemaining();
   try {
-    localStorage.setItem(DEVICE_AI_INSTALL_FREE_USED_KEY, "0");
+    writeInstallFreeRemaining(left + 1);
   } catch {
     // ignore
   }

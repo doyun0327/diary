@@ -202,3 +202,58 @@ export async function refundAiPackCreditsRemote(
   }
   return (await res.json()) as AiPackCreditsDto;
 }
+
+export type InstallFreeDto = {
+  remaining: number;
+  limit: number;
+  notice?: string | null;
+};
+
+/** 기기당 설치 무료 AI — 네이티브 기기 키로 서버 동기화 */
+export async function syncInstallFreeRemote(
+  accessToken: string,
+  deviceKey: string,
+  clientRemaining: number,
+): Promise<InstallFreeDto> {
+  const res = await fetch(apiUrl('/api/usage/install-free'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ deviceKey, clientRemaining }),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '설치 무료 동기화 실패'));
+  }
+  return (await res.json()) as InstallFreeDto;
+}
+
+export async function consumeInstallFreeRemote(
+  accessToken: string,
+  deviceKey: string,
+  clientRemaining: number,
+): Promise<InstallFreeDto> {
+  const res = await fetch(apiUrl('/api/usage/install-free/consume'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ deviceKey, clientRemaining }),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '설치 무료 차감 실패'));
+  }
+  return (await res.json()) as InstallFreeDto;
+}
+
+export async function refundInstallFreeRemote(
+  accessToken: string,
+  deviceKey: string,
+  clientRemaining: number,
+): Promise<InstallFreeDto> {
+  const res = await fetch(apiUrl('/api/usage/install-free/refund'), {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ deviceKey, clientRemaining }),
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res, '설치 무료 환불 실패'));
+  }
+  return (await res.json()) as InstallFreeDto;
+}

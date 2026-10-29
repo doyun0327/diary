@@ -53,12 +53,12 @@ import {
   canUseProAiQuota,
   consumeAiDrawDailyQuota,
   consumeAiPackCredit,
-  consumeInstallFreeAiDraw,
   consumeProAiDrawQuota,
   FREE_DAILY_AI_AD_LIMIT,
   getAiDrawCredits,
   getAiDrawsToday,
   getAiPackCredits,
+  getInstallFreeAiDrawsRemaining,
   getDiaryAccessState,
   grantAiDrawCreditWithDailyCap,
   isAiDailyLimitReached,
@@ -108,6 +108,10 @@ import {
   fetchAiPackCredits,
   fetchMonthlyUsage,
 } from '../api/usageApi';
+import {
+  syncInstallFreeQuota,
+  tryConsumeInstallFreeQuota,
+} from '../utils/installFreeSync';
 import './DiaryWritePage.css';
 import '../components/RoomSafetyModal.css';
 
@@ -954,12 +958,13 @@ function DiaryWritePage({
         limit: FREE_DAILY_AI_AD_LIMIT,
       };
     }
-    // 무료: 팩 → 설치 무료 1회 → 광고 일일 1
+    // 무료: 팩 → 설치 무료 → 광고 일일
     if (pack > 0) {
       return { used: 0, limit: pack };
     }
-    if (canUseInstallFreeAiDraw()) {
-      return { used: 0, limit: 1 };
+    const installFreeLeft = getInstallFreeAiDrawsRemaining();
+    if (installFreeLeft > 0) {
+      return { used: 0, limit: installFreeLeft };
     }
     const adCredits = getAiDrawCredits();
     if (adCredits > 0) {
@@ -984,8 +989,13 @@ function DiaryWritePage({
     if (purchased > 0) {
       lines.push({ key: 'pack', n: purchased, labelKey: 'quota.breakdownPack' });
     }
-    if (canUseInstallFreeAiDraw() && !canUseProAiQuota()) {
-      lines.push({ key: 'install-free', n: 1, labelKey: 'quota.breakdownInstallFree' });
+    const installFreeLeft = getInstallFreeAiDrawsRemaining();
+    if (installFreeLeft > 0 && !canUseProAiQuota()) {
+      lines.push({
+        key: 'install-free',
+        n: installFreeLeft,
+        labelKey: 'quota.breakdownInstallFree',
+      });
     }
     const hasCreditLine = lines.some(
       (l) =>
@@ -1166,6 +1176,10 @@ function DiaryWritePage({
       aiQuotaKindRef.current = 'ai-pack';
       return true;
     }
+    // 재설치 복구 방지: 서버 잔여 먼저 맞춤
+    if (isFlutterApp() && getAccessToken()) {
+      await syncInstallFreeQuota();
+    }
     if (canUseInstallFreeAiDraw()) {
       aiQuotaKindRef.current = 'install-free';
       return true;
@@ -1226,7 +1240,7 @@ function DiaryWritePage({
     }
 
     if (kind === 'install-free') {
-      if (!consumeInstallFreeAiDraw()) {
+      if (!(await tryConsumeInstallFreeQuota())) {
         console.warn('[ai] commit install-free failed, image kept');
       }
       return;
