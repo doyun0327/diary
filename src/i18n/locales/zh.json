@@ -807,6 +807,7 @@
       "saveFailed": "无法保存日记",
       "empty": "请填写标题、正文或画作",
       "adNotCompleted": "需要看完广告才能用 AI 画画。",
+      "adNoFill": "暂时没有可观看的广告，请稍后再试。",
       "adNotCompletedWrite": "看完广告才能保存这篇日记",
       "adAppOnly": "广告仅在 App 内可用",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",

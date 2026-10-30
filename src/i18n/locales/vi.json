@@ -807,6 +807,7 @@
       "saveFailed": "Không lưu được nhật ký",
       "empty": "Thêm tiêu đề, nội dung hoặc bức vẽ",
       "adNotCompleted": "Bạn cần xem hết quảng cáo mới vẽ được bằng AI.",
+      "adNoFill": "Hiện chưa có quảng cáo nào. Vui lòng thử lại sau giây lát.",
       "adNotCompletedWrite": "Xem hết quảng cáo để lưu nhật ký này",
       "adAppOnly": "Quảng cáo chỉ có trong ứng dụng",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",

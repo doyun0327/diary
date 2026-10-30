@@ -807,6 +807,7 @@
       "saveFailed": "Impossible d'enregistrer le journal",
       "empty": "Ajoutez un titre, un texte ou un dessin",
       "adNotCompleted": "Il faut regarder la pub jusqu'a la fin pour dessiner avec l'IA.",
+      "adNoFill": "Aucune publicité n'est disponible pour le moment. Réessaie dans un instant.",
       "adNotCompletedWrite": "Termine la pub pour enregistrer ce journal",
       "adAppOnly": "Les pubs sont disponibles uniquement dans l’app",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",

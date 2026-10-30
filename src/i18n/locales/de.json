@@ -807,6 +807,7 @@
       "saveFailed": "Tagebucheintrag konnte nicht gespeichert werden",
       "empty": "Füge Titel, Text oder Zeichnung hinzu",
       "adNotCompleted": "Du musst die Werbung zu Ende schauen, um mit KI zu zeichnen.",
+      "adNoFill": "Gerade ist keine Werbung verfügbar. Bitte versuche es gleich noch einmal.",
       "adNotCompletedWrite": "Schließe die Werbung ab, um dieses Tagebuch zu speichern",
       "adAppOnly": "Werbung ist nur in der App verfügbar",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",

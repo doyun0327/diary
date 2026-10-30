@@ -27,7 +27,7 @@ declare global {
       active: boolean;
       error?: string | null;
     }) => void;
-    __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string }) => void;
+    __onDiaryRewardedAd?: (payload: { ok: boolean; reason?: string; error?: string }) => void;
     __onDiaryTipPurchaseComplete?: (payload: {
       ok: boolean;
       cancelled?: boolean;
@@ -92,43 +92,58 @@ export function notifyAiDrawComplete(payload?: {
   });
 }
 
-export async function requestAiRewardedAd(): Promise<boolean> {
+/** 실패 이유 (신규 앱 빌드만 보냄): no_ad = 보여 줄 광고 없음, dismissed = 끝까지 안 보고 닫음 */
+export type RewardedAdError = "no_ad" | "dismissed";
+
+export interface RewardedAdResult {
+  ok: boolean;
+  error?: RewardedAdError;
+}
+
+export async function requestAiRewardedAd(): Promise<RewardedAdResult> {
   return requestRewardedAd("aiDraw");
 }
 
 export async function requestDiaryRewardedAd(): Promise<boolean> {
-  return requestRewardedAd("diarySave");
+  return (await requestRewardedAd("diarySave")).ok;
+}
+
+type RewardedAdPayload = { ok?: boolean; reason?: string; error?: string };
+
+function toRewardedAdResult(payload?: RewardedAdPayload | null): RewardedAdResult {
+  const ok = Boolean(payload?.ok);
+  const error = payload?.error === "no_ad" || payload?.error === "dismissed" ? payload.error : undefined;
+  return ok ? { ok } : { ok, error };
 }
 
 async function requestRewardedAd(
   reason: "aiDraw" | "diarySave",
-): Promise<boolean> {
-  if (!isFlutterApp()) return false;
+): Promise<RewardedAdResult> {
+  if (!isFlutterApp()) return { ok: false };
 
-  return new Promise<boolean>((resolve) => {
+  return new Promise<RewardedAdResult>((resolve) => {
     let done = false;
     const prev = window.__onDiaryRewardedAd;
 
     const onCustom = (event: Event) => {
-      const detail = (event as CustomEvent<{ ok?: boolean }>).detail;
-      finish(Boolean(detail?.ok));
+      finish(toRewardedAdResult((event as CustomEvent<RewardedAdPayload>).detail));
     };
 
-    function finish(ok: boolean) {
+    function finish(result: RewardedAdResult) {
       if (done) return;
       done = true;
       window.clearTimeout(timer);
       window.removeEventListener("diary-rewarded-ad-result", onCustom);
       window.__onDiaryRewardedAd = prev;
-      resolve(ok);
+      resolve(result);
     }
 
-    window.__onDiaryRewardedAd = (payload) => finish(Boolean(payload?.ok));
+    window.__onDiaryRewardedAd = (payload) => finish(toRewardedAdResult(payload));
     window.addEventListener("diary-rewarded-ad-result", onCustom);
     postDiaryNative({ type: "rewardedAdShow", reason });
 
     // 네이티브 응답이 유실되면 웹이 영원히 멈추지 않게
-    const timer = window.setTimeout(() => finish(false), 180_000);
+    const timer = window.setTimeout(() => finish({ ok: false, error: "no_ad" }), 180_000);
   });
 }
 

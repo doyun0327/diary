@@ -807,6 +807,7 @@
       "saveFailed": "Não foi possível salvar o diário",
       "empty": "Adicione um título, texto ou desenho",
       "adNotCompleted": "E preciso ver o anuncio ate o fim para desenhar com IA.",
+      "adNoFill": "Nenhum anúncio disponível agora. Tente novamente em instantes.",
       "adNotCompletedWrite": "Termine o anúncio para salvar este diário",
       "adAppOnly": "Anúncios só estão disponíveis no app",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",

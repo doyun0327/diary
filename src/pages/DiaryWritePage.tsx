@@ -291,7 +291,6 @@ function DiaryWritePage({
   const [rewardPromptOpen, setRewardPromptOpen] = useState(false);
   const [aiDailyLimitOpen, setAiDailyLimitOpen] = useState(false);
   const [proAiLimitOpen, setProAiLimitOpen] = useState(false);
-  const [adIncompleteOpen, setAdIncompleteOpen] = useState(false);
   const [aiStyleOpen, setAiStyleOpen] = useState(false);
   /** 스타일 모달이 일기 경로인지 사진 경로인지 */
   const [aiStylePickerSource, setAiStylePickerSource] = useState<
@@ -888,7 +887,6 @@ function DiaryWritePage({
       armPurchaseShield(6_000);
       setRewardPromptOpen(false);
       setAiDailyLimitOpen(false);
-      setAdIncompleteOpen(false);
       // 월한도 추가구매 모달은 유지 (실드가 모달 클릭을 막지 않도록 AppModal z-index > shield)
       setAiError(null);
       contentRef.current?.blur();
@@ -1750,13 +1748,18 @@ function DiaryWritePage({
     }
     setRewardPromptOpen(false);
     setProAiLimitOpen(false);
-    setAdIncompleteOpen(false);
     setAiError(null);
     clearPurchaseShield();
-    const ok = await requestAiRewardedAd();
-    if (!ok) {
+    const adResult = await requestAiRewardedAd();
+    if (!adResult.ok) {
       clearPurchaseShield();
-      setAdIncompleteOpen(true);
+      // 광고를 끝까지 본 경우에만 그림. 실패 시 반복 모달 대신 짧은 안내만
+      onAppToast?.(
+        adResult.error === 'no_ad'
+          ? t('write.err.adNoFill')
+          : t('write.err.adNotCompleted'),
+        3000,
+      );
       return;
     }
     // 광고 닫힌 직후 WebView가 바로 요청하면 실패하는 경우 대비
@@ -2589,17 +2592,6 @@ function DiaryWritePage({
                 ) : null}
               </div>
             </AppModal>
-          )}
-          {adIncompleteOpen && (
-            <AppModal
-              title={t('write.ai.adIncompleteTitle')}
-              lead={t('write.err.adNotCompleted')}
-              onDismiss={() => setAdIncompleteOpen(false)}
-              showClose
-              closeAriaLabel={t('common.close')}
-              primaryLabel={t('write.ai.rewardCta')}
-              onPrimary={() => void handleWatchAd()}
-            />
           )}
           {aiPickOpen && aiPickOptions.length > 0 && (
             <AppModal

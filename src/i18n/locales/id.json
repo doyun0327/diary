@@ -811,6 +811,7 @@
       "saveFailed": "Gagal menyimpan diary",
       "empty": "Tambahkan judul, teks, atau gambar",
       "adNotCompleted": "Anda harus menonton iklan sampai selesai untuk menggambar dengan AI.",
+      "adNoFill": "Belum ada iklan yang tersedia. Coba lagi sebentar lagi.",
       "adNotCompletedWrite": "Selesaikan iklan untuk menyimpan diary ini",
       "adAppOnly": "Iklan hanya tersedia di aplikasi",
       "diaryDailyLimit": "오늘은 광고로 일기 3번까지 저장할 수 있어요. (작성·수정 포함) PRO로 더 많이 쓸 수 있어요.",
