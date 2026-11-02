@@ -63,10 +63,11 @@ function mergeServerComments(
 }
 
 /** 스레드에 등장한 순서 기준 0~9 색 인덱스 */
-function buildCommentColorMap(comments: RoomComment[]): Map<string, number> {
+/** 친구별 댓글 색 인덱스. 내 댓글은 테마 색을 쓰므로 제외 */
+function buildCommentColorMap(comments: RoomComment[], myUserId: string): Map<string, number> {
   const map = new Map<string, number>();
   for (const c of comments) {
-    if (!map.has(c.authorUserId)) {
+    if (c.authorUserId !== myUserId && !map.has(c.authorUserId)) {
       map.set(c.authorUserId, map.size % 10);
     }
   }
@@ -273,8 +274,8 @@ function RoomPostPage({
   }, [comments, blockTick]);
 
   const colorMap = useMemo(
-    () => buildCommentColorMap(visibleComments),
-    [visibleComments],
+    () => buildCommentColorMap(visibleComments, userId),
+    [visibleComments, userId],
   );
 
   const refreshSeqRef = useRef(0);
@@ -695,7 +696,7 @@ function RoomPostPage({
                   'rooms__comment',
                   isMine ? 'rooms__comment--mine' : 'rooms__comment--other',
                   showName ? 'rooms__comment--named' : 'rooms__comment--cont',
-                  `rooms__comment--c${colorIdx}`,
+                  isMine ? '' : `rooms__comment--c${colorIdx}`,
                   sending ? 'rooms__comment--sending' : '',
                   failed ? 'rooms__comment--failed' : '',
                 ]
