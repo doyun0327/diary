@@ -2039,65 +2039,66 @@
   text-underline-offset: 2px;
 }
 
+/* 친구별 댓글: 현재 테마 accent 를 바탕으로 살짝만 구분 */
 .rooms__comment--c0 {
-  --rooms-comment-bg: #ffe8c8;
-  --rooms-comment-fg: #5a3d1a;
-  --rooms-comment-border: #f0d0a0;
-  --rooms-comment-ink: #b07530;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 78%, #fff 22%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 32%, var(--color-border-soft));
+  --rooms-comment-ink: var(--color-accent-text);
 }
 .rooms__comment--c1 {
-  --rooms-comment-bg: #d8f0e8;
-  --rooms-comment-fg: #1e4a3c;
-  --rooms-comment-border: #a8d8c8;
-  --rooms-comment-ink: #2a8a6a;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 62%, var(--color-bg-muted) 38%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 24%, var(--color-border));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-text) 80%, var(--color-text) 20%);
 }
 .rooms__comment--c2 {
-  --rooms-comment-bg: #fce0ea;
-  --rooms-comment-fg: #5a2038;
-  --rooms-comment-border: #f0b8c8;
-  --rooms-comment-ink: #c05078;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-surface) 30%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 40%, #fff 60%);
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-hover) 55%, var(--color-accent-text) 45%);
 }
 .rooms__comment--c3 {
-  --rooms-comment-bg: #ddeef8;
-  --rooms-comment-fg: #1a3a55;
-  --rooms-comment-border: #a8cce0;
-  --rooms-comment-ink: #3a7aaa;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-bg-muted) 55%, var(--color-accent-soft) 45%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 20%, var(--color-border-soft));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-text) 65%, var(--color-text-muted) 35%);
 }
 .rooms__comment--c4 {
-  --rooms-comment-bg: #ebe4f5;
-  --rooms-comment-fg: #3a2a55;
-  --rooms-comment-border: #c8b8e0;
-  --rooms-comment-ink: #6a50a0;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 55%, #fff 45%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent-hover) 28%, var(--color-border-soft));
+  --rooms-comment-ink: var(--color-accent-hover);
 }
 .rooms__comment--c5 {
-  --rooms-comment-bg: #fff0c8;
-  --rooms-comment-fg: #5a4a10;
-  --rooms-comment-border: #e8d890;
-  --rooms-comment-ink: #a08820;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 85%, var(--color-bg) 15%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 36%, var(--color-border));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-text) 90%, var(--color-accent) 10%);
 }
 .rooms__comment--c6 {
-  --rooms-comment-bg: #e0f0d0;
-  --rooms-comment-fg: #2a4520;
-  --rooms-comment-border: #b8d8a0;
-  --rooms-comment-ink: #5a9030;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-bg-soft) 50%, var(--color-accent-soft) 50%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 18%, var(--color-border));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-text) 55%, var(--color-text) 45%);
 }
 .rooms__comment--c7 {
-  --rooms-comment-bg: #f8e0d0;
-  --rooms-comment-fg: #5a3020;
-  --rooms-comment-border: #e8b898;
-  --rooms-comment-ink: #c06840;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 48%, #fff 52%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent-hover) 22%, var(--color-border-soft));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent) 40%, var(--color-accent-text) 60%);
 }
 .rooms__comment--c8 {
-  --rooms-comment-bg: #d8e8f8;
-  --rooms-comment-fg: #203050;
-  --rooms-comment-border: #a8c0e0;
-  --rooms-comment-ink: #4060a0;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-accent-soft) 66%, var(--color-bg-input) 34%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 30%, #fff 70%);
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-hover) 70%, var(--color-text-muted) 30%);
 }
 .rooms__comment--c9 {
-  --rooms-comment-bg: #f0e0f0;
-  --rooms-comment-fg: #4a2848;
-  --rooms-comment-border: #d8b0d0;
-  --rooms-comment-ink: #905080;
+  --rooms-comment-bg: color-mix(in srgb, var(--color-bg-muted) 40%, var(--color-accent-soft) 60%);
+  --rooms-comment-fg: var(--color-text);
+  --rooms-comment-border: color-mix(in srgb, var(--color-accent) 26%, var(--color-border));
+  --rooms-comment-ink: color-mix(in srgb, var(--color-accent-text) 75%, var(--color-accent-hover) 25%);
 }
 
 .rooms-cover-pick {
