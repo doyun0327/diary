@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveAppLanguage } from '../i18n';
 import {
   nyangTicketIntroSrc,
   preloadNyangTicketImages,
@@ -7,30 +8,32 @@ import {
 } from '../utils/nyangTicketImages';
 import './AppIntro.css';
 
-/** public/intro 구독 혜택 이미지 */
-const INTRO_IMAGES = [
-  { id: 'draw50', file: '50장.png', labelKey: 'nyangTicket.benefitDraw50' },
+/** public/intro 구독 혜택 */
+const INTRO_BENEFITS = [
+  { id: 'draw40', file: '40장.png', labelKey: 'nyangTicket.benefitDraw50' },
   { id: 'pdf', file: 'pdf저장.png', labelKey: 'nyangTicket.benefitPdf' },
   { id: 'search', file: '검색.png', labelKey: 'nyangTicket.benefitSearch' },
   { id: 'noAds', file: '광고제거.png', labelKey: 'nyangTicket.benefitNoAds' },
 ] as const;
-const SLIDE_COUNT = INTRO_IMAGES.length;
+const SLIDE_COUNT = INTRO_BENEFITS.length;
 
 type AppIntroProps = {
   onFinish: () => void;
 };
 
-/** 첫 실행 앱 소개 — public/intro 이미지 가로 슬라이드 */
+/** 첫 실행 앱 소개 — 한국어는 이미지, 그 외는 혜택 문구 슬라이드 */
 export default function AppIntro({ onFinish }: AppIntroProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isKorean = resolveAppLanguage(i18n.language) === 'ko';
   const [index, setIndex] = useState(0);
   const [cacheTick, setCacheTick] = useState(0);
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!isKorean) return;
     preloadNyangTicketImages();
     return subscribeNyangTicketImagesReady(() => setCacheTick((n) => n + 1));
-  }, []);
+  }, [isKorean]);
 
   const go = (next: number) => {
     if (next >= SLIDE_COUNT) {
@@ -51,7 +54,8 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
         }}
         onTouchEnd={(e) => {
           if (touchX.current == null) return;
-          const dx = (e.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
+          const dx =
+            (e.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
           touchX.current = null;
           if (dx < -40) go(index + 1);
           if (dx > 40) go(index - 1);
@@ -73,21 +77,29 @@ export default function AppIntro({ onFinish }: AppIntroProps) {
           className="app-intro__track"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {INTRO_IMAGES.map((item, i) => (
-            <section key={item.id} className="app-intro__slide" aria-hidden={i !== index}>
-              <img
-                className="app-intro__image"
-                src={nyangTicketIntroSrc(item.file)}
-                alt={t(item.labelKey)}
-                draggable={false}
-              />
+          {INTRO_BENEFITS.map((item, i) => (
+            <section
+              key={item.id}
+              className={`app-intro__slide${isKorean ? '' : ' app-intro__slide--text'}`}
+              aria-hidden={i !== index}
+            >
+              {isKorean ? (
+                <img
+                  className="app-intro__image"
+                  src={nyangTicketIntroSrc(item.file)}
+                  alt={t(item.labelKey)}
+                  draggable={false}
+                />
+              ) : (
+                <p className="app-intro__text">{t(item.labelKey)}</p>
+              )}
             </section>
           ))}
         </div>
       </div>
 
       <div className="app-intro__dots" role="tablist" aria-label={t('appIntro.aria')}>
-        {INTRO_IMAGES.map((item, i) => (
+        {INTRO_BENEFITS.map((item, i) => (
           <button
             key={item.id}
             type="button"

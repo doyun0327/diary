@@ -52,6 +52,23 @@
   pointer-events: none;
 }
 
+.app-intro__slide--text {
+  padding: 28px 28px 72px;
+  background: var(--color-bg, #f7eedc);
+}
+
+.app-intro__text {
+  margin: 0;
+  max-width: 18em;
+  text-align: center;
+  font-family: var(--brand-font, inherit);
+  font-size: clamp(1.35rem, 5.2vw, 1.85rem);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--color-accent-text, #1a1a1a);
+}
+
 .app-intro__dots {
   position: absolute;
   left: 0;

@@ -8,9 +8,10 @@ import {
 export const FREE_ENTRY_GRANT = 5;
 /** @deprecated 일기 평생 무료 N장 — 현재는 일일 광고 한도 사용 */
 export const FREE_ENTRY_LIMIT_ENABLED = false;
-export const MONTHLY_DIARY_LIMIT = 50;
+/** @deprecated 일기 월간 한도 — 현재는 AI 그림 월간 한도만 사용 */
+export const MONTHLY_DIARY_LIMIT = 40;
 /** Pro: 이번 달 AI 그림 생성 한도 (작성·수정 동일) */
-export const MONTHLY_AI_DRAW_LIMIT = MONTHLY_DIARY_LIMIT;
+export const MONTHLY_AI_DRAW_LIMIT = 40;
 /** 무료 회원: 광고 보고 하루 최대 AI 그림 생성 횟수 */
 export const FREE_DAILY_AI_AD_LIMIT = 1;
 /** @deprecated FREE_DAILY_AI_AD_LIMIT */

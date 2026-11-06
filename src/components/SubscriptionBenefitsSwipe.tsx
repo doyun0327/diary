@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveAppLanguage } from '../i18n';
 import {
   nyangTicketIntroSrc,
   preloadNyangTicketImages,
@@ -7,9 +8,9 @@ import {
 } from '../utils/nyangTicketImages';
 import './SubscriptionBenefitsSwipe.css';
 
-/** public/intro — 구독 혜택 이미지 */
-const IMAGES = [
-  { id: 'draw50', file: '50장.png', labelKey: 'nyangTicket.benefitDraw50' },
+/** public/intro — 구독 혜택 (한국어 이미지 / 그 외 문구) */
+const BENEFITS = [
+  { id: 'draw40', file: '40장.png', labelKey: 'nyangTicket.benefitDraw50' },
   { id: 'pdf', file: 'pdf저장.png', labelKey: 'nyangTicket.benefitPdf' },
   { id: 'search', file: '검색.png', labelKey: 'nyangTicket.benefitSearch' },
   { id: 'noAds', file: '광고제거.png', labelKey: 'nyangTicket.benefitNoAds' },
@@ -20,19 +21,21 @@ interface SubscriptionBenefitsSwipeProps {
   compact?: boolean;
 }
 
-/** 구독 혜택 — 썸네일 스크롤 + 탭 시 확대 */
+/** 구독 혜택 — 한국어: 이미지 / 그 외: 텍스트 목록 */
 export default function SubscriptionBenefitsSwipe({
   compact = false,
 }: SubscriptionBenefitsSwipeProps = {}) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isKorean = resolveAppLanguage(i18n.language) === 'ko';
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [cacheTick, setCacheTick] = useState(0);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
+    if (!isKorean) return;
     preloadNyangTicketImages();
     return subscribeNyangTicketImagesReady(() => setCacheTick((n) => n + 1));
-  }, []);
+  }, [isKorean]);
 
   useEffect(() => {
     if (previewIndex == null) return;
@@ -40,7 +43,7 @@ export default function SubscriptionBenefitsSwipe({
       if (e.key === 'Escape') setPreviewIndex(null);
       if (e.key === 'ArrowRight') {
         setPreviewIndex((i) =>
-          i == null ? i : Math.min(IMAGES.length - 1, i + 1),
+          i == null ? i : Math.min(BENEFITS.length - 1, i + 1),
         );
       }
       if (e.key === 'ArrowLeft') {
@@ -52,7 +55,7 @@ export default function SubscriptionBenefitsSwipe({
   }, [previewIndex]);
 
   const goPreview = (next: number) => {
-    setPreviewIndex(Math.max(0, Math.min(IMAGES.length - 1, next)));
+    setPreviewIndex(Math.max(0, Math.min(BENEFITS.length - 1, next)));
   };
 
   const onPreviewSwipeStart = (x: number, y: number) => {
@@ -70,13 +73,30 @@ export default function SubscriptionBenefitsSwipe({
     else goPreview(previewIndex - 1);
   };
 
-  const preview = previewIndex != null ? IMAGES[previewIndex] : null;
+  const preview = previewIndex != null ? BENEFITS[previewIndex] : null;
   void cacheTick;
+
+  if (!isKorean) {
+    return (
+      <div className={`sub-benefits${compact ? ' sub-benefits--compact' : ''}`}>
+        <ul className="sub-benefits__text-list" role="list">
+          {BENEFITS.map((item) => (
+            <li key={item.id} className="sub-benefits__text-item">
+              <span className="sub-benefits__text-mark" aria-hidden>
+                ✓
+              </span>
+              <span className="sub-benefits__text-label">{t(item.labelKey)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 
   return (
     <div className={`sub-benefits${compact ? ' sub-benefits--compact' : ''}`}>
       <ul className="sub-benefits__grid" role="list">
-        {IMAGES.map((item, i) => (
+        {BENEFITS.map((item, i) => (
           <li key={item.id} className="sub-benefits__cell">
             <button
               type="button"
@@ -143,12 +163,12 @@ export default function SubscriptionBenefitsSwipe({
                 ‹
               </button>
               <span className="sub-benefits__lightbox-count">
-                {previewIndex + 1} / {IMAGES.length}
+                {previewIndex + 1} / {BENEFITS.length}
               </span>
               <button
                 type="button"
                 className="sub-benefits__lightbox-nav-btn"
-                disabled={previewIndex >= IMAGES.length - 1}
+                disabled={previewIndex >= BENEFITS.length - 1}
                 onClick={() => goPreview(previewIndex + 1)}
               >
                 ›

@@ -4,13 +4,13 @@
  */
 
 export const NYANG_TICKET_INTRO_FILES = [
-  '50장.png',
+  '40장.png',
   'pdf저장.png',
   '검색.png',
   '광고제거.png',
 ] as const;
 
-const NYANG_TICKET_IMAGE_CACHE = 'nyang-ticket-intro-v1';
+const NYANG_TICKET_IMAGE_CACHE = 'nyang-ticket-intro-v2';
 
 const blobUrlByFile = new Map<string, string>();
 const readyListeners = new Set<() => void>();

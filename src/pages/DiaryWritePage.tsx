@@ -946,7 +946,7 @@ function DiaryWritePage({
           limit: status.monthlyLimit + pack,
         };
       }
-      // 월 50장 소진 후: 광고로 받는 오늘 1회
+      // 월 한도 소진 후: 광고로 받는 오늘 1회
       const adCredits = getAiDrawCredits();
       if (adCredits > 0) {
         return { used: 0, limit: adCredits };
@@ -1075,7 +1075,7 @@ function DiaryWritePage({
     setAiError(t('write.err.aiDailyLimit'));
   };
 
-  /** Pro 월 50회 소진 후: 팩 잔량 있으면 바로 진행, 없으면 구매/광고 모달 */
+  /** Pro 월 한도 소진 후: 팩 잔량 있으면 바로 진행, 없으면 구매/광고 모달 */
   const promptProMonthlyExhausted = () => {
     if (getAiPackCredits() > 0) {
       void runAiDraw();
