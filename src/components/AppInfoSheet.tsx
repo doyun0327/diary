@@ -10,12 +10,6 @@ import { fetchTipStorePrices, waitForTipPurchase } from '../utils/tipPurchase';
 import CloseIcon from './CloseIcon';
 import './AppInfoSheet.css';
 
-const ACCOUNT_DELETION_PATH = '/account-deletion.html';
-
-function accountDeletionUrl(): string {
-  return `${getInviteWebOrigin()}${ACCOUNT_DELETION_PATH}`;
-}
-
 /** privacy.html 의 ./account-deletion.html 등 상대 링크를 공개 URL로 */
 function resolveLegalHref(href: string): string {
   const raw = href.trim();
@@ -270,21 +264,7 @@ function AppInfoSheet({ onClose, initialView = 'main' }: AppInfoSheetProps) {
               />
             </p>
             <h3>{t('appInfo.legal.accountDeletionHeading')}</h3>
-            <p>
-              <Trans
-                i18nKey="appInfo.legal.accountDeletionBody"
-                components={{
-                  deletionLink: (
-                    <a
-                      className="app-info__text-link"
-                      href={accountDeletionUrl()}
-                      target="_blank"
-                      rel="noreferrer"
-                    />
-                  ),
-                }}
-              />
-            </p>
+            <p>{t('appInfo.legal.accountDeletionBody')}</p>
             <h3>{t('appInfo.legal.refundHeading')}</h3>
             <p>{t('appInfo.legal.refundBody')}</p>
           </div>
