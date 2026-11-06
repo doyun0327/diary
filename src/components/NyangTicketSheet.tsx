@@ -16,7 +16,7 @@ import {
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
-import { isFlutterApp, isIOSApp } from '../utils/nativeShare';
+import { isAndroidApp, isFlutterApp, isIOSApp } from '../utils/nativeShare';
 import {
   REQUIRE_GOOGLE_FOR_PRO_EVENT,
   requestSubscriptionPurchaseAndSync,
@@ -701,8 +701,8 @@ function NyangTicketSheet({
             {error}
           </p>
         )}
-        {/* 시트 맨 아래 고정 (모든 탭). 시트 바닥 = 광고 배너 바로 위, 구독자는 화면 맨 아래 */}
-        {onOpenLegal ? (
+        {/* Android 앱에서는 숨김. 시트 맨 아래 고정 (모든 탭). 시트 바닥 = 광고 배너 바로 위, 구독자는 화면 맨 아래 */}
+        {onOpenLegal && !isAndroidApp() ? (
           <p className="nyang-ticket__legal-links">
             <button type="button" onClick={onOpenLegal}>
               {t('appInfo.legal.termsHeading')}
