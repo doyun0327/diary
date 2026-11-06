@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Vous avez un journal inachevé",
+    "draftResumeLead": "Nous avons enregistré le journal que vous écriviez avant la mise à jour ou le redémarrage. Continuer ?",
+    "draftResumeContinue": "Continuer",
+    "draftResumeDiscard": "Supprimer",
     "close": "Fermer",
     "cancel": "Annuler",
     "ok": "vérifier",

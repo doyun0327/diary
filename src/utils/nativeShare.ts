@@ -73,6 +73,11 @@ export function isIOSApp(): boolean {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
+/** Android Flutter 앱 (갤럭시 등). Android 전용 분기에 사용 */
+export function isAndroidApp(): boolean {
+  return isFlutterApp() && !isIOSApp();
+}
+
 export function postDiaryNative(data: Record<string, unknown>) {
   const native = diaryNative();
   if (!native) return;

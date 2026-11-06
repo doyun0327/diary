@@ -123,6 +123,31 @@ export async function clearWriteDraftMedia(): Promise<void> {
 /** 배포 새로고침 직전 등 — 작성 화면이 동기 flush 하도록 */
 export const DRAFT_FLUSH_EVENT = 'diary-flush-draft';
 
-export function requestDraftFlush(): void {
+type DraftFlushHandler = () => void | Promise<void>;
+const draftFlushHandlers = new Set<DraftFlushHandler>();
+
+/** 작성 화면이 마운트되어 있을 때 미디어까지 await 가능한 flush 등록 */
+export function subscribeDraftFlush(handler: DraftFlushHandler): () => void {
+  draftFlushHandlers.add(handler);
+  return () => {
+    draftFlushHandlers.delete(handler);
+  };
+}
+
+/** 메타·캔버스 초안을 끝까지 저장한 뒤 resolve (배포 새로고침 직전용) */
+export async function requestDraftFlushAsync(): Promise<void> {
   window.dispatchEvent(new Event(DRAFT_FLUSH_EVENT));
+  await Promise.all(
+    [...draftFlushHandlers].map((handler) =>
+      Promise.resolve()
+        .then(() => handler())
+        .catch((err) => {
+          console.warn('[draft] flush handler failed', err);
+        }),
+    ),
+  );
+}
+
+export function requestDraftFlush(): void {
+  void requestDraftFlushAsync();
 }

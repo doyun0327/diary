@@ -54,9 +54,15 @@ import { isFlutterApp, postDiaryNative } from "./utils/nativeShare";
 import {
   clearWriteDraft,
   loadWriteDraft,
-  requestDraftFlush,
+  requestDraftFlushAsync,
   saveWriteDraft,
+  writeDraftHasContent,
+  type WriteDraft,
 } from "./utils/writeDraft";
+import {
+  consumeDeployNavSnapshot,
+  saveDeployNavSnapshot,
+} from "./utils/deployNavSnapshot";
 import { syncSharedDiaryAfterDelete, syncSharedDiaryAfterEdit } from "./utils/syncSharedDiary";
 import { prefetchRoomFeed, prefetchRoomsList } from "./utils/roomPrefetch";
 import { clearRememberedRoomFeedPage } from "./utils/roomCache";
@@ -137,11 +143,20 @@ function App() {
   const { clientId, nickname, setNickname, avatarUrl, setAvatarUrl, gender, setGender, ageGroup, setAgeGroup } =
     useClientProfile();
   const screenLock = useScreenLock();
-  const [page, setPage] = useState<Page>("home");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const resumeNavRef = useRef(consumeDeployNavSnapshot());
+  const [page, setPage] = useState<Page>(
+    () => resumeNavRef.current?.page ?? "home",
+  );
+  const [selectedId, setSelectedId] = useState<string | null>(
+    () => resumeNavRef.current?.selectedId ?? null,
+  );
   /** 메인 달력에서 고른 날짜 — 새 일기 작성 시 사용 */
-  const [selectedDate, setSelectedDate] = useState(() => today());
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState(
+    () => resumeNavRef.current?.selectedDate ?? today(),
+  );
+  const [editingId, setEditingId] = useState<string | null>(
+    () => resumeNavRef.current?.editingId ?? null,
+  );
   const [characterOpen, setCharacterOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -164,8 +179,12 @@ function App() {
     start: string;
     end: string;
   } | null>(null);
-  const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
-  const [activePostId, setActivePostId] = useState<string | null>(null);
+  const [activeRoomId, setActiveRoomId] = useState<string | null>(
+    () => resumeNavRef.current?.activeRoomId ?? null,
+  );
+  const [activePostId, setActivePostId] = useState<string | null>(
+    () => resumeNavRef.current?.activePostId ?? null,
+  );
   /** FCM으로 같은 글을 다시 열 때 RoomPostPage 강제 리마운트 */
   const [roomPostOpenKey, setRoomPostOpenKey] = useState(0);
   /** 초대 링크로 받은 코드 — RoomsHub에서 자동 입장 후 소거 */
@@ -200,10 +219,6 @@ function App() {
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (deployUpdating) requestDraftFlush();
-  }, [deployUpdating]);
 
   useEffect(() => {
     const run = () => {
@@ -248,8 +263,95 @@ function App() {
   }, [ready, editingId, entries]);
 
   const now = new Date();
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [calYear, setCalYear] = useState(
+    () => resumeNavRef.current?.calYear ?? now.getFullYear(),
+  );
+  const [calMonth, setCalMonth] = useState(
+    () => resumeNavRef.current?.calMonth ?? now.getMonth(),
+  );
+
+  useEffect(() => {
+    if (!deployUpdating) return;
+    saveDeployNavSnapshot({
+      page,
+      editingId,
+      selectedId,
+      selectedDate,
+      activeRoomId,
+      activePostId,
+      calYear,
+      calMonth,
+    });
+    void requestDraftFlushAsync();
+  }, [
+    deployUpdating,
+    page,
+    editingId,
+    selectedId,
+    selectedDate,
+    activeRoomId,
+    activePostId,
+    calYear,
+    calMonth,
+  ]);
+
+  // 작성 중 페이지가 내려가면(배포 새로고침·updating.html 이동·WebView 재로드) 작성 화면 위치를 남김.
+  // 내용 자체는 DiaryWritePage 가 localStorage/IndexedDB 초안으로 저장한다.
+  const navForUnloadRef = useRef({
+    page,
+    editingId,
+    selectedId,
+    selectedDate,
+    activeRoomId,
+    activePostId,
+    calYear,
+    calMonth,
+  });
+  navForUnloadRef.current = {
+    page,
+    editingId,
+    selectedId,
+    selectedDate,
+    activeRoomId,
+    activePostId,
+    calYear,
+    calMonth,
+  };
+  useEffect(() => {
+    const onPageHide = () => {
+      const nav = navForUnloadRef.current;
+      if (nav.page !== "write") return;
+      saveDeployNavSnapshot(nav);
+    };
+    window.addEventListener("pagehide", onPageHide);
+    return () => window.removeEventListener("pagehide", onPageHide);
+  }, []);
+
+  /**
+   * 앱 재시작(앱 업데이트·프로세스 종료·탭 닫힘)으로 화면 스냅샷이 없지만
+   * 저장 안 된 작성 초안이 남아 있으면 '이어 쓰기' 안내.
+   */
+  const [draftResumeOffer, setDraftResumeOffer] = useState<WriteDraft | null>(
+    () => {
+      if (resumeNavRef.current?.page === "write") return null;
+      const draft = loadWriteDraft();
+      return draft && writeDraftHasContent(draft) ? draft : null;
+    },
+  );
+
+  const resumeWriteDraft = () => {
+    const draft = draftResumeOffer;
+    setDraftResumeOffer(null);
+    if (!draft) return;
+    setSelectedDate(draft.date);
+    setEditingId(draft.editingId ?? null);
+    setPage("write");
+  };
+
+  const discardWriteDraft = () => {
+    setDraftResumeOffer(null);
+    clearWriteDraft();
+  };
 
   const [onboardingTick, setOnboardingTick] = useState(0);
   const needsProfileSetup = !isProfileSetupDone();
@@ -953,6 +1055,7 @@ function App() {
     if (date) setSelectedDate(date);
     setEditingId(null);
     clearWriteDraft();
+    setDraftResumeOffer(null);
     setPage("write");
   };
 
@@ -1374,16 +1477,12 @@ function App() {
           />,
           document.getElementById("root") ?? document.body,
         )}
-      {cloudSyncLoading &&
-        createPortal(
-          <CloudSyncLoadingOverlay message={t("account.sync.loadingDiaries")} />,
-          document.getElementById("root") ?? document.body,
-        )}
-      {deployUpdating &&
-        createPortal(
-          <CloudSyncLoadingOverlay message={t("common.deployUpdating")} />,
-          document.getElementById("root") ?? document.body,
-        )}
+      {cloudSyncLoading ? (
+        <CloudSyncLoadingOverlay message={t("account.sync.loadingDiaries")} />
+      ) : null}
+      {deployUpdating ? (
+        <CloudSyncLoadingOverlay message={t("common.deployUpdating")} />
+      ) : null}
       {languageOpen &&
         createPortal(
           <LanguageSheet onClose={() => setLanguageOpen(false)} />,
@@ -1594,6 +1693,26 @@ function App() {
               markPagebyAfterSavePromptSeen();
               setPagebyAfterSavePromptOpen(false);
             }}
+            closeAriaLabel={t("common.close")}
+          />,
+          document.getElementById("root") ?? document.body,
+        )}
+      {draftResumeOffer &&
+        ready &&
+        page === "home" &&
+        !screenLock.locked &&
+        !deployUpdating &&
+        createPortal(
+          <AppModal
+            title={t("common.draftResumeTitle")}
+            lead={t("common.draftResumeLead")}
+            // 닫기만 하면 초안은 남겨 둠 — 다음 실행 때 다시 안내
+            onDismiss={() => setDraftResumeOffer(null)}
+            showClose
+            primaryLabel={t("common.draftResumeContinue")}
+            onPrimary={resumeWriteDraft}
+            secondaryLabel={t("common.draftResumeDiscard")}
+            onSecondary={discardWriteDraft}
             closeAriaLabel={t("common.close")}
           />,
           document.getElementById("root") ?? document.body,

@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "작성 중이던 일기가 있어요",
+    "draftResumeLead": "업데이트전에 쓰던 일기를 저장해 두었어요. 이어서 쓸까요?",
+    "draftResumeContinue": "이어 쓰기",
+    "draftResumeDiscard": "삭제",
     "close": "닫기",
     "cancel": "취소",
     "ok": "확인",

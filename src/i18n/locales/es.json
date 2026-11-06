@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Tienes un diario sin terminar",
+    "draftResumeLead": "Guardamos el diario que escribías antes de la actualización o el reinicio. ¿Quieres seguir?",
+    "draftResumeContinue": "Seguir escribiendo",
+    "draftResumeDiscard": "Descartar",
     "close": "Cerrar",
     "cancel": "Cancelar",
     "ok": "controlar",

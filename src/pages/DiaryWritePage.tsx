@@ -80,11 +80,11 @@ import {
 } from '../utils/onboarding';
 import {
   clearWriteDraft,
-  DRAFT_FLUSH_EVENT,
   loadWriteDraft,
   loadWriteDraftMedia,
   saveWriteDraft,
   saveWriteDraftMedia,
+  subscribeDraftFlush,
   writeDraftHasContent,
 } from '../utils/writeDraft';
 import {
@@ -93,7 +93,7 @@ import {
   saveAiPickPending,
 } from '../utils/aiPickPending';
 import { resolveDiaryImageForSave, resolveInkImageForSave } from '../utils/resolveDiaryImage';
-import { isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
+import { isAndroidApp, isFlutterApp, requestAiRewardedAd } from '../utils/nativeShare';
 import { openNyangTicket } from '../utils/openNyangTicket';
 import { getAccessToken, isGoogleSignedIn, useAuthSession } from '../hooks/useAuthSession';
 import {
@@ -401,6 +401,8 @@ function DiaryWritePage({
   const savingRef = useRef(false);
   const drawingTouchedRef = useRef(false);
   const drawingClearedRef = useRef(false);
+  /** 마운트 시 저장 안 된 초안(배포·재시작 전 작성분)을 복원했는지 */
+  const resumedFromDraftRef = useRef(Boolean(resumeDraft));
   const baselineRef = useRef({
     date: resumeDraft?.date ?? initialEntry?.date ?? initialDate ?? today(),
     title: resumeDraft?.title ?? initialEntry?.title ?? '',
@@ -702,7 +704,30 @@ function DiaryWritePage({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- entryId 변경(또는 새 글 마운트) 시에만
   }, [initialEntry?.id]);
 
+  /** 저장 완료·작성 취소 후에는 늦게 끝난 flush 가 초안을 되살리지 않도록 */
+  const draftClosedRef = useRef(false);
+  /** 사용자가 캔버스(그림·사진·스티커·AI 그림)를 실제로 바꿨는지 — 수정 모드 초안 판단용 */
+  const canvasEditedRef = useRef(false);
+  const mediaFlushTimerRef = useRef<number | null>(null);
+
+  const isMetaChangedFromBaseline = useCallback(() => {
+    const b = baselineRef.current;
+    return (
+      date !== b.date ||
+      title !== b.title ||
+      content !== b.content ||
+      mood !== b.mood ||
+      fontId !== b.fontId ||
+      fontSizeId !== b.fontSizeId
+    );
+  }, [date, title, content, mood, fontId, fontSizeId]);
+
   const flushWriteDraftMeta = useCallback(() => {
+    if (draftClosedRef.current) return;
+    // 수정 모드: 열어 보기만 한 경우엔 초안을 만들지 않음 (재시작 시 '이어 쓰기' 오탐 방지)
+    if (isEdit && !isMetaChangedFromBaseline() && !canvasEditedRef.current) {
+      return;
+    }
     const hasDrawing = Boolean(canvasRef.current?.hasContent());
     const meta = {
       date,
@@ -728,11 +753,16 @@ function DiaryWritePage({
     fontSizeId,
     initialEntry?.id,
     isEdit,
+    isMetaChangedFromBaseline,
   ]);
 
   const flushWriteDraftMedia = useCallback(async () => {
+    if (draftClosedRef.current || savingRef.current) return;
+    // 수정 모드에서 캔버스를 안 건드렸으면 원본 그림을 그대로 쓰면 되므로 생략
+    if (isEdit && !canvasEditedRef.current) return;
     try {
       await canvasRef.current?.prepareExport();
+      if (draftClosedRef.current) return;
       const rawState = canvasRef.current?.getCanvasState() ?? null;
       const imageUrl = canvasRef.current?.toDataURL() ?? null;
       const hasDrawing = Boolean(canvasRef.current?.hasContent());
@@ -740,6 +770,11 @@ function DiaryWritePage({
         canvasState: rawState,
         imageUrl: imageUrl || null,
       });
+      if (draftClosedRef.current) {
+        // 저장/취소가 미디어 쓰기 도중 끝남 → 방금 쓴 미디어도 정리
+        clearWriteDraft();
+        return;
+      }
       if (hasDrawing) {
         saveWriteDraft({
           date,
@@ -755,12 +790,48 @@ function DiaryWritePage({
     } catch (err) {
       console.warn('[draft] canvas flush failed', err);
     }
-  }, [date, title, content, mood, fontId, fontSizeId, initialEntry?.id]);
+  }, [date, title, content, mood, fontId, fontSizeId, initialEntry?.id, isEdit]);
 
   const flushWriteDraft = useCallback(async () => {
     flushWriteDraftMeta();
     await flushWriteDraftMedia();
   }, [flushWriteDraftMeta, flushWriteDraftMedia]);
+
+  const flushWriteDraftRef = useRef(flushWriteDraft);
+  flushWriteDraftRef.current = flushWriteDraft;
+
+  /**
+   * 그림·사진·스티커·AI 그림이 바뀌면 잠시 뒤 캔버스까지 IndexedDB 에 저장.
+   * 배포 새로고침·앱 업데이트로 프로세스가 갑자기 죽어도 마지막 그림이 남도록
+   * pagehide 에만 의존하지 않는다.
+   */
+  const markCanvasEdited = useCallback(() => {
+    canvasEditedRef.current = true;
+    if (mediaFlushTimerRef.current != null) {
+      window.clearTimeout(mediaFlushTimerRef.current);
+    }
+    mediaFlushTimerRef.current = window.setTimeout(() => {
+      mediaFlushTimerRef.current = null;
+      void flushWriteDraftRef.current();
+    }, 1200);
+  }, []);
+
+  const closeDraft = useCallback(() => {
+    draftClosedRef.current = true;
+    if (mediaFlushTimerRef.current != null) {
+      window.clearTimeout(mediaFlushTimerRef.current);
+      mediaFlushTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (mediaFlushTimerRef.current != null) {
+        window.clearTimeout(mediaFlushTimerRef.current);
+      }
+    },
+    [],
+  );
 
   // 텍스트·설정만 가볍게 자동 임시저장 (캔버스 export는 타이핑마다 하지 않음)
   useEffect(() => {
@@ -770,21 +841,21 @@ function DiaryWritePage({
     return () => window.clearTimeout(timer);
   }, [flushWriteDraftMeta]);
 
-  // 배포 새로고침·백그라운드 전환 직전 flush
+  // 배포 새로고침·백그라운드 전환 직전 flush (async await 가능)
   useEffect(() => {
-    const onFlush = () => {
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') void flushWriteDraft();
+    };
+    const onPageHide = () => {
       void flushWriteDraft();
     };
-    const onHide = () => {
-      if (document.visibilityState === 'hidden') onFlush();
-    };
-    window.addEventListener(DRAFT_FLUSH_EVENT, onFlush);
+    const unsub = subscribeDraftFlush(() => flushWriteDraft());
     document.addEventListener('visibilitychange', onHide);
-    window.addEventListener('pagehide', onFlush);
+    window.addEventListener('pagehide', onPageHide);
     return () => {
-      window.removeEventListener(DRAFT_FLUSH_EVENT, onFlush);
+      unsub();
       document.removeEventListener('visibilitychange', onHide);
-      window.removeEventListener('pagehide', onFlush);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, [flushWriteDraft]);
 
@@ -816,12 +887,15 @@ function DiaryWritePage({
   };
 
   const leaveWithoutSaving = () => {
+    closeDraft();
     clearWriteDraft();
     setLeaveConfirmOpen(false);
     onCancel();
   };
 
   const isDirty = () => {
+    // 복원한 초안은 아직 저장 안 된 작업 — 취소 시 확인 없이 지우지 않음
+    if (resumedFromDraftRef.current) return true;
     const b = baselineRef.current;
     if (date !== b.date) return true;
     if (title !== b.title) return true;
@@ -1566,6 +1640,7 @@ function DiaryWritePage({
         await canvasRef.current?.loadImage(imageUrl);
         drawingTouchedRef.current = true;
         aiImageOnCanvasRef.current = true;
+        markCanvasEdited();
         dismissAiCoach();
         await clearAiPickPending();
       } else {
@@ -1674,6 +1749,7 @@ function DiaryWritePage({
 
       drawingTouchedRef.current = true;
       if (aiSrcs.length > 0) aiImageOnCanvasRef.current = true;
+      markCanvasEdited();
       dismissAiCoach();
     } catch {
       showAiRetryToast();
@@ -1830,6 +1906,7 @@ function DiaryWritePage({
       // 수정 + 그림 없음 + 지우기 안 함 → 미디어 필드 생략 = 기존 유지
       await onSave(payload);
       // 저장 성공 후에만 초안 삭제 — 저장 중 삭제하면 캔버스 이펙트가 재실행되며 깜박임
+      closeDraft();
       clearWriteDraft();
       drawingClearedRef.current = false;
     } catch (err) {
@@ -1991,7 +2068,9 @@ function DiaryWritePage({
               onFontIdChange={setFontId}
               fontSizeId={fontSizeId}
               onFontSizeChange={setFontSizeId}
+              onDirty={markCanvasEdited}
               onCleared={() => {
+                markCanvasEdited();
                 drawingClearedRef.current = true;
                 aiImageOnCanvasRef.current = false;
                 setAiReportReady(false);
@@ -2031,17 +2110,19 @@ function DiaryWritePage({
               </div>
             ) : null}
             </div>
-            <button
-              type="button"
-              className="diary-write__ai-report"
-              disabled={!aiReportReady}
-              onClick={() => {
-                if (!aiReportReady) return;
-                openAiReport({ where: 'canvas' });
-              }}
-            >
-              {t('write.ai.report')}
-            </button>
+            {!isAndroidApp() ? (
+              <button
+                type="button"
+                className="diary-write__ai-report"
+                disabled={!aiReportReady}
+                onClick={() => {
+                  if (!aiReportReady) return;
+                  openAiReport({ where: 'canvas' });
+                }}
+              >
+                {t('write.ai.report')}
+              </button>
+            ) : null}
           </div>
         </section>
 
@@ -2623,7 +2704,7 @@ function DiaryWritePage({
                           {checked ? '✓' : ''}
                         </span>
                       </button>
-                      {option.kind === 'ai' ? (
+                      {option.kind === 'ai' && !isAndroidApp() ? (
                         <button
                           type="button"
                           className="diary-write__ai-pick-report"

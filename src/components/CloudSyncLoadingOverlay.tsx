@@ -36,6 +36,7 @@ export default function CloudSyncLoadingOverlay({ message }: CloudSyncLoadingOve
     };
   }, []);
 
+  // #root 가 아니라 body 에 올려 React 트리/작업 화면이 덮어씌워지지 않게 함
   return createPortal(
     <div
       className="cloud-sync-loading"
@@ -49,6 +50,6 @@ export default function CloudSyncLoadingOverlay({ message }: CloudSyncLoadingOve
         <p className="cloud-sync-loading__text">{message}</p>
       </div>
     </div>,
-    document.getElementById('root') ?? document.body,
+    document.body,
   );
 }

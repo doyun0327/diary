@@ -193,18 +193,12 @@ export default {
       if (isUpdatingAsset(url.pathname)) {
         return env.ASSETS.fetch(request);
       }
+      // 새 진입(문서 요청)만 안내 페이지 — 열린 SPA는 JS/CSS/이미지 등 자산 자산으로 유지
       if (looksLikeDocumentRequest(request, url.pathname)) {
         const updating = new URL('/updating.html', url.origin);
         return env.ASSETS.fetch(new Request(updating, request));
       }
-      return new Response('Service updating', {
-        status: 503,
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Retry-After': '120',
-          'Cache-Control': 'no-store',
-        },
-      });
+      return env.ASSETS.fetch(request);
     }
 
     return env.ASSETS.fetch(request);

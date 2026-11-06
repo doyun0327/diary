@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Bạn có nhật ký đang viết dở",
+    "draftResumeLead": "Chúng tôi đã lưu nhật ký bạn đang viết trước khi cập nhật hoặc khởi động lại. Viết tiếp nhé?",
+    "draftResumeContinue": "Viết tiếp",
+    "draftResumeDiscard": "Xóa",
     "close": "Đóng",
     "cancel": "Hủy",
     "ok": "kiểm tra",

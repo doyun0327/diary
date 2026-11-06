@@ -17,15 +17,9 @@ import { createId } from '../utils/id';
 import { materializeImageSrc } from '../utils/materializeImage';
 import {
   isAssetStickerSrc,
-  isPremiumStickerCategory,
   isPremiumStickerItem,
-  PREMIUM_PACK_TAB_ICON,
 } from '../utils/assetStickers';
-import {
-  resolveAssetStickerSrc,
-  subscribeAssetStickerLocalCache,
-  warmAssetStickerLocalCache,
-} from '../utils/assetStickerLocalCache';
+import { resolveAssetStickerSrc } from '../utils/assetStickerLocalCache';
 import { getEmojiStickerImageUrl } from '../utils/emojiStickerImage';
 import { STICKER_CATEGORIES, stickerItemValue, type StickerCategoryId } from '../utils/stickers';
 import { trimDrawingToContent } from '../utils/trimDrawingToContent';
@@ -392,22 +386,11 @@ function DrawingCanvas({
   );
   const [eraserSizeId, setEraserSizeId] =
     useState<(typeof ERASER_SIZES)[number]['id']>('m');
-  /** 일러스트 스티커 로컬 캐시 갱신 시 썸네일/오버레이 재렌더 */
-  const [, setAssetStickerCacheTick] = useState(0);
-
   useEffect(() => {
     if (!colorsOpen || mode !== 'pen' || fontOpen) {
       setCustomPickerOpen(false);
     }
   }, [colorsOpen, mode, fontOpen]);
-
-  useEffect(() => {
-    if (!stickerOpen || stickerCategoryId !== 'pack') return;
-    void warmAssetStickerLocalCache();
-    return subscribeAssetStickerLocalCache(() => {
-      setAssetStickerCacheTick((n) => n + 1);
-    });
-  }, [stickerOpen, stickerCategoryId]);
 
   useEffect(() => {
     if (!stickerOpen) return;
@@ -2502,10 +2485,7 @@ function DrawingCanvas({
               role="tablist"
               aria-label={t('canvas.stickerCatsAria')}
             >
-              {STICKER_CATEGORIES.map((cat) => {
-                const isPackTab = isPremiumStickerCategory(cat.id);
-                const tabIcon = isPackTab ? PREMIUM_PACK_TAB_ICON : cat.icon;
-                return (
+              {STICKER_CATEGORIES.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
@@ -2513,13 +2493,12 @@ function DrawingCanvas({
                   aria-selected={stickerCategoryId === cat.id}
                   aria-label={t(`stickers.${cat.id}`)}
                   title={t(`stickers.${cat.id}`)}
-                  className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}${isPackTab && !isPremiumActive ? ' drawing__sticker-tab--premium' : ''}`}
+                  className={`drawing__sticker-tab ${stickerCategoryId === cat.id ? 'active' : ''}`}
                   onClick={() => setStickerCategoryId(cat.id)}
                 >
-                  {tabIcon}
+                  {cat.icon}
                 </button>
-                );
-              })}
+              ))}
             </div>
           </div>
 
@@ -2529,13 +2508,11 @@ function DrawingCanvas({
             ).map((item, index) => {
               const value = stickerItemValue(item);
               const previewSrc = stickerDisplaySrc(value);
-              const isLockedPackItem =
-                isPremiumStickerCategory(stickerCategoryId) && !isPremiumActive;
               return (
                 <button
                   key={`${stickerCategoryId}-${value}-${index}`}
                   type="button"
-                  className={`${selectedSticker === value ? 'selected' : ''}${previewSrc ? ' drawing__stickers-btn--image' : ''}${isLockedPackItem ? ' drawing__stickers-btn--locked' : ''}`}
+                  className={`${selectedSticker === value ? 'selected' : ''}${previewSrc ? ' drawing__stickers-btn--image' : ''}`}
                   onClick={() => pickSticker(value)}
                 >
                   {previewSrc ? (

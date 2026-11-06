@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Ada diary yang belum selesai",
+    "draftResumeLead": "Kami menyimpan diary yang kamu tulis sebelum update atau restart. Lanjutkan menulis?",
+    "draftResumeContinue": "Lanjutkan",
+    "draftResumeDiscard": "Hapus",
     "close": "Tutup",
     "cancel": "Batal",
     "ok": "memeriksa",

@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Du hast ein unfertiges Tagebuch",
+    "draftResumeLead": "Wir haben den Eintrag gespeichert, den du vor dem Update oder Neustart geschrieben hast. Weiterschreiben?",
+    "draftResumeContinue": "Weiterschreiben",
+    "draftResumeDiscard": "Verwerfen",
     "close": "Schließen",
     "cancel": "Abbrechen",
     "ok": "überprüfen",

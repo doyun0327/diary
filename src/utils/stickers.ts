@@ -1,5 +1,3 @@
-import { PACK_STICKER_CATEGORY } from './assetStickers';
-
 const BASE_STICKER_CATEGORIES = [
   {
     "id": "face",
@@ -659,7 +657,8 @@ const BASE_STICKER_CATEGORIES = [
 
 export type StickerItem = string | { readonly src: string };
 
-export const STICKER_CATEGORIES = [...BASE_STICKER_CATEGORIES, PACK_STICKER_CATEGORY] as const;
+/** 맨 끝 일러스트(pack) 카테고리는 UI에서 숨김. 이미 붙인 /stikers 스티커는 src로 그대로 표시 */
+export const STICKER_CATEGORIES = BASE_STICKER_CATEGORIES;
 
 export type StickerCategoryId = (typeof STICKER_CATEGORIES)[number]['id'];
 

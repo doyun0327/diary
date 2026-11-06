@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "書きかけの日記があります",
+    "draftResumeLead": "アップデートや再起動の前に書いていた日記を保存しました。続けて書きますか？",
+    "draftResumeContinue": "続けて書く",
+    "draftResumeDiscard": "削除",
     "close": "閉じる",
     "cancel": "キャンセル",
     "ok": "確認",

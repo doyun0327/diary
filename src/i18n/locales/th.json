@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "มีไดอารี่ที่ยังเขียนไม่เสร็จ",
+    "draftResumeLead": "เราบันทึกไดอารี่ที่คุณเขียนไว้ก่อนอัปเดตหรือรีสตาร์ทแล้ว เขียนต่อไหม?",
+    "draftResumeContinue": "เขียนต่อ",
+    "draftResumeDiscard": "ลบ",
     "close": "ปิด",
     "cancel": "ยกเลิก",
     "ok": "ตรวจสอบ",

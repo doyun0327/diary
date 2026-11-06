@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "有未完成的日记",
+    "draftResumeLead": "已保存更新或重启前正在写的日记。要继续写吗？",
+    "draftResumeContinue": "继续写",
+    "draftResumeDiscard": "删除",
     "close": "关闭",
     "cancel": "取消",
     "ok": "查看",

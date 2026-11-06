@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "You have an unfinished diary",
+    "draftResumeLead": "We saved the diary you were writing before the update or restart. Continue writing?",
+    "draftResumeContinue": "Continue",
+    "draftResumeDiscard": "Discard",
     "close": "Close",
     "cancel": "Cancel",
     "ok": "OK",

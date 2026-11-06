@@ -1,5 +1,9 @@
 {
   "common": {
+    "draftResumeTitle": "Você tem um diário inacabado",
+    "draftResumeLead": "Salvamos o diário que você escrevia antes da atualização ou reinício. Continuar escrevendo?",
+    "draftResumeContinue": "Continuar",
+    "draftResumeDiscard": "Descartar",
     "close": "Fechar",
     "cancel": "Cancelar",
     "ok": "verificar",
