@@ -808,6 +808,8 @@
 
 .diary-write__ai-source-list {
   display: grid;
+  /* 긴 문구가 칸을 밀어 모달 밖으로 나가지 않게 */
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -885,7 +887,6 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 2.6em;
   min-height: 2.6em;
   font-family: var(--brand-font);
   font-size: 0.88rem;
@@ -894,6 +895,7 @@
   color: var(--color-text);
   text-align: center;
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .diary-write__ai-source-btn {
@@ -962,7 +964,7 @@
   font-weight: 800;
   line-height: 1.35;
   color: var(--color-text);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .diary-write__ai-photo {
@@ -1122,8 +1124,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 auto;
   box-sizing: border-box;
-  height: 2.7em;
   min-height: 2.7em;
   padding: 4px 6px;
   font-size: 0.72rem;
@@ -1132,6 +1134,12 @@
   color: var(--color-text);
   text-align: center;
   word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* keep-all 은 한글 어절용 — 띄어쓰기 없는 일본어·중국어는 줄바꿈이 막혀 글자가 잘림 */
+:is(:lang(ja), :lang(zh)) :is(.diary-write__ai-source-style-name, .diary-write__ai-style-name, .diary-write__ai-bg-hint-text) {
+  word-break: normal;
 }
 
 /* 짧은 이름(웹툰 주인공풍 등)도 라벨 영역 세로 가운데 */

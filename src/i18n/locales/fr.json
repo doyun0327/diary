@@ -719,15 +719,15 @@
           "desc": "Je dessine des scènes de journal intime aux pastels doux."
         },
         "webtoonHero": {
-          "name": "Héroswebtoonst",
+          "name": "Héros de webtoon",
           "desc": "Te transforme en héros tout juste sorti d’une BD."
         },
         "oilPastel": {
-          "name": "Pastelàl’huilest",
+          "name": "Pastel à l’huile mignon",
           "desc": "Ajoute une texture dessin à la main cocooning à un personnage mignon."
         },
         "jpRetroFilm": {
-          "name": "CinémarétroJPst",
+          "name": "Film rétro japonais",
           "desc": "Teintes de film rêveuses et vibe anime 90s pour un rendu rétro."
         }
       },

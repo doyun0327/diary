@@ -719,15 +719,15 @@
           "desc": "Ich zeichne Tagebuchszenen in sanften Pastelltönen."
         },
         "webtoonHero": {
-          "name": "Webtoonheldst",
+          "name": "Webtoon-Held",
           "desc": "Verwandelt dich in einen Protagonisten, der gerade aus einem Comic gestiegen ist."
         },
         "oilPastel": {
-          "name": "Ölpastellst",
+          "name": "Süßes Ölpastell",
           "desc": "Verleiht einem süßen Charakter eine kuschelige Handzeichentextur."
         },
         "jpRetroFilm": {
-          "name": "JPretrofilmst",
+          "name": "JP-Retrofilm",
           "desc": "Verträumte Filmfarben und 90er-Anime-Feeling für einen Retro-Look."
         }
       },

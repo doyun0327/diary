@@ -723,15 +723,15 @@
           "desc": "Saya menggambar adegan buku harian dengan warna pastel yang lembut."
         },
         "webtoonHero": {
-          "name": "Pahlawanwebtoonst",
+          "name": "Tokoh webtoon",
           "desc": "Mengubahmu jadi protagonis yang baru keluar dari komik."
         },
         "oilPastel": {
-          "name": "Pastelminyakst",
+          "name": "Pastel minyak imut",
           "desc": "Memberi tekstur gambar tangan yang hangat pada karakter lucu."
         },
         "jpRetroFilm": {
-          "name": "FilmretroJPst",
+          "name": "Film retro Jepang",
           "desc": "Warna film sayu dan vibe anime 90-an untuk look retro."
         }
       },
