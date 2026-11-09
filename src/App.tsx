@@ -474,9 +474,7 @@ function App() {
     if (fetchedProUsageUserRef.current === usageFetchKey) return;
     fetchedProUsageUserRef.current = usageFetchKey;
     void fetchMonthlyUsage(token)
-      .then((usage) =>
-        applyMonthlyUsageFromServer(usage.used, usage.yearMonth),
-      )
+      .then((usage) => applyMonthlyUsageFromServer(usage.used))
       .catch(() => {
         fetchedProUsageUserRef.current = null;
       });

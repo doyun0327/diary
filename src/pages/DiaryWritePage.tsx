@@ -1218,7 +1218,7 @@ function DiaryWritePage({
         if (token) {
           try {
             const usage = await fetchMonthlyUsage(token);
-            applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+            applyMonthlyUsageFromServer(usage.used);
             if (usage.allowed !== false && usage.used < usage.limit) {
               aiQuotaKindRef.current = 'pro-server';
               return true;
@@ -1275,7 +1275,7 @@ function DiaryWritePage({
       if (token) {
         try {
           const usage = await consumeMonthlyUsage(token);
-          applyMonthlyUsageFromServer(usage.used, usage.yearMonth);
+          applyMonthlyUsageFromServer(usage.used);
           return;
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);

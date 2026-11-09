@@ -335,10 +335,13 @@ export function applySubscriptionStatus(
       (productId.includes("pageby") || productId.includes("premium")));
 
   if (treatActive) {
+    // 만료 시각을 모르면 기존 주기를 유지 — 매번 now+30일을 만들면 주기가 바뀐 것으로 오인
     state.premiumUntil =
       until != null && until > now
         ? until
-        : now + 30 * 24 * 60 * 60 * 1000;
+        : state.premiumUntil != null && state.premiumUntil > now
+          ? state.premiumUntil
+          : now + 30 * 24 * 60 * 60 * 1000;
     const trimmed = typeof productId === "string" ? productId.trim() : "";
     if (trimmed) {
       state.premiumProductId = trimmed;
@@ -519,16 +522,13 @@ export function refundProAiDrawQuota() {
   return true;
 }
 
-export function applyMonthlyUsageFromServer(used: number, yearMonth: string) {
+/**
+ * 서버 사용량을 그대로 반영. monthKey 는 로컬 기준 키로 맞춘다 —
+ * 서버 주기 키를 넣으면 로컬 만료 시각과 달라 다음 렌더에서 사용량이 0으로 지워진다.
+ */
+export function applyMonthlyUsageFromServer(used: number) {
   const state = loadAccessState();
-  const periodKey =
-    yearMonth ||
-    getProBillingPeriodKey(state);
-  if (state.monthKey !== periodKey) {
-    state.monthKey = periodKey;
-    state.monthlyLimitUsed = 0;
-  }
-  state.monthKey = periodKey;
+  state.monthKey = getProBillingPeriodKey(state);
   state.monthlyLimitUsed = Math.max(0, Math.min(MONTHLY_AI_DRAW_LIMIT, Math.floor(used)));
   saveAccessState(state);
   window.dispatchEvent(new Event(SUBSCRIPTION_CHANGE_EVENT));
