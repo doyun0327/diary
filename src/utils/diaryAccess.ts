@@ -175,17 +175,75 @@ function getMonthKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/** Pro 구독 결제 주기 키 = RevenueCat 만료 ms. 없으면 null */
-export function getProBillingPeriodEndMs(): number | null {
+/** 월간 구독으로 보는 최대 잔여 기간 (서버 MONTHLY_PLAN_MAX_AHEAD_MS 와 동일) */
+const MONTHLY_PLAN_MAX_AHEAD_MS = 32 * 24 * 60 * 60 * 1000;
+/** 연간 구독으로 쪼개는 최대 잔여 기간 (서버 YEARLY_PLAN_MAX_AHEAD_MS 와 동일) */
+const YEARLY_PLAN_MAX_AHEAD_MS = 400 * 24 * 60 * 60 * 1000;
+
+/** UTC 기준 n개월 전 (Java ZonedDateTime.minusMonths 와 같이 말일 보정) */
+function minusUtcMonths(periodEndMs: number, months: number): number {
+  const d = new Date(periodEndMs);
+  const y = d.getUTCFullYear();
+  const m = d.getUTCMonth() - months;
+  const day = d.getUTCDate();
+  const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  return Date.UTC(
+    y,
+    m,
+    Math.min(day, lastDay),
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+    d.getUTCMilliseconds(),
+  );
+}
+
+/**
+ * 서버 MonthlyUsageService.toCurrentPeriodEnd 와 동일.
+ * 연간 만료일이면 지금이 속한 한 달짜리 주기 끝으로 줄인다.
+ */
+export function toCurrentAiQuotaPeriodEndMs(
+  periodEndMs: number | null,
+  now = Date.now(),
+): number | null {
+  if (periodEndMs == null) return null;
+  if (
+    periodEndMs <= now + MONTHLY_PLAN_MAX_AHEAD_MS ||
+    periodEndMs > now + YEARLY_PLAN_MAX_AHEAD_MS
+  ) {
+    return periodEndMs;
+  }
+  let monthsBack = 0;
+  while (minusUtcMonths(periodEndMs, monthsBack + 1) > now) {
+    monthsBack += 1;
+  }
+  return minusUtcMonths(periodEndMs, monthsBack);
+}
+
+/** RevenueCat 구독 만료(연간이면 약 1년 뒤). 갱신일 표시용 */
+export function getProPremiumUntilMs(): number | null {
   const state = loadAccessState();
   const until = state.premiumUntil;
   if (until == null || until <= Date.now()) return null;
   return until;
 }
 
+/**
+ * Pro AI 월 한도용 결제 주기 끝.
+ * 월간 = 구독 만료, 연간 = 만료일 기준 이번 달 경계 (서버와 동일).
+ */
+export function getProBillingPeriodEndMs(): number | null {
+  return toCurrentAiQuotaPeriodEndMs(getProPremiumUntilMs());
+}
+
 function getProBillingPeriodKey(state: AccessState = loadAccessState()): string {
-  if (state.premiumUntil != null && state.premiumUntil > Date.now()) {
-    return String(state.premiumUntil);
+  const quotaEnd = toCurrentAiQuotaPeriodEndMs(
+    state.premiumUntil != null && state.premiumUntil > Date.now()
+      ? state.premiumUntil
+      : null,
+  );
+  if (quotaEnd != null) {
+    return String(quotaEnd);
   }
   return getMonthKey();
 }

@@ -12,7 +12,7 @@ import {
   getActiveSubProductId,
   getAiPackCredits,
   getDiaryAccessState,
-  getProBillingPeriodEndMs,
+  getProPremiumUntilMs,
   MONTHLY_AI_DRAW_LIMIT,
   subscribeDiaryAccess,
 } from '../utils/diaryAccess';
@@ -215,14 +215,14 @@ function NyangTicketSheet({
   const isPro = access.isPremiumActive;
   const subLeft = Math.max(0, access.monthlyRemaining);
   const activeSubProductId = isPro ? getActiveSubProductId() : null;
-  const nextRenewalMs = isPro ? getProBillingPeriodEndMs() : null;
+  const nextRenewalMs = isPro ? getProPremiumUntilMs() : null;
   const nextRenewalYmd = nextRenewalMs ? formatRenewalYmd(nextRenewalMs) : null;
 
   const recordSubscriptionPurchase = async (productId?: string | null) => {
     const token = getAccessToken();
     if (!token) return;
     try {
-      const periodEnd = getProBillingPeriodEndMs();
+      const periodEnd = getProPremiumUntilMs();
       await recordPurchaseRemote(token, {
         kind: 'subscription',
         productId: (productId && productId.trim()) || SUB_MONTHLY_PRODUCT_ID,
@@ -284,7 +284,7 @@ function NyangTicketSheet({
       if (ok) {
         applySubscriptionStatus(
           true,
-          getProBillingPeriodEndMs(),
+          getProPremiumUntilMs(),
           productId,
         );
         setMessage(t('nyangTicket.subscribeDone'));

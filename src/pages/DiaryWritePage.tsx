@@ -1212,30 +1212,29 @@ function DiaryWritePage({
     }
 
     // Pro: 구독 월 한도 먼저 → 그다음 그림충전 팩 → 광고
+    // 연간 구독은 로컬 소진이어도 서버가 매달 리셋했을 수 있어 항상 서버를 먼저 본다.
     if (canUseProAiQuota()) {
-      if (!isProAiMonthlyLimitReached()) {
-        const token = getAccessToken();
-        if (token) {
-          try {
-            const usage = await fetchMonthlyUsage(token);
-            applyMonthlyUsageFromServer(usage.used);
-            if (usage.allowed !== false && usage.used < usage.limit) {
-              aiQuotaKindRef.current = 'pro-server';
-              return true;
-            }
-            if (!(await reserveProOverflowQuota())) {
-              promptProMonthlyExhausted();
-              return false;
-            }
+      const token = getAccessToken();
+      if (token) {
+        try {
+          const usage = await fetchMonthlyUsage(token);
+          applyMonthlyUsageFromServer(usage.used);
+          if (usage.allowed !== false && usage.used < usage.limit) {
+            aiQuotaKindRef.current = 'pro-server';
             return true;
-          } catch {
-            // 로컬 잔여로 폴백
           }
-        }
-        if (getDiaryAccessState().monthlyRemaining > 0) {
-          aiQuotaKindRef.current = 'pro-local';
+          if (!(await reserveProOverflowQuota())) {
+            promptProMonthlyExhausted();
+            return false;
+          }
           return true;
+        } catch {
+          // 로컬 잔여로 폴백
         }
+      }
+      if (!isProAiMonthlyLimitReached() && getDiaryAccessState().monthlyRemaining > 0) {
+        aiQuotaKindRef.current = 'pro-local';
+        return true;
       }
       if (!(await reserveProOverflowQuota())) {
         promptProMonthlyExhausted();
@@ -1390,10 +1389,7 @@ function DiaryWritePage({
       return;
     }
     if (canUseProAiQuota()) {
-      if (isProAiMonthlyLimitReached()) {
-        promptProMonthlyExhausted();
-        return;
-      }
+      // 로컬 소진이어도 서버 월 리셋(연간) 가능 — 한도 판단은 reserveAiDrawQuota 에서
       void runAiDraw();
       return;
     }
